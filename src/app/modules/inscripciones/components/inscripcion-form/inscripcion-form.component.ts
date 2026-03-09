@@ -4,21 +4,27 @@
  * SIN any - tipado estricto
  */
 
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, inject, signal, computed, Signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Subscription } from 'rxjs';
 import { InscripcionesStateService } from '../../services/inscripciones-state.service';
-import { CreateInscripcionDto, UpdateInscripcionDto, Inscripcion } from '../../../../shared/models';
+import { PersonasStateService } from '../../../personas/services/personas-state.service';
+import { CreateInscripcionDto, UpdateInscripcionDto, Inscripcion, PersonaUnion } from '../../../../shared/models';
 import { TipoInscripcion, TIPO_INSCRIPCION_LABELS } from '../../../../shared/enums';
+import { ConfiguracionService } from '../../../../shared/services';
+
+// Shared Form Components
+import { FormFieldComponent } from '../../../../shared/components/form/form-field/form-field.component';
+import { SelectFieldComponent } from '../../../../shared/components/form/select-field/select-field.component';
+import { NumberFieldComponent } from '../../../../shared/components/form/number-field/number-field.component';
+import { CheckboxFieldComponent } from '../../../../shared/components/form/checkbox-field/checkbox-field.component';
+
+interface TipoOption {
+  value: TipoInscripcion;
+  label: string;
+}
 
 @Component({
   selector: 'app-inscripcion-form',
@@ -26,27 +32,44 @@ import { TipoInscripcion, TIPO_INSCRIPCION_LABELS } from '../../../../shared/enu
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatCheckboxModule,
-    MatProgressSpinnerModule
+    FormFieldComponent,
+    SelectFieldComponent,
+    NumberFieldComponent,
+    CheckboxFieldComponent
   ],
   templateUrl: './inscripcion-form.component.html',
+  styleUrls: ['./inscripcion-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class InscripcionFormComponent implements OnInit {
+export class InscripcionFormComponent implements OnInit, OnDestroy {
   private readonly state: InscripcionesStateService = inject(InscripcionesStateService);
+  private readonly personasState: PersonasStateService = inject(PersonasStateService);
+  private readonly configService = inject(ConfiguracionService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly fb = inject(FormBuilder);
 
   readonly loading = this.state.loading;
+  readonly personasLoading = this.personasState.loading;
+  readonly personas: Signal<PersonaUnion[]> = this.personasState.allPersonas;
   readonly tipoLabels = TIPO_INSCRIPCION_LABELS;
   readonly tipos: TipoInscripcion[] = ['grupo', 'scout_argentina'];
+
+  /** Options for tipo select */
+  readonly tiposOptions: TipoOption[] = this.tipos.map(tipo => ({
+    value: tipo,
+    label: TIPO_INSCRIPCION_LABELS[tipo]
+  }));
+
+  /** Track current tipo for conditional rendering */
+  private readonly currentTipo = signal<TipoInscripcion>('scout_argentina');
+
+  /** Show authorization fields only for scout_argentina inscriptions */
+  readonly showAuthorizationFields: Signal<boolean> = computed(() => {
+    return this.currentTipo() === 'scout_argentina';
+  });
+
+  private tipoSubscription: Subscription | null = null;
 
   inscripcionForm: FormGroup = this.fb.group({
     personaId: ['', Validators.required],
@@ -63,18 +86,72 @@ export class InscripcionFormComponent implements OnInit {
   isEditing = false;
   inscripcionId: string | null = null;
 
+  // Arrow functions for select field callbacks
+  getPersonaId = (persona: PersonaUnion): string => persona.id;
+  formatPersonaForSelect = (persona: PersonaUnion): string => `${persona.nombre} ${persona.apellido} (${persona.dni})`;
+  getTipoValue = (option: TipoOption): TipoInscripcion => option.value;
+  getTipoLabel = (option: TipoOption): string => option.label;
+
   ngOnInit(): void {
     this.inscripcionId = this.route.snapshot.paramMap.get('id');
     this.isEditing = !!this.inscripcionId;
 
+    // Load personas for the selector if not already loaded
+    if (this.personasState.allPersonas().length === 0) {
+      this.personasState.load();
+    }
+
+    // Listen to tipo changes to update authorization fields visibility
+    this.tipoSubscription = this.inscripcionForm.get('tipo')?.valueChanges.subscribe(
+      (tipo: TipoInscripcion) => {
+        this.currentTipo.set(tipo);
+        // Clear authorization fields when switching to grupo
+        if (tipo === 'grupo') {
+          this.inscripcionForm.patchValue({
+            declaracionDeSalud: false,
+            autorizacionDeImagen: false,
+            salidasCercanas: false,
+            autorizacionIngreso: false,
+          });
+        }
+        // Auto-fill monto from config when not editing
+        if (!this.isEditing) {
+          this.inscripcionForm.get('montoTotal')?.setValue(this.configService.getMontoByTipo(tipo));
+        }
+      }
+    ) ?? null;
+
     if (this.isEditing && this.inscripcionId) {
       this.loadInscripcion(this.inscripcionId);
+    } else {
+      // Set initial monto based on default tipo for new inscriptions
+      this.setMontoFromConfig();
     }
+  }
+
+  /**
+   * Set montoTotal from config based on current tipo
+   */
+  private setMontoFromConfig(): void {
+    const tipo = this.inscripcionForm.get('tipo')?.value as TipoInscripcion;
+    const monto = this.configService.getMontoByTipo(tipo);
+    this.inscripcionForm.get('montoTotal')?.setValue(monto);
+  }
+
+  /** Format persona for display in selector */
+  formatPersona(persona: PersonaUnion): string {
+    return `${persona.nombre} ${persona.apellido} (${persona.dni})`;
+  }
+
+  ngOnDestroy(): void {
+    this.tipoSubscription?.unsubscribe();
   }
 
   private loadInscripcion(id: string): void {
     const inscripcion: Inscripcion | undefined = this.state.inscripciones().find((i: Inscripcion) => i.id === id);
     if (inscripcion) {
+      // Update currentTipo for conditional rendering
+      this.currentTipo.set(inscripcion.tipo);
       // In edit mode, only allow editing authorization fields and bonificacion
       this.inscripcionForm.patchValue({
         personaId: inscripcion.personaId,
