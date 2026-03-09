@@ -1,0 +1,23 @@
+<div class="chips-filter">
+  <mat-chip-set>
+    @for (chip of chips; track $index) {
+    <mat-chip
+      (click)="onChipClick($index)"
+      [class.chip-active]="isChipSelected($index)"
+      [ngStyle]="getChipStyles(chip, $index)"
+      [attr.aria-label]="chip.label"
+      [attr.aria-pressed]="isChipSelected($index)"
+      role="button"
+      tabindex="0"
+      (keyup.enter)="onChipClick($index)"
+      (keyup.space)="onChipClick($index)"
+    >
+      @if (chip.icon) {
+        <mat-icon class="chip-icon">{{ chip.icon }}</mat-icon>
+      }
+      <span class="chip-label">{{ chip.label }}</span>
+    </mat-chip>
+    }
+  </mat-chip-set>
+</div>
+

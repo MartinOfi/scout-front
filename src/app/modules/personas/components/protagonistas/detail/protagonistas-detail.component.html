@@ -1,0 +1,29 @@
+<div class="detail-container">
+  <header class="page-header">
+    <button mat-icon-button (click)="onBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>Detalle del Protagonista</h1>
+  </header>
+
+  @if (loading()) {
+    <app-loading-spinner message="Cargando..." />
+  } @else if (error()) {
+    <app-empty-state
+      icon="error_outline"
+      [message]="error() ?? 'Error al cargar'"
+      actionLabel="Volver"
+      (onAction)="onBack()" />
+  } @else if (protagonista()) {
+    <app-protagonista-info-card
+      [protagonista]="protagonista()!"
+      (edit)="onEdit()"
+      (delete)="onDelete()" />
+  } @else {
+    <app-empty-state
+      icon="person_off"
+      message="Protagonista no encontrado"
+      actionLabel="Volver al listado"
+      (onAction)="onBack()" />
+  }
+</div>

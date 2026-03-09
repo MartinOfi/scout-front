@@ -1,0 +1,48 @@
+<div class="movimiento-row" [class]="movimiento().tipo">
+  <div class="movimiento-info" (click)="verDetalle.emit(movimiento().id)">
+    <div class="fecha">
+      {{ movimiento().fecha | date:'dd/MM/yyyy' }}
+    </div>
+    
+    <div class="concepto">
+      <span class="concepto-label">
+        {{ conceptoLabels[movimiento().concepto] || movimiento().concepto }}
+      </span>
+      @if (movimiento().descripcion) {
+        <span class="descripcion">{{ movimiento().descripcion }}</span>
+      }
+    </div>
+
+    <mat-chip-set>
+      <mat-chip 
+        [color]="movimiento().tipo === tipoEnum.INGRESO ? 'primary' : 'warn'"
+        selected>
+        {{ movimiento().tipo === tipoEnum.INGRESO ? 'Ingreso' : 'Egreso' }}
+      </mat-chip>
+      <mat-chip>{{ estadoLabels[movimiento().estadoPago] }}</mat-chip>
+    </mat-chip-set>
+  </div>
+
+  <div class="monto" [class.ingreso]="movimiento().tipo === tipoEnum.INGRESO">
+    {{ movimiento().monto | currency:'ARS':'symbol':'1.2-2' }}
+  </div>
+
+  <button mat-icon-button [matMenuTriggerFor]="menu">
+    <mat-icon>more_vert</mat-icon>
+  </button>
+
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="verDetalle.emit(movimiento().id)">
+      <mat-icon>visibility</mat-icon>
+      <span>Ver detalle</span>
+    </button>
+    <button mat-menu-item (click)="editar.emit(movimiento().id)">
+      <mat-icon>edit</mat-icon>
+      <span>Editar</span>
+    </button>
+    <button mat-menu-item (click)="eliminar.emit(movimiento().id)">
+      <mat-icon color="warn">delete</mat-icon>
+      <span>Eliminar</span>
+    </button>
+  </mat-menu>
+</div>

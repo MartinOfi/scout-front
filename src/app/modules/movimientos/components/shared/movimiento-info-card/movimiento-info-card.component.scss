@@ -1,0 +1,91 @@
+.movimiento-card {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 8px 0;
+
+  .tipo-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .tipo-text {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+
+      &.primary {
+        color: #1976d2;
+      }
+
+      &.warn {
+        color: #d32f2f;
+      }
+    }
+  }
+
+  .monto {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+
+    .currency {
+      font-size: 18px;
+      color: rgba(0, 0, 0, 0.60);
+    }
+
+    .amount {
+      font-size: 32px;
+      font-weight: 600;
+      color: rgba(0, 0, 0, 0.87);
+    }
+  }
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 16px 0;
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    &.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .label {
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.60);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .value {
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.87);
+    }
+  }
+}
+
+.metadata {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 8px;
+
+  small {
+    font-size: 11px;
+    color: rgba(0, 0, 0, 0.45);
+  }
+}

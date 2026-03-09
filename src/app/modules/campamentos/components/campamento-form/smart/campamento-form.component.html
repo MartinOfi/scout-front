@@ -1,0 +1,53 @@
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        {{ isEditing() ? 'Editar Campamento' : 'Nuevo Campamento' }}
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <app-loading-spinner *ngIf="loading()"></app-loading-spinner>
+
+      <form [formGroup]="form" *ngIf="!loading()" class="form-grid">
+        <mat-form-field class="full-width">
+          <mat-label>Nombre del Campamento</mat-label>
+          <input matInput formControlName="nombre" placeholder="Ej: Campamento de Verano 2024">
+          <mat-error *ngIf="form.get('nombre')?.hasError('required')">El nombre es requerido</mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Fecha de Inicio</mat-label>
+          <input matInput [matDatepicker]="pickerInicio" formControlName="fechaInicio">
+          <mat-datepicker-toggle matIconSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+          <mat-datepicker #pickerInicio></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Fecha de Fin</mat-label>
+          <input matInput [matDatepicker]="pickerFin" formControlName="fechaFin">
+          <mat-datepicker-toggle matIconSuffix [for]="pickerFin"></mat-datepicker-toggle>
+          <mat-datepicker #pickerFin></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Costo por Persona</mat-label>
+          <input matInput type="number" formControlName="costoPorPersona">
+          <span matTextPrefix>$&nbsp;</span>
+        </mat-form-field>
+
+        <mat-form-field class="full-width">
+          <mat-label>Descripción</mat-label>
+          <textarea matInput formControlName="descripcion" rows="4"></textarea>
+        </mat-form-field>
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <button mat-button (click)="onCancel()">Cancelar</button>
+      <button mat-raised-button color="primary" (click)="onSubmit()">
+        {{ isEditing() ? 'Actualizar' : 'Crear' }}
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

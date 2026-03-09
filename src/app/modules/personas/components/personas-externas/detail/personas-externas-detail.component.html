@@ -1,0 +1,38 @@
+<div class="detail-container">
+  <header class="page-header">
+    <button mat-icon-button (click)="onBack()"><mat-icon>arrow_back</mat-icon></button>
+    <h1>Detalle de Persona Externa</h1>
+  </header>
+
+  @if (loading()) {
+    <app-loading-spinner message="Cargando..." />
+  } @else if (error()) {
+    <app-empty-state
+      icon="error_outline"
+      [message]="error() ?? 'Error al cargar'"
+      actionLabel="Volver"
+      (onAction)="onBack()" />
+  } @else if (personaExterna()) {
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-card-title>{{ personaExterna()!.nombre }}</mat-card-title>
+        <mat-card-subtitle>
+          <mat-chip [color]="personaExterna()!.estado === 'activo' ? 'primary' : 'warn'">{{ personaExterna()!.estado }}</mat-chip>
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-row"><span class="label">Relación:</span><span>{{ personaExterna()!.relacion || '-' }}</span></div>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-icon-button (click)="onEdit()"><mat-icon>edit</mat-icon></button>
+        <button mat-icon-button color="warn" (click)="onDelete()"><mat-icon>delete</mat-icon></button>
+      </mat-card-actions>
+    </mat-card>
+  } @else {
+    <app-empty-state
+      icon="person_off"
+      message="Persona externa no encontrada"
+      actionLabel="Volver al listado"
+      (onAction)="onBack()" />
+  }
+</div>

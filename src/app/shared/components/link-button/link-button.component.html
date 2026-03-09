@@ -1,0 +1,6 @@
+<a class="link-button" (click)="onClick()" (keydown.enter)="onClick()" tabindex="0">
+  <span class="link-button__text">{{ text() }}</span>
+  @if (showIcon()) {
+    <mat-icon class="link-button__icon">{{ icon() }}</mat-icon>
+  }
+</a>

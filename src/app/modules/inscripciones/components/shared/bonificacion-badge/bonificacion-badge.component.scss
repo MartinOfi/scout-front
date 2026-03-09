@@ -1,0 +1,20 @@
+.estado-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .label {
+    font-weight: 500;
+  }
+
+  .bonificacion {
+    font-size: 12px;
+    opacity: 0.8;
+  }
+}

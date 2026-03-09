@@ -1,0 +1,65 @@
+<!--
+Template del componente selector múltiple de días
+
+Basado en las especificaciones del todo.md líneas 68, 91
+Selector múltiple de días
+-->
+
+<div class="days-selector">
+  @if (label) {
+    <label class="days-selector-label">
+      {{ label }}
+      @if (required) {
+        <span class="required-indicator">*</span>
+      }
+    </label>
+  }
+
+  <!-- Botones de selección rápida -->
+  <div class="quick-selection">
+    <button
+      type="button"
+      class="quick-btn"
+      (click)="selectAllDays()"
+      [disabled]="disabled || isDisabled"
+      >
+      Todos
+    </button>
+    <button
+      type="button"
+      class="quick-btn"
+      (click)="clearAllDays()"
+      [disabled]="disabled || isDisabled"
+      >
+      Ninguno
+    </button>
+  </div>
+
+  <!-- Grid de días -->
+  <div class="days-grid">
+    @for (day of allDays; track day) {
+      <div
+        class="day-item"
+        [class.selected]="isDaySelected(day)"
+        [class.disabled]="disabled || isDisabled"
+        (click)="toggleDay(day)"
+        >
+        <input
+          type="checkbox"
+          [checked]="isDaySelected(day)"
+          [disabled]="disabled || isDisabled"
+          class="day-checkbox"
+          (change)="toggleDay(day)"
+          />
+        <span class="day-name">{{ getDayName(day) }}</span>
+      </div>
+    }
+  </div>
+
+  @if (errorMessage) {
+    <div class="error-message">
+      {{ errorMessage }}
+    </div>
+  }
+</div>
+

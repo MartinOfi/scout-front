@@ -1,0 +1,87 @@
+<div class="movimiento-form-container">
+  <div class="header">
+    <h2>{{ isEditing ? 'Editar' : 'Nuevo' }} Movimiento</h2>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="movimiento-form">
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Tipo</mat-label>
+        <mat-select formControlName="tipo">
+          @for (tipo of tipos; track tipo) {
+            <mat-option [value]="tipo">
+              {{ tipo === 'ingreso' ? 'Ingreso' : 'Egreso' }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Monto</mat-label>
+        <input matInput type="number" formControlName="monto" placeholder="0.00">
+        <span matPrefix>$&nbsp;</span>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <app-concepto-selector
+        [tipo]="form.get('tipo')?.value"
+        [selected]="form.get('concepto')?.value"
+        (conceptoChange)="onConceptoChange($event)">
+      </app-concepto-selector>
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Descripción</mat-label>
+      <textarea matInput formControlName="descripcion" rows="2"></textarea>
+    </mat-form-field>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Medio de Pago</mat-label>
+        <mat-select formControlName="medioPago">
+          @for (medio of mediosPago; track medio) {
+            <mat-option [value]="medio">
+              {{ medio === 'efectivo' ? 'Efectivo' : 'Transferencia' }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="fecha">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Estado de Pago</mat-label>
+        <mat-select formControlName="estadoPago">
+          @for (estado of estadosPago; track estado) {
+            <mat-option [value]="estado">
+              {{ estado === 'pagado' ? 'Pagado' : 'Pendiente de Reembolso' }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-slide-toggle formControlName="requiereComprobante">
+        Requiere Comprobante
+      </mat-slide-toggle>
+    </div>
+
+    <div class="form-actions">
+      <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+      <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading()">
+        @if (loading()) {
+          <mat-spinner diameter="20"></mat-spinner>
+        } @else {
+          {{ isEditing ? 'Guardar Cambios' : 'Crear Movimiento' }}
+        }
+      </button>
+    </div>
+  </form>
+</div>

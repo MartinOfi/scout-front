@@ -1,0 +1,39 @@
+<div class="detail-container">
+  <header class="page-header">
+    <button mat-icon-button (click)="onBack()"><mat-icon>arrow_back</mat-icon></button>
+    <h1>Detalle del Educador</h1>
+  </header>
+
+  @if (loading()) {
+    <app-loading-spinner message="Cargando..." />
+  } @else if (error()) {
+    <app-empty-state
+      icon="error_outline"
+      [message]="error() ?? 'Error al cargar'"
+      actionLabel="Volver"
+      (onAction)="onBack()" />
+  } @else if (educador()) {
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-card-title>{{ educador()!.nombre }}</mat-card-title>
+        <mat-card-subtitle>
+          <mat-chip [color]="educador()!.estado === 'activo' ? 'primary' : 'warn'">{{ educador()!.estado }}</mat-chip>
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-row"><span class="label">Rama:</span><mat-chip>{{ educador()!.rama || '-' }}</mat-chip></div>
+        <div class="info-row"><span class="label">Cargo:</span><span>{{ educador()!.cargo || '-' }}</span></div>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-icon-button (click)="onEdit()"><mat-icon>edit</mat-icon></button>
+        <button mat-icon-button color="warn" (click)="onDelete()"><mat-icon>delete</mat-icon></button>
+      </mat-card-actions>
+    </mat-card>
+  } @else {
+    <app-empty-state
+      icon="person_off"
+      message="Educador no encontrado"
+      actionLabel="Volver al listado"
+      (onAction)="onBack()" />
+  }
+</div>

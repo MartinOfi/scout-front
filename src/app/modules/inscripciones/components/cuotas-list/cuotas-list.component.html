@@ -1,0 +1,63 @@
+<div class="cuotas-list-container">
+  <header class="page-header">
+    <h1>Cuotas del Grupo</h1>
+    <button mat-button (click)="onBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Volver
+    </button>
+  </header>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+  } @else if (error()) {
+    <div class="error-state">
+      <mat-icon color="warn">error</mat-icon>
+      <p>{{ error() }}</p>
+    </div>
+  } @else {
+    <table mat-table [dataSource]="cuotas()" class="cuotas-table">
+      <ng-container matColumnDef="persona">
+        <th mat-header-cell *matHeaderCellDef>Persona</th>
+        <td mat-cell *matCellDef="let cuota">{{ cuota.persona?.nombre }} {{ cuota.persona?.apellido }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="numero">
+        <th mat-header-cell *matHeaderCellDef>Cuota N°</th>
+        <td mat-cell *matCellDef="let cuota">{{ cuota.numero }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="ano">
+        <th mat-header-cell *matHeaderCellDef>Año</th>
+        <td mat-cell *matCellDef="let cuota">{{ cuota.ano }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="monto">
+        <th mat-header-cell *matHeaderCellDef>Monto</th>
+        <td mat-cell *matCellDef="let cuota">${{ cuota.montoTotal | number }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="estado">
+        <th mat-header-cell *matHeaderCellDef>Estado</th>
+        <td mat-cell *matCellDef="let cuota">
+          <mat-chip [color]="cuota.estado === 'pagado' ? 'primary' : 'warn'" selected>
+            {{ getEstadoLabel(cuota.estado) }}
+          </mat-chip>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef>Acciones</th>
+        <td mat-cell *matCellDef="let cuota">
+          <button mat-icon-button color="primary">
+            <mat-icon>payment</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  }
+</div>

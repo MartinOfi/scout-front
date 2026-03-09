@@ -1,0 +1,63 @@
+<form [formGroup]="form" class="venta-form">
+  <h3>Registrar Venta</h3>
+
+  <div class="form-fields">
+    <!-- Producto -->
+    <mat-form-field>
+      <mat-label>Producto</mat-label>
+      <mat-select formControlName="productoId">
+        <mat-option *ngFor="let producto of productos" [value]="producto.id">
+          {{ producto.nombre }} - ${{ producto.precioVenta | number:'1.2-2' }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('productoId')?.hasError('required')">
+        Seleccione un producto
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Persona/Vendedor -->
+    <mat-form-field>
+      <mat-label>Vendedor</mat-label>
+      <mat-select formControlName="personaId">
+        <mat-option *ngFor="let persona of personas" [value]="persona.id">
+          {{ persona.nombre }} {{ persona.apellido }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('personaId')?.hasError('required')">
+        Seleccione un vendedor
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Cantidad -->
+    <mat-form-field>
+      <mat-label>Cantidad</mat-label>
+      <input matInput type="number" formControlName="cantidad" min="1">
+      <mat-error *ngIf="form.get('cantidad')?.hasError('required')">
+        La cantidad es requerida
+      </mat-error>
+      <mat-error *ngIf="form.get('cantidad')?.hasError('min')">
+        Debe ser al menos 1
+      </mat-error>
+    </mat-form-field>
+  </div>
+
+  <!-- Resumen -->
+  <div class="summary" *ngIf="productoSeleccionado">
+    <div class="summary-item">
+      <span class="label">Total Venta:</span>
+      <span class="value primary">${{ totalVenta | number:'1.2-2' }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Ganancia:</span>
+      <span class="value success">${{ ganancia | number:'1.2-2' }}</span>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+    <button mat-raised-button color="primary" type="submit" (click)="onSubmit()">
+      Registrar Venta
+    </button>
+  </div>
+</form>

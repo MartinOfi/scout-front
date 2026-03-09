@@ -1,0 +1,41 @@
+<div class="evento-detail-container">
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+  } @else if (error()) {
+    <div class="error-state">
+      <mat-icon color="warn">error</mat-icon>
+      <p>{{ error() }}</p>
+    </div>
+  } @else if (evento) {
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>{{ evento.nombre }}</mat-card-title>
+        <mat-card-subtitle>{{ getTipoLabel(evento.tipo) }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p><strong>Descripción:</strong> {{ evento.descripcion || 'Sin descripción' }}</p>
+        <p><strong>Fecha:</strong> {{ evento.fecha | date }}</p>
+        @if (evento.destinoGanancia) {
+          <p><strong>Destino Ganancia:</strong> {{ evento.destinoGanancia }}</p>
+        }
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button (click)="onBack()">
+          <mat-icon>arrow_back</mat-icon>
+          Volver
+        </button>
+        <button mat-raised-button color="primary" (click)="onEdit()">
+          <mat-icon>edit</mat-icon>
+          Editar
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  } @else {
+    <div class="empty-state">
+      <mat-icon>event_busy</mat-icon>
+      <p>Evento no encontrado</p>
+    </div>
+  }
+</div>

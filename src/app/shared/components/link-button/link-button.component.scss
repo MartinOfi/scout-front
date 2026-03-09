@@ -1,0 +1,29 @@
+.link-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary-color);
+  text-decoration: none;
+
+  &:hover {
+    font-weight: 900;
+    transition: font-weight 0.2s ease-in-out;
+  }
+
+  &__text {
+    line-height: 1;
+  }
+
+  &__icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+
+  }
+}

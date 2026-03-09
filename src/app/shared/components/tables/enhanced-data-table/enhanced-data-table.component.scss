@@ -1,0 +1,293 @@
+/**
+ * Estilos específicos para el componente de tabla mejorada con checkboxes y acciones
+ *
+ * Usa colores del proyecto Scout definidos en styles.scss:
+ * - success: #2e7d32 / bg: #e8f5e9
+ * - info: #1565c0 / bg: #e3f2fd
+ * - warning: #ef6c00 / bg: #fff3e0
+ * - danger: #c62828 / bg: #ffebee
+ * - primary-burgundy: #812128
+ * - primary-indigo: #242167
+ */
+
+// Configuración del host para ocupar todo el ancho disponible
+:host {
+  display: block;
+  width: 100%;
+}
+
+// Contenedor principal de la tabla mejorada
+.enhanced-data-table-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+// Estilos para checkboxes - usando color indigo del proyecto
+.select-all-checkbox,
+.item-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--color-primary-indigo, #242167);
+  border-radius: 4px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    accent-color: var(--color-indigo-dark, #1a184d);
+  }
+
+  &:focus {
+    outline: 2px solid var(--color-primary-indigo, #242167);
+    outline-offset: 2px;
+  }
+}
+
+// Estilos para botones de acción
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px white, 0 0 0 4px var(--color-primary-indigo, #242167);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    transform: scale(1.05);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  span {
+    white-space: nowrap;
+  }
+
+  mat-icon {
+    flex-shrink: 0;
+    font-size: 1.25rem !important;
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    line-height: 1.25rem !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+// Estados de status con bordes redondeados - usando colores del proyecto
+.status-badge {
+  position: relative;
+  display: inline-block;
+  padding: 4px 12px;
+  font-weight: 600;
+  line-height: 1.25;
+  border-radius: 9999px;
+
+  // Estados usando colores semánticos del proyecto
+  &.scheduled {
+    color: #1565c0;
+    background-color: #e3f2fd;
+  }
+
+  &.pending {
+    color: #ef6c00;
+    background-color: #fff3e0;
+  }
+
+  &.confirmed,
+  &.completed {
+    color: #2e7d32;
+    background-color: #e8f5e9;
+  }
+
+  &.in-progress {
+    color: var(--color-primary-indigo, #242167);
+    background-color: #ede7f6;
+  }
+
+  &.pickup {
+    color: var(--color-primary-indigo, #242167);
+    background-color: #e8eaf6;
+  }
+
+  &.drop-off {
+    color: #ad1457;
+    background-color: #fce4ec;
+  }
+
+  &.cancelled,
+  &.emergency {
+    color: #c62828;
+    background-color: #ffebee;
+  }
+
+  &.interrupted {
+    color: #e65100;
+    background-color: #fff3e0;
+  }
+
+  &.delayed {
+    color: #ef6c00;
+    background-color: #fff3e0;
+  }
+
+  // Estado por defecto
+  &.default {
+    color: #616161;
+    background-color: #f5f5f5;
+  }
+}
+
+// Hover effects para mejor UX
+.table-row {
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #f9fafb;
+  }
+}
+
+// Mejoras de accesibilidad para headers
+th[class*="cursor-pointer"]:focus {
+  outline: 2px solid var(--color-primary-indigo, #242167);
+  outline-offset: 2px;
+}
+
+// Estados de hover mejorados con transiciones suaves
+tr[class*="hover\\:bg-gray-100"]:hover {
+  transition: background-color 0.2s ease;
+}
+
+// Responsividad adicional para pantallas muy pequeñas
+@media (max-width: 640px) {
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  // Ajustes para checkboxes en móviles
+  .select-all-checkbox,
+  .item-checkbox {
+    width: 18px;
+    height: 18px;
+  }
+
+  // Ajustes para botones de acción en móviles
+  .action-btn {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+}
+
+// Estados de loading
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+// Animaciones para estados de carga
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+// Estados vacíos
+.empty-state {
+  text-align: center;
+  padding: 32px 0;
+
+  svg {
+    margin: 0 auto;
+    height: 48px;
+    width: 48px;
+    color: #9ca3af;
+  }
+
+  h3 {
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #111827;
+  }
+
+  p {
+    margin-top: 4px;
+    font-size: 14px;
+    color: #6b7280;
+  }
+}
+
+// Mejoras de accesibilidad para botones de acción
+.action-btn:focus-visible {
+  outline: 2px solid var(--color-primary-indigo, #242167);
+  outline-offset: 2px;
+}
+
+// Transiciones suaves para todos los elementos interactivos
+.select-all-checkbox,
+.item-checkbox,
+.action-btn,
+.table-row {
+  transition: all 0.2s ease;
+}
+
+// Estados de selección visual
+.table-row.selected {
+  background-color: #e3f2fd;
+}
+
+// Mejoras de contraste para accesibilidad
+@media (prefers-contrast: high) {
+  .status-badge {
+    border: 1px solid currentColor;
+  }
+
+  .action-btn {
+    border: 1px solid currentColor;
+  }
+}
+
+// Reducción de movimiento para usuarios que lo prefieren
+@media (prefers-reduced-motion: reduce) {
+  .select-all-checkbox,
+  .item-checkbox,
+  .action-btn,
+  .table-row,
+  tr[class*="hover\\:bg-gray-100"] {
+    transition: none;
+  }
+
+  .animate-spin {
+    animation: none;
+  }
+}
+
+// Loading spinner color usando indigo del proyecto
+.border-b-2.border-blue-600 {
+  border-bottom-color: var(--color-primary-indigo, #242167);
+}

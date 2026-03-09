@@ -1,0 +1,7 @@
+<div class="layout-container" [class.sidebar-collapsed]="sidebarCollapsed()">
+  <app-sidebar (collapsed)="onSidebarCollapsed($event)" />
+  <main class="main-content">
+    <app-page-header />
+    <router-outlet />
+  </main>
+</div>

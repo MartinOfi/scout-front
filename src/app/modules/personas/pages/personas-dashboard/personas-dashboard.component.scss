@@ -1,0 +1,69 @@
+.personas-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.personas-tabs {
+
+  &-container-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &-container {
+    background: white;
+    border-radius: 8px;
+    padding: var(--spacing-lg);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.tab-content {
+  margin-top: var(--spacing-md);
+}
+
+.loading-state,
+.empty-state,
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  text-align: center;
+  gap: var(--spacing-md);
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: var(--gray-400);
+  }
+
+  p {
+    color: var(--gray-600);
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+.error-state {
+  mat-icon {
+    color: var(--danger);
+  }
+
+  p {
+    color: var(--danger);
+  }
+}

@@ -1,0 +1,51 @@
+<div class="form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ isEditing ? 'Editar Educador' : 'Nuevo Educador' }}</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (loading()) {
+        <app-loading-spinner message="Guardando..." />
+      } @else if (error()) {
+        <app-empty-state
+          icon="error_outline"
+          [message]="error() ?? 'Error al guardar'"
+          actionLabel="Reintentar"
+          (onAction)="onSubmit()" />
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" placeholder="Nombre completo">
+            @if (form.get('nombre')?.hasError('required')) {
+              <mat-error>El nombre es requerido</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Rama</mat-label>
+            <mat-select formControlName="rama">
+              <mat-option [value]="null">Sin rama específica</mat-option>
+              @for (rama of ramas; track rama) {
+                <mat-option [value]="rama">{{ rama }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Cargo</mat-label>
+            <input matInput formControlName="cargo" placeholder="Ej: Jefe de Grupo">
+          </mat-form-field>
+
+          <div class="form-actions">
+            <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+            <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading()">
+              {{ isEditing ? 'Guardar Cambios' : 'Crear Educador' }}
+            </button>
+          </div>
+        </form>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

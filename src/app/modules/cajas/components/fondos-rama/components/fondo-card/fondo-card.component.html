@@ -1,0 +1,25 @@
+<mat-card class="fondo-card" [class]="rama()">
+  <mat-card-content>
+    <div class="fondo-header">
+      <mat-icon class="rama-icon">{{ icon() }}</mat-icon>
+      <span class="rama-label">{{ label() }}</span>
+    </div>
+    
+    <div class="saldo-display">
+      <span class="saldo-amount" [class.negativo]="saldo() < 0">
+        {{ saldo() | currency:'ARS':'symbol':'1.2-2' }}
+      </span>
+    </div>
+  </mat-card-content>
+  
+  <mat-card-actions>
+    <button mat-button (click)="verMovimientos.emit()">
+      <mat-icon>receipt_long</mat-icon>
+      Movimientos
+    </button>
+    <button mat-raised-button color="primary" (click)="registrarMovimiento.emit()">
+      <mat-icon>add</mat-icon>
+      Registrar
+    </button>
+  </mat-card-actions>
+</mat-card>

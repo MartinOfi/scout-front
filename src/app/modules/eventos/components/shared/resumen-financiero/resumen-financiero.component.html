@@ -1,0 +1,38 @@
+<mat-card class="resumen-card">
+  <mat-card-header>
+    <mat-card-title>Resumen Financiero</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="resumen-grid">
+      <!-- Ingresos -->
+      <div class="resumen-item ingresos">
+        <mat-icon color="primary">trending_up</mat-icon>
+        <div class="content">
+          <span class="label">Total Ingresos</span>
+          <span class="value">${{ totalIngresos | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <!-- Egresos -->
+      <div class="resumen-item egresos">
+        <mat-icon color="warn">trending_down</mat-icon>
+        <div class="content">
+          <span class="label">Total Egresos</span>
+          <span class="value">${{ totalEgresos | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <!-- Resultado Neto -->
+      <div class="resumen-item resultado" [class.positivo]="esPositivo" [class.negativo]="!esPositivo">
+        <mat-icon [color]="esPositivo ? 'primary' : 'warn'">
+          {{ esPositivo ? 'check_circle' : 'error' }}
+        </mat-icon>
+        <div class="content">
+          <span class="label">Resultado Neto</span>
+          <span class="value">${{ resultadoNeto | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

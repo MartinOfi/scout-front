@@ -1,0 +1,41 @@
+<div class="form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ isEditing ? 'Editar Persona Externa' : 'Nueva Persona Externa' }}</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (loading()) {
+        <app-loading-spinner message="Guardando..." />
+      } @else if (error()) {
+        <app-empty-state
+          icon="error_outline"
+          [message]="error() ?? 'Error al guardar'"
+          actionLabel="Reintentar"
+          (onAction)="onSubmit()" />
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" placeholder="Nombre completo">
+            @if (form.get('nombre')?.hasError('required')) {
+              <mat-error>El nombre es requerido</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Relación</mat-label>
+            <input matInput formControlName="relacion" placeholder="Ej: Padre, Madre, Colaborador">
+          </mat-form-field>
+
+          <div class="form-actions">
+            <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+            <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading()">
+              {{ isEditing ? 'Guardar Cambios' : 'Crear Persona Externa' }}
+            </button>
+          </div>
+        </form>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,88 @@
+<mat-card class="movimiento-card">
+  <mat-card-header>
+    <div class="header-content">
+      <div class="tipo-badge">
+        <mat-icon [color]="tipoColor">{{ tipoIcon }}</mat-icon>
+        <span class="tipo-text" [class]="tipoColor">{{ movimiento.tipo | uppercase }}</span>
+      </div>
+      <div class="monto">
+        <span class="currency">$</span>
+        <span class="amount">{{ movimiento.monto | number:'1.2-2' }}</span>
+      </div>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="info-grid">
+      <!-- Concepto -->
+      <div class="info-item">
+        <span class="label">Concepto:</span>
+        <span class="value">{{ conceptoLabels[movimiento.concepto] }}</span>
+      </div>
+
+      <!-- Fecha -->
+      <div class="info-item">
+        <span class="label">Fecha:</span>
+        <span class="value">{{ movimiento.fecha | date:'dd/MM/yyyy' }}</span>
+      </div>
+
+      <!-- Responsable -->
+      <div class="info-item">
+        <span class="label">Responsable:</span>
+        <span class="value">
+          {{ movimiento.responsable?.nombre }} {{ movimiento.responsable?.apellido }}
+        </span>
+      </div>
+
+      <!-- Medio de Pago -->
+      <div class="info-item">
+        <span class="label">Medio de Pago:</span>
+        <span class="value">{{ medioPagoLabels[movimiento.medioPago] }}</span>
+      </div>
+
+      <!-- Estado de Pago -->
+      <div class="info-item">
+        <span class="label">Estado de Pago:</span>
+        <mat-chip [color]="estadoPagoColor">
+          {{ estadoPagoLabels[movimiento.estadoPago] }}
+        </mat-chip>
+      </div>
+
+      <!-- Caja -->
+      <div class="info-item">
+        <span class="label">Caja:</span>
+        <span class="value">{{ movimiento.caja?.nombre || 'N/A' }}</span>
+      </div>
+
+      <!-- Descripción -->
+      <div class="info-item full-width" *ngIf="movimiento.descripcion">
+        <span class="label">Descripción:</span>
+        <span class="value">{{ movimiento.descripcion }}</span>
+      </div>
+
+      <!-- Comprobante -->
+      <div class="info-item" *ngIf="movimiento.requiereComprobante">
+        <span class="label">Comprobante:</span>
+        <mat-chip [color]="movimiento.comprobanteEntregado ? 'primary' : 'accent'">
+          {{ movimiento.comprobanteEntregado ? 'Entregado' : 'Pendiente' }}
+        </mat-chip>
+      </div>
+
+      <!-- Persona a Reembolsar -->
+      <div class="info-item" *ngIf="movimiento.personaAReembolsar">
+        <span class="label">A Reembolsar:</span>
+        <span class="value">
+          {{ movimiento.personaAReembolsar.nombre }} {{ movimiento.personaAReembolsar.apellido }}
+        </span>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Metadata -->
+    <div class="metadata">
+      <small>Creado: {{ movimiento.createdAt | date:'dd/MM/yyyy HH:mm' }}</small>
+      <small>Actualizado: {{ movimiento.updatedAt | date:'dd/MM/yyyy HH:mm' }}</small>
+    </div>
+  </mat-card-content>
+</mat-card>

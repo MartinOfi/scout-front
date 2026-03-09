@@ -1,0 +1,85 @@
+<div class="inscripcion-form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ isEditing ? 'Editar Inscripción' : 'Nueva Inscripción' }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      @if (loading()) {
+        <div class="loading-state">
+          <mat-spinner diameter="40"></mat-spinner>
+        </div>
+      } @else {
+        <form [formGroup]="inscripcionForm" (ngSubmit)="onSubmit()">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>ID Persona</mat-label>
+            <input matInput formControlName="personaId" placeholder="ID de la persona">
+            @if (inscripcionForm.get('personaId')?.hasError('required')) {
+              <mat-error>El ID de persona es requerido</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Tipo de Inscripción</mat-label>
+            <mat-select formControlName="tipo">
+              @for (tipo of tipos; track tipo) {
+                <mat-option [value]="tipo">{{ tipoLabels[tipo] }}</mat-option>
+              }
+            </mat-select>
+            @if (inscripcionForm.get('tipo')?.hasError('required')) {
+              <mat-error>El tipo es requerido</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Año</mat-label>
+            <input matInput type="number" formControlName="ano">
+            @if (inscripcionForm.get('ano')?.hasError('required')) {
+              <mat-error>El año es requerido</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Monto Total</mat-label>
+            <input matInput type="number" formControlName="montoTotal">
+            @if (inscripcionForm.get('montoTotal')?.hasError('required')) {
+              <mat-error>El monto es requerido</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Monto Bonificado</mat-label>
+            <input matInput type="number" formControlName="montoBonificado">
+            <mat-hint>Monto a descontar del total (bonificación)</mat-hint>
+          </mat-form-field>
+
+          <div class="authorization-section">
+            <h3>Autorizaciones</h3>
+
+            <mat-checkbox formControlName="declaracionDeSalud">
+              Declaración de Salud
+            </mat-checkbox>
+
+            <mat-checkbox formControlName="autorizacionDeImagen">
+              Autorización de Imagen
+            </mat-checkbox>
+
+            <mat-checkbox formControlName="salidasCercanas">
+              Autorización Salidas Cercanas
+            </mat-checkbox>
+
+            <mat-checkbox formControlName="autorizacionIngreso">
+              Autorización de Ingreso
+            </mat-checkbox>
+          </div>
+
+          <div class="form-actions">
+            <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+            <button mat-raised-button color="primary" type="submit" [disabled]="inscripcionForm.invalid || loading()">
+              {{ isEditing ? 'Actualizar' : 'Crear' }}
+            </button>
+          </div>
+        </form>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,14 @@
+<mat-form-field appearance="outline" class="full-width">
+  <mat-label>{{ label() }}</mat-label>
+  <mat-select 
+    [value]="value()" 
+    [disabled]="disabled()"
+    (selectionChange)="change.emit($event.value)">
+    @for (rama of ramas; track rama) {
+      <mat-option [value]="rama">{{ rama }}</mat-option>
+    }
+  </mat-select>
+  @if (required()) {
+    <mat-error>La rama es requerida</mat-error>
+  }
+</mat-form-field>

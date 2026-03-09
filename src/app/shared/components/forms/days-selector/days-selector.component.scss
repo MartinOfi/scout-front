@@ -1,0 +1,114 @@
+/**
+ * Estilos para el componente selector múltiple de días
+ * 
+ * Basado en las especificaciones del todo.md líneas 68, 91
+ * Estilos del selector
+ */
+
+.days-selector {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.days-selector-label {
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+
+  .required-indicator {
+    color: #ef4444;
+    margin-left: 0.25rem;
+  }
+}
+
+.quick-selection {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+
+  .quick-btn {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    background-color: white;
+    color: #374151;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+
+    &:hover:not(:disabled) {
+      background-color: #f3f4f6;
+      border-color: #9ca3af;
+    }
+
+    &:disabled {
+      background-color: #f9fafb;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.5rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.day-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+
+  &:hover:not(.disabled) {
+    background-color: #f9fafb;
+    border-color: #9ca3af;
+  }
+
+  &.selected {
+    background-color: #eff6ff;
+    border-color: #3b82f6;
+    color: #1e40af;
+  }
+
+  &.disabled {
+    background-color: #f9fafb;
+    color: #9ca3af;
+    cursor: not-allowed;
+  }
+}
+
+.day-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #3b82f6;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.day-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+

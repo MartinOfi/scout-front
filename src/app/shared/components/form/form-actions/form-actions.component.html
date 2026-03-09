@@ -1,0 +1,15 @@
+<div class="w-full">
+  <div
+    class="flex gap-4"
+    [ngClass]="{
+      'justify-end': align() === 'end',
+      'justify-start': align() === 'start',
+      'justify-between': align() === 'between',
+      'pt-6': !dense(),
+      'pt-4': dense()
+    }"
+  >
+    <ng-content></ng-content>
+  </div>
+  <ng-content select="[actions-extra]"></ng-content>
+</div>

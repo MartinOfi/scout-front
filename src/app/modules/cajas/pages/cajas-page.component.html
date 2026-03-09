@@ -1,0 +1,20 @@
+<div class="cajas-page">
+  <header class="page-header">
+    <h1>Gestión de Cajas</h1>
+    <p class="subtitle">Administra las cajas del grupo, fondos de rama y cuentas personales</p>
+  </header>
+
+  <mat-tab-group animationDuration="300ms" class="cajas-tabs">
+    <mat-tab label="Caja de Grupo">
+      <app-caja-grupo></app-caja-grupo>
+    </mat-tab>
+    
+    <mat-tab label="Fondos de Rama">
+      <app-fondos-rama></app-fondos-rama>
+    </mat-tab>
+    
+    <mat-tab label="Cuentas Personales">
+      <app-cuentas-personales></app-cuentas-personales>
+    </mat-tab>
+  </mat-tab-group>
+</div>

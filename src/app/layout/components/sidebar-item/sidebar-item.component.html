@@ -1,0 +1,13 @@
+<a
+  class="sidebar-item"
+  [routerLink]="item().route"
+  routerLinkActive="active"
+  [class.collapsed]="isCollapsed()"
+  [matTooltip]="isCollapsed() ? item().label : ''"
+  matTooltipPosition="right"
+>
+  <mat-icon>{{ item().icon }}</mat-icon>
+  @if (!isCollapsed()) {
+    <span class="item-label">{{ item().label }}</span>
+  }
+</a>

@@ -1,0 +1,34 @@
+<div class="protagonistas-list-container">
+  <header class="page-header">
+    <h1>Protagonistas</h1>
+    <button mat-raised-button color="primary" (click)="onCreate()">
+      <mat-icon>add</mat-icon>
+      Nuevo Protagonista
+    </button>
+  </header>
+
+  <app-protagonista-filters 
+    (filterChange)="onFilterChange($event)" />
+
+  @if (loading()) {
+    <app-loading-spinner message="Cargando protagonistas..." />
+  } @else if (error()) {
+    <app-empty-state
+      icon="error_outline"
+      [message]="error() ?? 'Error al cargar protagonistas'"
+      actionLabel="Reintentar"
+      (onAction)="state.load()" />
+  } @else if (protagonistas().length === 0) {
+    <app-empty-state
+      icon="person_add"
+      message="No hay protagonistas. ¡Crea uno ahora!"
+      actionLabel="Nuevo Protagonista"
+      (onAction)="onCreate()" />
+  } @else {
+    <app-protagonista-table
+      [data]="protagonistas()"
+      (select)="onSelect($event)"
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)" />
+  }
+</div>

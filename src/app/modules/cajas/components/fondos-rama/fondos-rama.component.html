@@ -1,0 +1,29 @@
+<div class="fondos-rama-container">
+  <div class="header">
+    <h2>Fondos de Rama</h2>
+    <div class="total-saldos">
+      <span class="label">Total Fondos:</span>
+      <span class="amount">{{ totalSaldosRamas() | currency:'ARS':'symbol':'1.2-2' }}</span>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Cargando fondos...</span>
+    </div>
+  }
+
+  <div class="fondos-grid">
+    @for (rama of ramas; track rama) {
+      <app-fondo-card
+        [rama]="rama"
+        [saldo]="getSaldoRama(rama)"
+        [icon]="getRamaIcon(rama)"
+        [label]="getRamaLabel(rama)"
+        (verMovimientos)="onVerMovimientosRama(rama)"
+        (registrarMovimiento)="onRegistrarMovimiento(rama)">
+      </app-fondo-card>
+    }
+  </div>
+</div>

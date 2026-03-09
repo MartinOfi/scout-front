@@ -1,0 +1,35 @@
+// Login Component Styles
+// Sigue patrón de campamentos-list.component.scss
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+  text-align: center;
+
+  h1 {
+    margin: 0 0 8px;
+    font-size: 32px;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0 0 32px;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 16px;
+  }
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 32px;
+}
+
+.login-button {
+  width: 100%;
+  margin-top: 16px;
+}

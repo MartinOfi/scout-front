@@ -1,0 +1,65 @@
+.resumen-card {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.resumen-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding: 16px 0;
+}
+
+.resumen-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: #f5f5f5;
+
+  mat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .label {
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.60);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .value {
+      font-size: 24px;
+      font-weight: 600;
+      color: rgba(0, 0, 0, 0.87);
+    }
+  }
+
+  &.resultado {
+    grid-column: 1 / -1;
+
+    &.positivo {
+      background-color: #e8f5e9;
+
+      .value {
+        color: #2e7d32;
+      }
+    }
+
+    &.negativo {
+      background-color: #ffebee;
+
+      .value {
+        color: #c62828;
+      }
+    }
+  }
+}

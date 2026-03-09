@@ -1,0 +1,30 @@
+<div class="cuentas-personales-container">
+  <div class="header">
+    <h2>Cuentas Personales</h2>
+    <p class="subtitle">Cuentas corrientes de educadores y protagonistas</p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Cargando cuentas...</span>
+    </div>
+  }
+
+  <div class="cuentas-list">
+    @for (persona of personas(); track trackByPersonaId($index, persona)) {
+      <app-cuenta-personal-row
+        [persona]="persona"
+        [saldo]="0"
+        (verMovimientos)="onVerMovimientos(persona.id)"
+        (registrarMovimiento)="onRegistrarMovimiento(persona.id)"
+        (verDetalle)="onVerDetalle(persona.id)">
+      </app-cuenta-personal-row>
+    } @empty {
+      <div class="empty-state">
+        <mat-icon>person_off</mat-icon>
+        <span>No hay personas con cuentas personales</span>
+      </div>
+    }
+  </div>
+</div>

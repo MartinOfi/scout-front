@@ -1,0 +1,14 @@
+<article class="data-list-item">
+  <span class="data-list-item__icon" [class]="'data-list-item__icon--' + iconVariant()">
+    <mat-icon>{{ icon() }}</mat-icon>
+  </span>
+  <div class="data-list-item__content">
+    <span class="data-list-item__primary">{{ primaryText() }}</span>
+    @if (secondaryText()) {
+      <span class="data-list-item__secondary">{{ secondaryText() }}</span>
+    }
+  </div>
+  <span class="data-list-item__value" [class]="valueColorClass()">
+    {{ value() | currency:'$':'symbol':'1.0-0':'es-AR' }}
+  </span>
+</article>

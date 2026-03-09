@@ -1,0 +1,81 @@
+.action-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-height: 120px;
+  width: 100%;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &__icon-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+
+    mat-icon {
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+      color: white;
+    }
+  }
+
+  &__label {
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.3;
+    color: var(--gray-700);
+  }
+
+
+  // Variant colors - light background, solid icon badge
+  &--primary {
+    background-color: rgba(198, 40, 40, 0.06);
+
+    .action-button__icon-badge {
+      background-color: #8b2131;
+    }
+  }
+
+  &--info {
+    background-color: rgba(21, 101, 192, 0.06);
+
+    .action-button__icon-badge {
+      background-color: #1e4a8a;
+    }
+  }
+
+  &--success {
+    background-color: rgba(46, 125, 50, 0.08);
+
+    .action-button__icon-badge {
+      background-color: #2e7d32;
+    }
+  }
+
+  &--warning {
+    background-color: rgba(239, 108, 0, 0.1);
+
+    .action-button__icon-badge {
+      background-color: #d97706;
+    }
+  }
+}

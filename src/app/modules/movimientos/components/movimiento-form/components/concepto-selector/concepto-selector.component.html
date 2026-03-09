@@ -1,0 +1,10 @@
+<mat-form-field appearance="outline" class="concepto-field">
+  <mat-label>Concepto</mat-label>
+  <mat-select [value]="selected()" (selectionChange)="conceptoChange.emit($event.value)">
+    @for (concepto of conceptosFiltrados(); track concepto) {
+      <mat-option [value]="concepto">
+        {{ conceptoLabels[concepto] }}
+      </mat-option>
+    }
+  </mat-select>
+</mat-form-field>

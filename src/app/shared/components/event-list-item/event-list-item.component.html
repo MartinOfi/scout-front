@@ -1,0 +1,12 @@
+<article class="event-list-item" (click)="onClick()">
+  <div class="event-list-item__date-badge">
+    <span class="event-list-item__month">{{ mesAbreviado() }}</span>
+    <span class="event-list-item__day">{{ dia() }}</span>
+  </div>
+  <div class="event-list-item__content">
+    <h4 class="event-list-item__title">{{ titulo() }}</h4>
+    <span class="event-list-item__category" [ngStyle]="categoryStyles()">
+      {{ categoria().label }}
+    </span>
+  </div>
+</article>

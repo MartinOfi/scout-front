@@ -1,0 +1,13 @@
+.layout-container {
+  display: flex;
+  min-height: 100vh;
+
+  .main-content {
+    flex: 1;
+    margin-left: 0;
+    padding: var(--spacing-2xl);
+    background-color: #fafafa;
+    overflow-y: auto;
+    transition: margin-left 0.2s ease-in-out;
+  }
+}

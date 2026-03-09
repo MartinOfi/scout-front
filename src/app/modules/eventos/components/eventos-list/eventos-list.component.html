@@ -1,0 +1,41 @@
+<div class="eventos-list-container">
+  <header class="page-header">
+    <h1>Eventos</h1>
+    <button mat-raised-button color="primary" (click)="onCreate()">
+      <mat-icon>add</mat-icon>
+      Nuevo Evento
+    </button>
+  </header>
+
+  <app-evento-filters (filterChange)="onFiltroChange($event)" />
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Cargando eventos...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state">
+      <mat-icon color="warn">error</mat-icon>
+      <p>{{ error() }}</p>
+      <button mat-button (click)="state.load()">Reintentar</button>
+    </div>
+  } @else if (eventosFiltrados().length === 0) {
+    <div class="empty-state">
+      <mat-icon>event_busy</mat-icon>
+      <p>No hay eventos disponibles</p>
+      @if (filtroTipo() !== 'todos' || filtroBusqueda()) {
+        <p class="hint">Intenta ajustar los filtros</p>
+      }
+    </div>
+  } @else {
+    <div class="eventos-list">
+      @for (evento of eventosFiltrados(); track evento.id) {
+        <app-evento-row
+          [evento]="evento"
+          (select)="onSelect($event)"
+          (edit)="onEdit($event)" />
+      }
+    </div>
+  }
+</div>

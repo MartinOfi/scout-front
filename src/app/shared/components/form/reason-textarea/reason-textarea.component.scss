@@ -1,0 +1,22 @@
+@reference "tailwindcss";
+
+.reason-textarea {
+  margin-bottom: 20px;
+
+  .label {
+    @apply block font-medium text-gray-800;
+    font-size: 15px;
+    line-height: 20px;
+    margin-bottom: 16px;
+  }
+
+  .textarea {
+    @apply w-full rounded-lg border border-gray-100 bg-gray-50 text-gray-800 placeholder-gray-400 outline-none;
+    resize: none;
+    font-size: 16px;
+    line-height: 24px;
+    padding: 16px;
+
+    @apply hover:border-[#6200EE] focus:border-[#6200EE];
+  }
+}

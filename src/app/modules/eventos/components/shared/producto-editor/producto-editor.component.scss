@@ -1,0 +1,34 @@
+.producto-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header {
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+  }
+}
+
+.add-form {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
+  gap: 16px;
+  align-items: start;
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.productos-table {
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 32px;
+  color: rgba(0, 0, 0, 0.45);
+}

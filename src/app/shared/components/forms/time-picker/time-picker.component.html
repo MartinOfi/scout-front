@@ -1,0 +1,37 @@
+<!--
+Template del componente selector de hora
+
+Basado en las especificaciones del todo.md líneas 67, 90
+Selector de hora
+-->
+
+<div class="time-picker">
+  @if (label) {
+    <label [for]="'time-picker-' + label" class="time-picker-label">
+      {{ label }}
+      @if (required) {
+        <span class="required-indicator">*</span>
+      }
+    </label>
+  }
+
+  <input
+    [id]="'time-picker-' + label"
+    type="time"
+    [value]="value"
+    [placeholder]="placeholder()"
+    [disabled]="disabled || isDisabled"
+    [required]="required"
+    (change)="onTimeChange($event)"
+    (blur)="onTouched()"
+    class="time-picker-input"
+    [class.error]="errorMessage"
+    />
+
+  @if (errorMessage) {
+    <div class="error-message">
+      {{ errorMessage }}
+    </div>
+  }
+</div>
+

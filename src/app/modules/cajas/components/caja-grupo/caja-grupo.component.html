@@ -1,0 +1,47 @@
+<div class="caja-grupo-container">
+  <div class="header">
+    <h2>Caja de Grupo</h2>
+    <div class="actions">
+      <button mat-raised-button color="primary" (click)="onRegistrarMovimiento()">
+        <mat-icon>add</mat-icon>
+        Registrar Movimiento
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Cargando...</span>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-state">
+      <mat-icon color="warn">error</mat-icon>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (cajaGrupo(); as caja) {
+    <app-saldo-card
+      [saldo]="saldoGrupo()"
+      [nombre]="'Caja Principal'"
+      [tipo]="'grupo'">
+    </app-saldo-card>
+
+    <div class="movimientos-section">
+      <div class="section-header">
+        <h3>Últimos Movimientos</h3>
+        <button mat-button color="primary" (click)="onVerTodosMovimientos()">
+          Ver todos
+        </button>
+      </div>
+
+      <app-movimientos-table
+        [movimientos]="movimientosGrupo() | slice:0:10"
+        (verDetalle)="onVerMovimiento($event)">
+      </app-movimientos-table>
+    </div>
+  }
+</div>

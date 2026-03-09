@@ -1,0 +1,33 @@
+<div class="personas-externas-list-container">
+  <header class="page-header">
+    <h1>Personas Externas</h1>
+    <button mat-raised-button color="primary" (click)="onCreate()">
+      <mat-icon>add</mat-icon>
+      Nueva Persona Externa
+    </button>
+  </header>
+
+  <app-personas-externas-filters (filterChange)="onFilterChange($event)" />
+
+  @if (loading()) {
+    <app-loading-spinner message="Cargando personas externas..." />
+  } @else if (error()) {
+    <app-empty-state
+      icon="error_outline"
+      [message]="error() ?? 'Error al cargar personas externas'"
+      actionLabel="Reintentar"
+      (onAction)="state.load()" />
+  } @else if (personasExternas().length === 0) {
+    <app-empty-state
+      icon="person_add"
+      message="No hay personas externas. ¡Crea una ahora!"
+      actionLabel="Nueva Persona Externa"
+      (onAction)="onCreate()" />
+  } @else {
+    <app-personas-externas-table
+      [data]="personasExternas()"
+      (select)="onSelect($event)"
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)" />
+  }
+</div>

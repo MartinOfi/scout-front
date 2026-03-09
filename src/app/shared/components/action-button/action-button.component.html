@@ -1,0 +1,14 @@
+<button
+  type="button"
+  class="action-button"
+  [class.action-button--primary]="variant() === 'primary'"
+  [class.action-button--info]="variant() === 'info'"
+  [class.action-button--success]="variant() === 'success'"
+  [class.action-button--warning]="variant() === 'warning'"
+  (click)="onClick()"
+>
+  <div class="action-button__icon-badge">
+    <mat-icon>{{ icon() }}</mat-icon>
+  </div>
+  <span class="action-button__label">{{ label() }}</span>
+</button>

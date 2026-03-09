@@ -1,0 +1,11 @@
+<mat-chip [color]="colorChip" class="estado-badge">
+  <mat-icon *ngIf="estado === 'pagado'">check_circle</mat-icon>
+  <mat-icon *ngIf="estado === 'parcial'">schedule</mat-icon>
+  <mat-icon *ngIf="estado === 'pendiente'">error</mat-icon>
+
+  <span class="label">{{ estadoLabels[estado] }}</span>
+
+  <span *ngIf="montoBonificado && montoBonificado > 0" class="bonificacion">
+    (Bonif: ${{ montoBonificado | number:'1.2-2' }})
+  </span>
+</mat-chip>

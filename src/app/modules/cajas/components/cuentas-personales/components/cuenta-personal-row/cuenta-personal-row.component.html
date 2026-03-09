@@ -1,0 +1,30 @@
+<div class="cuenta-row">
+  <div class="persona-info" (click)="verDetalle.emit()">
+    <mat-icon class="persona-icon">person</mat-icon>
+    <div class="persona-details">
+      <span class="persona-nombre">
+        {{ persona().nombre }} {{ persona().apellido }}
+      </span>
+      @if (getRama(persona()); as rama) {
+        <mat-chip-set>
+          <mat-chip>{{ ramaLabels[rama] }}</mat-chip>
+        </mat-chip-set>
+      }
+    </div>
+  </div>
+
+  <div class="saldo-info">
+    <span class="saldo-amount" [class.negativo]="saldo() < 0">
+      {{ saldo() | currency:'ARS':'symbol':'1.2-2' }}
+    </span>
+  </div>
+
+  <div class="actions">
+    <button mat-icon-button (click)="verMovimientos.emit()" matTooltip="Ver movimientos">
+      <mat-icon>receipt_long</mat-icon>
+    </button>
+    <button mat-icon-button color="primary" (click)="registrarMovimiento.emit()" matTooltip="Registrar movimiento">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+</div>

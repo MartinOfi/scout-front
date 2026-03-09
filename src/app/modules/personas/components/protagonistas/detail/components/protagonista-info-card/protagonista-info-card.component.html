@@ -1,0 +1,32 @@
+<mat-card class="info-card">
+  <mat-card-header>
+    <mat-card-title>{{ protagonista().nombre }}</mat-card-title>
+    <mat-card-subtitle>
+      <mat-chip [color]="protagonista().estado === 'activo' ? 'primary' : 'warn'">
+        {{ protagonista().estado }}
+      </mat-chip>
+    </mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="info-row">
+      <span class="label">Rama:</span>
+      <mat-chip>{{ protagonista().rama }}</mat-chip>
+    </div>
+    <div class="info-row">
+      <span class="label">Bonificado:</span>
+      <mat-icon [color]="protagonista().fueBonificado ? 'primary' : 'disabled'">
+        {{ protagonista().fueBonificado ? 'check_circle' : 'cancel' }}
+      </mat-icon>
+    </div>
+  </mat-card-content>
+
+  <mat-card-actions align="end">
+    <button mat-icon-button (click)="edit.emit()">
+      <mat-icon>edit</mat-icon>
+    </button>
+    <button mat-icon-button color="warn" (click)="delete.emit()">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </mat-card-actions>
+</mat-card>

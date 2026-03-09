@@ -1,0 +1,11 @@
+<label class="inline-flex items-center gap-2">
+  <input
+    [id]="id() || null"
+    type="checkbox"
+    [disabled]="disabled"
+    [checked]="value"
+    (change)="handleChange($event)"
+    class="h-4 w-4 border-gray-300 rounded text-blue-600 focus:ring-blue-500"
+  />
+  <ng-content></ng-content>
+</label>

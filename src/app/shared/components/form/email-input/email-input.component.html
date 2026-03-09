@@ -1,0 +1,22 @@
+<div>
+  <label
+    [for]="'email-input'"
+    class="block text-sm/6 font-medium text-gray-700"
+  >
+    {{ label() }}
+  </label>
+  <div class="mt-2">
+    <input
+      [id]="'email-input'"
+      type="email"
+      [placeholder]="placeholder()"
+      [required]="required()"
+      [disabled]="disabled"
+      autocomplete="email"
+      [value]="value"
+      (input)="onInput($event)"
+      (blur)="onBlur()"
+      class="block w-full rounded-md border-gray-300 px-3 py-1.5 text-base text-gray-900 shadow-sm placeholder:text-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm/6"
+    />
+  </div>
+</div>

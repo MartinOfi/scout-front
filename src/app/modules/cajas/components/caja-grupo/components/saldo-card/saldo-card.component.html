@@ -1,0 +1,15 @@
+<mat-card class="saldo-card" [class]="tipo()">
+  <mat-card-content>
+    <div class="saldo-info">
+      <mat-icon class="saldo-icon">
+        {{ tipo() === 'grupo' ? 'account_balance' : 'savings' }}
+      </mat-icon>
+      <div class="saldo-details">
+        <span class="saldo-label">{{ nombre() }}</span>
+        <span class="saldo-amount" [class.negativo]="saldo() < 0">
+          {{ saldo() | currency:'ARS':'symbol':'1.2-2' }}
+        </span>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

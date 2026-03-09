@@ -1,0 +1,19 @@
+<div class="evento-filters">
+  <form [formGroup]="filterForm">
+    <mat-form-field appearance="outline">
+      <mat-label>Buscar</mat-label>
+      <input matInput formControlName="busqueda" placeholder="Nombre del evento">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Tipo</mat-label>
+      <mat-select formControlName="tipo">
+        <mat-option value="todos">Todos</mat-option>
+        @for (tipo of tipoLabels | keyvalue; track tipo.key) {
+          <mat-option [value]="tipo.key">{{ tipo.value }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </form>
+</div>

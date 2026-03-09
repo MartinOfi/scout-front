@@ -1,0 +1,9 @@
+<article class="stat-card">
+  <header class="stat-card__header">
+    <span class="stat-card__icon" [class]="'stat-card__icon--' + variant()">
+      <mat-icon>{{ icon() }}</mat-icon>
+    </span>
+    <span class="stat-card__title">{{ title() }}</span>
+  </header>
+  <p class="stat-card__value">{{ value() | currency:'$':'symbol':'1.0-0':'es-AR' }}</p>
+</article>

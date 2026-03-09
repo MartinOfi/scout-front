@@ -1,0 +1,39 @@
+<aside class="sidebar" [class.collapsed]="isCollapsed()">
+  <div class="sidebar-header">
+    <div class="header-content">
+      <img src="assets/images/logo.png" alt="Grupo Scout Calasanz" class="logo-image" />
+      @if (!isCollapsed()) {
+      <div class="header-text">
+        <span class="group-name">Scout Finance</span>
+        <span class="group-subtitle">Sistema de Gestión</span>
+      </div>
+      }
+    </div>
+  </div>
+
+  <div class="divider-wrapper">
+    <hr class="divider" />
+    <button class="toggle-btn btn-icon" type="button" (click)="toggle()"
+      [attr.aria-label]="isCollapsed() ? 'Expandir menú' : 'Colapsar menú'">
+      <mat-icon>{{ toggleIcon() }}</mat-icon>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav">
+    @for (item of menuItems; track item.route) {
+    <app-sidebar-item [item]="item" [isCollapsed]="isCollapsed()" />
+    }
+  </nav>
+
+  <hr class="divider" />
+
+  <div class="sidebar-footer">
+    <mat-icon class="user-avatar">account_circle</mat-icon>
+    @if (!isCollapsed()) {
+    <div class="user-info">
+      <span class="user-name">{{ user().name }}</span>
+      <span class="user-email">{{ user().email }}</span>
+    </div>
+    }
+  </div>
+</aside>

@@ -1,0 +1,37 @@
+<div class="detail-container">
+  <header class="header">
+    <button mat-icon-button (click)="onBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>Detalle del Movimiento</h1>
+    <div class="actions">
+      <button mat-button (click)="onEdit()" [disabled]="!movimiento()">
+        <mat-icon>edit</mat-icon>
+        Editar
+      </button>
+      <button mat-button color="warn" (click)="onDelete()" [disabled]="!movimiento()">
+        <mat-icon>delete</mat-icon>
+        Eliminar
+      </button>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Cargando movimiento...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error() && !loading()" class="error-container">
+    <mat-icon color="warn">error</mat-icon>
+    <p>{{ error() }}</p>
+    <button mat-raised-button (click)="onBack()">Volver</button>
+  </div>
+
+  <!-- Data State -->
+  <app-movimiento-info-card
+    *ngIf="movimiento() && !loading()"
+    [movimiento]="movimiento()!">
+  </app-movimiento-info-card>
+</div>

@@ -1,0 +1,36 @@
+<section class="personas-stats">
+  @for (stat of stats(); track stat.title) {
+  <app-stat-card [icon]="stat.icon" [title]="stat.title" [value]="stat.value" [variant]="stat.variant" />
+  }
+</section>
+
+<div class="personas-tabs-container">
+  <div class="personas-tabs-container-header">
+    <app-button-tabs [tabs]="tabs" [activeTab]="activeTab()" (tabChange)="onTabChange($event)" />
+    <button type="button" class="btn btn-primary" (click)="onNuevoMiembro()">Nuevo Miembro</button>
+  </div>
+
+  <div class="tab-content">
+    <app-generic-filters [filterConfigs]="filterConfigs" [autoApply]="true" (filtersChanged)="onFilterChange($event)" />
+
+    @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Cargando personas...</p>
+    </div>
+    } @else if (error()) {
+    <div class="error-state">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ error() }}</p>
+    </div>
+    } @else if (filteredPersonas().length === 0) {
+    <div class="empty-state">
+      <mat-icon>person_off</mat-icon>
+      <p>No se encontraron personas</p>
+    </div>
+    } @else {
+    <app-data-table [data]="filteredPersonas()" [columns]="tableColumns"
+      [config]="{ showHeader: true, hoverable: true }" (actionClick)="onActionClick($event)" />
+    }
+  </div>
+</div>

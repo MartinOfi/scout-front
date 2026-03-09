@@ -1,0 +1,239 @@
+<!--
+Template del componente de tabla reutilizable
+
+Este template implementa una tabla responsiva con las siguientes características:
+- Diseño exacto preservado del HTML original
+- Soporte para diferentes tipos de columnas (image, status, text, date, number)
+- Ordenamiento por columnas
+- Estados de status con colores diferenciados
+- Imágenes de avatar responsivas
+- Scroll horizontal en dispositivos móviles
+- Configuración dinámica de apariencia
+-->
+
+<!-- Contenedor principal -->
+<div class="data-table-container">
+  <!-- Tabla -->
+  <div class="table-wrapper">
+    <!-- Contenedor con scroll horizontal para móviles -->
+    <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
+      <!-- Tabla con sombras y bordes redondeados -->
+      <div class="inline-block min-w-full overflow-hidden">
+        <table class="min-w-full leading-normal">
+          <!-- Header de la tabla (condicional según configuración) -->
+          @if (config().showHeader !== false) {
+          <thead>
+            <tr class="table-header-row">
+              <!-- Iteración dinámica de columnas -->
+              @for (column of columns(); track column) {
+              <th class="table-header-cell" [class.cursor-pointer]="column.sortable" (click)="onColumnSort(column)">
+                {{ column.header }}
+                <!-- Indicador de ordenamiento -->
+                @if (column.sortable && currentSort?.column === column.key) {
+                <span class="sort-indicator">
+                  {{ currentSort?.direction === "asc" ? "↑" : "↓" }}
+                </span>
+                }
+              </th>
+              }
+            </tr>
+          </thead>
+          }
+
+          <!-- Cuerpo de la tabla -->
+          <tbody>
+            <!-- Iteración de filas con optimización de rendimiento -->
+            @for (
+            row of paginatedData; track trackByFn(i,
+            row); let i = $index) {
+            <tr [class.bg-gray-50]="config().stripedRows && i % 2 === 1" [class.hover:bg-gray-100]="config().hoverable"
+              [class.cursor-pointer]="config().hoverable" (click)="onRowClick(row)" (dblclick)="onRowDoubleClick(row)">
+              <!-- Iteración dinámica de celdas según columnas -->
+              @for (column of columns(); track column) {
+              <td class="table-body-cell" [class.border-b-0]="i === paginatedData.length - 1">
+                <!-- Renderizado condicional según tipo de columna -->
+                <!-- Tipo imagen (avatar) con nombre -->
+                @if (column.type === 'image') {
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 w-10 h-10">
+                    <img class="w-full h-full rounded-full" [src]="row[column.key]" [alt]="row['name'] || 'Avatar'" />
+                  </div>
+                  @if (row['name']) {
+                  <div class="ml-3">
+                    <p class="text-gray-900 whitespace-no-wrap">
+                      {{ row["name"] }}
+                    </p>
+                  </div>
+                  }
+                </div>
+                }
+                <!-- Tipo number -->
+                @if (column.type === 'number') {
+                <p class="text-gray-900 whitespace-no-wrap">
+                  {{ row[column.key] }}
+                </p>
+                }
+                <!-- Tipo punctuality (barra de progreso + porcentaje) -->
+                @if (column.type === 'punctuality') {
+                <div class="flex items-center gap-3">
+                  <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden min-w-[80px]">
+                    <div class="h-full rounded-full transition-all duration-300"
+                      [ngClass]="getPunctualityBarColor(row[column.key])"
+                      [style.width.%]="getPunctualityPercentage(row[column.key])">
+                    </div>
+                  </div>
+                  <span class="text-sm font-medium text-gray-900 whitespace-nowrap min-w-[50px]">
+                    {{ row[column.key + 'Text'] || row[column.key] }}
+                  </span>
+                </div>
+                }
+                <!-- Tipo onTime (número en verde) -->
+                @if (column.type === 'onTime') {
+                <p class="text-green-600 font-medium whitespace-no-wrap">
+                  {{ row[column.key] }}
+                </p>
+                }
+                <!-- Tipo late (número en rojo) -->
+                @if (column.type === 'late') {
+                <p class="text-red-600 font-medium whitespace-no-wrap">
+                  {{ row[column.key] }}
+                </p>
+                }
+                <!-- Tipo rating (número sin estrella) -->
+                @if (column.type === 'rating') {
+                <p class="text-gray-900 font-medium whitespace-no-wrap">
+                  {{ row[column.key] }}
+                </p>
+                }
+                <!-- Tipo status con colores diferenciados y bordes redondeados -->
+                @if (column.type === 'status') {
+                <span class="relative inline-block px-3 py-1 font-semibold leading-tight rounded-full"
+                  [ngClass]="getStatusColor(row[column.key]?.toString() || '')">
+                  <span aria-hidden="true" class="absolute inset-0 opacity-50 rounded-full" [ngClass]="
+                            getStatusColor(row[column.key]?.toString() || '').split(
+                              ' '
+                            )[1]
+                          "></span>
+                  <span class="relative">{{
+                    (row[column.key] || "").toString() | serviceStatusFormat
+                    }}</span>
+                </span>
+                }
+                <!-- Tipo fecha -->
+                @if (column.type === 'date' || column.type === 'time' ||
+                column.type === 'datetime' || column.type === 'datelong') {
+                <p class="text-gray-900 whitespace-no-wrap">
+                  {{ row[column.key] || "" | dateFormat : column.type }}
+                </p>
+                }
+                <!-- Tipo acción (botones) -->
+                @if (column.type === 'action') {
+                <div class="flex items-center space-x-2">
+                  @for (action of column.actions; track action) {
+                  @if (isActionVisible(action, row)) {
+                  <button type="button" class="action-btn unstyled" [class]="
+                      action.className || 'text-blue-600 hover:text-blue-800'
+                    " [disabled]="!isActionEnabled(action, row)" [title]="action.tooltip"
+                    (click)="onActionClick(action.key, row, $event)">
+                    <!-- SVG personalizado si está definido -->
+                    @if (action.svgIcon) {
+                    <span class="w-5 h-5 inline-flex items-center justify-center text-current"
+                      [innerHTML]="sanitizeSvg(action.svgIcon)"></span>
+                    }
+                    <!-- Icono de Material si está definido y no hay SVG -->
+                    @if (action.icon && !action.svgIcon) {
+                    <mat-icon class="w-4 h-4 text-current">{{ action.icon
+                      }}</mat-icon>
+                    }
+                    <!-- Texto si no hay icono ni SVG -->
+                    @if (!action.icon && !action.svgIcon) {
+                    <span>{{ action.label }}</span>
+                    }
+                  </button>
+                  }
+                  }
+                </div>
+                }
+                <!-- Tipo phone (link clickeable a WhatsApp) -->
+                @if (column.type === 'phone') {
+                <a class="text-blue-600 hover:text-blue-800 cursor-pointer underline whitespace-no-wrap"
+                  (click)="onPhoneClick(row[column.key], $event)" [title]="'Abrir WhatsApp'">
+                  {{ row[column.key] }}
+                </a>
+                }
+                <!-- Tipo texto, número (renderizado por defecto) -->
+                @if (
+                column.type !== 'image' &&
+                column.type !== 'status' &&
+                column.type !== 'date' &&
+                column.type !== 'time' &&
+                column.type !== 'datetime' &&
+                column.type !== 'number' &&
+                column.type !== 'datelong' &&
+                column.type !== 'action' &&
+                column.type !== 'phone' &&
+                column.type !== 'punctuality' &&
+                column.type !== 'onTime' &&
+                column.type !== 'late' &&
+                column.type !== 'rating'
+                ) {
+                <p class="text-gray-900 whitespace-no-wrap" [ngClass]="getAppointmentTimeClass(column, row)">
+                  {{ row[column.key] }}
+                </p>
+                }
+              </td>
+              }
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Información de paginación -->
+  @if (config().hidePagination !== true) {
+  @if (!loading() && paginatedData.length > 0) {
+  <div class="pagination-info mb-3">
+    <p class="text-sm text-gray-600">
+      Mostrando {{ (currentPage - 1) * pageSize() + 1 }} -
+      {{ Math.min(currentPage * pageSize(), filteredData.length) }}
+      de {{ filteredData.length }} elementos
+    </p>
+  </div>
+  }
+
+  <!-- Controles de paginación -->
+  @if (!loading() && totalPages > 1) {
+  <div class="pagination-controls">
+    <div class="flex items-center justify-center space-x-2 mb-3">
+      <!-- Botón Anterior -->
+      <button type="button" class="pagination-btn" [disabled]="currentPage === 1"
+        (click)="onPageChange(currentPage - 1)">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Anterior
+      </button>
+      <!-- Números de página -->
+      <div class="flex items-center space-x-1">
+        @for (page of getPageNumbers(); track page) {
+        <button type="button" class="page-number-btn" [class.active]="page === currentPage"
+          (click)="onPageChange(page)">
+          {{ page }}
+        </button>
+        }
+      </div>
+      <!-- Botón Siguiente -->
+      <button type="button" class="pagination-btn" [disabled]="currentPage === totalPages"
+        (click)="onPageChange(currentPage + 1)">
+        Siguiente
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+  }
+  }
+</div>

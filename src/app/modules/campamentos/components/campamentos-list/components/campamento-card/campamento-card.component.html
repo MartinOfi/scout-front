@@ -1,0 +1,43 @@
+<mat-card class="campamento-card">
+  <mat-card-header>
+    <mat-card-title>{{ campamento.nombre }}</mat-card-title>
+    <mat-card-subtitle>
+      {{ campamento.fechaInicio | date:'dd/MM/yyyy' }} - {{ campamento.fechaFin | date:'dd/MM/yyyy' }}
+    </mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="info-grid">
+      <div class="info-item">
+        <mat-icon class="icon">attach_money</mat-icon>
+        <span class="label">Costo:</span>
+        <span class="value">${{ campamento.costoPorPersona }}</span>
+      </div>
+
+      <div class="info-item">
+        <mat-icon class="icon">group</mat-icon>
+        <span class="label">Participantes:</span>
+        <span class="value">{{ campamento.participantes?.length ?? 0 }}</span>
+      </div>
+    </div>
+
+    <p *ngIf="campamento.descripcion" class="description">
+      {{ campamento.descripcion }}
+    </p>
+  </mat-card-content>
+
+  <mat-card-actions align="end">
+    <button mat-button (click)="onSelect()">
+      <mat-icon>visibility</mat-icon>
+      Ver
+    </button>
+    <button mat-button (click)="onEdit()">
+      <mat-icon>edit</mat-icon>
+      Editar
+    </button>
+    <button mat-button color="warn" (click)="onDelete()">
+      <mat-icon>delete</mat-icon>
+      Eliminar
+    </button>
+  </mat-card-actions>
+</mat-card>

@@ -1,0 +1,44 @@
+<div class="participante-row">
+  <div class="info">
+    <div class="name">{{ participante.participanteNombre }}</div>
+    <div class="details">
+      <span class="cuota">Cuota: ${{ participante.costoPorPersona | number:'1.2-2' }}</span>
+      <span class="separator">•</span>
+      <span class="pagado">Pagado: ${{ participante.totalPagado | number:'1.2-2' }}</span>
+      <span class="separator">•</span>
+      <span class="adeudado">Adeuda: ${{ participante.saldoPendiente | number:'1.2-2' }}</span>
+    </div>
+  </div>
+
+  <div class="progress">
+    <mat-progress-bar
+      mode="determinate"
+      [value]="porcentajePagado"
+      [color]="estadoPago === 'completo' ? 'primary' : 'accent'">
+    </mat-progress-bar>
+    <span class="percentage">{{ porcentajePagado | number:'1.0-0' }}%</span>
+  </div>
+
+  <div class="status">
+    <mat-chip [class]="'status-chip status-' + estadoPago">
+      {{ estadoPago === 'completo' ? 'Pagado' : estadoPago === 'parcial' ? 'Parcial' : 'Pendiente' }}
+    </mat-chip>
+  </div>
+
+  <div class="actions">
+    <button
+      mat-icon-button
+      (click)="onRegistrarPago()"
+      [disabled]="estadoPago === 'completo'"
+      matTooltip="Registrar Pago">
+      <mat-icon>payment</mat-icon>
+    </button>
+    <button
+      mat-icon-button
+      color="warn"
+      (click)="onRemove()"
+      matTooltip="Remover Participante">
+      <mat-icon>person_remove</mat-icon>
+    </button>
+  </div>
+</div>

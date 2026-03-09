@@ -1,0 +1,43 @@
+.campamento-card {
+  margin-bottom: 16px;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+    color: rgba(0, 0, 0, 0.54);
+  }
+
+  .label {
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.60);
+  }
+
+  .value {
+    font-weight: 600;
+  }
+}
+
+.description {
+  color: rgba(0, 0, 0, 0.60);
+  font-size: 14px;
+  margin: 8px 0 0;
+}

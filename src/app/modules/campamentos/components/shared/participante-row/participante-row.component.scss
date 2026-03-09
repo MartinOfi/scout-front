@@ -1,0 +1,77 @@
+.participante-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+}
+
+.info {
+  .name {
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .details {
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.60);
+
+    .separator {
+      margin: 0 8px;
+    }
+
+    .adeudado {
+      font-weight: 500;
+      color: #f44336;
+    }
+  }
+}
+
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 150px;
+
+  mat-progress-bar {
+    height: 8px;
+    border-radius: 4px;
+  }
+
+  .percentage {
+    font-size: 12px;
+    text-align: right;
+    color: rgba(0, 0, 0, 0.60);
+  }
+}
+
+.status-chip {
+  font-size: 12px;
+  padding: 4px 12px;
+
+  &.status-completo {
+    background-color: #4caf50;
+    color: white;
+  }
+
+  &.status-parcial {
+    background-color: #ff9800;
+    color: white;
+  }
+
+  &.status-pendiente {
+    background-color: #f44336;
+    color: white;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 4px;
+}

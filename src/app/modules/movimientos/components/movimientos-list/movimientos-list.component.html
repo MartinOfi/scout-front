@@ -1,0 +1,59 @@
+<div class="movimientos-list-container">
+  <div class="header">
+    <h2>Movimientos</h2>
+    <button mat-raised-button color="primary" (click)="onNuevoMovimiento()">
+      <mat-icon>add</mat-icon>
+      Nuevo Movimiento
+    </button>
+  </div>
+
+  <app-movimiento-filters
+    (filterChange)="onFilterChange($event)"
+    (clearFilters)="onClearFilters()">
+  </app-movimiento-filters>
+
+  <div class="resumen">
+    <div class="resumen-item ingresos">
+      <span class="label">Total Ingresos</span>
+      <span class="amount">{{ totalIngresos() | currency:'ARS':'symbol':'1.2-2' }}</span>
+    </div>
+    <div class="resumen-item egresos">
+      <span class="label">Total Egresos</span>
+      <span class="amount">{{ totalEgresos() | currency:'ARS':'symbol':'1.2-2' }}</span>
+    </div>
+    <div class="resumen-item saldo" [class.negativo]="saldoNeto() < 0">
+      <span class="label">Saldo Neto</span>
+      <span class="amount">{{ saldoNeto() | currency:'ARS':'symbol':'1.2-2' }}</span>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Cargando movimientos...</span>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-state">
+      <mat-icon color="warn">error</mat-icon>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <div class="movimientos-list">
+    @for (movimiento of movimientos(); track movimiento.id) {
+      <app-movimiento-row
+        [movimiento]="movimiento"
+        (verDetalle)="onVerDetalle($event)"
+        (editar)="onEditar($event)"
+        (eliminar)="onEliminar($event)">
+      </app-movimiento-row>
+    } @empty {
+      <div class="empty-state">
+        <mat-icon>receipt_long</mat-icon>
+        <span>No se encontraron movimientos</span>
+      </div>
+    }
+  </div>
+</div>

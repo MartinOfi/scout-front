@@ -1,0 +1,15 @@
+<article class="data-list-card">
+  <header class="data-list-card__header">
+    <h3 class="data-list-card__title">{{ title() }}</h3>
+    @if (linkText()) {
+      <app-link-button
+        [text]="linkText()"
+        [icon]="linkIcon()"
+        (clicked)="onLinkClick()"
+      />
+    }
+  </header>
+  <div class="data-list-card__content">
+    <ng-content />
+  </div>
+</article>

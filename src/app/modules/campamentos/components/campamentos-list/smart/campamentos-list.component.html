@@ -1,0 +1,38 @@
+<div class="container">
+  <header class="header">
+    <h1>Campamentos</h1>
+    <button mat-raised-button color="primary" (click)="onCreate()">
+      <mat-icon>add</mat-icon>
+      Crear Campamento
+    </button>
+  </header>
+
+  <!-- Loading State -->
+  <app-loading-spinner *ngIf="loading()"></app-loading-spinner>
+
+  <!-- Error State -->
+  <div *ngIf="error()" class="error-container">
+    <mat-icon color="warn">error</mat-icon>
+    <span>{{ error() }}</span>
+  </div>
+
+  <!-- Empty State -->
+  <app-empty-state
+    *ngIf="!loading() && !error() && campamentos().length === 0"
+    title="No hay campamentos registrados"
+    message="Comienza creando tu primer campamento"
+    actionLabel="Crear Campamento"
+    (action)="onCreate()">
+  </app-empty-state>
+
+  <!-- Data State -->
+  <div *ngIf="!loading() && campamentos().length > 0" class="campamentos-grid">
+    <app-campamento-card
+      *ngFor="let campamento of campamentos()"
+      [campamento]="campamento"
+      (select)="onSelect($event)"
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)">
+    </app-campamento-card>
+  </div>
+</div>

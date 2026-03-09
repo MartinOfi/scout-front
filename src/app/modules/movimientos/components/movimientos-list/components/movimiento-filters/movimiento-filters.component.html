@@ -1,0 +1,44 @@
+<div class="filters-container" [formGroup]="filterForm">
+  <mat-form-field appearance="outline">
+    <mat-label>Tipo</mat-label>
+    <mat-select formControlName="tipo" (selectionChange)="onFilterChange()">
+      <mat-option [value]="null">Todos</mat-option>
+      @for (tipo of tipos; track tipo) {
+        <mat-option [value]="tipo">
+          {{ tipo === 'ingreso' ? 'Ingreso' : 'Egreso' }}
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Concepto</mat-label>
+    <mat-select formControlName="concepto" (selectionChange)="onFilterChange()">
+      <mat-option [value]="null">Todos</mat-option>
+      @for (concepto of conceptos; track concepto) {
+        <mat-option [value]="concepto">
+          {{ conceptoLabels[concepto] }}
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Fecha desde</mat-label>
+    <input matInput [matDatepicker]="pickerInicio" formControlName="fechaInicio" (dateChange)="onFilterChange()">
+    <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+    <mat-datepicker #pickerInicio></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Fecha hasta</mat-label>
+    <input matInput [matDatepicker]="pickerFin" formControlName="fechaFin" (dateChange)="onFilterChange()">
+    <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+    <mat-datepicker #pickerFin></mat-datepicker>
+  </mat-form-field>
+
+  <button mat-stroked-button color="primary" (click)="onClear()">
+    <mat-icon>clear_all</mat-icon>
+    Limpiar
+  </button>
+</div>

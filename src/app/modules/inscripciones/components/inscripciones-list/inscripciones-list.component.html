@@ -1,0 +1,32 @@
+<section class="inscripciones-stats">
+  @for (stat of stats(); track stat.title) {
+  <app-stat-card [icon]="stat.icon" [title]="stat.title" [value]="stat.value" [variant]="stat.variant" />
+  }
+</section>
+
+<div class="inscripciones-tabs-container">
+  <div class="inscripciones-tabs-container-header">
+    <app-button-tabs [tabs]="tabs" [activeTab]="activeTab()" (tabChange)="onTabChange($event)" />
+    <button type="button" class="btn btn-primary" (click)="onCreate()">Nueva Inscripción</button>
+  </div>
+
+  <div class="tab-content">
+    <app-generic-filters [filterConfigs]="filterConfigs" [autoApply]="true" [showClearButton]="true"
+      (filtersChanged)="onFilterChange($event)" />
+
+    @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Cargando inscripciones...</p>
+    </div>
+    } @else if (tableData().length === 0) {
+    <div class="empty-state">
+      <mat-icon>assignment</mat-icon>
+      <p>No hay inscripciones para mostrar</p>
+    </div>
+    } @else {
+    <app-data-table [data]="tableData()" [columns]="tableColumns" [config]="{ showHeader: true, hoverable: true }"
+      (actionClick)="onActionClick($event)" />
+    }
+  </div>
+</div>
