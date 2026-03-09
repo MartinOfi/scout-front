@@ -1,0 +1,23 @@
+<app-form-container title="Configuración de Inscripciones" icon="settings">
+  <app-form-field label="Monto Inscripción Scout Argentina">
+    <app-number-field
+      [formControl]="montoScoutArgentinaCtrl"
+      [min]="0"
+      placeholder="0">
+    </app-number-field>
+  </app-form-field>
+
+  <app-form-field label="Monto Inscripción de Grupo">
+    <app-number-field
+      [formControl]="montoGrupoCtrl"
+      [min]="0"
+      placeholder="0">
+    </app-number-field>
+  </app-form-field>
+
+  <app-form-actions>
+    <button mat-flat-button color="primary" (click)="guardar()">
+      Guardar
+    </button>
+  </app-form-actions>
+</app-form-container>
