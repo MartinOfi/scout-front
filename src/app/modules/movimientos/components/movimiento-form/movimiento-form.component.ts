@@ -17,7 +17,7 @@ import { MovimientosStateService } from '../../services/movimientos-state.servic
 import { InscripcionesApiService } from '../../../inscripciones/services/inscripciones-api.service';
 import { CajasApiService } from '../../../cajas/services/cajas-api.service';
 import { CreateMovimientoDto, InscripcionConEstado, CajaConSaldo } from '../../../../shared/models';
-import { TipoMovimientoEnum, MedioPagoEnum, EstadoPago, TIPO_INSCRIPCION_LABELS } from '../../../../shared/enums';
+import { TipoMovimientoEnum, MedioPagoEnum, EstadoPago, TIPO_INSCRIPCION_LABELS, ConceptoMovimiento } from '../../../../shared/enums';
 
 // Shared Form Components
 import { FormFieldComponent } from '../../../../shared/components/form/form-field/form-field.component';
@@ -157,7 +157,7 @@ export class MovimientoFormComponent implements OnInit {
 
         // Pre-fill form with inscription context
         this.form.patchValue({
-          concepto: 'inscripcion',
+          concepto: ConceptoMovimiento.INSCRIPCION_GRUPO,
           tipo: TipoMovimientoEnum.INGRESO,
           // Suggest the pending amount
           monto: insc.saldoPendiente > 0 ? insc.saldoPendiente : 0,
