@@ -1,156 +1,201 @@
-<div class="scout-form-page">
-  <div class="scout-form-wrapper scout-form-wrapper--single">
-    <div class="scout-form-card">
+<div class="payment-page">
+  <div class="payment-container">
+
+    <!-- Inscripción Context Card (when paying for inscription) -->
+    @if (inscripcion(); as insc) {
+    <section class="context-card" aria-labelledby="context-heading">
+      <!-- Back link -->
+      <button type="button" class="context-back" (click)="onCancel()" aria-label="Volver al detalle de inscripción">
+        <mat-icon aria-hidden="true">arrow_back</mat-icon>
+        <span>Volver a inscripción</span>
+      </button>
+
+      <!-- Identity row -->
+      <div class="context-identity">
+        <div class="context-avatar" aria-hidden="true">
+          {{ (insc.persona?.nombre ?? 'X')[0] }}
+        </div>
+        <div class="context-info">
+          <h2 id="context-heading" class="context-name">{{ insc.persona?.nombre ?? 'Sin nombre' }}</h2>
+          <p class="context-meta">
+            {{ tipoInscripcionLabels[insc.tipo] }} · {{ insc.ano }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Payment progress -->
+      <div class="context-payment">
+        <div class="context-amounts">
+          <div class="context-amount context-amount--pending">
+            <span class="context-amount__label">Saldo pendiente</span>
+            <span class="context-amount__value">
+              {{ insc.saldoPendiente | currency:'ARS':'symbol':'1.0-0' }}
+            </span>
+          </div>
+          <div class="context-amount">
+            <span class="context-amount__label">Pagado</span>
+            <span class="context-amount__value context-amount__value--success">
+              {{ insc.montoPagado | currency:'ARS':'symbol':'1.0-0' }}
+            </span>
+          </div>
+          <div class="context-amount">
+            <span class="context-amount__label">Total</span>
+            <span class="context-amount__value">
+              {{ montoAPagar() | currency:'ARS':'symbol':'1.0-0' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="context-progress" role="progressbar" [attr.aria-valuenow]="progressPercent()" aria-valuemin="0"
+          aria-valuemax="100" [attr.aria-label]="progressPercent() + '% del pago completado'">
+          <div class="context-progress__bar">
+            <div class="context-progress__fill" [ngClass]="progressClass()" [style.width.%]="progressPercent()">
+            </div>
+          </div>
+          <span class="context-progress__label">{{ progressPercent() }}% completado</span>
+        </div>
+      </div>
+    </section>
+    }
+
+    <!-- Form Card -->
+    <div class="form-card">
       <!-- Header -->
-      <header class="scout-form-header scout-form-header--with-divider">
-        <h1 class="scout-form-title">
-          <i class="fas fa-exchange-alt scout-form-icon"></i>
+      <header class="form-header">
+        @if (inscripcion()) {
+        <h1 class="form-title">Registrar Pago</h1>
+        <p class="form-subtitle">Completá los datos del pago de inscripción</p>
+        } @else {
+        <h1 class="form-title">
+          <mat-icon aria-hidden="true">receipt_long</mat-icon>
           {{ isEditing ? 'Editar' : 'Nuevo' }} Movimiento
         </h1>
-        <p class="scout-form-subtitle">
-          Registra un ingreso o egreso en la caja
-        </p>
+        <p class="form-subtitle">Registra un ingreso o egreso en la caja</p>
+        }
       </header>
 
-      <!-- Content -->
-      <div class="scout-form-body">
+      <!-- Form Content -->
+      <div class="form-body">
         <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+          <!-- Quick amount fill (when inscripcion context) -->
+          @if (inscripcion(); as insc) {
+          @if (insc.saldoPendiente > 0) {
+          <div class="quick-amount">
+            <button type="button" class="quick-amount__btn" (click)="fillPendingAmount()"
+              [class.quick-amount__btn--active]="form.get('monto')?.value === insc.saldoPendiente">
+              <mat-icon aria-hidden="true">bolt</mat-icon>
+              Pagar saldo completo
+              <span class="quick-amount__value">{{ insc.saldoPendiente | currency:'ARS':'symbol':'1.0-0' }}</span>
+            </button>
+          </div>
+          }
+          }
+
           <div class="form-row">
-            <!-- Tipo -->
-            <app-form-field
-              label="Tipo"
-              [forId]="'tipo-select'"
-              [required]="true"
-              [invalid]="!!(form.get('tipo')?.invalid && form.get('tipo')?.touched)"
-            >
-              <app-select-field
-                id="tipo-select"
-                formControlName="tipo"
-                placeholder="Seleccionar tipo"
-                [options]="tipoOptions"
-                optionValue="value"
-                optionLabel="label"
-              />
+            <!-- Tipo (hidden when inscripcion - always INGRESO) -->
+            @if (!inscripcion()) {
+            <app-form-field label="Tipo" [forId]="'tipo-select'" [required]="true"
+              [invalid]="!!(form.get('tipo')?.invalid && form.get('tipo')?.touched)">
+              <app-select-field id="tipo-select" formControlName="tipo" placeholder="Seleccionar tipo"
+                [options]="tipoOptions" optionValue="value" optionLabel="label" />
               <span error>El tipo es requerido</span>
             </app-form-field>
+            }
 
             <!-- Monto -->
-            <app-form-field
-              label="Monto"
-              [forId]="'monto-input'"
-              [required]="true"
+            <app-form-field label="Monto a pagar" [forId]="'monto-input'" [required]="true"
               [invalid]="!!(form.get('monto')?.invalid && form.get('monto')?.touched)"
-            >
+              [class.form-field--full]="inscripcion()">
               <div class="input-with-prefix">
                 <span class="input-prefix">$</span>
-                <app-number-field
-                  id="monto-input"
-                  formControlName="monto"
-                  [min]="0"
-                  [step]="0.01"
-                  placeholder="0.00"
-                />
+                <app-number-field id="monto-input" formControlName="monto" [min]="0" [step]="0.01" placeholder="0.00" />
               </div>
               <span error>El monto es requerido</span>
             </app-form-field>
           </div>
 
-          <!-- Concepto -->
-          <app-concepto-selector
-            [tipo]="form.get('tipo')?.value"
-            [selected]="form.get('concepto')?.value"
+          <!-- Concepto (hidden when inscripcion - pre-selected) -->
+          @if (!inscripcion()) {
+          <app-concepto-selector [tipo]="form.get('tipo')?.value" [selected]="form.get('concepto')?.value"
             (conceptoChange)="onConceptoChange($event)">
           </app-concepto-selector>
-
-          <!-- Descripción -->
-          <app-form-field
-            label="Descripción"
-            [forId]="'descripcion-input'"
-          >
-            <app-textarea-field
-              id="descripcion-input"
-              formControlName="descripcion"
-              [rows]="2"
-              placeholder="Descripción opcional"
-            />
-          </app-form-field>
+          }
 
           <div class="form-row">
             <!-- Medio de Pago -->
-            <app-form-field
-              label="Medio de Pago"
-              [forId]="'medio-pago-select'"
-              [required]="true"
-              [invalid]="!!(form.get('medioPago')?.invalid && form.get('medioPago')?.touched)"
-            >
-              <app-select-field
-                id="medio-pago-select"
-                formControlName="medioPago"
-                placeholder="Seleccionar medio"
-                [options]="medioPagoOptions"
-                optionValue="value"
-                optionLabel="label"
-              />
+            <app-form-field label="Medio de Pago" [forId]="'medio-pago-select'" [required]="true"
+              [invalid]="!!(form.get('medioPago')?.invalid && form.get('medioPago')?.touched)">
+              <app-select-field id="medio-pago-select" formControlName="medioPago" placeholder="Seleccionar medio"
+                [options]="medioPagoOptions" optionValue="value" optionLabel="label" />
               <span error>El medio de pago es requerido</span>
             </app-form-field>
 
-            <!-- Fecha - mantiene mat-datepicker para el calendario -->
-            <mat-form-field appearance="outline">
-              <mat-label>Fecha</mat-label>
-              <input matInput [matDatepicker]="picker" formControlName="fecha">
-              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-              <mat-datepicker #picker></mat-datepicker>
-            </mat-form-field>
+            <!-- Fecha -->
+            <app-form-field label="Fecha" [forId]="'fecha-input'" [required]="true"
+              [invalid]="!!(form.get('fecha')?.invalid && form.get('fecha')?.touched)">
+              <app-date-field id="fecha-input" formControlName="fecha" />
+              <span error>La fecha es requerida</span>
+            </app-form-field>
           </div>
 
+          <!-- Descripción -->
+          <app-form-field label="Descripción" [forId]="'descripcion-input'">
+            <app-textarea-field id="descripcion-input" formControlName="descripcion" [rows]="2"
+              placeholder="Notas adicionales (opcional)" />
+          </app-form-field>
+
+          <!-- Responsable (when inscripcion context) -->
+          @if (inscripcion()) {
+            <app-form-field label="Responsable" [forId]="'responsable-select'" [required]="true"
+              [invalid]="!!(form.get('responsableId')?.invalid && form.get('responsableId')?.touched)">
+              <select id="responsable-select" formControlName="responsableId" class="scout-input">
+                <option value="">Seleccionar quién recibe el pago</option>
+                @for (resp of responsables(); track resp.id) {
+                  <option [value]="resp.id">{{ resp.nombre }}</option>
+                }
+              </select>
+              <span error>Seleccioná quién recibe el pago</span>
+            </app-form-field>
+          }
+
+          @if (!inscripcion()) {
           <div class="form-row">
             <!-- Estado de Pago -->
-            <app-form-field
-              label="Estado de Pago"
-              [forId]="'estado-pago-select'"
-              [required]="true"
-              [invalid]="!!(form.get('estadoPago')?.invalid && form.get('estadoPago')?.touched)"
-            >
-              <app-select-field
-                id="estado-pago-select"
-                formControlName="estadoPago"
-                placeholder="Seleccionar estado"
-                [options]="estadoPagoOptions"
-                optionValue="value"
-                optionLabel="label"
-              />
+            <app-form-field label="Estado de Pago" [forId]="'estado-pago-select'" [required]="true"
+              [invalid]="!!(form.get('estadoPago')?.invalid && form.get('estadoPago')?.touched)">
+              <app-select-field id="estado-pago-select" formControlName="estadoPago" placeholder="Seleccionar estado"
+                [options]="estadoPagoOptions" optionValue="value" optionLabel="label" />
               <span error>El estado es requerido</span>
             </app-form-field>
 
-            <!-- Requiere Comprobante - mantiene mat-slide-toggle -->
+            <!-- Requiere Comprobante -->
             <div class="toggle-field">
               <mat-slide-toggle formControlName="requiereComprobante">
                 Requiere Comprobante
               </mat-slide-toggle>
             </div>
           </div>
+          }
         </form>
       </div>
 
       <!-- Actions -->
-      <div class="scout-form-actions">
-        <div class="scout-form-actions__row scout-form-actions__row--between">
-          <button type="button" class="btn-secondary" (click)="onCancel()">
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            class="btn-primary"
-            [disabled]="form.invalid || loading()"
-            (click)="onSubmit()"
-          >
-            @if (loading()) {
-              <span class="loading-spinner-small"></span>
-            } @else {
-              {{ isEditing ? 'Guardar Cambios' : 'Crear Movimiento' }}
-            }
-          </button>
-        </div>
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="onCancel()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="form.invalid || loading()" (click)="onSubmit()">
+          @if (loading()) {
+          <span class="loading-spinner"></span>
+          } @else if (inscripcion()) {
+          <mat-icon aria-hidden="true">check</mat-icon>
+          Registrar Pago
+          } @else {
+          {{ isEditing ? 'Guardar Cambios' : 'Crear Movimiento' }}
+          }
+        </button>
       </div>
     </div>
   </div>
