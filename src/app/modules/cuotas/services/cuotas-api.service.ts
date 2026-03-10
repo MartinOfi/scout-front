@@ -56,18 +56,21 @@ export class CuotasApiService {
 
   /**
    * Register a payment for cuota
+   * Backend: POST /cuotas/:id/pago
    */
   registrarPago(
     cuotaId: string,
     monto: number,
-    medioPago: string
-  ): Observable<Cuota> {
-    return this.http.post<Cuota, { monto: number; medioPago: string }>(
-      `${this.endpoint}/${cuotaId}/pagar`,
-      {
-        monto,
-        medioPago,
-      }
-    );
+    medioPago: string,
+    responsableId: string
+  ): Observable<{ cuota: Cuota; movimiento: unknown }> {
+    return this.http.post<
+      { cuota: Cuota; movimiento: unknown },
+      { monto: number; medioPago: string; responsableId: string }
+    >(`${this.endpoint}/${cuotaId}/pago`, {
+      monto,
+      medioPago,
+      responsableId,
+    });
   }
 }

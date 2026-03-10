@@ -1,10 +1,17 @@
-<mat-form-field appearance="outline" class="concepto-field">
-  <mat-label>Concepto</mat-label>
-  <mat-select [value]="selected()" (selectionChange)="conceptoChange.emit($event.value)">
+<app-form-field
+  label="Concepto"
+  [forId]="'concepto-select'"
+  [required]="true"
+>
+  <select
+    id="concepto-select"
+    class="scout-select"
+    [value]="selected()"
+    (change)="onSelectChange($event)"
+  >
+    <option value="">Seleccionar concepto</option>
     @for (concepto of conceptosFiltrados(); track concepto) {
-      <mat-option [value]="concepto">
-        {{ conceptoLabels[concepto] }}
-      </mat-option>
+      <option [value]="concepto">{{ conceptoLabels[concepto] }}</option>
     }
-  </mat-select>
-</mat-form-field>
+  </select>
+</app-form-field>

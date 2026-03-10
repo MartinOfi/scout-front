@@ -5,34 +5,60 @@
 
   <!-- Add Product Form -->
   <form [formGroup]="form" class="add-form">
-    <mat-form-field>
-      <mat-label>Nombre del Producto</mat-label>
-      <input matInput formControlName="nombre" placeholder="Ej: Empanadas">
-      <mat-error *ngIf="form.get('nombre')?.hasError('required')">
-        El nombre es requerido
-      </mat-error>
-    </mat-form-field>
+    <app-form-field
+      label="Nombre del Producto"
+      [forId]="'nombre-input'"
+      [required]="true"
+      [invalid]="!!(form.get('nombre')?.invalid && form.get('nombre')?.touched)"
+    >
+      <app-text-field
+        id="nombre-input"
+        formControlName="nombre"
+        placeholder="Ej: Empanadas"
+      />
+      <span error>El nombre es requerido</span>
+    </app-form-field>
 
-    <mat-form-field>
-      <mat-label>Precio de Costo</mat-label>
-      <input matInput type="number" formControlName="precioCosto" step="0.01">
-      <span matTextPrefix>$&nbsp;</span>
-      <mat-error *ngIf="form.get('precioCosto')?.hasError('required')">
-        Requerido
-      </mat-error>
-    </mat-form-field>
+    <app-form-field
+      label="Precio de Costo"
+      [forId]="'precio-costo-input'"
+      [required]="true"
+      [invalid]="!!(form.get('precioCosto')?.invalid && form.get('precioCosto')?.touched)"
+    >
+      <div class="input-with-prefix">
+        <span class="input-prefix">$</span>
+        <app-number-field
+          id="precio-costo-input"
+          formControlName="precioCosto"
+          [min]="0"
+          [step]="0.01"
+          placeholder="0.00"
+        />
+      </div>
+      <span error>Requerido</span>
+    </app-form-field>
 
-    <mat-form-field>
-      <mat-label>Precio de Venta</mat-label>
-      <input matInput type="number" formControlName="precioVenta" step="0.01">
-      <span matTextPrefix>$&nbsp;</span>
-      <mat-error *ngIf="form.get('precioVenta')?.hasError('required')">
-        Requerido
-      </mat-error>
-    </mat-form-field>
+    <app-form-field
+      label="Precio de Venta"
+      [forId]="'precio-venta-input'"
+      [required]="true"
+      [invalid]="!!(form.get('precioVenta')?.invalid && form.get('precioVenta')?.touched)"
+    >
+      <div class="input-with-prefix">
+        <span class="input-prefix">$</span>
+        <app-number-field
+          id="precio-venta-input"
+          formControlName="precioVenta"
+          [min]="0"
+          [step]="0.01"
+          placeholder="0.00"
+        />
+      </div>
+      <span error>Requerido</span>
+    </app-form-field>
 
-    <button mat-raised-button color="primary" type="button" (click)="onAdd()">
-      <mat-icon>add</mat-icon>
+    <button type="button" class="btn-primary" (click)="onAdd()">
+      <i class="fas fa-plus"></i>
       Agregar
     </button>
   </form>
@@ -75,7 +101,9 @@
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
 
-  <div *ngIf="productos.length === 0" class="empty-state">
-    <p>No hay productos agregados</p>
-  </div>
+  @if (productos.length === 0) {
+    <div class="empty-state">
+      <p>No hay productos agregados</p>
+    </div>
+  }
 </div>

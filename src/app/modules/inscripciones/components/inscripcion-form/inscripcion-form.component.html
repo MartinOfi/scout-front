@@ -1,85 +1,189 @@
-<div class="inscripcion-form-container">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>{{ isEditing ? 'Editar Inscripción' : 'Nueva Inscripción' }}</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      @if (loading()) {
-        <div class="loading-state">
-          <mat-spinner diameter="40"></mat-spinner>
-        </div>
-      } @else {
-        <form [formGroup]="inscripcionForm" (ngSubmit)="onSubmit()">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>ID Persona</mat-label>
-            <input matInput formControlName="personaId" placeholder="ID de la persona">
-            @if (inscripcionForm.get('personaId')?.hasError('required')) {
-              <mat-error>El ID de persona es requerido</mat-error>
-            }
-          </mat-form-field>
+<div class="scout-form-page">
+  <div class="scout-form-wrapper scout-form-wrapper--single">
+    <div class="scout-form-card">
+      <!-- Header -->
+      <header class="scout-form-header scout-form-header--with-divider">
+        <h1 class="scout-form-title">
+          <i class="fas fa-id-card scout-form-icon"></i>
+          {{ isEditing ? 'Editar Inscripción' : 'Nueva Inscripción' }}
+        </h1>
+        <p class="scout-form-subtitle">
+          {{ isEditing ? 'Modifica los datos de la inscripción' : 'Registra una nueva inscripción Scout Argentina o de Grupo' }}
+        </p>
+      </header>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Tipo de Inscripción</mat-label>
-            <mat-select formControlName="tipo">
-              @for (tipo of tipos; track tipo) {
-                <mat-option [value]="tipo">{{ tipoLabels[tipo] }}</mat-option>
-              }
-            </mat-select>
-            @if (inscripcionForm.get('tipo')?.hasError('required')) {
-              <mat-error>El tipo es requerido</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Año</mat-label>
-            <input matInput type="number" formControlName="ano">
-            @if (inscripcionForm.get('ano')?.hasError('required')) {
-              <mat-error>El año es requerido</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Monto Total</mat-label>
-            <input matInput type="number" formControlName="montoTotal">
-            @if (inscripcionForm.get('montoTotal')?.hasError('required')) {
-              <mat-error>El monto es requerido</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Monto Bonificado</mat-label>
-            <input matInput type="number" formControlName="montoBonificado">
-            <mat-hint>Monto a descontar del total (bonificación)</mat-hint>
-          </mat-form-field>
-
-          <div class="authorization-section">
-            <h3>Autorizaciones</h3>
-
-            <mat-checkbox formControlName="declaracionDeSalud">
-              Declaración de Salud
-            </mat-checkbox>
-
-            <mat-checkbox formControlName="autorizacionDeImagen">
-              Autorización de Imagen
-            </mat-checkbox>
-
-            <mat-checkbox formControlName="salidasCercanas">
-              Autorización Salidas Cercanas
-            </mat-checkbox>
-
-            <mat-checkbox formControlName="autorizacionIngreso">
-              Autorización de Ingreso
-            </mat-checkbox>
+      <!-- Content -->
+      <div class="scout-form-body">
+        @if (loading()) {
+          <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Cargando...</p>
           </div>
+        } @else {
+          <form [formGroup]="inscripcionForm" (ngSubmit)="onSubmit()">
+            <!-- Persona Select -->
+            <app-form-field
+              label="Persona"
+              [forId]="'persona-select'"
+              [required]="true"
+              [disabled]="isEditing"
+              [invalid]="!!(inscripcionForm.get('personaId')?.invalid && inscripcionForm.get('personaId')?.touched)"
+            >
+              <app-select-field
+                id="persona-select"
+                formControlName="personaId"
+                placeholder="Seleccionar persona"
+                [options]="personas()"
+                [optionValueFn]="getPersonaId"
+                [optionLabelFn]="formatPersonaForSelect"
+                [loading]="personasLoading()"
+                emptyText="No hay personas disponibles"
+              />
+              <span error>La persona es requerida</span>
+            </app-form-field>
 
-          <div class="form-actions">
-            <button mat-button type="button" (click)="onCancel()">Cancelar</button>
-            <button mat-raised-button color="primary" type="submit" [disabled]="inscripcionForm.invalid || loading()">
-              {{ isEditing ? 'Actualizar' : 'Crear' }}
+            <!-- Tipo de Inscripción -->
+            <app-form-field
+              label="Tipo de Inscripción"
+              [forId]="'tipo-select'"
+              [required]="true"
+              [disabled]="isEditing"
+              [invalid]="!!(inscripcionForm.get('tipo')?.invalid && inscripcionForm.get('tipo')?.touched)"
+            >
+              <app-select-field
+                id="tipo-select"
+                formControlName="tipo"
+                placeholder="Seleccionar tipo"
+                [options]="tiposOptions"
+                [optionValueFn]="getTipoValue"
+                [optionLabelFn]="getTipoLabel"
+              />
+              <span error>El tipo es requerido</span>
+            </app-form-field>
+
+            <!-- Año -->
+            <app-form-field
+              label="Año"
+              [forId]="'ano-input'"
+              [required]="true"
+              [disabled]="isEditing"
+              [invalid]="!!(inscripcionForm.get('ano')?.invalid && inscripcionForm.get('ano')?.touched)"
+            >
+              <app-number-field
+                id="ano-input"
+                formControlName="ano"
+                [min]="2000"
+                [max]="2100"
+                placeholder="Ej: 2026"
+              />
+              <span error>El año es requerido</span>
+            </app-form-field>
+
+            <!-- Montos Row -->
+            <div class="form-row">
+              <app-form-field
+                label="Monto Total"
+                [forId]="'monto-total'"
+                [required]="true"
+                [disabled]="isEditing"
+                [invalid]="!!(inscripcionForm.get('montoTotal')?.invalid && inscripcionForm.get('montoTotal')?.touched)"
+              >
+                <div class="input-with-prefix">
+                  <span class="input-prefix">$</span>
+                  <app-number-field
+                    id="monto-total"
+                    formControlName="montoTotal"
+                    [min]="0"
+                    placeholder="0"
+                  />
+                </div>
+                <span error>El monto es requerido</span>
+              </app-form-field>
+
+              <app-form-field
+                label="Monto Bonificado"
+                [forId]="'monto-bonificado'"
+                hint="Monto a descontar del total (bonificación)"
+              >
+                <div class="input-with-prefix">
+                  <span class="input-prefix">$</span>
+                  <app-number-field
+                    id="monto-bonificado"
+                    formControlName="montoBonificado"
+                    [min]="0"
+                    placeholder="0"
+                  />
+                </div>
+              </app-form-field>
+
+              @if (!isEditing) {
+                <app-form-field
+                  label="Monto Pagado"
+                  [forId]="'monto-pagado'"
+                  hint="Pago inicial al momento de inscribirse"
+                >
+                  <div class="input-with-prefix">
+                    <span class="input-prefix">$</span>
+                    <app-number-field
+                      id="monto-pagado"
+                      formControlName="montoPagado"
+                      [min]="0"
+                      placeholder="0"
+                    />
+                  </div>
+                </app-form-field>
+              }
+            </div>
+
+            <!-- Autorizaciones Section -->
+            @if (showAuthorizationFields()) {
+              <div class="authorization-section">
+                <h3 class="section-title">Autorizaciones</h3>
+                <p class="section-description">
+                  Marca las autorizaciones firmadas por el responsable
+                </p>
+
+                <div class="checkbox-grid">
+                  <app-checkbox-field formControlName="declaracionDeSalud">
+                    Declaración de Salud
+                  </app-checkbox-field>
+
+                  <app-checkbox-field formControlName="autorizacionDeImagen">
+                    Autorización de Imagen
+                  </app-checkbox-field>
+
+                  <app-checkbox-field formControlName="salidasCercanas">
+                    Autorización Salidas Cercanas
+                  </app-checkbox-field>
+
+                  <app-checkbox-field formControlName="autorizacionIngreso">
+                    Autorización de Ingreso
+                  </app-checkbox-field>
+                </div>
+              </div>
+            }
+          </form>
+        }
+      </div>
+
+      <!-- Actions -->
+      @if (!loading()) {
+        <div class="scout-form-actions">
+          <div class="scout-form-actions__row scout-form-actions__row--between">
+            <button type="button" class="btn-secondary" (click)="onCancel()">
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="btn-primary"
+              [disabled]="inscripcionForm.invalid || loading()"
+              (click)="onSubmit()"
+            >
+              {{ isEditing ? 'Actualizar' : 'Crear Inscripción' }}
             </button>
           </div>
-        </form>
+        </div>
       }
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </div>
 </div>

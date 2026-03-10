@@ -1,87 +1,157 @@
-<div class="movimiento-form-container">
-  <div class="header">
-    <h2>{{ isEditing ? 'Editar' : 'Nuevo' }} Movimiento</h2>
+<div class="scout-form-page">
+  <div class="scout-form-wrapper scout-form-wrapper--single">
+    <div class="scout-form-card">
+      <!-- Header -->
+      <header class="scout-form-header scout-form-header--with-divider">
+        <h1 class="scout-form-title">
+          <i class="fas fa-exchange-alt scout-form-icon"></i>
+          {{ isEditing ? 'Editar' : 'Nuevo' }} Movimiento
+        </h1>
+        <p class="scout-form-subtitle">
+          Registra un ingreso o egreso en la caja
+        </p>
+      </header>
+
+      <!-- Content -->
+      <div class="scout-form-body">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="form-row">
+            <!-- Tipo -->
+            <app-form-field
+              label="Tipo"
+              [forId]="'tipo-select'"
+              [required]="true"
+              [invalid]="!!(form.get('tipo')?.invalid && form.get('tipo')?.touched)"
+            >
+              <app-select-field
+                id="tipo-select"
+                formControlName="tipo"
+                placeholder="Seleccionar tipo"
+                [options]="tipoOptions"
+                optionValue="value"
+                optionLabel="label"
+              />
+              <span error>El tipo es requerido</span>
+            </app-form-field>
+
+            <!-- Monto -->
+            <app-form-field
+              label="Monto"
+              [forId]="'monto-input'"
+              [required]="true"
+              [invalid]="!!(form.get('monto')?.invalid && form.get('monto')?.touched)"
+            >
+              <div class="input-with-prefix">
+                <span class="input-prefix">$</span>
+                <app-number-field
+                  id="monto-input"
+                  formControlName="monto"
+                  [min]="0"
+                  [step]="0.01"
+                  placeholder="0.00"
+                />
+              </div>
+              <span error>El monto es requerido</span>
+            </app-form-field>
+          </div>
+
+          <!-- Concepto -->
+          <app-concepto-selector
+            [tipo]="form.get('tipo')?.value"
+            [selected]="form.get('concepto')?.value"
+            (conceptoChange)="onConceptoChange($event)">
+          </app-concepto-selector>
+
+          <!-- Descripción -->
+          <app-form-field
+            label="Descripción"
+            [forId]="'descripcion-input'"
+          >
+            <app-textarea-field
+              id="descripcion-input"
+              formControlName="descripcion"
+              [rows]="2"
+              placeholder="Descripción opcional"
+            />
+          </app-form-field>
+
+          <div class="form-row">
+            <!-- Medio de Pago -->
+            <app-form-field
+              label="Medio de Pago"
+              [forId]="'medio-pago-select'"
+              [required]="true"
+              [invalid]="!!(form.get('medioPago')?.invalid && form.get('medioPago')?.touched)"
+            >
+              <app-select-field
+                id="medio-pago-select"
+                formControlName="medioPago"
+                placeholder="Seleccionar medio"
+                [options]="medioPagoOptions"
+                optionValue="value"
+                optionLabel="label"
+              />
+              <span error>El medio de pago es requerido</span>
+            </app-form-field>
+
+            <!-- Fecha - mantiene mat-datepicker para el calendario -->
+            <mat-form-field appearance="outline">
+              <mat-label>Fecha</mat-label>
+              <input matInput [matDatepicker]="picker" formControlName="fecha">
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <!-- Estado de Pago -->
+            <app-form-field
+              label="Estado de Pago"
+              [forId]="'estado-pago-select'"
+              [required]="true"
+              [invalid]="!!(form.get('estadoPago')?.invalid && form.get('estadoPago')?.touched)"
+            >
+              <app-select-field
+                id="estado-pago-select"
+                formControlName="estadoPago"
+                placeholder="Seleccionar estado"
+                [options]="estadoPagoOptions"
+                optionValue="value"
+                optionLabel="label"
+              />
+              <span error>El estado es requerido</span>
+            </app-form-field>
+
+            <!-- Requiere Comprobante - mantiene mat-slide-toggle -->
+            <div class="toggle-field">
+              <mat-slide-toggle formControlName="requiereComprobante">
+                Requiere Comprobante
+              </mat-slide-toggle>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Actions -->
+      <div class="scout-form-actions">
+        <div class="scout-form-actions__row scout-form-actions__row--between">
+          <button type="button" class="btn-secondary" (click)="onCancel()">
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="form.invalid || loading()"
+            (click)="onSubmit()"
+          >
+            @if (loading()) {
+              <span class="loading-spinner-small"></span>
+            } @else {
+              {{ isEditing ? 'Guardar Cambios' : 'Crear Movimiento' }}
+            }
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="movimiento-form">
-    <div class="form-row">
-      <mat-form-field appearance="outline">
-        <mat-label>Tipo</mat-label>
-        <mat-select formControlName="tipo">
-          @for (tipo of tipos; track tipo) {
-            <mat-option [value]="tipo">
-              {{ tipo === 'ingreso' ? 'Ingreso' : 'Egreso' }}
-            </mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Monto</mat-label>
-        <input matInput type="number" formControlName="monto" placeholder="0.00">
-        <span matPrefix>$&nbsp;</span>
-      </mat-form-field>
-    </div>
-
-    <div class="form-row">
-      <app-concepto-selector
-        [tipo]="form.get('tipo')?.value"
-        [selected]="form.get('concepto')?.value"
-        (conceptoChange)="onConceptoChange($event)">
-      </app-concepto-selector>
-    </div>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Descripción</mat-label>
-      <textarea matInput formControlName="descripcion" rows="2"></textarea>
-    </mat-form-field>
-
-    <div class="form-row">
-      <mat-form-field appearance="outline">
-        <mat-label>Medio de Pago</mat-label>
-        <mat-select formControlName="medioPago">
-          @for (medio of mediosPago; track medio) {
-            <mat-option [value]="medio">
-              {{ medio === 'efectivo' ? 'Efectivo' : 'Transferencia' }}
-            </mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Fecha</mat-label>
-        <input matInput [matDatepicker]="picker" formControlName="fecha">
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </mat-form-field>
-    </div>
-
-    <div class="form-row">
-      <mat-form-field appearance="outline">
-        <mat-label>Estado de Pago</mat-label>
-        <mat-select formControlName="estadoPago">
-          @for (estado of estadosPago; track estado) {
-            <mat-option [value]="estado">
-              {{ estado === 'pagado' ? 'Pagado' : 'Pendiente de Reembolso' }}
-            </mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-
-      <mat-slide-toggle formControlName="requiereComprobante">
-        Requiere Comprobante
-      </mat-slide-toggle>
-    </div>
-
-    <div class="form-actions">
-      <button mat-button type="button" (click)="onCancel()">Cancelar</button>
-      <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading()">
-        @if (loading()) {
-          <mat-spinner diameter="20"></mat-spinner>
-        } @else {
-          {{ isEditing ? 'Guardar Cambios' : 'Crear Movimiento' }}
-        }
-      </button>
-    </div>
-  </form>
 </div>

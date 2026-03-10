@@ -8,7 +8,7 @@ import { Routes } from '@angular/router';
 export const INSCRIPCIONES_ROUTES: Routes = [
   {
     path: '',
-    loadComponent: () => import('./components/inscripciones-list/smart/inscripciones-list.component')
+    loadComponent: () => import('./components/inscripciones-list/inscripciones-list.component')
       .then(m => m.InscripcionesListComponent)
   },
   {
@@ -20,6 +20,16 @@ export const INSCRIPCIONES_ROUTES: Routes = [
     path: 'cuotas',
     loadComponent: () => import('./components/cuotas-list/smart/cuotas-list.component')
       .then(m => m.CuotasListComponent)
+  },
+  {
+    path: ':id',
+    loadComponent: () => import('./components/inscripcion-detail/smart/inscripcion-detail.component')
+      .then(m => m.InscripcionDetailComponent)
+  },
+  {
+    path: ':id/editar',
+    loadComponent: () => import('./components/inscripcion-form/smart/inscripcion-form.component')
+      .then(m => m.InscripcionFormComponent)
   },
   {
     path: ':id/pago',

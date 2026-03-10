@@ -63,11 +63,17 @@ export interface CreateMovimientoDto {
 
 /**
  * DTO for updating a movimiento
+ * Backend: PATCH /movimientos/:id
  */
 export interface UpdateMovimientoDto {
+  monto?: number;
   descripcion?: string;
+  medioPago?: MedioPago;
+  requiereComprobante?: boolean;
   comprobanteEntregado?: boolean;
   estadoPago?: EstadoPago;
+  personaAReembolsarId?: string;
+  fecha?: string;
 }
 
 /**

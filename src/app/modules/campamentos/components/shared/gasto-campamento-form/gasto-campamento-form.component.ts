@@ -7,14 +7,16 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
 
 import { MEDIOS_PAGO, MedioPago, EstadoPago } from '../../../../../shared/enums';
 import { Persona } from '../../../../../shared/models';
 import { positiveNumberValidator, decimalValidator, safeTextValidator } from '../../../../../shared/validators/custom-validators';
+
+// Shared Form Components
+import { FormFieldComponent } from '../../../../../shared/components/form/form-field/form-field.component';
+import { NumberFieldComponent } from '../../../../../shared/components/form/number-field/number-field.component';
+import { TextareaFieldComponent } from '../../../../../shared/components/form/textarea-field/textarea-field.component';
+import { SelectFieldComponent } from '../../../../../shared/components/form/select-field/select-field.component';
 
 @Component({
   selector: 'app-gasto-campamento-form',
@@ -22,10 +24,10 @@ import { positiveNumberValidator, decimalValidator, safeTextValidator } from '..
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule
+    FormFieldComponent,
+    NumberFieldComponent,
+    TextareaFieldComponent,
+    SelectFieldComponent
   ],
   templateUrl: './gasto-campamento-form.component.html',
   styleUrl: './gasto-campamento-form.component.scss',
@@ -44,8 +46,8 @@ export class GastoCampamentoFormComponent implements OnInit {
   @Output() cancel = new EventEmitter<void>();
 
   form!: FormGroup;
-  readonly mediosPago = MEDIOS_PAGO;
-  readonly estadosPago = Object.values(EstadoPago);
+  readonly mediosPago = [...MEDIOS_PAGO];
+  readonly estadosPago = [...Object.values(EstadoPago)];
 
   constructor(private fb: FormBuilder) {}
 
@@ -72,6 +74,9 @@ export class GastoCampamentoFormComponent implements OnInit {
       estadoPago: [EstadoPago.PAGADO, [Validators.required]]
     });
   }
+
+  getResponsableId = (persona: Persona): string => persona.id;
+  getResponsableLabel = (persona: Persona): string => persona.nombre;
 
   onSubmit(): void {
     if (this.form.invalid) {

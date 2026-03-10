@@ -3,61 +3,85 @@
 
   <div class="form-fields">
     <!-- Producto -->
-    <mat-form-field>
-      <mat-label>Producto</mat-label>
-      <mat-select formControlName="productoId">
-        <mat-option *ngFor="let producto of productos" [value]="producto.id">
-          {{ producto.nombre }} - ${{ producto.precioVenta | number:'1.2-2' }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="form.get('productoId')?.hasError('required')">
-        Seleccione un producto
-      </mat-error>
-    </mat-form-field>
+    <app-form-field
+      label="Producto"
+      [forId]="'producto-select'"
+      [required]="true"
+      [invalid]="!!(form.get('productoId')?.invalid && form.get('productoId')?.touched)"
+    >
+      <app-select-field
+        id="producto-select"
+        formControlName="productoId"
+        placeholder="Seleccionar producto"
+        [options]="productos"
+        [optionValueFn]="getProductoId"
+        [optionLabelFn]="getProductoLabel"
+      />
+      <span error>Seleccione un producto</span>
+    </app-form-field>
 
     <!-- Persona/Vendedor -->
-    <mat-form-field>
-      <mat-label>Vendedor</mat-label>
-      <mat-select formControlName="personaId">
-        <mat-option *ngFor="let persona of personas" [value]="persona.id">
-          {{ persona.nombre }} {{ persona.apellido }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="form.get('personaId')?.hasError('required')">
-        Seleccione un vendedor
-      </mat-error>
-    </mat-form-field>
+    <app-form-field
+      label="Vendedor"
+      [forId]="'persona-select'"
+      [required]="true"
+      [invalid]="!!(form.get('personaId')?.invalid && form.get('personaId')?.touched)"
+    >
+      <app-select-field
+        id="persona-select"
+        formControlName="personaId"
+        placeholder="Seleccionar vendedor"
+        [options]="personas"
+        [optionValueFn]="getPersonaId"
+        [optionLabelFn]="getPersonaLabel"
+      />
+      <span error>Seleccione un vendedor</span>
+    </app-form-field>
 
     <!-- Cantidad -->
-    <mat-form-field>
-      <mat-label>Cantidad</mat-label>
-      <input matInput type="number" formControlName="cantidad" min="1">
-      <mat-error *ngIf="form.get('cantidad')?.hasError('required')">
-        La cantidad es requerida
-      </mat-error>
-      <mat-error *ngIf="form.get('cantidad')?.hasError('min')">
-        Debe ser al menos 1
-      </mat-error>
-    </mat-form-field>
+    <app-form-field
+      label="Cantidad"
+      [forId]="'cantidad-input'"
+      [required]="true"
+      [invalid]="!!(form.get('cantidad')?.invalid && form.get('cantidad')?.touched)"
+    >
+      <app-number-field
+        id="cantidad-input"
+        formControlName="cantidad"
+        [min]="1"
+        placeholder="1"
+      />
+      @if (form.get('cantidad')?.hasError('required')) {
+        <span error>La cantidad es requerida</span>
+      } @else if (form.get('cantidad')?.hasError('min')) {
+        <span error>Debe ser al menos 1</span>
+      }
+    </app-form-field>
   </div>
 
   <!-- Resumen -->
-  <div class="summary" *ngIf="productoSeleccionado">
-    <div class="summary-item">
-      <span class="label">Total Venta:</span>
-      <span class="value primary">${{ totalVenta | number:'1.2-2' }}</span>
+  @if (productoSeleccionado) {
+    <div class="summary">
+      <div class="summary-item">
+        <span class="label">Total Venta:</span>
+        <span class="value primary">${{ totalVenta | number:'1.2-2' }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Ganancia:</span>
+        <span class="value success">${{ ganancia | number:'1.2-2' }}</span>
+      </div>
     </div>
-    <div class="summary-item">
-      <span class="label">Ganancia:</span>
-      <span class="value success">${{ ganancia | number:'1.2-2' }}</span>
-    </div>
-  </div>
+  }
 
   <!-- Actions -->
-  <div class="actions">
-    <button mat-button type="button" (click)="onCancel()">Cancelar</button>
-    <button mat-raised-button color="primary" type="submit" (click)="onSubmit()">
-      Registrar Venta
-    </button>
+  <div class="scout-form-actions">
+    <div class="scout-form-actions__row scout-form-actions__row--between">
+      <button type="button" class="btn-secondary" (click)="onCancel()">
+        Cancelar
+      </button>
+      <button type="submit" class="btn-primary" (click)="onSubmit()">
+        Registrar Venta
+      </button>
+    </div>
   </div>
 </form>

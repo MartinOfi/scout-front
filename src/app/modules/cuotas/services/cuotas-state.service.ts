@@ -159,15 +159,21 @@ export class CuotasStateService {
 
   /**
    * Registrar pago para cuota
+   * Backend: POST /cuotas/:id/pago
    */
-  registrarPago(cuotaId: string, monto: number, medioPago: string): Observable<Cuota> {
+  registrarPago(
+    cuotaId: string,
+    monto: number,
+    medioPago: string,
+    responsableId: string
+  ): Observable<{ cuota: Cuota; movimiento: unknown }> {
     this._loading.set(true);
     this._error.set(null);
 
-    return this.apiService.registrarPago(cuotaId, monto, medioPago).pipe(
-      tap((cuota: Cuota) => {
+    return this.apiService.registrarPago(cuotaId, monto, medioPago, responsableId).pipe(
+      tap((response: { cuota: Cuota; movimiento: unknown }) => {
         this._cuotas.update((prev) =>
-          prev.map((c) => (c.id === cuotaId ? cuota : c))
+          prev.map((c) => (c.id === cuotaId ? response.cuota : c))
         );
         this.notificationService.showSuccess('Pago registrado exitosamente');
       }),

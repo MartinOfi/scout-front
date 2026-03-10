@@ -8,6 +8,7 @@ import { Persona } from './persona.model';
 
 /**
  * Inscripcion (Scout group or Scout Argentina annual registration)
+ * estado and montoPagado are calculated fields, returned by GET endpoints
  */
 export interface Inscripcion {
   id: string;
@@ -23,15 +24,32 @@ export interface Inscripcion {
   autorizacionIngreso: boolean;
   createdAt: string;
   updatedAt: string;
+  // Calculated fields (returned by backend)
+  estado?: EstadoInscripcion;
+  montoPagado?: number;
+  saldoPendiente?: number;
+}
+
+/**
+ * Movimiento embedded in inscripcion detail response
+ */
+export interface MovimientoInscripcion {
+  id: string;
+  monto: number;
+  medioPago: string;
+  fecha: string;
+  descripcion: string | null;
 }
 
 /**
  * Inscripcion with calculated payment state (returned by GET /:id)
+ * Flat structure matching backend InscripcionResponseDto
  */
-export interface InscripcionConEstado {
-  inscripcion: Inscripcion;
-  montoPagado: number;
+export interface InscripcionConEstado extends Inscripcion {
   estado: EstadoInscripcion;
+  montoPagado: number;
+  saldoPendiente: number;
+  movimientos: MovimientoInscripcion[];
 }
 
 /**
@@ -43,6 +61,7 @@ export interface CreateInscripcionDto {
   ano: number;
   montoTotal: number;
   montoBonificado?: number;
+  montoPagado?: number;
   declaracionDeSalud?: boolean;
   autorizacionDeImagen?: boolean;
   salidasCercanas?: boolean;

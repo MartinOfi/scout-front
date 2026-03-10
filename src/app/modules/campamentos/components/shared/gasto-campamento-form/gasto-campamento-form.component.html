@@ -1,79 +1,109 @@
 <form [formGroup]="form" class="gasto-form">
   <div class="form-grid">
     <!-- Monto -->
-    <mat-form-field>
-      <mat-label>Monto del Gasto</mat-label>
-      <input matInput type="number" formControlName="monto" step="0.01" min="0">
-      <span matTextPrefix>$&nbsp;</span>
-      <mat-error *ngIf="form.get('monto')?.hasError('required')">
-        El monto es requerido
-      </mat-error>
-      <mat-error *ngIf="form.get('monto')?.hasError('positiveNumber')">
-        Debe ser un número positivo
-      </mat-error>
-    </mat-form-field>
+    <app-form-field
+      label="Monto del Gasto"
+      [forId]="'monto-input'"
+      [required]="true"
+      [invalid]="!!(form.get('monto')?.invalid && form.get('monto')?.touched)"
+    >
+      <div class="input-with-prefix">
+        <span class="input-prefix">$</span>
+        <app-number-field
+          id="monto-input"
+          formControlName="monto"
+          [min]="0"
+          [step]="0.01"
+          placeholder="0.00"
+        />
+      </div>
+      @if (form.get('monto')?.hasError('required')) {
+        <span error>El monto es requerido</span>
+      } @else if (form.get('monto')?.hasError('positiveNumber')) {
+        <span error>Debe ser un número positivo</span>
+      }
+    </app-form-field>
 
     <!-- Responsable -->
-    <mat-form-field>
-      <mat-label>Responsable</mat-label>
-      <mat-select formControlName="responsableId">
-        <mat-option *ngFor="let responsable of responsables" [value]="responsable.id">
-          {{ responsable.nombre }} {{ responsable.apellido }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="form.get('responsableId')?.hasError('required')">
-        Seleccione un responsable
-      </mat-error>
-    </mat-form-field>
+    <app-form-field
+      label="Responsable"
+      [forId]="'responsable-select'"
+      [required]="true"
+      [invalid]="!!(form.get('responsableId')?.invalid && form.get('responsableId')?.touched)"
+    >
+      <app-select-field
+        id="responsable-select"
+        formControlName="responsableId"
+        placeholder="Seleccionar responsable"
+        [options]="responsables"
+        [optionValueFn]="getResponsableId"
+        [optionLabelFn]="getResponsableLabel"
+      />
+      <span error>Seleccione un responsable</span>
+    </app-form-field>
 
-    <!-- Descripción (full width) -->
-    <mat-form-field class="full-width">
-      <mat-label>Descripción del Gasto</mat-label>
-      <textarea
-        matInput
+    <!-- Descripción -->
+    <app-form-field
+      label="Descripción del Gasto"
+      [forId]="'descripcion-input'"
+      [required]="true"
+      [invalid]="!!(form.get('descripcion')?.invalid && form.get('descripcion')?.touched)"
+      class="full-width"
+    >
+      <app-textarea-field
+        id="descripcion-input"
         formControlName="descripcion"
-        rows="3"
-        placeholder="Ej: Compra de alimentos, transporte, etc.">
-      </textarea>
-      <mat-error *ngIf="form.get('descripcion')?.hasError('required')">
-        La descripción es requerida
-      </mat-error>
-      <mat-error *ngIf="form.get('descripcion')?.hasError('maxlength')">
-        Máximo 500 caracteres
-      </mat-error>
-    </mat-form-field>
+        [rows]="3"
+        placeholder="Ej: Compra de alimentos, transporte, etc."
+      />
+      @if (form.get('descripcion')?.hasError('required')) {
+        <span error>La descripción es requerida</span>
+      } @else if (form.get('descripcion')?.hasError('maxlength')) {
+        <span error>Máximo 500 caracteres</span>
+      }
+    </app-form-field>
 
     <!-- Medio de Pago -->
-    <mat-form-field>
-      <mat-label>Medio de Pago</mat-label>
-      <mat-select formControlName="medioPago">
-        <mat-option *ngFor="let medio of mediosPago" [value]="medio">
-          {{ medio }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="form.get('medioPago')?.hasError('required')">
-        Seleccione un medio de pago
-      </mat-error>
-    </mat-form-field>
+    <app-form-field
+      label="Medio de Pago"
+      [forId]="'medio-pago-select'"
+      [required]="true"
+      [invalid]="!!(form.get('medioPago')?.invalid && form.get('medioPago')?.touched)"
+    >
+      <app-select-field
+        id="medio-pago-select"
+        formControlName="medioPago"
+        placeholder="Seleccionar medio"
+        [options]="mediosPago"
+      />
+      <span error>Seleccione un medio de pago</span>
+    </app-form-field>
 
     <!-- Estado de Pago -->
-    <mat-form-field>
-      <mat-label>Estado de Pago</mat-label>
-      <mat-select formControlName="estadoPago">
-        <mat-option *ngFor="let estado of estadosPago" [value]="estado">
-          {{ estado }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="form.get('estadoPago')?.hasError('required')">
-        Seleccione un estado
-      </mat-error>
-    </mat-form-field>
+    <app-form-field
+      label="Estado de Pago"
+      [forId]="'estado-pago-select'"
+      [required]="true"
+      [invalid]="!!(form.get('estadoPago')?.invalid && form.get('estadoPago')?.touched)"
+    >
+      <app-select-field
+        id="estado-pago-select"
+        formControlName="estadoPago"
+        placeholder="Seleccionar estado"
+        [options]="estadosPago"
+      />
+      <span error>Seleccione un estado</span>
+    </app-form-field>
   </div>
 
-  <div class="actions">
-    <button mat-button type="button" (click)="onCancel()">Cancelar</button>
-    <button mat-raised-button color="primary" type="submit" (click)="onSubmit()">
-      Registrar Gasto
-    </button>
+  <div class="scout-form-actions">
+    <div class="scout-form-actions__row scout-form-actions__row--between">
+      <button type="button" class="btn-secondary" (click)="onCancel()">
+        Cancelar
+      </button>
+      <button type="submit" class="btn-primary" (click)="onSubmit()">
+        Registrar Gasto
+      </button>
+    </div>
   </div>
 </form>

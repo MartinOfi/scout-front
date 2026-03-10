@@ -77,6 +77,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
     ano: [new Date().getFullYear(), [Validators.required, Validators.min(2000), Validators.max(2100)]],
     montoTotal: [0, [Validators.required, Validators.min(0)]],
     montoBonificado: [0, [Validators.min(0)]],
+    montoPagado: [0, [Validators.min(0)]],
     declaracionDeSalud: [false],
     autorizacionDeImagen: [false],
     salidasCercanas: [false],
@@ -88,7 +89,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
 
   // Arrow functions for select field callbacks
   getPersonaId = (persona: PersonaUnion): string => persona.id;
-  formatPersonaForSelect = (persona: PersonaUnion): string => `${persona.nombre} ${persona.apellido} (${persona.dni})`;
+  formatPersonaForSelect = (persona: PersonaUnion): string => persona.nombre;
   getTipoValue = (option: TipoOption): TipoInscripcion => option.value;
   getTipoLabel = (option: TipoOption): string => option.label;
 
@@ -140,7 +141,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
 
   /** Format persona for display in selector */
   formatPersona(persona: PersonaUnion): string {
-    return `${persona.nombre} ${persona.apellido} (${persona.dni})`;
+    return persona.nombre;
   }
 
   ngOnDestroy(): void {
@@ -197,6 +198,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
         ano: formValue.ano,
         montoTotal: formValue.montoTotal,
         montoBonificado: formValue.montoBonificado || undefined,
+        montoPagado: formValue.montoPagado || undefined,
         declaracionDeSalud: formValue.declaracionDeSalud || undefined,
         autorizacionDeImagen: formValue.autorizacionDeImagen || undefined,
         salidasCercanas: formValue.salidasCercanas || undefined,

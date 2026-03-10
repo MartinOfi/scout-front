@@ -35,17 +35,21 @@ export function createMockInscripcion(overrides: Partial<Inscripcion> = {}): Ins
 }
 
 /**
- * Create mock InscripcionConEstado
+ * Create mock InscripcionConEstado (flat structure matching backend)
  */
 export function createMockInscripcionConEstado(
   overrides: Partial<Inscripcion> = {},
   montoPagado = 0,
   estado: 'pendiente' | 'parcial' | 'pagado' = 'pendiente'
 ): InscripcionConEstado {
+  const inscripcion = createMockInscripcion(overrides);
+  const saldoPendiente = Math.max(0, inscripcion.montoTotal - inscripcion.montoBonificado - montoPagado);
   return {
-    inscripcion: createMockInscripcion(overrides),
+    ...inscripcion,
     montoPagado,
     estado,
+    saldoPendiente,
+    movimientos: [],
   };
 }
 

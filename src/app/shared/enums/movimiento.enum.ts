@@ -16,10 +16,12 @@ export enum TipoMovimientoEnum {
 
 /**
  * Concepts of movements (15 total)
+ * Synced with backend: src/common/enums/index.ts
  */
 export enum ConceptoMovimiento {
   // Inscripciones
-  INSCRIPCION = 'inscripcion',
+  INSCRIPCION_GRUPO = 'inscripcion_grupo',
+  INSCRIPCION_SCOUT_ARGENTINA = 'inscripcion_scout_argentina',
   INSCRIPCION_PAGO_SCOUT_ARGENTINA = 'inscripcion_pago_scout_argentina',
 
   // Cuotas
@@ -45,7 +47,6 @@ export enum ConceptoMovimiento {
 
   // Ajustes
   AJUSTE_INICIAL = 'ajuste_inicial',
-  AJUSTE_BONIFICACION = 'ajuste_bonificacion',
 
   // Fondos de rama
   ASIGNACION_FONDO_RAMA = 'asignacion_fondo_rama',
@@ -58,7 +59,8 @@ export enum ConceptoMovimiento {
  * Labels for ConceptoMovimiento (for UI display)
  */
 export const CONCEPTO_MOVIMIENTO_LABELS: Record<ConceptoMovimiento, string> = {
-  [ConceptoMovimiento.INSCRIPCION]: 'Inscripción',
+  [ConceptoMovimiento.INSCRIPCION_GRUPO]: 'Inscripción de Grupo',
+  [ConceptoMovimiento.INSCRIPCION_SCOUT_ARGENTINA]: 'Inscripción Scout Argentina',
   [ConceptoMovimiento.INSCRIPCION_PAGO_SCOUT_ARGENTINA]: 'Pago a Scout Argentina',
   [ConceptoMovimiento.CUOTA_GRUPO]: 'Cuota de Grupo',
   [ConceptoMovimiento.CAMPAMENTO_PAGO]: 'Pago de Campamento',
@@ -70,7 +72,6 @@ export const CONCEPTO_MOVIMIENTO_LABELS: Record<ConceptoMovimiento, string> = {
   [ConceptoMovimiento.GASTO_GENERAL]: 'Gasto General',
   [ConceptoMovimiento.REEMBOLSO]: 'Reembolso',
   [ConceptoMovimiento.AJUSTE_INICIAL]: 'Ajuste Inicial',
-  [ConceptoMovimiento.AJUSTE_BONIFICACION]: 'Bonificación',
   [ConceptoMovimiento.ASIGNACION_FONDO_RAMA]: 'Asignación a Fondo de Rama',
   [ConceptoMovimiento.TRANSFERENCIA_BAJA]: 'Transferencia por Baja',
 } as const;

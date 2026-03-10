@@ -1,25 +1,23 @@
 /**
  * Persona models
  * Typed interfaces - NO any
+ * Synced with backend API: docs/API_REFERENCE.md
  */
 
-import { PersonaType, EstadoPersona, Rama } from '../enums';
+import { PersonaType, EstadoPersona, Rama, CargoEducador } from '../enums';
 
 /**
  * Base persona interface (abstract)
+ * Matches backend Persona entity
  */
 export interface Persona {
   id: string;
   tipo: PersonaType;
   nombre: string;
-  apellido: string;
-  dni: string;
   estado: EstadoPersona;
-  fechaIngreso: Date;
-  cuentaPersonalId?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
 }
 
 /**
@@ -28,7 +26,6 @@ export interface Persona {
 export interface Protagonista extends Persona {
   tipo: PersonaType.PROTAGONISTA;
   rama: Rama;
-  fueBonificado: boolean;
 }
 
 /**
@@ -36,8 +33,8 @@ export interface Protagonista extends Persona {
  */
 export interface Educador extends Persona {
   tipo: PersonaType.EDUCADOR;
-  rama?: Rama;
-  cargo?: string;
+  rama: Rama | null;
+  cargo: CargoEducador;
 }
 
 /**
@@ -45,9 +42,8 @@ export interface Educador extends Persona {
  */
 export interface PersonaExterna extends Persona {
   tipo: PersonaType.EXTERNA;
-  relacion?: string;
-  contacto?: string;
-  notas?: string;
+  contacto: string | null;
+  notas: string | null;
 }
 
 /**
@@ -57,52 +53,42 @@ export type PersonaUnion = Protagonista | Educador | PersonaExterna;
 
 /**
  * DTO for creating a protagonista
+ * Backend: POST /personas/protagonistas
  */
 export interface CreateProtagonistaDto {
   nombre: string;
-  apellido: string;
-  dni: string;
   rama: Rama;
-  fechaIngreso: string;
 }
 
 /**
  * DTO for creating an educador
+ * Backend: POST /personas/educadores
  */
 export interface CreateEducadorDto {
   nombre: string;
-  apellido: string;
-  dni: string;
-  fechaIngreso: string;
   rama?: Rama;
-  cargo?: string;
+  cargo: CargoEducador;
 }
 
 /**
  * DTO for creating a persona externa
+ * Backend: POST /personas/externas
  */
 export interface CreatePersonaExternaDto {
   nombre: string;
-  apellido: string;
-  dni: string;
-  fechaIngreso?: string;
-  relacion?: string;
   contacto?: string;
   notas?: string;
 }
 
 /**
  * DTO for updating any persona
+ * Backend: PATCH /personas/:id
  */
 export interface UpdatePersonaDto {
   nombre?: string;
-  apellido?: string;
-  dni?: string;
   estado?: EstadoPersona;
-  fechaIngreso?: string;
   rama?: Rama;
-  cargo?: string;
-  relacion?: string;
+  cargo?: CargoEducador;
   contacto?: string;
   notas?: string;
 }

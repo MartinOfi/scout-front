@@ -8,29 +8,32 @@ import { Component, OnInit, ChangeDetectionStrategy, inject, Signal, computed } 
 import { CommonModule } from '@angular/common';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon';
-import { MatSelectModule } from '@angular/material/select';
 import { filter, take } from 'rxjs';
 
 import { EducadoresStateService } from '../../../services';
 import { PersonasFormBuilder } from '../../../services/personas-form.builder';
-import { LoadingSpinnerComponent, EmptyStateComponent } from '../../../../../shared';
+import { EmptyStateComponent } from '../../../../../shared';
 import { Educador, CreateEducadorDto, UpdatePersonaDto } from '../../../../../shared/models';
-import { Rama, RAMAS } from '../../../../../shared/enums';
+import { RAMAS, CARGOS_EDUCADOR } from '../../../../../shared/enums';
+
+// Shared Form Components
+import { FormFieldComponent } from '../../../../../shared/components/form/form-field/form-field.component';
+import { TextFieldComponent } from '../../../../../shared/components/form/text-field/text-field.component';
+import { SelectFieldComponent } from '../../../../../shared/components/form/select-field/select-field.component';
 
 @Component({
   selector: 'app-educadores-form',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatCardModule, MatButtonModule,
-    MatFormFieldModule, MatInputModule, MatIconModule, MatSelectModule,
-    LoadingSpinnerComponent, EmptyStateComponent
+    CommonModule,
+    ReactiveFormsModule,
+    EmptyStateComponent,
+    FormFieldComponent,
+    TextFieldComponent,
+    SelectFieldComponent
   ],
   templateUrl: './educadores-form.component.html',
+  styleUrls: ['./educadores-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EducadoresFormComponent implements OnInit {
@@ -42,7 +45,8 @@ export class EducadoresFormComponent implements OnInit {
   form: FormGroup = this.formBuilder.buildCreateEducadorForm();
   isEditing = false;
   editId: string | null = null;
-  readonly ramas = RAMAS;
+  readonly ramas = [...RAMAS];
+  readonly cargos = [...CARGOS_EDUCADOR];
 
   readonly loading: Signal<boolean> = this.state.loading;
   readonly error: Signal<string | null> = this.state.error;

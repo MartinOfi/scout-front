@@ -18,8 +18,9 @@ export const TIPO_INSCRIPCION_LABELS: Record<TipoInscripcion, string> = {
 
 /**
  * Inscription states (calculated from payments)
+ * Synced with backend: EstadoInscripcion enum
  */
-export type EstadoInscripcion = 'pendiente' | 'parcial' | 'pagado';
+export type EstadoInscripcion = 'pendiente' | 'parcial' | 'pagado' | 'bonificado';
 
 /**
  * Labels for EstadoInscripcion
@@ -28,6 +29,7 @@ export const ESTADO_INSCRIPCION_LABELS: Record<EstadoInscripcion, string> = {
   pendiente: 'Pendiente',
   parcial: 'Pago Parcial',
   pagado: 'Pagado',
+  bonificado: 'Bonificado',
 } as const;
 
 /**

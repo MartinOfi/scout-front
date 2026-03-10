@@ -146,7 +146,7 @@ export class PersonasDashboardComponent implements OnInit {
     // Apply search filter
     if (search) {
       personas = personas.filter(p =>
-        `${p.nombre} ${p.apellido}`.toLowerCase().includes(search)
+        p.nombre.toLowerCase().includes(search)
       );
     }
 
@@ -212,7 +212,7 @@ export class PersonasDashboardComponent implements OnInit {
   private mapToTableRow(persona: PersonaUnion): PersonaTableRow {
     return {
       id: persona.id,
-      nombreCompleto: `${persona.nombre} ${persona.apellido}`,
+      nombreCompleto: persona.nombre,
       saldoPersonal: '$0', // TODO: Connect to actual saldo data
       deudaGrupo: '$0', // TODO: Connect to actual deuda data
       tipo: persona.tipo,

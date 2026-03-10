@@ -9,11 +9,14 @@ import { FormGroup, FormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 
 import { Producto, CreateProductoDto } from '../../../../../shared/models';
 import { positiveNumberValidator, decimalValidator } from '../../../../../shared/validators/custom-validators';
+
+// Shared Form Components
+import { FormFieldComponent } from '../../../../../shared/components/form/form-field/form-field.component';
+import { TextFieldComponent } from '../../../../../shared/components/form/text-field/text-field.component';
+import { NumberFieldComponent } from '../../../../../shared/components/form/number-field/number-field.component';
 
 @Component({
   selector: 'app-producto-editor',
@@ -24,8 +27,9 @@ import { positiveNumberValidator, decimalValidator } from '../../../../../shared
     MatTableModule,
     MatButtonModule,
     MatIconModule,
-    MatFormFieldModule,
-    MatInputModule
+    FormFieldComponent,
+    TextFieldComponent,
+    NumberFieldComponent
   ],
   templateUrl: './producto-editor.component.html',
   styleUrl: './producto-editor.component.scss',

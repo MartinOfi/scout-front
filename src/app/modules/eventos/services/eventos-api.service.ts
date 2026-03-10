@@ -194,4 +194,49 @@ export class EventosApiService {
       estadoPago,
     });
   }
+
+  // ============================================================================
+  // CIERRE DE EVENTO
+  // ============================================================================
+
+  /**
+   * Close an evento and distribute earnings
+   * Backend: POST /eventos/:id/cerrar
+   */
+  cerrar(
+    eventoId: string,
+    medioPago: string
+  ): Observable<{ message: string; movimientos: Movimiento[] }> {
+    return this.http.post<
+      { message: string; movimientos: Movimiento[] },
+      { medioPago: string }
+    >(`${this.endpoint}/${eventoId}/cerrar`, { medioPago });
+  }
+
+  /**
+   * Get resumen de ventas for evento
+   * Backend: GET /eventos/:id/resumen-ventas
+   */
+  getResumenVentas(eventoId: string): Observable<{
+    eventoId: string;
+    totalVentas: number;
+    totalCosto: number;
+    gananciaTotal: number;
+    ventasPorProducto: Array<{
+      productoId: string;
+      nombre: string;
+      cantidadVendida: number;
+      ingresos: number;
+      costo: number;
+      ganancia: number;
+    }>;
+    ventasPorVendedor: Array<{
+      vendedorId: string;
+      nombre: string;
+      cantidadVendida: number;
+      ganancia: number;
+    }>;
+  }> {
+    return this.http.get(`${this.endpoint}/${eventoId}/resumen-ventas`);
+  }
 }

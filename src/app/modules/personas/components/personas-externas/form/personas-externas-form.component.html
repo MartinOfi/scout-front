@@ -1,41 +1,95 @@
-<div class="form-container">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>{{ isEditing ? 'Editar Persona Externa' : 'Nueva Persona Externa' }}</mat-card-title>
-    </mat-card-header>
+<div class="scout-form-page">
+  <div class="scout-form-wrapper scout-form-wrapper--single">
+    <div class="scout-form-card">
+      <!-- Header -->
+      <header class="scout-form-header scout-form-header--with-divider">
+        <h1 class="scout-form-title">
+          <i class="fas fa-user-friends scout-form-icon"></i>
+          {{ isEditing ? 'Editar Persona Externa' : 'Nueva Persona Externa' }}
+        </h1>
+        <p class="scout-form-subtitle">
+          {{ isEditing ? 'Modifica los datos de la persona externa' : 'Registra una nueva persona externa (padre, colaborador, etc.)' }}
+        </p>
+      </header>
 
-    <mat-card-content>
-      @if (loading()) {
-        <app-loading-spinner message="Guardando..." />
-      } @else if (error()) {
-        <app-empty-state
-          icon="error_outline"
-          [message]="error() ?? 'Error al guardar'"
-          actionLabel="Reintentar"
-          (onAction)="onSubmit()" />
-      } @else {
-        <form [formGroup]="form" (ngSubmit)="onSubmit()">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Nombre</mat-label>
-            <input matInput formControlName="nombre" placeholder="Nombre completo">
-            @if (form.get('nombre')?.hasError('required')) {
-              <mat-error>El nombre es requerido</mat-error>
-            }
-          </mat-form-field>
+      <!-- Content -->
+      <div class="scout-form-body">
+        @if (loading()) {
+          <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Guardando...</p>
+          </div>
+        } @else if (error()) {
+          <app-empty-state
+            icon="error_outline"
+            [message]="error() ?? 'Error al guardar'"
+            actionLabel="Reintentar"
+            (onAction)="onSubmit()"
+          />
+        } @else {
+          <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <!-- Nombre -->
+            <app-form-field
+              label="Nombre"
+              [forId]="'nombre-input'"
+              [required]="true"
+              [invalid]="!!(form.get('nombre')?.invalid && form.get('nombre')?.touched)"
+            >
+              <app-text-field
+                id="nombre-input"
+                formControlName="nombre"
+                placeholder="Nombre completo"
+              />
+              <span error>El nombre es requerido (mínimo 2 caracteres)</span>
+            </app-form-field>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Relación</mat-label>
-            <input matInput formControlName="relacion" placeholder="Ej: Padre, Madre, Colaborador">
-          </mat-form-field>
+            <!-- Contacto -->
+            <app-form-field
+              label="Contacto"
+              [forId]="'contacto-input'"
+              hint="Opcional - Teléfono o email de contacto"
+            >
+              <app-text-field
+                id="contacto-input"
+                formControlName="contacto"
+                placeholder="Ej: +54 11 1234-5678"
+              />
+            </app-form-field>
 
-          <div class="form-actions">
-            <button mat-button type="button" (click)="onCancel()">Cancelar</button>
-            <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading()">
+            <!-- Notas -->
+            <app-form-field
+              label="Notas"
+              [forId]="'notas-input'"
+              hint="Opcional - Información adicional"
+            >
+              <app-text-field
+                id="notas-input"
+                formControlName="notas"
+                placeholder="Ej: Padre de Juan, disponible los sábados"
+              />
+            </app-form-field>
+          </form>
+        }
+      </div>
+
+      <!-- Actions -->
+      @if (!loading() && !error()) {
+        <div class="scout-form-actions">
+          <div class="scout-form-actions__row scout-form-actions__row--between">
+            <button type="button" class="btn-secondary" (click)="onCancel()">
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="btn-primary"
+              [disabled]="form.invalid || loading()"
+              (click)="onSubmit()"
+            >
               {{ isEditing ? 'Guardar Cambios' : 'Crear Persona Externa' }}
             </button>
           </div>
-        </form>
+        </div>
       }
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </div>
 </div>

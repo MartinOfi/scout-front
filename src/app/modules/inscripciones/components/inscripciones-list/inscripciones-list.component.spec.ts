@@ -46,6 +46,9 @@ describe('InscripcionesListComponent', () => {
     autorizacionIngreso: false,
     createdAt: '2026-01-01T00:00:00Z',
     updatedAt: '2026-01-01T00:00:00Z',
+    montoPagado: 0,
+    saldoPendiente: 15000,
+    estado: 'pendiente',
     ...overrides,
   });
 
@@ -171,6 +174,9 @@ describe('InscripcionesListComponent', () => {
           tipo: 'scout_argentina',
           montoTotal: 15000,
           montoBonificado: 5000,
+          montoPagado: 8000,
+          saldoPendiente: 2000,
+          estado: 'parcial',
         }),
       ];
 
@@ -183,7 +189,9 @@ describe('InscripcionesListComponent', () => {
       expect(tableData[0].id).toBe('1');
       expect(tableData[0].montoTotal).toBe('$15.000');
       expect(tableData[0].montoBonificado).toBe('$5.000');
-      expect(tableData[0].montoAPagar).toBe('$10.000');
+      expect(tableData[0].montoPagado).toBe('$8.000');
+      expect(tableData[0].saldoPendiente).toBe('$2.000');
+      expect(tableData[0].estado).toBe('parcial');
     });
 
     it('should show dash for zero bonificado', () => {
@@ -197,6 +205,19 @@ describe('InscripcionesListComponent', () => {
 
       const tableData = component.tableData();
       expect(tableData[0].montoBonificado).toBe('-');
+    });
+
+    it('should default to pendiente estado when not provided', () => {
+      const mockInscripciones: Inscripcion[] = [
+        createMockInscripcion({ id: '1', tipo: 'scout_argentina' }),
+      ];
+
+      mockStateService.inscripciones.set(mockInscripciones);
+      component.activeTab.set('scout_argentina');
+      TestBed.flushEffects();
+
+      const tableData = component.tableData();
+      expect(tableData[0].estado).toBe('pendiente');
     });
   });
 
@@ -219,14 +240,27 @@ describe('InscripcionesListComponent', () => {
   });
 
   describe('Filter Change Handling', () => {
-    it('should handle filter change', () => {
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation();
+    it('should update currentFilters on onFilterChange', () => {
       const filtros = { search: 'Juan', ano: '2026' };
 
       component.onFilterChange(filtros);
 
-      expect(consoleSpy).toHaveBeenCalledWith('Filter changed:', filtros);
-      consoleSpy.mockRestore();
+      expect(component.currentFilters()).toEqual({ search: 'Juan', ano: '2026' });
+    });
+
+    it('should filter inscripciones by search term', () => {
+      const mockInscripciones: Inscripcion[] = [
+        createMockInscripcion({ id: '1', tipo: 'scout_argentina', persona: { id: 'p1', nombre: 'Juan Pérez' } as any }),
+        createMockInscripcion({ id: '2', tipo: 'scout_argentina', persona: { id: 'p2', nombre: 'María López' } as any }),
+      ];
+
+      mockStateService.inscripciones.set(mockInscripciones);
+      component.activeTab.set('scout_argentina');
+      component.onFilterChange({ search: 'Juan', ano: '' });
+      TestBed.flushEffects();
+
+      expect(component.filteredInscripciones().length).toBe(1);
+      expect(component.filteredInscripciones()[0].id).toBe('1');
     });
   });
 

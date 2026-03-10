@@ -8,27 +8,29 @@ import { Component, OnInit, ChangeDetectionStrategy, inject, Signal, computed } 
 import { CommonModule } from '@angular/common';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon';
 import { filter, take } from 'rxjs';
 
 import { PersonasExternasStateService } from '../../../services';
 import { PersonasFormBuilder } from '../../../services/personas-form.builder';
-import { LoadingSpinnerComponent, EmptyStateComponent } from '../../../../../shared';
+import { EmptyStateComponent } from '../../../../../shared';
 import { PersonaExterna, CreatePersonaExternaDto, UpdatePersonaDto } from '../../../../../shared/models';
+
+// Shared Form Components
+import { FormFieldComponent } from '../../../../../shared/components/form/form-field/form-field.component';
+import { TextFieldComponent } from '../../../../../shared/components/form/text-field/text-field.component';
 
 @Component({
   selector: 'app-personas-externas-form',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatCardModule, MatButtonModule,
-    MatFormFieldModule, MatInputModule, MatIconModule,
-    LoadingSpinnerComponent, EmptyStateComponent
+    CommonModule,
+    ReactiveFormsModule,
+    EmptyStateComponent,
+    FormFieldComponent,
+    TextFieldComponent
   ],
   templateUrl: './personas-externas-form.component.html',
+  styleUrls: ['./personas-externas-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PersonasExternasFormComponent implements OnInit {

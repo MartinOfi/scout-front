@@ -8,20 +8,18 @@ import { Component, OnInit, ChangeDetectionStrategy, inject, Signal, computed } 
 import { CommonModule } from '@angular/common';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon';
 import { filter, take } from 'rxjs';
 
 import { PersonasStateService } from '../../../services';
 import { PersonasFormBuilder } from '../../../services/personas-form.builder';
-import { LoadingSpinnerComponent, EmptyStateComponent } from '../../../../../shared';
+import { EmptyStateComponent } from '../../../../../shared';
 import { Protagonista, CreateProtagonistaDto, UpdatePersonaDto } from '../../../../../shared/models';
-import { Rama } from '../../../../../shared/enums';
+import { Rama, RAMAS } from '../../../../../shared/enums';
 
-import { RamaSelectorComponent } from './components/rama-selector/rama-selector.component';
+// Shared Form Components
+import { FormFieldComponent } from '../../../../../shared/components/form/form-field/form-field.component';
+import { TextFieldComponent } from '../../../../../shared/components/form/text-field/text-field.component';
+import { SelectFieldComponent } from '../../../../../shared/components/form/select-field/select-field.component';
 
 @Component({
   selector: 'app-protagonistas-form',
@@ -29,16 +27,13 @@ import { RamaSelectorComponent } from './components/rama-selector/rama-selector.
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatCardModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    LoadingSpinnerComponent,
     EmptyStateComponent,
-    RamaSelectorComponent
+    FormFieldComponent,
+    TextFieldComponent,
+    SelectFieldComponent
   ],
   templateUrl: './protagonistas-form.component.html',
+  styleUrls: ['./protagonistas-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProtagonistasFormComponent implements OnInit {
@@ -50,6 +45,7 @@ export class ProtagonistasFormComponent implements OnInit {
   form: FormGroup = this.formBuilder.buildCreateProtagonistaForm();
   isEditing = false;
   editId: string | null = null;
+  readonly ramas = [...RAMAS];
 
   readonly loading: Signal<boolean> = this.state.loading;
   readonly error: Signal<string | null> = this.state.error;
@@ -95,9 +91,5 @@ export class ProtagonistasFormComponent implements OnInit {
 
   onCancel(): void {
     this.router.navigate(['/personas/protagonistas']);
-  }
-
-  onRamaChange(rama: Rama): void {
-    this.form.patchValue({ rama });
   }
 }

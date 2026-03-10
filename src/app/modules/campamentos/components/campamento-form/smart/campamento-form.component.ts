@@ -10,13 +10,16 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { MatCardModule } from '@angular/material/card';
 
 import { CampamentosStateService, CampamentosFormBuilder } from '../../../services';
-import { LoadingSpinnerComponent } from '../../../../../shared';
+
+// Shared Form Components
+import { FormFieldComponent } from '../../../../../shared/components/form/form-field/form-field.component';
+import { TextFieldComponent } from '../../../../../shared/components/form/text-field/text-field.component';
+import { NumberFieldComponent } from '../../../../../shared/components/form/number-field/number-field.component';
+import { TextareaFieldComponent } from '../../../../../shared/components/form/textarea-field/textarea-field.component';
 
 @Component({
   selector: 'app-campamento-form',
@@ -26,23 +29,22 @@ import { LoadingSpinnerComponent } from '../../../../../shared';
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatCardModule,
-    LoadingSpinnerComponent
+    FormFieldComponent,
+    TextFieldComponent,
+    NumberFieldComponent,
+    TextareaFieldComponent
   ],
   templateUrl: './campamento-form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CampamentoFormComponent implements OnInit {
-  // Services
   readonly state: CampamentosStateService = inject(CampamentosStateService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly formBuilder = inject(CampamentosFormBuilder);
 
-  // Form
   readonly form: FormGroup = this.formBuilder.buildCreateForm();
   readonly isEditing = signal(false);
   readonly loading = signal(false);
@@ -57,8 +59,6 @@ export class CampamentoFormComponent implements OnInit {
 
   loadCampamento(id: string): void {
     this.loading.set(true);
-    // TODO: Cargar campamento por ID y poblar el form
-    // this.state.selected (cargar por ID si no existe computed)
     this.loading.set(false);
   }
 

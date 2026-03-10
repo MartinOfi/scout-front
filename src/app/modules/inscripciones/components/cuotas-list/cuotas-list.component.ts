@@ -4,30 +4,26 @@
  * SIN any - tipado estricto
  */
 
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatChipsModule } from '@angular/material/chips';
 import { CuotasStateService } from '../../../cuotas/services/cuotas-state.service';
-import { Cuota } from '../../../../shared/models';
-import { EstadoCuota, ESTADO_CUOTA_LABELS } from '../../../../shared/enums';
+import { ESTADO_CUOTA_LABELS } from '../../../../shared/enums';
+import { DataTableComponent } from '../../../../shared/components/tables/data-table.component';
+import { TableColumn, TableData, ActionEvent } from '../../../../shared/models/table.model';
 
 @Component({
   selector: 'app-cuotas-list',
   standalone: true,
   imports: [
     CommonModule,
-    MatCardModule,
     MatButtonModule,
     MatIconModule,
-    MatTableModule,
     MatProgressSpinnerModule,
-    MatChipsModule
+    DataTableComponent
   ],
   templateUrl: './cuotas-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -39,16 +35,45 @@ export class CuotasListComponent implements OnInit {
   readonly cuotas = this.state.cuotas;
   readonly loading = this.state.loading;
   readonly error = this.state.error;
-  readonly estadoLabels = ESTADO_CUOTA_LABELS;
 
-  displayedColumns: string[] = ['persona', 'numero', 'ano', 'monto', 'estado', 'acciones'];
+  readonly tableData = computed((): TableData[] => {
+    return this.cuotas().map(c => ({
+      id: c.id,
+      persona: c.persona?.nombre || '',
+      nombre: c.nombre,
+      ano: c.ano,
+      monto: c.montoTotal,
+      estado: ESTADO_CUOTA_LABELS[c.estado] || c.estado
+    }));
+  });
+
+  readonly tableColumns: TableColumn[] = [
+    { key: 'persona', header: 'Persona', type: 'text', sortable: true },
+    { key: 'nombre', header: 'Cuota', type: 'text', sortable: true },
+    { key: 'ano', header: 'Año', type: 'number', sortable: true },
+    { key: 'monto', header: 'Monto', type: 'number', sortable: true,
+      formatter: (value: unknown) => `$${(value as number).toLocaleString('es-AR')}` },
+    { key: 'estado', header: 'Estado', type: 'status', sortable: true },
+    {
+      key: 'actions',
+      header: 'Acciones',
+      type: 'action',
+      actions: [
+        { key: 'payment', label: 'Pagar', icon: 'payment', tooltip: 'Registrar pago' }
+      ]
+    }
+  ];
 
   ngOnInit(): void {
     this.state.load();
   }
 
-  getEstadoLabel(estado: EstadoCuota): string {
-    return this.estadoLabels[estado];
+  onActionClick(event: ActionEvent): void {
+    const id = event.row['id'] as string;
+    if (event.action === 'payment') {
+      // TODO: Open payment dialog
+      console.log('Register payment for cuota:', id);
+    }
   }
 
   onBack(): void {

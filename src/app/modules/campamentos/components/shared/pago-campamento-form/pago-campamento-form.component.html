@@ -4,10 +4,12 @@
       <span class="label">Monto Total:</span>
       <span class="value">${{ montoTotal | number:'1.2-2' }}</span>
     </div>
-    <div class="summary-item" *ngIf="saldoCuentaPersonal > 0">
-      <span class="label">Saldo Cuenta Personal:</span>
-      <span class="value success">${{ saldoCuentaPersonal | number:'1.2-2' }}</span>
-    </div>
+    @if (saldoCuentaPersonal > 0) {
+      <div class="summary-item">
+        <span class="label">Saldo Cuenta Personal:</span>
+        <span class="value success">${{ saldoCuentaPersonal | number:'1.2-2' }}</span>
+      </div>
+    }
     <div class="summary-item">
       <span class="label">Monto Restante:</span>
       <span class="value" [class.success]="montoRestante === 0">
@@ -16,51 +18,69 @@
     </div>
   </div>
 
-  <mat-divider></mat-divider>
+  <hr class="divider" />
 
   <div class="form-fields">
-    <mat-form-field>
-      <mat-label>Monto del Pago</mat-label>
-      <input matInput type="number" formControlName="monto" step="0.01" min="0">
-      <span matTextPrefix>$&nbsp;</span>
-      <mat-error *ngIf="form.get('monto')?.hasError('required')">
-        El monto es requerido
-      </mat-error>
-      <mat-error *ngIf="form.get('monto')?.hasError('positiveNumber')">
-        Debe ser un número positivo
-      </mat-error>
-      <mat-error *ngIf="form.get('monto')?.hasError('max')">
-        No puede exceder ${{ montoTotal }}
-      </mat-error>
-    </mat-form-field>
+    <!-- Monto -->
+    <app-form-field
+      label="Monto del Pago"
+      [forId]="'monto-input'"
+      [required]="true"
+      [invalid]="!!(form.get('monto')?.invalid && form.get('monto')?.touched)"
+    >
+      <div class="input-with-prefix">
+        <span class="input-prefix">$</span>
+        <app-number-field
+          id="monto-input"
+          formControlName="monto"
+          [min]="0"
+          [step]="0.01"
+          placeholder="0.00"
+        />
+      </div>
+      @if (form.get('monto')?.hasError('required')) {
+        <span error>El monto es requerido</span>
+      } @else if (form.get('monto')?.hasError('positiveNumber')) {
+        <span error>Debe ser un número positivo</span>
+      } @else if (form.get('monto')?.hasError('max')) {
+        <span error>No puede exceder ${{ montoTotal }}</span>
+      }
+    </app-form-field>
 
-    <mat-form-field>
-      <mat-label>Medio de Pago</mat-label>
-      <mat-select formControlName="medioPago">
-        <mat-option *ngFor="let medio of mediosPago" [value]="medio">
-          {{ medio }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="form.get('medioPago')?.hasError('required')">
-        Seleccione un medio de pago
-      </mat-error>
-    </mat-form-field>
+    <!-- Medio de Pago -->
+    <app-form-field
+      label="Medio de Pago"
+      [forId]="'medio-pago-select'"
+      [required]="true"
+      [invalid]="!!(form.get('medioPago')?.invalid && form.get('medioPago')?.touched)"
+    >
+      <app-select-field
+        id="medio-pago-select"
+        formControlName="medioPago"
+        placeholder="Seleccionar medio"
+        [options]="mediosPago"
+      />
+      <span error>Seleccione un medio de pago</span>
+    </app-form-field>
   </div>
 
-  <div class="quick-actions" *ngIf="puedeUsarCuenta">
-    <button
-      mat-stroked-button
-      type="button"
-      (click)="usarSaldoDisponible()">
-      <mat-icon>account_balance_wallet</mat-icon>
-      Usar Saldo Disponible ({{ saldoCuentaPersonal | number:'1.2-2' }})
-    </button>
-  </div>
+  @if (puedeUsarCuenta) {
+    <div class="quick-actions">
+      <button type="button" class="btn-outline" (click)="usarSaldoDisponible()">
+        <i class="fas fa-wallet"></i>
+        Usar Saldo Disponible (${{ saldoCuentaPersonal | number:'1.2-2' }})
+      </button>
+    </div>
+  }
 
-  <div class="actions">
-    <button mat-button type="button" (click)="onCancel()">Cancelar</button>
-    <button mat-raised-button color="primary" type="submit" (click)="onSubmit()">
-      Registrar Pago
-    </button>
+  <div class="scout-form-actions">
+    <div class="scout-form-actions__row scout-form-actions__row--between">
+      <button type="button" class="btn-secondary" (click)="onCancel()">
+        Cancelar
+      </button>
+      <button type="submit" class="btn-primary" (click)="onSubmit()">
+        Registrar Pago
+      </button>
+    </div>
   </div>
 </form>

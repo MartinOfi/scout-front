@@ -1,9 +1,9 @@
 // =============================================================================
-// CAMPAMENTO FORM STYLES
+// MOVIMIENTO FORM STYLES
 // =============================================================================
 
 @use 'sass:color';
-@use '../../../../../shared/components/form/form-tokens' as *;
+@use '../../../../shared/components/form/form-tokens' as *;
 
 // Page layout
 .scout-form-page {
@@ -77,7 +77,6 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  // Material form field styling within rows
   mat-form-field {
     width: 100%;
     margin-bottom: 20px;
@@ -108,6 +107,14 @@
   }
 }
 
+// Toggle field styling
+.toggle-field {
+  display: flex;
+  align-items: center;
+  padding-top: 16px;
+  margin-bottom: 20px;
+}
+
 // Actions
 .scout-form-actions {
   padding: 20px 28px 28px;
@@ -136,6 +143,9 @@
   cursor: pointer;
   transition: all $transition-fast;
   border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 
   &:focus-visible {
     outline: 2px solid $brand-burgundy;
@@ -172,21 +182,12 @@
   }
 }
 
-// Loading state
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 48px 24px;
-  gap: 16px;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid $stone-200;
-  border-top-color: $brand-burgundy;
+// Loading spinner small (for button)
+.loading-spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -197,13 +198,7 @@
   }
 }
 
-.loading-text {
-  font-size: 14px;
-  color: $stone-500;
-  margin: 0;
-}
-
-// Override Material datepicker to match scout style
+// Override Material components to match scout style
 ::ng-deep {
   mat-form-field {
     .mdc-text-field--outlined {
@@ -217,6 +212,23 @@
 
     .mat-mdc-form-field-subscript-wrapper {
       display: none;
+    }
+  }
+
+  mat-slide-toggle {
+    --mdc-switch-selected-track-color: #{$brand-burgundy};
+    --mdc-switch-selected-handle-color: #{$brand-burgundy};
+    --mdc-switch-selected-hover-track-color: #{$brand-burgundy-light};
+    --mdc-switch-selected-hover-handle-color: #{$brand-burgundy-light};
+    --mdc-switch-selected-focus-track-color: #{$brand-burgundy};
+    --mdc-switch-selected-focus-handle-color: #{$brand-burgundy};
+    --mdc-switch-selected-pressed-track-color: #{$brand-burgundy};
+    --mdc-switch-selected-pressed-handle-color: #{$brand-burgundy};
+
+    .mdc-label {
+      font-family: var(--font-family-base);
+      font-size: 14px;
+      color: $stone-700;
     }
   }
 }

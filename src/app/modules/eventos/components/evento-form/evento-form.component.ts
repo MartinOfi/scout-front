@@ -8,17 +8,25 @@ import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatNativeDateModule } from '@angular/material/core';
+
 import { EventosStateService } from '../../services/eventos-state.service';
 import { CreateEventoDto, UpdateEventoDto } from '../../../../shared/models';
 import { TipoEvento, DestinoGanancia, DESTINO_GANANCIA_LABELS, TIPO_EVENTO_LABELS } from '../../../../shared/enums';
+
+// Shared Form Components
+import { FormFieldComponent } from '../../../../shared/components/form/form-field/form-field.component';
+import { TextFieldComponent } from '../../../../shared/components/form/text-field/text-field.component';
+import { TextareaFieldComponent } from '../../../../shared/components/form/textarea-field/textarea-field.component';
+import { SelectFieldComponent } from '../../../../shared/components/form/select-field/select-field.component';
+
+interface SelectOption {
+  value: string;
+  label: string;
+}
 
 @Component({
   selector: 'app-evento-form',
@@ -26,16 +34,17 @@ import { TipoEvento, DestinoGanancia, DESTINO_GANANCIA_LABELS, TIPO_EVENTO_LABEL
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule,
     MatDatepickerModule,
-    MatProgressSpinnerModule
+    MatNativeDateModule,
+    FormFieldComponent,
+    TextFieldComponent,
+    TextareaFieldComponent,
+    SelectFieldComponent
   ],
   templateUrl: './evento-form.component.html',
+  styleUrls: ['./evento-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EventoFormComponent implements OnInit {
@@ -49,6 +58,17 @@ export class EventoFormComponent implements OnInit {
   readonly tipoLabels = TIPO_EVENTO_LABELS;
   readonly destinoLabels = DESTINO_GANANCIA_LABELS;
   readonly destinos: DestinoGanancia[] = Object.values(DestinoGanancia);
+
+  // Options for select fields
+  readonly tipoOptions: SelectOption[] = [
+    { value: TipoEvento.GRUPO, label: TIPO_EVENTO_LABELS[TipoEvento.GRUPO] },
+    { value: TipoEvento.VENTA, label: TIPO_EVENTO_LABELS[TipoEvento.VENTA] }
+  ];
+
+  readonly destinoOptions: SelectOption[] = Object.values(DestinoGanancia).map(d => ({
+    value: d,
+    label: DESTINO_GANANCIA_LABELS[d]
+  }));
 
   eventoForm: FormGroup = this.fb.group({
     nombre: ['', [Validators.required, Validators.maxLength(100)]],

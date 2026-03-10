@@ -1,5 +1,5 @@
 // =============================================================================
-// CAMPAMENTO FORM STYLES
+// PROTAGONISTAS FORM STYLES
 // =============================================================================
 
 @use 'sass:color';
@@ -65,47 +65,6 @@
 
 .scout-form-body {
   padding: 28px;
-}
-
-// Form rows
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0 20px;
-
-  @media (min-width: 480px) {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  // Material form field styling within rows
-  mat-form-field {
-    width: 100%;
-    margin-bottom: 20px;
-  }
-}
-
-// Input with prefix
-.input-with-prefix {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.input-prefix {
-  position: absolute;
-  left: 14px;
-  color: $stone-500;
-  font-weight: 500;
-  font-size: 15px;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.input-with-prefix ::ng-deep {
-  .scout-input,
-  input {
-    padding-left: 32px;
-  }
 }
 
 // Actions
@@ -201,22 +160,4 @@
   font-size: 14px;
   color: $stone-500;
   margin: 0;
-}
-
-// Override Material datepicker to match scout style
-::ng-deep {
-  mat-form-field {
-    .mdc-text-field--outlined {
-      --mdc-outlined-text-field-container-shape: 10px;
-      --mdc-outlined-text-field-outline-color: #{$stone-300};
-      --mdc-outlined-text-field-hover-outline-color: #{$stone-400};
-      --mdc-outlined-text-field-focus-outline-color: #{$brand-burgundy};
-      --mdc-outlined-text-field-label-text-color: #{$stone-700};
-      --mdc-outlined-text-field-input-text-color: #{$stone-800};
-    }
-
-    .mat-mdc-form-field-subscript-wrapper {
-      display: none;
-    }
-  }
 }

@@ -59,3 +59,24 @@ export const RAMA_LABELS: Record<Rama, string> = {
   'Caminantes': 'Caminantes',
   'Rovers': 'Rovers',
 } as const;
+
+/**
+ * Cargos de educadores
+ * Synced with backend: CargoEducador enum
+ */
+export enum CargoEducador {
+  EDUCADOR = 'Educador',
+  JEFE_DE_RAMA = 'Jefe de Rama',
+  JEFE_DE_GRUPO = 'Jefe de Grupo',
+}
+
+export const CARGOS_EDUCADOR = Object.values(CargoEducador);
+
+/**
+ * Labels for CargoEducador (for UI display)
+ */
+export const CARGO_EDUCADOR_LABELS: Record<CargoEducador, string> = {
+  [CargoEducador.EDUCADOR]: 'Educador',
+  [CargoEducador.JEFE_DE_RAMA]: 'Jefe de Rama',
+  [CargoEducador.JEFE_DE_GRUPO]: 'Jefe de Grupo',
+} as const;

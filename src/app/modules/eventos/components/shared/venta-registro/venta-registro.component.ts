@@ -6,13 +6,14 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormGroup, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
 
 import { Producto, Persona, CreateVentaProductoDto } from '../../../../../shared/models';
 import { positiveNumberValidator } from '../../../../../shared/validators/custom-validators';
+
+// Shared Form Components
+import { FormFieldComponent } from '../../../../../shared/components/form/form-field/form-field.component';
+import { NumberFieldComponent } from '../../../../../shared/components/form/number-field/number-field.component';
+import { SelectFieldComponent } from '../../../../../shared/components/form/select-field/select-field.component';
 
 @Component({
   selector: 'app-venta-registro',
@@ -20,10 +21,9 @@ import { positiveNumberValidator } from '../../../../../shared/validators/custom
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule
+    FormFieldComponent,
+    NumberFieldComponent,
+    SelectFieldComponent
   ],
   templateUrl: './venta-registro.component.html',
   styleUrl: './venta-registro.component.scss',
@@ -47,6 +47,12 @@ export class VentaRegistroComponent implements OnInit {
       cantidad: [1, [Validators.required, positiveNumberValidator(), Validators.min(1)]]
     });
   }
+
+  // Option functions for select fields
+  getProductoId = (producto: Producto): string => producto.id;
+  getProductoLabel = (producto: Producto): string => `${producto.nombre} - $${producto.precioVenta.toFixed(2)}`;
+  getPersonaId = (persona: Persona): string => persona.id;
+  getPersonaLabel = (persona: Persona): string => persona.nombre;
 
   get productoSeleccionado(): Producto | undefined {
     const id = this.form.get('productoId')?.value;

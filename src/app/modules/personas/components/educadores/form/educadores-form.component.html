@@ -1,51 +1,99 @@
-<div class="form-container">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>{{ isEditing ? 'Editar Educador' : 'Nuevo Educador' }}</mat-card-title>
-    </mat-card-header>
+<div class="scout-form-page">
+  <div class="scout-form-wrapper scout-form-wrapper--single">
+    <div class="scout-form-card">
+      <!-- Header -->
+      <header class="scout-form-header scout-form-header--with-divider">
+        <h1 class="scout-form-title">
+          <i class="fas fa-user-tie scout-form-icon"></i>
+          {{ isEditing ? 'Editar Educador' : 'Nuevo Educador' }}
+        </h1>
+        <p class="scout-form-subtitle">
+          {{ isEditing ? 'Modifica los datos del educador' : 'Registra un nuevo educador en el grupo' }}
+        </p>
+      </header>
 
-    <mat-card-content>
-      @if (loading()) {
-        <app-loading-spinner message="Guardando..." />
-      } @else if (error()) {
-        <app-empty-state
-          icon="error_outline"
-          [message]="error() ?? 'Error al guardar'"
-          actionLabel="Reintentar"
-          (onAction)="onSubmit()" />
-      } @else {
-        <form [formGroup]="form" (ngSubmit)="onSubmit()">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Nombre</mat-label>
-            <input matInput formControlName="nombre" placeholder="Nombre completo">
-            @if (form.get('nombre')?.hasError('required')) {
-              <mat-error>El nombre es requerido</mat-error>
-            }
-          </mat-form-field>
+      <!-- Content -->
+      <div class="scout-form-body">
+        @if (loading()) {
+          <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Guardando...</p>
+          </div>
+        } @else if (error()) {
+          <app-empty-state
+            icon="error_outline"
+            [message]="error() ?? 'Error al guardar'"
+            actionLabel="Reintentar"
+            (onAction)="onSubmit()"
+          />
+        } @else {
+          <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <!-- Nombre -->
+            <app-form-field
+              label="Nombre"
+              [forId]="'nombre-input'"
+              [required]="true"
+              [invalid]="!!(form.get('nombre')?.invalid && form.get('nombre')?.touched)"
+            >
+              <app-text-field
+                id="nombre-input"
+                formControlName="nombre"
+                placeholder="Nombre completo"
+              />
+              <span error>El nombre es requerido (mínimo 2 caracteres)</span>
+            </app-form-field>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Rama</mat-label>
-            <mat-select formControlName="rama">
-              <mat-option [value]="null">Sin rama específica</mat-option>
-              @for (rama of ramas; track rama) {
-                <mat-option [value]="rama">{{ rama }}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
+            <!-- Rama (Opcional) -->
+            <app-form-field
+              label="Rama"
+              [forId]="'rama-select'"
+              hint="Opcional - Asignar a una rama específica"
+            >
+              <app-select-field
+                id="rama-select"
+                formControlName="rama"
+                placeholder="Sin rama específica"
+                [options]="ramas"
+              />
+            </app-form-field>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Cargo</mat-label>
-            <input matInput formControlName="cargo" placeholder="Ej: Jefe de Grupo">
-          </mat-form-field>
+            <!-- Cargo -->
+            <app-form-field
+              label="Cargo"
+              [forId]="'cargo-select'"
+              [required]="true"
+              [invalid]="!!(form.get('cargo')?.invalid && form.get('cargo')?.touched)"
+            >
+              <app-select-field
+                id="cargo-select"
+                formControlName="cargo"
+                placeholder="Seleccionar cargo"
+                [options]="cargos"
+              />
+              <span error>El cargo es requerido</span>
+            </app-form-field>
+          </form>
+        }
+      </div>
 
-          <div class="form-actions">
-            <button mat-button type="button" (click)="onCancel()">Cancelar</button>
-            <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading()">
+      <!-- Actions -->
+      @if (!loading() && !error()) {
+        <div class="scout-form-actions">
+          <div class="scout-form-actions__row scout-form-actions__row--between">
+            <button type="button" class="btn-secondary" (click)="onCancel()">
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="btn-primary"
+              [disabled]="form.invalid || loading()"
+              (click)="onSubmit()"
+            >
               {{ isEditing ? 'Guardar Cambios' : 'Crear Educador' }}
             </button>
           </div>
-        </form>
+        </div>
       }
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </div>
 </div>

@@ -21,12 +21,18 @@ import { FilterType } from '../../../../shared/components/filters/generic-filter
 import { TableColumn, ActionEvent, TableAction } from '../../../../shared/models/table.model';
 import { TipoInscripcion } from '../../../../shared/enums';
 import { Inscripcion } from '../../../../shared/models';
+import { ConfirmDialogService } from '../../../../shared/services';
 
 interface StatConfig {
   readonly icon: string;
   readonly title: string;
   readonly value: number;
   readonly variant: StatCardVariant;
+}
+
+interface InscripcionFilters {
+  search: string;
+  ano: string;
 }
 
 interface InscripcionTableRow {
@@ -36,7 +42,13 @@ interface InscripcionTableRow {
   ano: number;
   montoTotal: string;
   montoBonificado: string;
-  montoAPagar: string;
+  montoPagado: string;
+  saldoPendiente: string;
+  estado: string;
+  declaracionDeSalud: boolean;
+  autorizacionDeImagen: boolean;
+  salidasCercanas: boolean;
+  autorizacionIngreso: boolean;
 }
 
 @Component({
@@ -60,6 +72,7 @@ interface InscripcionTableRow {
 export class InscripcionesListComponent implements OnInit {
   readonly state: InscripcionesStateService = inject(InscripcionesStateService);
   private readonly router = inject(Router);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   readonly inscripciones = this.state.inscripciones;
   readonly loading = this.state.loading;
@@ -68,10 +81,30 @@ export class InscripcionesListComponent implements OnInit {
   /** Currently active tab (tipo) */
   readonly activeTab = signal<TipoInscripcion>('scout_argentina');
 
-  /** Filtered inscripciones by active tab */
+  /** Current filter values */
+  readonly currentFilters = signal<InscripcionFilters>({ search: '', ano: '' });
+
+  /** Filtered inscripciones by active tab and filters */
   readonly filteredInscripciones = computed((): Inscripcion[] => {
     const tipo = this.activeTab();
-    return this.inscripciones().filter((i) => i.tipo === tipo);
+    const filters = this.currentFilters();
+
+    return this.inscripciones().filter((inscripcion) => {
+      // Filter by tipo (tab)
+      if (inscripcion.tipo !== tipo) return false;
+
+      // Filter by year
+      if (filters.ano && inscripcion.ano !== parseInt(filters.ano, 10)) return false;
+
+      // Filter by search (persona name)
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        const personaName = inscripcion.persona?.nombre?.toLowerCase() || '';
+        if (!personaName.includes(searchLower)) return false;
+      }
+
+      return true;
+    });
   });
 
   readonly stats = computed((): readonly StatConfig[] => {
@@ -92,7 +125,13 @@ export class InscripcionesListComponent implements OnInit {
       ano: i.ano,
       montoTotal: `$${i.montoTotal.toLocaleString()}`,
       montoBonificado: i.montoBonificado > 0 ? `$${i.montoBonificado.toLocaleString()}` : '-',
-      montoAPagar: `$${(i.montoTotal - i.montoBonificado).toLocaleString()}`,
+      montoPagado: `$${(i.montoPagado ?? 0).toLocaleString()}`,
+      saldoPendiente: `$${(i.saldoPendiente ?? 0).toLocaleString()}`,
+      estado: i.estado ?? 'pendiente',
+      declaracionDeSalud: i.declaracionDeSalud,
+      autorizacionDeImagen: i.autorizacionDeImagen,
+      salidasCercanas: i.salidasCercanas,
+      autorizacionIngreso: i.autorizacionIngreso,
     }));
   });
 
@@ -101,6 +140,17 @@ export class InscripcionesListComponent implements OnInit {
     { key: 'scout_argentina', label: 'Scout Argentina', icon: 'badge' },
     { key: 'grupo', label: 'Grupo', icon: 'groups' },
   ];
+
+  /** Generate year options dynamically (current year ± 1) */
+  private getYearOptions(): { value: string; label: string }[] {
+    const currentYear = new Date().getFullYear();
+    return [
+      { value: '', label: 'Todos los años' },
+      { value: String(currentYear - 1), label: String(currentYear - 1) },
+      { value: String(currentYear), label: String(currentYear) },
+      { value: String(currentYear + 1), label: String(currentYear + 1) },
+    ];
+  }
 
   /** Filter configurations */
   readonly filterConfigs: FilterConfig[] = [
@@ -116,11 +166,7 @@ export class InscripcionesListComponent implements OnInit {
       type: FilterType.SELECT,
       label: 'Año',
       placeholder: 'Todos los años',
-      options: [
-        { value: '', label: 'Todos los años' },
-        { value: '2025', label: '2025' },
-        { value: '2026', label: '2026' },
-      ],
+      options: this.getYearOptions(),
       defaultValue: '',
     },
   ];
@@ -128,10 +174,13 @@ export class InscripcionesListComponent implements OnInit {
   /** Table columns configuration */
   readonly tableColumns: TableColumn[] = [
     { key: 'persona', header: 'Persona', type: 'text' },
-    { key: 'ano', header: 'Año', type: 'number' },
-    { key: 'montoTotal', header: 'Monto Total', type: 'text' },
-    { key: 'montoBonificado', header: 'Bonificado', type: 'text' },
-    { key: 'montoAPagar', header: 'A Pagar', type: 'text' },
+    { key: 'montoPagado', header: 'Pagado', type: 'text' },
+    { key: 'saldoPendiente', header: 'Pendiente', type: 'text' },
+    { key: 'estado', header: 'Estado', type: 'status' },
+    { key: "declaracionDeSalud", header: "Declaración de Salud", type: "boolean" },
+    { key: "autorizacionDeImagen", header: "Autorización de Imagen", type: "boolean" },
+    { key: "salidasCercanas", header: "Salidas Cercanas", type: "boolean" },
+    { key: "autorizacionIngreso", header: "Autorización de Ingreso", type: "boolean" },
     {
       key: 'actions',
       header: 'Acciones',
@@ -165,8 +214,10 @@ export class InscripcionesListComponent implements OnInit {
   }
 
   onFilterChange(filters: Record<string, unknown>): void {
-    console.log('Filter changed:', filters);
-    // TODO: Implement actual filtering logic
+    this.currentFilters.set({
+      search: (filters['search'] as string) ?? '',
+      ano: (filters['ano'] as string) ?? '',
+    });
   }
 
   onCreate(): void {
@@ -182,9 +233,11 @@ export class InscripcionesListComponent implements OnInit {
   }
 
   onDelete(id: string): void {
-    if (confirm('¿Está seguro de eliminar esta inscripción?')) {
-      this.state.delete(id).subscribe();
-    }
+    this.confirmDialog.confirmDelete('inscripción').subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.state.delete(id).subscribe();
+      }
+    });
   }
 
   onActionClick(event: ActionEvent): void {

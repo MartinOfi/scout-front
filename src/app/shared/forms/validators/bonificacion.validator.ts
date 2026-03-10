@@ -1,31 +1,40 @@
 /**
  * Bonificación Validator
- * Valida si el protagonista puede aplicar bonificación (RN2)
+ * Validates inscription bonification based on inscription history
+ *
+ * Note: fueBonificado field was removed from Protagonista entity.
+ * Bonification is now tracked via EstadoInscripcion.BONIFICADO state.
  */
 
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { Protagonista } from '../../models';
+import { Inscripcion } from '../../models';
+import { EstadoInscripcion } from '../../enums';
 
 /**
  * Validator for bonificación availability
- * Checks if protagonista has already used their bonificación
+ * Checks if persona has any bonified inscription in current year
  */
 export function bonificacionValidator(
-  getProtagonista: () => Protagonista | null
+  getInscripciones: () => Inscripcion[],
+  ano: number
 ): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const aplicarBonificacion = control.value;
     if (!aplicarBonificacion) return null;
-    
-    const protagonista = getProtagonista();
-    if (protagonista && protagonista.fueBonificado) {
-      return { 
-        bonificacionNoDisponible: { 
-          message: 'Este protagonista ya utilizó su bonificación' 
-        } 
+
+    const inscripciones = getInscripciones();
+    const hasBonificadoThisYear = inscripciones.some(
+      (i) => i.ano === ano && i.estado === 'bonificado'
+    );
+
+    if (hasBonificadoThisYear) {
+      return {
+        bonificacionNoDisponible: {
+          message: 'Ya existe una inscripción bonificada para este año',
+        },
       };
     }
-    
+
     return null;
   };
 }

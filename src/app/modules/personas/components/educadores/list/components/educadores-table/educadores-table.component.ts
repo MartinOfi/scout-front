@@ -3,18 +3,17 @@
  * Dumb Component - max 80 líneas
  */
 
-import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatChipsModule } from '@angular/material/chips';
 import { Educador } from '../../../../../../../shared/models';
+import { ESTADO_PERSONA_LABELS, CARGO_EDUCADOR_LABELS } from '../../../../../../../shared/enums';
+import { DataTableComponent } from '../../../../../../../shared/components/tables/data-table.component';
+import { TableColumn, TableData, ActionEvent } from '../../../../../../../shared/models/table.model';
 
 @Component({
   selector: 'app-educadores-table',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatButtonModule, MatIconModule, MatChipsModule],
+  imports: [CommonModule, DataTableComponent],
   templateUrl: './educadores-table.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -23,5 +22,46 @@ export class EducadoresTableComponent {
   readonly select = output<string>();
   readonly edit = output<string>();
   readonly delete = output<string>();
-  readonly displayedColumns = ['nombre', 'rama', 'cargo', 'estado', 'acciones'];
+
+  readonly tableData = computed((): TableData[] => {
+    return this.data().map(e => ({
+      id: e.id,
+      nombre: e.nombre,
+      rama: e.rama || '-',
+      cargo: CARGO_EDUCADOR_LABELS[e.cargo] || e.cargo || '-',
+      estado: ESTADO_PERSONA_LABELS[e.estado] || e.estado
+    }));
+  });
+
+  readonly tableColumns: TableColumn[] = [
+    { key: 'nombre', header: 'Nombre', type: 'text', sortable: true },
+    { key: 'rama', header: 'Rama', type: 'status', sortable: true },
+    { key: 'cargo', header: 'Cargo', type: 'text', sortable: true },
+    { key: 'estado', header: 'Estado', type: 'status', sortable: true },
+    {
+      key: 'actions',
+      header: 'Acciones',
+      type: 'action',
+      actions: [
+        { key: 'edit', label: 'Editar', icon: 'edit', tooltip: 'Editar' },
+        { key: 'delete', label: 'Eliminar', icon: 'delete', className: 'text-red-600', tooltip: 'Eliminar' }
+      ]
+    }
+  ];
+
+  onActionClick(event: ActionEvent): void {
+    const id = event.row['id'] as string;
+    switch (event.action) {
+      case 'edit':
+        this.edit.emit(id);
+        break;
+      case 'delete':
+        this.delete.emit(id);
+        break;
+    }
+  }
+
+  onRowClick(row: TableData): void {
+    this.select.emit(row['id'] as string);
+  }
 }

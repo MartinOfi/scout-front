@@ -2,6 +2,7 @@
  * Personas Form Builder
  * Construye FormGroups tipados para crear/editar personas
  * SIN any - tipado estricto
+ * Synced with backend API: docs/API_REFERENCE.md
  */
 
 import { Injectable, inject } from '@angular/core';
@@ -17,7 +18,7 @@ import {
   PersonaExterna,
 } from '../../../shared/models';
 
-import { Rama } from '../../../shared/enums';
+import { Rama, CargoEducador } from '../../../shared/enums';
 import { safeTextValidator } from '../../../shared/validators/custom-validators';
 
 @Injectable({
@@ -32,6 +33,7 @@ export class PersonasFormBuilder {
 
   /**
    * Construir formulario para crear un nuevo protagonista
+   * Backend accepts: nombre, rama
    */
   buildCreateProtagonistaForm(): FormGroup {
     return this.fb.group({
@@ -44,29 +46,13 @@ export class PersonasFormBuilder {
           safeTextValidator(),
         ],
       ],
-      apellido: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(100),
-          safeTextValidator(),
-        ],
-      ],
-      dni: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^\d{7,8}$/),
-        ],
-      ],
-      fechaIngreso: ['', [Validators.required]],
       rama: ['', [Validators.required]],
     });
   }
 
   /**
    * Construir formulario para editar un protagonista
+   * Backend accepts: nombre, estado, rama
    */
   buildEditProtagonistaForm(protagonista: Protagonista): FormGroup {
     return this.fb.group({
@@ -79,23 +65,6 @@ export class PersonasFormBuilder {
           safeTextValidator(),
         ],
       ],
-      apellido: [
-        protagonista.apellido,
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(100),
-          safeTextValidator(),
-        ],
-      ],
-      dni: [
-        protagonista.dni,
-        [
-          Validators.required,
-          Validators.pattern(/^\d{7,8}$/),
-        ],
-      ],
-      fechaIngreso: [protagonista.fechaIngreso, [Validators.required]],
       rama: [protagonista.rama, [Validators.required]],
     });
   }
@@ -106,9 +75,6 @@ export class PersonasFormBuilder {
   extractCreateProtagonistaDto(form: FormGroup): CreateProtagonistaDto {
     return {
       nombre: form.value.nombre as string,
-      apellido: form.value.apellido as string,
-      dni: form.value.dni as string,
-      fechaIngreso: form.value.fechaIngreso as string,
       rama: form.value.rama as Rama,
     };
   }
@@ -119,8 +85,6 @@ export class PersonasFormBuilder {
   extractUpdateProtagonistaDto(form: FormGroup): UpdatePersonaDto {
     return {
       nombre: form.value.nombre as string,
-      apellido: form.value.apellido as string,
-      dni: form.value.dni as string,
       rama: form.value.rama as Rama,
     };
   }
@@ -131,6 +95,7 @@ export class PersonasFormBuilder {
 
   /**
    * Construir formulario para crear un nuevo educador
+   * Backend accepts: nombre, rama (optional), cargo
    */
   buildCreateEducadorForm(): FormGroup {
     return this.fb.group({
@@ -143,30 +108,14 @@ export class PersonasFormBuilder {
           safeTextValidator(),
         ],
       ],
-      apellido: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(100),
-          safeTextValidator(),
-        ],
-      ],
-      dni: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^\d{7,8}$/),
-        ],
-      ],
-      fechaIngreso: ['', [Validators.required]],
       rama: [null],
-      cargo: ['', [Validators.maxLength(100)]],
+      cargo: ['', [Validators.required]],
     });
   }
 
   /**
    * Construir formulario para editar un educador
+   * Backend accepts: nombre, estado, rama, cargo
    */
   buildEditEducadorForm(educador: Educador): FormGroup {
     return this.fb.group({
@@ -179,25 +128,8 @@ export class PersonasFormBuilder {
           safeTextValidator(),
         ],
       ],
-      apellido: [
-        educador.apellido,
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(100),
-          safeTextValidator(),
-        ],
-      ],
-      dni: [
-        educador.dni,
-        [
-          Validators.required,
-          Validators.pattern(/^\d{7,8}$/),
-        ],
-      ],
-      fechaIngreso: [educador.fechaIngreso, [Validators.required]],
       rama: [educador.rama],
-      cargo: [educador.cargo ?? '', [Validators.maxLength(100)]],
+      cargo: [educador.cargo, [Validators.required]],
     });
   }
 
@@ -207,11 +139,8 @@ export class PersonasFormBuilder {
   extractCreateEducadorDto(form: FormGroup): CreateEducadorDto {
     return {
       nombre: form.value.nombre as string,
-      apellido: form.value.apellido as string,
-      dni: form.value.dni as string,
-      fechaIngreso: form.value.fechaIngreso as string,
       rama: form.value.rama ?? undefined,
-      cargo: form.value.cargo || undefined,
+      cargo: form.value.cargo as CargoEducador,
     };
   }
 
@@ -221,10 +150,8 @@ export class PersonasFormBuilder {
   extractUpdateEducadorDto(form: FormGroup): UpdatePersonaDto {
     return {
       nombre: form.value.nombre as string,
-      apellido: form.value.apellido as string,
-      dni: form.value.dni as string,
       rama: form.value.rama ?? undefined,
-      cargo: form.value.cargo || undefined,
+      cargo: form.value.cargo as CargoEducador,
     };
   }
 
@@ -234,6 +161,7 @@ export class PersonasFormBuilder {
 
   /**
    * Construir formulario para crear una nueva persona externa
+   * Backend accepts: nombre, contacto, notas
    */
   buildCreatePersonaExternaForm(): FormGroup {
     return this.fb.group({
@@ -246,28 +174,14 @@ export class PersonasFormBuilder {
           safeTextValidator(),
         ],
       ],
-      apellido: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(100),
-          safeTextValidator(),
-        ],
-      ],
-      dni: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^\d{7,8}$/),
-        ],
-      ],
-      relacion: ['', [Validators.maxLength(100)]],
+      contacto: ['', [Validators.maxLength(100)]],
+      notas: [''],
     });
   }
 
   /**
    * Construir formulario para editar una persona externa
+   * Backend accepts: nombre, estado, contacto, notas
    */
   buildEditPersonaExternaForm(personaExterna: PersonaExterna): FormGroup {
     return this.fb.group({
@@ -280,23 +194,8 @@ export class PersonasFormBuilder {
           safeTextValidator(),
         ],
       ],
-      apellido: [
-        personaExterna.apellido,
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(100),
-          safeTextValidator(),
-        ],
-      ],
-      dni: [
-        personaExterna.dni,
-        [
-          Validators.required,
-          Validators.pattern(/^\d{7,8}$/),
-        ],
-      ],
-      relacion: [personaExterna.relacion ?? '', [Validators.maxLength(100)]],
+      contacto: [personaExterna.contacto ?? '', [Validators.maxLength(100)]],
+      notas: [personaExterna.notas ?? ''],
     });
   }
 
@@ -306,9 +205,8 @@ export class PersonasFormBuilder {
   extractCreatePersonaExternaDto(form: FormGroup): CreatePersonaExternaDto {
     return {
       nombre: form.value.nombre as string,
-      apellido: form.value.apellido as string,
-      dni: form.value.dni as string,
-      relacion: form.value.relacion || undefined,
+      contacto: form.value.contacto || undefined,
+      notas: form.value.notas || undefined,
     };
   }
 
@@ -318,9 +216,8 @@ export class PersonasFormBuilder {
   extractUpdatePersonaExternaDto(form: FormGroup): UpdatePersonaDto {
     return {
       nombre: form.value.nombre as string,
-      apellido: form.value.apellido as string,
-      dni: form.value.dni as string,
-      relacion: form.value.relacion || undefined,
+      contacto: form.value.contacto || undefined,
+      notas: form.value.notas || undefined,
     };
   }
 

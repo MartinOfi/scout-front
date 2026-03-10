@@ -1,9 +1,9 @@
 // =============================================================================
-// CAMPAMENTO FORM STYLES
+// EVENTO FORM STYLES
 // =============================================================================
 
 @use 'sass:color';
-@use '../../../../../shared/components/form/form-tokens' as *;
+@use '../../../../shared/components/form/form-tokens' as *;
 
 // Page layout
 .scout-form-page {
@@ -65,47 +65,6 @@
 
 .scout-form-body {
   padding: 28px;
-}
-
-// Form rows
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0 20px;
-
-  @media (min-width: 480px) {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  // Material form field styling within rows
-  mat-form-field {
-    width: 100%;
-    margin-bottom: 20px;
-  }
-}
-
-// Input with prefix
-.input-with-prefix {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.input-prefix {
-  position: absolute;
-  left: 14px;
-  color: $stone-500;
-  font-weight: 500;
-  font-size: 15px;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.input-with-prefix ::ng-deep {
-  .scout-input,
-  input {
-    padding-left: 32px;
-  }
 }
 
 // Actions
@@ -203,9 +162,15 @@
   margin: 0;
 }
 
+// Material form field full width
+.full-width {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
 // Override Material datepicker to match scout style
 ::ng-deep {
-  mat-form-field {
+  mat-form-field.full-width {
     .mdc-text-field--outlined {
       --mdc-outlined-text-field-container-shape: 10px;
       --mdc-outlined-text-field-outline-color: #{$stone-300};

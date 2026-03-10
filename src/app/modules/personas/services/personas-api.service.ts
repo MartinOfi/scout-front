@@ -21,6 +21,9 @@ import { API_CONFIG } from '../../../shared/constants';
 export class PersonasApiService {
   private readonly http = inject(HttpService);
   private readonly endpoint = API_CONFIG.ENDPOINTS.PERSONAS;
+  private readonly endpointProtagonistas = API_CONFIG.ENDPOINTS.PROTAGONISTAS;
+  private readonly endpointEducadores = API_CONFIG.ENDPOINTS.EDUCADORES;
+  private readonly endpointPersonasExternas = API_CONFIG.ENDPOINTS.PERSONAS_EXTERNAS;
 
   /**
    * Get all active personas
@@ -40,21 +43,21 @@ export class PersonasApiService {
    * Create a new protagonista
    */
   createProtagonista(dto: CreateProtagonistaDto): Observable<Persona> {
-    return this.http.post<Persona, CreateProtagonistaDto>(this.endpoint, dto);
+    return this.http.post<Persona, CreateProtagonistaDto>(this.endpointProtagonistas, dto);
   }
 
   /**
    * Create a new educador
    */
   createEducador(dto: CreateEducadorDto): Observable<Persona> {
-    return this.http.post<Persona, CreateEducadorDto>(this.endpoint, dto);
+    return this.http.post<Persona, CreateEducadorDto>(this.endpointEducadores, dto);
   }
 
   /**
    * Create a new persona externa
    */
   createPersonaExterna(dto: CreatePersonaExternaDto): Observable<Persona> {
-    return this.http.post<Persona, CreatePersonaExternaDto>(this.endpoint, dto);
+    return this.http.post<Persona, CreatePersonaExternaDto>(this.endpointPersonasExternas, dto);
   }
 
   /**

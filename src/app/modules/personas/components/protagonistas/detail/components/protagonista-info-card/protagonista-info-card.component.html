@@ -13,12 +13,6 @@
       <span class="label">Rama:</span>
       <mat-chip>{{ protagonista().rama }}</mat-chip>
     </div>
-    <div class="info-row">
-      <span class="label">Bonificado:</span>
-      <mat-icon [color]="protagonista().fueBonificado ? 'primary' : 'disabled'">
-        {{ protagonista().fueBonificado ? 'check_circle' : 'cancel' }}
-      </mat-icon>
-    </div>
   </mat-card-content>
 
   <mat-card-actions align="end">

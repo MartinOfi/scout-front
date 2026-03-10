@@ -12,8 +12,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { EventosStateService } from '../../services/eventos-state.service';
 import { Evento } from '../../../../shared/models';
-import { TipoEvento } from '../../../../shared/enums';
-import { EventoRowComponent } from './components/evento-row.component';
+import { TipoEvento, TIPO_EVENTO_LABELS } from '../../../../shared/enums';
+import { DataTableComponent } from '../../../../shared/components/tables/data-table.component';
+import { TableColumn, TableData, ActionEvent } from '../../../../shared/models/table.model';
 import { EventoFiltersComponent } from './components/evento-filters.component';
 
 @Component({
@@ -24,7 +25,7 @@ import { EventoFiltersComponent } from './components/evento-filters.component';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    EventoRowComponent,
+    DataTableComponent,
     EventoFiltersComponent
   ],
   templateUrl: './eventos-list.component.html',
@@ -55,6 +56,32 @@ export class EventosListComponent implements OnInit {
     return lista;
   });
 
+  readonly tableData = computed((): TableData[] => {
+    return this.eventosFiltrados().map(e => ({
+      id: e.id,
+      nombre: e.nombre,
+      fecha: e.fecha,
+      tipo: TIPO_EVENTO_LABELS[e.tipo] || e.tipo,
+      descripcion: e.descripcion || ''
+    }));
+  });
+
+  readonly tableColumns: TableColumn[] = [
+    { key: 'nombre', header: 'Nombre', type: 'text', sortable: true },
+    { key: 'fecha', header: 'Fecha', type: 'date', sortable: true },
+    { key: 'tipo', header: 'Tipo', type: 'status', sortable: true },
+    { key: 'descripcion', header: 'Descripción', type: 'text' },
+    {
+      key: 'actions',
+      header: 'Acciones',
+      type: 'action',
+      actions: [
+        { key: 'view', label: 'Ver', icon: 'visibility', tooltip: 'Ver detalle' },
+        { key: 'edit', label: 'Editar', icon: 'edit', tooltip: 'Editar' }
+      ]
+    }
+  ];
+
   ngOnInit(): void {
     this.state.load();
   }
@@ -68,11 +95,19 @@ export class EventosListComponent implements OnInit {
     this.router.navigate(['/eventos/crear']);
   }
 
-  onEdit(id: string): void {
-    this.router.navigate(['/eventos', id, 'editar']);
+  onActionClick(event: ActionEvent): void {
+    const id = event.row['id'] as string;
+    switch (event.action) {
+      case 'view':
+        this.router.navigate(['/eventos', id]);
+        break;
+      case 'edit':
+        this.router.navigate(['/eventos', id, 'editar']);
+        break;
+    }
   }
 
-  onSelect(id: string): void {
-    this.router.navigate(['/eventos', id]);
+  onRowClick(row: TableData): void {
+    this.router.navigate(['/eventos', row['id']]);
   }
 }

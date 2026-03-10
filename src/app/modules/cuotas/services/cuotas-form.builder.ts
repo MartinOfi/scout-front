@@ -28,12 +28,13 @@ export class CuotasFormBuilder {
 
   /**
    * Construir formulario para crear una nueva cuota
+   * Backend accepts: personaId, nombre, ano, montoTotal
    */
   buildCreateForm(): FormGroup {
     return this.fb.group({
       personaId: ['', [Validators.required]],
-      numero: ['', [Validators.required]],
-      ano: [new Date().getFullYear(), [Validators.required]],
+      nombre: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
+      ano: [new Date().getFullYear(), [Validators.required, Validators.min(2020), Validators.max(2100)]],
       montoTotal: [
         '',
         [
@@ -85,7 +86,7 @@ export class CuotasFormBuilder {
   extractCreateDto(form: FormGroup): CreateCuotaDto {
     return {
       personaId: form.value.personaId as string,
-      numero: Number(form.value.numero) as number,
+      nombre: form.value.nombre as string,
       ano: Number(form.value.ano) as number,
       montoTotal: Number(form.value.montoTotal) as number,
     };

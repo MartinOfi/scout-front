@@ -11,23 +11,26 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { MovimientosStateService } from '../../services/movimientos-state.service';
-import { CajasStateService } from '../../../cajas/services/cajas-state.service';
-import { CreateMovimientoDto, Movimiento } from '../../../../shared/models';
-import { 
-  TipoMovimientoEnum, 
-  MedioPagoEnum,
-  EstadoPago 
-} from '../../../../shared/enums';
+import { CreateMovimientoDto } from '../../../../shared/models';
+import { TipoMovimientoEnum, MedioPagoEnum, EstadoPago } from '../../../../shared/enums';
+
+// Shared Form Components
+import { FormFieldComponent } from '../../../../shared/components/form/form-field/form-field.component';
+import { NumberFieldComponent } from '../../../../shared/components/form/number-field/number-field.component';
+import { TextareaFieldComponent } from '../../../../shared/components/form/textarea-field/textarea-field.component';
+import { SelectFieldComponent } from '../../../../shared/components/form/select-field/select-field.component';
 
 // Dumb Component
 import { ConceptoSelectorComponent } from './components/concepto-selector/concepto-selector.component';
+
+interface SelectOption {
+  value: string;
+  label: string;
+}
 
 @Component({
   selector: 'app-movimiento-form',
@@ -37,19 +40,20 @@ import { ConceptoSelectorComponent } from './components/concepto-selector/concep
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
     MatDatepickerModule,
     MatSlideToggleModule,
-    MatProgressSpinnerModule,
+    FormFieldComponent,
+    NumberFieldComponent,
+    TextareaFieldComponent,
+    SelectFieldComponent,
     ConceptoSelectorComponent
   ],
   templateUrl: './movimiento-form.component.html',
+  styleUrls: ['./movimiento-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MovimientoFormComponent implements OnInit {
   private readonly state = inject(MovimientosStateService);
-  private readonly cajasState = inject(CajasStateService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly fb = inject(FormBuilder);
@@ -61,6 +65,22 @@ export class MovimientoFormComponent implements OnInit {
   readonly tipos = Object.values(TipoMovimientoEnum);
   readonly mediosPago = Object.values(MedioPagoEnum);
   readonly estadosPago = Object.values(EstadoPago);
+
+  // Options for select fields
+  readonly tipoOptions: SelectOption[] = [
+    { value: TipoMovimientoEnum.INGRESO, label: 'Ingreso' },
+    { value: TipoMovimientoEnum.EGRESO, label: 'Egreso' }
+  ];
+
+  readonly medioPagoOptions: SelectOption[] = [
+    { value: MedioPagoEnum.EFECTIVO, label: 'Efectivo' },
+    { value: MedioPagoEnum.TRANSFERENCIA, label: 'Transferencia' }
+  ];
+
+  readonly estadoPagoOptions: SelectOption[] = [
+    { value: EstadoPago.PAGADO, label: 'Pagado' },
+    { value: EstadoPago.PENDIENTE_REEMBOLSO, label: 'Pendiente de Reembolso' }
+  ];
 
   constructor() {
     this.form = this.fb.group({
@@ -78,7 +98,6 @@ export class MovimientoFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Leer query params para pre-llenar caja
     this.route.queryParams.subscribe((params) => {
       if (params['cajaId']) {
         this.form.patchValue({ cajaId: params['cajaId'] });
@@ -109,7 +128,7 @@ export class MovimientoFormComponent implements OnInit {
 
     this.state.create(dto).subscribe({
       next: () => this.router.navigate(['/movimientos']),
-      error: () => {} // Error ya manejado en el state
+      error: () => {}
     });
   }
 

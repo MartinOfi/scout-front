@@ -21,7 +21,8 @@
         </mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <div class="info-row"><span class="label">Relación:</span><span>{{ personaExterna()!.relacion || '-' }}</span></div>
+        <div class="info-row"><span class="label">Contacto:</span><span>{{ personaExterna()!.contacto || '-' }}</span></div>
+        <div class="info-row"><span class="label">Notas:</span><span>{{ personaExterna()!.notas || '-' }}</span></div>
       </mat-card-content>
       <mat-card-actions align="end">
         <button mat-icon-button (click)="onEdit()"><mat-icon>edit</mat-icon></button>

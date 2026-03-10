@@ -2,66 +2,67 @@
  * Personas Testing Utilities
  * Reusable test fixtures, mocks, and factories for Personas module
  * Used by all Smart component tests following TDD patterns
+ * Synced with backend API: docs/API_REFERENCE.md
  */
 
 import { signal } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { of } from 'rxjs';
 
-import { Protagonista, Educador, PersonaExterna } from '../../../shared/models';
-import { PersonaType, EstadoPersona, RamaEnum } from '../../../shared/enums';
+import {
+  Protagonista,
+  Educador,
+  PersonaExterna,
+  CreateProtagonistaDto,
+  CreateEducadorDto,
+  CreatePersonaExternaDto,
+  UpdatePersonaDto,
+} from '../../../shared/models';
+import { PersonaType, EstadoPersona, RamaEnum, CargoEducador } from '../../../shared/enums';
 
 // ============================================================================
-// Mock Data Factories
+// Mock Data Factories - Aligned with backend API
 // ============================================================================
 
-export const createMockProtagonista = (overrides: Partial<Protagonista> = {}): Protagonista => ({
+export const createMockProtagonista = (
+  overrides: Partial<Protagonista> = {}
+): Protagonista => ({
   id: '1',
-  nombre: 'Juan',
-  apellido: 'Pérez',
-  dni: '12345678',
+  nombre: 'Juan Pérez',
   tipo: PersonaType.PROTAGONISTA,
   estado: EstadoPersona.ACTIVO,
-  fechaIngreso: new Date('2024-01-01'),
   rama: RamaEnum.MANADA,
-  createdAt: new Date('2024-01-01'),
-  updatedAt: new Date('2024-01-01'),
-  deletedAt: undefined,
-  cuentaPersonalId: 'cuenta-1',
+  createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: '2024-01-01T00:00:00Z',
+  deletedAt: null,
   ...overrides,
 });
 
 export const createMockEducador = (overrides: Partial<Educador> = {}): Educador => ({
   id: '2',
-  nombre: 'María',
-  apellido: 'González',
-  dni: '87654321',
+  nombre: 'María González',
   tipo: PersonaType.EDUCADOR,
   estado: EstadoPersona.ACTIVO,
-  fechaIngreso: new Date('2024-01-01'),
   rama: RamaEnum.UNIDAD,
-  cargo: 'Coordinadora',
-  createdAt: new Date('2024-01-01'),
-  updatedAt: new Date('2024-01-01'),
-  deletedAt: undefined,
-  cuentaPersonalId: 'cuenta-2',
+  cargo: CargoEducador.EDUCADOR,
+  createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: '2024-01-01T00:00:00Z',
+  deletedAt: null,
   ...overrides,
 });
 
-export const createMockPersonaExterna = (overrides: Partial<PersonaExterna> = {}): PersonaExterna => ({
+export const createMockPersonaExterna = (
+  overrides: Partial<PersonaExterna> = {}
+): PersonaExterna => ({
   id: '3',
-  nombre: 'Carlos',
-  apellido: 'López',
-  dni: '11223344',
+  nombre: 'Carlos López',
   tipo: PersonaType.EXTERNA,
   estado: EstadoPersona.ACTIVO,
-  relacion: 'Padre',
   contacto: '123456789',
   notas: 'Contacto principal',
-  createdAt: new Date('2024-01-01'),
-  updatedAt: new Date('2024-01-01'),
-  deletedAt: undefined,
-  cuentaPersonalId: 'cuenta-3',
+  createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: '2024-01-01T00:00:00Z',
+  deletedAt: null,
   ...overrides,
 });
 
@@ -75,7 +76,7 @@ export const createMockPersonasStateService = () => ({
   personasExternas: signal<PersonaExterna[]>([]),
   loading: signal<boolean>(false),
   error: signal<string | null>(null),
-  selected: signal<any>(null),
+  selected: signal<Protagonista | Educador | PersonaExterna | null>(null),
   load: jasmine.createSpy().and.returnValue(of(undefined)),
   createProtagonista: jasmine.createSpy().and.returnValue(of(createMockProtagonista())),
   createEducador: jasmine.createSpy().and.returnValue(of(createMockEducador())),
@@ -121,7 +122,7 @@ export const createMockRouter = () => ({
   navigateByUrl: jasmine.createSpy('navigateByUrl').and.returnValue(Promise.resolve(true)),
 });
 
-export const createMockActivatedRoute = (params: any = {}) => ({
+export const createMockActivatedRoute = (params: Record<string, string> = {}) => ({
   params: of(params),
   snapshot: {
     params,
@@ -139,7 +140,7 @@ export const createMockConfirmDialogService = () => ({
 });
 
 /**
- * Typed Mock PersonasFormBuilder
+ * Typed Mock PersonasFormBuilder - Aligned with backend DTOs
  */
 export interface MockPersonasFormBuilder {
   buildCreateProtagonistaForm: () => FormGroup;
@@ -149,11 +150,11 @@ export interface MockPersonasFormBuilder {
   buildCreatePersonaExternaForm: () => FormGroup;
   buildEditPersonaExternaForm: (pe: PersonaExterna) => FormGroup;
   extractCreateProtagonistaDto: (form: FormGroup) => CreateProtagonistaDto;
-  extractUpdateProtagonistaDto: (form: FormGroup) => UpdateProtagonistaDto;
+  extractUpdateProtagonistaDto: (form: FormGroup) => UpdatePersonaDto;
   extractCreateEducadorDto: (form: FormGroup) => CreateEducadorDto;
-  extractUpdateEducadorDto: (form: FormGroup) => UpdateEducadorDto;
+  extractUpdateEducadorDto: (form: FormGroup) => UpdatePersonaDto;
   extractCreatePersonaExternaDto: (form: FormGroup) => CreatePersonaExternaDto;
-  extractUpdatePersonaExternaDto: (form: FormGroup) => UpdatePersonaExternaDto;
+  extractUpdatePersonaExternaDto: (form: FormGroup) => UpdatePersonaDto;
 }
 
 export const createMockPersonasFormBuilder = (): MockPersonasFormBuilder => {
@@ -162,66 +163,64 @@ export const createMockPersonasFormBuilder = (): MockPersonasFormBuilder => {
     buildCreateProtagonistaForm: (): FormGroup =>
       fb.group({
         nombre: [''],
-        apellido: [''],
-        dni: [''],
-        fechaIngreso: [''],
         rama: [''],
       }),
     buildEditProtagonistaForm: (p: Protagonista): FormGroup =>
       fb.group({
         nombre: [p.nombre],
-        apellido: [p.apellido],
-        dni: [p.dni],
-        fechaIngreso: [p.fechaIngreso],
         rama: [p.rama],
       }),
     buildCreateEducadorForm: (): FormGroup =>
       fb.group({
         nombre: [''],
-        apellido: [''],
-        dni: [''],
-        fechaIngreso: [''],
         rama: [null],
         cargo: [''],
       }),
     buildEditEducadorForm: (e: Educador): FormGroup =>
       fb.group({
         nombre: [e.nombre],
-        apellido: [e.apellido],
-        dni: [e.dni],
-        fechaIngreso: [e.fechaIngreso],
         rama: [e.rama],
         cargo: [e.cargo],
       }),
     buildCreatePersonaExternaForm: (): FormGroup =>
       fb.group({
         nombre: [''],
-        apellido: [''],
-        dni: [''],
-        relacion: [''],
+        contacto: [''],
+        notas: [''],
       }),
     buildEditPersonaExternaForm: (pe: PersonaExterna): FormGroup =>
       fb.group({
         nombre: [pe.nombre],
-        apellido: [pe.apellido],
-        dni: [pe.dni],
-        relacion: [pe.relacion],
+        contacto: [pe.contacto],
+        notas: [pe.notas],
       }),
-    extractCreateProtagonistaDto: (form: FormGroup): CreateProtagonistaDto =>
-      form.value as CreateProtagonistaDto,
-    extractUpdateProtagonistaDto: (form: FormGroup): UpdateProtagonistaDto =>
-      form.value as UpdateProtagonistaDto,
-    extractCreateEducadorDto: (form: FormGroup): CreateEducadorDto =>
-      form.value as CreateEducadorDto,
-    extractUpdateEducadorDto: (form: FormGroup): UpdateEducadorDto =>
-      form.value as UpdateEducadorDto,
-    extractCreatePersonaExternaDto: (
-      form: FormGroup
-    ): CreatePersonaExternaDto =>
-      form.value as CreatePersonaExternaDto,
-    extractUpdatePersonaExternaDto: (
-      form: FormGroup
-    ): UpdatePersonaExternaDto =>
-      form.value as UpdatePersonaExternaDto,
+    extractCreateProtagonistaDto: (form: FormGroup): CreateProtagonistaDto => ({
+      nombre: form.value.nombre,
+      rama: form.value.rama,
+    }),
+    extractUpdateProtagonistaDto: (form: FormGroup): UpdatePersonaDto => ({
+      nombre: form.value.nombre,
+      rama: form.value.rama,
+    }),
+    extractCreateEducadorDto: (form: FormGroup): CreateEducadorDto => ({
+      nombre: form.value.nombre,
+      rama: form.value.rama ?? undefined,
+      cargo: form.value.cargo,
+    }),
+    extractUpdateEducadorDto: (form: FormGroup): UpdatePersonaDto => ({
+      nombre: form.value.nombre,
+      rama: form.value.rama ?? undefined,
+      cargo: form.value.cargo,
+    }),
+    extractCreatePersonaExternaDto: (form: FormGroup): CreatePersonaExternaDto => ({
+      nombre: form.value.nombre,
+      contacto: form.value.contacto || undefined,
+      notas: form.value.notas || undefined,
+    }),
+    extractUpdatePersonaExternaDto: (form: FormGroup): UpdatePersonaDto => ({
+      nombre: form.value.nombre,
+      contacto: form.value.contacto || undefined,
+      notas: form.value.notas || undefined,
+    }),
   };
 };

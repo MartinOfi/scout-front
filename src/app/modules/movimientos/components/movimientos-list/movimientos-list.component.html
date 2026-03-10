@@ -32,28 +32,22 @@
       <mat-spinner diameter="40"></mat-spinner>
       <span>Cargando movimientos...</span>
     </div>
-  }
-
-  @if (error()) {
+  } @else if (error()) {
     <div class="error-state">
       <mat-icon color="warn">error</mat-icon>
       <span>{{ error() }}</span>
     </div>
+  } @else if (tableData().length === 0) {
+    <div class="empty-state">
+      <mat-icon>receipt_long</mat-icon>
+      <span>No se encontraron movimientos</span>
+    </div>
+  } @else {
+    <app-data-table
+      [data]="tableData()"
+      [columns]="tableColumns"
+      [config]="{ showHeader: true, hoverable: true }"
+      (actionClick)="onActionClick($event)"
+      (rowClick)="onRowClick($event)" />
   }
-
-  <div class="movimientos-list">
-    @for (movimiento of movimientos(); track movimiento.id) {
-      <app-movimiento-row
-        [movimiento]="movimiento"
-        (verDetalle)="onVerDetalle($event)"
-        (editar)="onEditar($event)"
-        (eliminar)="onEliminar($event)">
-      </app-movimiento-row>
-    } @empty {
-      <div class="empty-state">
-        <mat-icon>receipt_long</mat-icon>
-        <span>No se encontraron movimientos</span>
-      </div>
-    }
-  </div>
 </div>
