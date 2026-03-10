@@ -1,0 +1,254 @@
+<div class="detail-page">
+  @if (loading()) {
+    <div class="detail-loading">
+      <app-loading-spinner message="Cargando inscripción..." />
+    </div>
+  } @else if (error()) {
+    <div class="detail-error">
+      <app-empty-state
+        icon="error_outline"
+        [message]="error() ?? 'Error al cargar'"
+        actionLabel="Volver"
+        (onAction)="onBack()" />
+    </div>
+  } @else if (detail(); as d) {
+    <div class="detail-content">
+      <!-- Header: Identity + Status + Navigation -->
+      <header class="detail-header">
+        <div class="detail-header__left">
+          <h1 class="detail-header__name">
+            {{ d.persona?.nombre ?? 'Sin nombre' }}
+          </h1>
+          <div class="detail-header__meta">
+            <span class="detail-header__type">{{ tipoLabels[d.tipo] }}</span>
+            <span class="detail-header__separator">·</span>
+            <span>{{ d.ano }}</span>
+          </div>
+        </div>
+
+        <div class="detail-header__right">
+          <span
+            class="status-badge"
+            [ngClass]="'status-badge--' + d.estado"
+            role="status"
+            [attr.aria-label]="'Estado: ' + estadoLabels[d.estado]">
+            <mat-icon aria-hidden="true">{{ estadoIcon() }}</mat-icon>
+            {{ estadoLabels[d.estado] }}
+          </span>
+
+          <button
+            class="detail-header__back"
+            (click)="onBack()"
+            aria-label="Volver al listado de inscripciones">
+            <mat-icon aria-hidden="true">arrow_back</mat-icon>
+            Volver
+          </button>
+        </div>
+      </header>
+
+      <!-- Payment Progress Card -->
+      <section class="payment-card" aria-labelledby="payment-heading">
+        <div class="payment-hero">
+          <!-- Primary: What's pending or success message -->
+          <div class="payment-summary">
+            <div class="payment-summary__primary">
+              <span class="payment-summary__label">
+                @if (d.saldoPendiente > 0) {
+                  Saldo pendiente
+                } @else {
+                  Estado de pago
+                }
+              </span>
+              <span class="payment-summary__amount" [class.payment-summary__amount--success]="d.saldoPendiente === 0">
+                @if (d.saldoPendiente > 0) {
+                  {{ d.saldoPendiente | currency:'ARS':'symbol':'1.0-0' }}
+                } @else {
+                  Al día
+                }
+              </span>
+            </div>
+            <div class="payment-summary__context">
+              <strong>{{ d.montoPagado | currency:'ARS':'symbol':'1.0-0' }}</strong> pagado
+              de {{ montoAPagar() | currency:'ARS':'symbol':'1.0-0' }}
+            </div>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="payment-progress" role="progressbar"
+               [attr.aria-valuenow]="progressPercent()"
+               aria-valuemin="0"
+               aria-valuemax="100"
+               [attr.aria-label]="progressPercent() + '% del pago completado'">
+            <div class="payment-progress__bar">
+              <div
+                class="payment-progress__fill"
+                [ngClass]="progressClass()"
+                [style.width.%]="progressPercent()">
+              </div>
+            </div>
+            <div class="payment-progress__labels">
+              <span>{{ progressPercent() }}% completado</span>
+              @if (d.movimientos.length > 0) {
+                <span>{{ d.movimientos.length }} {{ d.movimientos.length === 1 ? 'pago' : 'pagos' }}</span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Financial breakdown -->
+        <div class="payment-breakdown">
+          <div class="payment-breakdown__item">
+            <span class="payment-breakdown__label">Inscripción</span>
+            <span class="payment-breakdown__value">{{ d.montoTotal | currency:'ARS':'symbol':'1.0-0' }}</span>
+          </div>
+          @if (d.montoBonificado > 0) {
+            <div class="payment-breakdown__item">
+              <span class="payment-breakdown__label">Bonificación</span>
+              <span class="payment-breakdown__value payment-breakdown__value--discount">
+                -{{ d.montoBonificado | currency:'ARS':'symbol':'1.0-0' }}
+              </span>
+            </div>
+          }
+          <div class="payment-breakdown__item">
+            <span class="payment-breakdown__label">Total</span>
+            <span class="payment-breakdown__value">{{ montoAPagar() | currency:'ARS':'symbol':'1.0-0' }}</span>
+          </div>
+          <div class="payment-breakdown__item">
+            <span class="payment-breakdown__label">Pagado</span>
+            <span class="payment-breakdown__value payment-breakdown__value--success">{{ d.montoPagado | currency:'ARS':'symbol':'1.0-0' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Two Column Layout: Timeline + Authorizations -->
+      <div class="detail-main">
+        <!-- Payment Timeline -->
+        <section class="timeline-section">
+          <div class="section-header">
+            <h2 class="section-header__title">Historial de pagos</h2>
+            @if (d.saldoPendiente > 0) {
+              <button
+                class="section-header__action"
+                (click)="onRegisterPayment()"
+                aria-label="Registrar nuevo pago para esta inscripción">
+                <mat-icon aria-hidden="true">add</mat-icon>
+                Pago
+              </button>
+            }
+          </div>
+
+          <div class="timeline" role="list" aria-label="Lista de pagos realizados">
+            @if (d.movimientos.length > 0) {
+              @for (mov of d.movimientos; track mov.id) {
+                <article class="timeline-item" role="listitem">
+                  <div class="timeline-item__marker" aria-hidden="true">
+                    <mat-icon>payments</mat-icon>
+                  </div>
+                  <div class="timeline-item__content">
+                    <div class="timeline-item__main">
+                      <span class="timeline-item__amount">{{ mov.monto | currency:'ARS':'symbol':'1.0-0' }}</span>
+                      <span class="timeline-item__date">{{ mov.fecha | date:'d MMM' }}</span>
+                    </div>
+                    <div class="timeline-item__details">
+                      <span class="timeline-item__method">{{ medioPagoLabel(mov.medioPago) }}</span>
+                    </div>
+                  </div>
+                </article>
+              }
+            } @else {
+              <div class="timeline-empty">
+                <div class="timeline-empty__icon">
+                  <mat-icon>receipt_long</mat-icon>
+                </div>
+                <p class="timeline-empty__text">Sin pagos</p>
+                <p class="timeline-empty__hint">Registrá el primer pago</p>
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- Authorizations (only for scout_argentina) -->
+        @if (showAuthorizations()) {
+          <section class="auth-section">
+            <div class="section-header">
+              <h2 class="section-header__title">Autorizaciones</h2>
+            </div>
+
+            <!-- Summary status -->
+            <div class="auth-status">
+              <div class="auth-status__icon" [ngClass]="authComplete() ? 'auth-status__icon--complete' : 'auth-status__icon--incomplete'">
+                <mat-icon>{{ authComplete() ? 'verified' : 'pending' }}</mat-icon>
+              </div>
+              <div class="auth-status__text">
+                @if (authComplete()) {
+                  <strong>Listo para actividades</strong>
+                  <span>Todo completado</span>
+                } @else {
+                  <strong>Pendientes</strong>
+                  <span>{{ authPendingCount() }} de 4</span>
+                }
+              </div>
+            </div>
+
+            <!-- Individual authorizations -->
+            <div class="auth-grid">
+              <div class="auth-item">
+                <div class="auth-item__check" [ngClass]="d.declaracionDeSalud ? 'auth-item__check--yes' : 'auth-item__check--no'">
+                  <mat-icon>{{ d.declaracionDeSalud ? 'check' : 'remove' }}</mat-icon>
+                </div>
+                <span class="auth-item__label">Salud</span>
+              </div>
+
+              <div class="auth-item">
+                <div class="auth-item__check" [ngClass]="d.autorizacionDeImagen ? 'auth-item__check--yes' : 'auth-item__check--no'">
+                  <mat-icon>{{ d.autorizacionDeImagen ? 'check' : 'remove' }}</mat-icon>
+                </div>
+                <span class="auth-item__label">Imagen</span>
+              </div>
+
+              <div class="auth-item">
+                <div class="auth-item__check" [ngClass]="d.salidasCercanas ? 'auth-item__check--yes' : 'auth-item__check--no'">
+                  <mat-icon>{{ d.salidasCercanas ? 'check' : 'remove' }}</mat-icon>
+                </div>
+                <span class="auth-item__label">Salidas</span>
+              </div>
+
+              <div class="auth-item">
+                <div class="auth-item__check" [ngClass]="d.autorizacionIngreso ? 'auth-item__check--yes' : 'auth-item__check--no'">
+                  <mat-icon>{{ d.autorizacionIngreso ? 'check' : 'remove' }}</mat-icon>
+                </div>
+                <span class="auth-item__label">Ingreso</span>
+              </div>
+            </div>
+          </section>
+        }
+      </div>
+
+      <!-- Page Actions -->
+      <footer class="detail-actions" role="group" aria-label="Acciones">
+        <button
+          class="action-btn action-btn--danger"
+          (click)="onDelete()"
+          aria-label="Eliminar esta inscripción">
+          <mat-icon aria-hidden="true">delete_outline</mat-icon>
+          Eliminar
+        </button>
+        <button
+          class="action-btn action-btn--primary"
+          (click)="onEdit()"
+          aria-label="Editar esta inscripción">
+          <mat-icon aria-hidden="true">edit</mat-icon>
+          Editar inscripción
+        </button>
+      </footer>
+    </div>
+  } @else {
+    <div class="detail-empty">
+      <app-empty-state
+        icon="receipt_long"
+        message="Inscripción no encontrada"
+        actionLabel="Volver al listado"
+        (onAction)="onBack()" />
+    </div>
+  }
+</div>

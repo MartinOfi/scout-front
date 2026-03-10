@@ -1,0 +1,797 @@
+// =============================================================================
+// INSCRIPCIÓN DETAIL - LOGBOOK-INSPIRED DESIGN
+// =============================================================================
+// Warm, editorial layout that tells the payment story of a scout.
+// Uses stone palette with burgundy brand accents from system.md
+
+@use '../../../../shared/components/form/form-tokens' as tokens;
+
+// -----------------------------------------------------------------------------
+// LAYOUT TOKENS
+// -----------------------------------------------------------------------------
+
+$page-max-width: 720px;
+$section-gap: 32px;
+$card-radius: 16px;
+$card-padding: 28px;
+$card-padding-compact: 20px;
+
+// -----------------------------------------------------------------------------
+// REDUCED MOTION
+// -----------------------------------------------------------------------------
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// PAGE CONTAINER
+// -----------------------------------------------------------------------------
+
+.detail-page {
+  min-height: 100%;
+  padding: 24px;
+  padding-bottom: 48px;
+
+  @media (max-width: 640px) {
+    padding: 16px;
+    padding-bottom: 32px;
+  }
+}
+
+.detail-content {
+  max-width: 960px; // Wider for horizontal layout
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+// -----------------------------------------------------------------------------
+// HEADER - UNIFIED NAV + IDENTITY
+// -----------------------------------------------------------------------------
+
+.detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  background: white;
+  border-radius: $card-radius;
+  box-shadow: tokens.$shadow-card;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+
+    @media (max-width: 640px) {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+
+  &__name {
+    margin: 0;
+    font-size: clamp(1.25rem, 3vw, 1.5rem);
+    font-weight: 600;
+    color: tokens.$stone-900;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 14px;
+    color: tokens.$stone-500;
+  }
+
+  &__type {
+    font-weight: 500;
+    color: tokens.$stone-700;
+  }
+
+  &__separator {
+    color: tokens.$stone-300;
+  }
+
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px 8px 8px;
+    background: transparent;
+    border: 1px solid tokens.$stone-200;
+    border-radius: 8px;
+    color: tokens.$stone-600;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background-color tokens.$transition-fast,
+      border-color tokens.$transition-fast,
+      color tokens.$transition-fast;
+    white-space: nowrap;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      background-color: tokens.$stone-50;
+      border-color: tokens.$stone-300;
+      color: tokens.$stone-800;
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: tokens.$shadow-focus;
+    }
+
+    &:active {
+      background-color: tokens.$stone-100;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// STATUS BADGE - PROMINENT ESTADO
+// -----------------------------------------------------------------------------
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  // State variants
+  &--pagado {
+    background-color: color-mix(in srgb, tokens.$color-success 12%, transparent);
+    color: tokens.$color-success;
+  }
+
+  &--parcial {
+    background-color: color-mix(in srgb, #d97706 12%, transparent);
+    color: #b45309;
+  }
+
+  &--pendiente {
+    background-color: tokens.$stone-200;
+    color: tokens.$stone-600;
+  }
+
+  &--bonificado {
+    background-color: color-mix(in srgb, tokens.$brand-indigo 12%, transparent);
+    color: tokens.$brand-indigo;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// PAYMENT PROGRESS CARD - THE HERO
+// -----------------------------------------------------------------------------
+
+.payment-card {
+  background: white;
+  border-radius: $card-radius;
+  box-shadow: tokens.$shadow-card;
+  overflow: hidden;
+}
+
+.payment-hero {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.payment-summary {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  &__primary {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__label {
+    font-size: 12px;
+    font-weight: 500;
+    color: tokens.$stone-500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__amount {
+    font-size: clamp(1.75rem, 5vw, 2rem);
+    font-weight: 700;
+    color: tokens.$stone-900;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+
+    &--success {
+      color: tokens.$color-success;
+    }
+  }
+
+  &__context {
+    font-size: 13px;
+    color: tokens.$stone-500;
+
+    strong {
+      color: tokens.$stone-700;
+      font-weight: 600;
+    }
+  }
+}
+
+// Progress bar - visual payment journey
+.payment-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &__bar {
+    position: relative;
+    height: 8px;
+    background-color: tokens.$stone-200;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  &__fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    border-radius: 4px;
+    transition: width 600ms cubic-bezier(0.16, 1, 0.3, 1);
+
+    &--success {
+      background-color: tokens.$color-success;
+    }
+
+    &--partial {
+      background-color: #d97706;
+    }
+
+    &--pending {
+      background-color: tokens.$stone-400;
+    }
+  }
+
+  &__labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: tokens.$stone-500;
+  }
+}
+
+// Financial breakdown - horizontal strip
+.payment-breakdown {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  background-color: tokens.$stone-50;
+  border-top: 1px solid tokens.$stone-200;
+
+  &__item {
+    flex: 1;
+    min-width: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px 16px;
+    border-right: 1px solid tokens.$stone-200;
+
+    &:last-child {
+      border-right: none;
+    }
+
+    @media (max-width: 480px) {
+      min-width: 50%;
+      border-bottom: 1px solid tokens.$stone-200;
+
+      &:nth-last-child(-n+2) {
+        border-bottom: none;
+      }
+    }
+  }
+
+  &__label {
+    font-size: 11px;
+    font-weight: 500;
+    color: tokens.$stone-500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__value {
+    font-size: 15px;
+    font-weight: 600;
+    color: tokens.$stone-800;
+    font-variant-numeric: tabular-nums;
+
+    &--muted {
+      color: tokens.$stone-500;
+    }
+
+    &--discount {
+      color: tokens.$brand-indigo;
+    }
+
+    &--success {
+      color: tokens.$color-success;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// MAIN CONTENT - TWO COLUMN LAYOUT
+// -----------------------------------------------------------------------------
+
+.detail-main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// PAYMENT TIMELINE - THE JOURNEY
+// -----------------------------------------------------------------------------
+
+.timeline-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  &__title {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: tokens.$stone-600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__action {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 5px 10px;
+    background-color: tokens.$brand-burgundy;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color tokens.$transition-fast,
+      transform tokens.$transition-fast;
+
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+
+    &:hover {
+      background-color: tokens.$brand-burgundy-light;
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(tokens.$brand-burgundy, 0.3);
+    }
+
+    &:active {
+      transform: scale(0.97);
+    }
+  }
+}
+
+.timeline {
+  background: white;
+  border-radius: $card-radius;
+  box-shadow: tokens.$shadow-card;
+  overflow: hidden;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid tokens.$stone-100;
+  transition: background-color tokens.$transition-fast;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background-color: tokens.$stone-50;
+  }
+
+  &__marker {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: color-mix(in srgb, tokens.$color-success 12%, transparent);
+    border-radius: 50%;
+    color: tokens.$color-success;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__main {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  &__amount {
+    font-size: 15px;
+    font-weight: 600;
+    color: tokens.$stone-900;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__date {
+    font-size: 12px;
+    color: tokens.$stone-500;
+    white-space: nowrap;
+  }
+
+  &__details {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: tokens.$stone-500;
+  }
+
+  &__method {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    background-color: tokens.$stone-100;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    color: tokens.$stone-600;
+  }
+}
+
+// Empty timeline state
+.timeline-empty {
+  padding: 24px 16px;
+  text-align: center;
+
+  &__icon {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: tokens.$stone-100;
+    border-radius: 50%;
+    color: tokens.$stone-400;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  &__text {
+    margin: 0 0 2px;
+    font-size: 13px;
+    font-weight: 500;
+    color: tokens.$stone-700;
+  }
+
+  &__hint {
+    margin: 0;
+    font-size: 12px;
+    color: tokens.$stone-500;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// AUTHORIZATIONS SECTION
+// -----------------------------------------------------------------------------
+
+.auth-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: tokens.$shadow-card;
+
+  &__icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &--complete {
+      background-color: color-mix(in srgb, tokens.$color-success 12%, transparent);
+      color: tokens.$color-success;
+    }
+
+    &--incomplete {
+      background-color: color-mix(in srgb, #d97706 12%, transparent);
+      color: #b45309;
+    }
+  }
+
+  &__text {
+    flex: 1;
+    line-height: 1.3;
+
+    strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: tokens.$stone-800;
+    }
+
+    span {
+      font-size: 12px;
+      color: tokens.$stone-500;
+    }
+  }
+}
+
+.auth-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.auth-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: tokens.$shadow-card;
+
+  &__check {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+
+    &--yes {
+      background-color: tokens.$color-success;
+      color: white;
+    }
+
+    &--no {
+      background-color: tokens.$stone-200;
+      color: tokens.$stone-400;
+    }
+  }
+
+  &__label {
+    font-size: 13px;
+    font-weight: 500;
+    color: tokens.$stone-700;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// PAGE ACTIONS
+// -----------------------------------------------------------------------------
+
+.detail-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+
+  @media (max-width: 480px) {
+    justify-content: space-between;
+  }
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color tokens.$transition-fast,
+    border-color tokens.$transition-fast,
+    color tokens.$transition-fast,
+    transform tokens.$transition-fast;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  &--primary {
+    background-color: tokens.$brand-burgundy;
+    border: none;
+    color: white;
+
+    &:hover {
+      background-color: tokens.$brand-burgundy-light;
+    }
+
+    &:focus-visible {
+      box-shadow: 0 0 0 3px rgba(tokens.$brand-burgundy, 0.3);
+    }
+
+    &:active {
+      transform: scale(0.97);
+    }
+  }
+
+  &--secondary {
+    background-color: white;
+    border: 1.5px solid tokens.$stone-300;
+    color: tokens.$stone-700;
+
+    &:hover {
+      border-color: tokens.$stone-400;
+      background-color: tokens.$stone-50;
+    }
+
+    &:focus-visible {
+      box-shadow: tokens.$shadow-focus;
+    }
+
+    &:active {
+      background-color: tokens.$stone-100;
+    }
+  }
+
+  &--danger {
+    background-color: transparent;
+    border: none;
+    color: tokens.$stone-500;
+    padding: 8px 10px;
+
+    &:hover {
+      color: tokens.$color-error;
+      background-color: tokens.$color-error-light;
+    }
+
+    &:focus-visible {
+      box-shadow: 0 0 0 3px rgba(tokens.$color-error, 0.2);
+    }
+
+    &:active {
+      background-color: color-mix(in srgb, tokens.$color-error 15%, transparent);
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// LOADING & ERROR STATES
+// -----------------------------------------------------------------------------
+
+.detail-loading,
+.detail-error,
+.detail-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  padding: 32px;
+}
