@@ -146,19 +146,6 @@
               placeholder="Notas adicionales (opcional)" />
           </app-form-field>
 
-          <!-- Responsable (when inscripcion context) -->
-          @if (inscripcion()) {
-            <app-form-field label="Responsable" [forId]="'responsable-select'" [required]="true"
-              [invalid]="!!(form.get('responsableId')?.invalid && form.get('responsableId')?.touched)">
-              <select id="responsable-select" formControlName="responsableId" class="scout-input">
-                <option value="">Seleccionar quién recibe el pago</option>
-                @for (resp of responsables(); track resp.id) {
-                  <option [value]="resp.id">{{ resp.nombre }}</option>
-                }
-              </select>
-              <span error>Seleccioná quién recibe el pago</span>
-            </app-form-field>
-          }
 
           @if (!inscripcion()) {
           <div class="form-row">
@@ -186,7 +173,7 @@
         <button type="button" class="btn-secondary" (click)="onCancel()">
           Cancelar
         </button>
-        <button type="submit" class="btn-primary" [disabled]="form.invalid || loading()" (click)="onSubmit()">
+        <button type="submit" class="btn-primary" (click)="onSubmit()">
           @if (loading()) {
           <span class="loading-spinner"></span>
           } @else if (inscripcion()) {

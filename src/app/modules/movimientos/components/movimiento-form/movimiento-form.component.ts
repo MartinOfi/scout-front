@@ -16,9 +16,8 @@ import { take } from 'rxjs';
 import { MovimientosStateService } from '../../services/movimientos-state.service';
 import { InscripcionesApiService } from '../../../inscripciones/services/inscripciones-api.service';
 import { CajasApiService } from '../../../cajas/services/cajas-api.service';
-import { PersonasApiService } from '../../../personas/services/personas-api.service';
-import { CreateMovimientoDto, InscripcionConEstado, CajaConSaldo, PersonaUnion } from '../../../../shared/models';
-import { TipoMovimientoEnum, MedioPagoEnum, EstadoPago, TIPO_INSCRIPCION_LABELS, PersonaType } from '../../../../shared/enums';
+import { CreateMovimientoDto, InscripcionConEstado, CajaConSaldo } from '../../../../shared/models';
+import { TipoMovimientoEnum, MedioPagoEnum, EstadoPago, TIPO_INSCRIPCION_LABELS } from '../../../../shared/enums';
 
 // Shared Form Components
 import { FormFieldComponent } from '../../../../shared/components/form/form-field/form-field.component';
@@ -59,7 +58,6 @@ export class MovimientoFormComponent implements OnInit {
   private readonly state = inject(MovimientosStateService);
   private readonly inscripcionesApi = inject(InscripcionesApiService);
   private readonly cajasApi = inject(CajasApiService);
-  private readonly personasApi = inject(PersonasApiService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly fb = inject(FormBuilder);
@@ -75,9 +73,6 @@ export class MovimientoFormComponent implements OnInit {
   // Caja de grupo (for inscription payments)
   readonly cajaGrupo = signal<CajaConSaldo | null>(null);
 
-  // Responsables options (educadores)
-  readonly responsables = signal<PersonaUnion[]>([]);
-  readonly loadingResponsables = signal(false);
 
   // Computed values for inscripcion context
   readonly montoAPagar = computed(() => {
@@ -166,7 +161,9 @@ export class MovimientoFormComponent implements OnInit {
           tipo: TipoMovimientoEnum.INGRESO,
           // Suggest the pending amount
           monto: insc.saldoPendiente > 0 ? insc.saldoPendiente : 0,
-          descripcion: `Pago inscripción ${this.tipoInscripcionLabels[insc.tipo]} ${insc.ano}`
+          descripcion: `Pago inscripción ${this.tipoInscripcionLabels[insc.tipo]} ${insc.ano}`,
+          // The responsable is the persona from the inscription
+          responsableId: insc.personaId
         });
       },
       error: () => {
@@ -181,22 +178,6 @@ export class MovimientoFormComponent implements OnInit {
         this.form.patchValue({ cajaId: caja.id });
       }
     });
-
-    // Load responsables (educadores y personas externas)
-    this.loadingResponsables.set(true);
-    this.personasApi.getAll().pipe(take(1)).subscribe({
-      next: (personas) => {
-        // Filter to only educadores and personas externas (not protagonistas)
-        const responsables = personas.filter(
-          p => p.tipo === PersonaType.EDUCADOR || p.tipo === PersonaType.EXTERNA
-        );
-        this.responsables.set(responsables);
-        this.loadingResponsables.set(false);
-      },
-      error: () => {
-        this.loadingResponsables.set(false);
-      }
-    });
   }
 
   onConceptoChange(concepto: string): void {
@@ -204,7 +185,6 @@ export class MovimientoFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    console.log(this.form);
     if (this.form.invalid) return;
 
     const rawValue = this.form.value;
@@ -221,8 +201,8 @@ export class MovimientoFormComponent implements OnInit {
       requiereComprobante: rawValue.requiereComprobante,
       estadoPago: rawValue.estadoPago,
       fecha: rawValue.fecha,
-      // Include inscripcion reference if in that context
-      ...(insc ? { referenciaId: insc.id, referenciaType: 'inscripcion' } : {})
+      // Include inscripcionId when paying for an inscription
+      ...(insc ? { inscripcionId: insc.id } : {})
     };
 
     this.state.create(dto).subscribe({
