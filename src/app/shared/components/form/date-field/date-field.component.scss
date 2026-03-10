@@ -1,2 +1,26 @@
-// Estilos específicos del date-field si son necesarios
-// Por ahora usa las clases de Tailwind en el template
+@use '../form-tokens' as *;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.scout-input--date {
+  // Improve date input appearance
+  &::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity $transition-fast;
+    padding: 4px;
+    margin-right: -4px;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  // Firefox styling
+  &::-moz-calendar-picker-indicator {
+    cursor: pointer;
+  }
+}

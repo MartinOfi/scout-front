@@ -1,13 +1,9 @@
-<div class="w-full">
+<div class="scout-form-actions" [class.scout-form-actions--dense]="dense()">
   <div
-    class="flex gap-4"
-    [ngClass]="{
-      'justify-end': align() === 'end',
-      'justify-start': align() === 'start',
-      'justify-between': align() === 'between',
-      'pt-6': !dense(),
-      'pt-4': dense()
-    }"
+    class="scout-form-actions__row"
+    [class.scout-form-actions__row--end]="align() === 'end'"
+    [class.scout-form-actions__row--start]="align() === 'start'"
+    [class.scout-form-actions__row--between]="align() === 'between'"
   >
     <ng-content></ng-content>
   </div>

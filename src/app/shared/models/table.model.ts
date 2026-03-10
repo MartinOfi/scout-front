@@ -27,7 +27,8 @@ export interface TableColumn {
     | 'punctuality'
     | 'onTime'
     | 'late'
-    | 'rating';
+    | 'rating'
+    | 'boolean';
   /** Whether the column is sortable */
   sortable?: boolean;
   /** Fixed width for the column */

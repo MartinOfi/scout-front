@@ -1,1 +1,35 @@
-/* Estilo base coherente con JourneyCreatePage */
+@use '../form-tokens' as *;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.scout-input--number {
+  // Tabular numbers for alignment
+  font-variant-numeric: tabular-nums;
+
+  // Style number spinners
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    height: auto;
+    opacity: 0;
+    transition: opacity $transition-fast;
+  }
+
+  &:hover,
+  &:focus {
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      opacity: 1;
+    }
+  }
+
+  // Firefox
+  -moz-appearance: textfield;
+
+  &:hover,
+  &:focus {
+    -moz-appearance: auto;
+  }
+}

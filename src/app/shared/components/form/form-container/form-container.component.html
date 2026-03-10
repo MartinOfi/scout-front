@@ -1,30 +1,32 @@
-<div class="min-h-screen bg-gray-50 py-8">
+<div class="scout-form-page">
   <div
-    class="mx-auto px-4 sm:px-6 lg:px-8"
-    [ngClass]="{ 'max-w-2xl': columns() === 1, 'max-w-5xl': columns() === 2 }"
+    class="scout-form-wrapper"
+    [class.scout-form-wrapper--single]="columns() === 1"
+    [class.scout-form-wrapper--double]="columns() === 2"
   >
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-      <div
-        class="px-6 py-4"
-        [ngClass]="{ 'border-b border-gray-200': divider() }"
+    <div class="scout-form-card">
+      <header
+        class="scout-form-header"
+        [class.scout-form-header--with-divider]="divider()"
       >
         @if (title) {
-        <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          @if (icon) { <i class="{{ icon }} text-gray-500"></i> }
-          {{ title }}
-        </h1>
-        } @if (subtitle) {
-        <p class="mt-1 text-sm text-gray-600">{{ subtitle }}</p>
+          <h1 class="scout-form-title">
+            @if (icon) {
+              <i class="{{ icon }} scout-form-icon"></i>
+            }
+            {{ title }}
+          </h1>
+        }
+        @if (subtitle) {
+          <p class="scout-form-subtitle">{{ subtitle }}</p>
         }
         <ng-content select="[form-header]"></ng-content>
-      </div>
+      </header>
 
       <div
-        class="px-6"
-        [ngClass]="{
-          'py-6': density() === 'comfortable',
-          'py-4': density() === 'compact'
-        }"
+        class="scout-form-body"
+        [class.scout-form-body--comfortable]="density() === 'comfortable'"
+        [class.scout-form-body--compact]="density() === 'compact'"
       >
         <ng-content></ng-content>
       </div>

@@ -1,11 +1,13 @@
-<label class="inline-flex items-center gap-2">
+<label class="scout-checkbox-label">
   <input
     [id]="id() || null"
     type="checkbox"
     [disabled]="disabled"
     [checked]="value"
     (change)="handleChange($event)"
-    class="h-4 w-4 border-gray-300 rounded text-blue-600 focus:ring-blue-500"
+    class="scout-checkbox"
   />
-  <ng-content></ng-content>
+  <span class="scout-checkbox-text">
+    <ng-content></ng-content>
+  </span>
 </label>

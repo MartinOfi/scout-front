@@ -1,1 +1,10 @@
-/* Wrapper de campo: estilos mínimos; se apoya en utilidades Tailwind */
+@use '../form-tokens' as *;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.scout-field__control {
+  position: relative;
+}

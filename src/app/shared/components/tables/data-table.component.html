@@ -154,6 +154,16 @@ Este template implementa una tabla responsiva con las siguientes característica
                   }
                 </div>
                 }
+                <!-- Tipo boolean (check o X icon) -->
+                @if (column.type === 'boolean') {
+                <div class="flex justify-center">
+                  @if (row[column.key]) {
+                  <mat-icon class="text-green-600">check_circle</mat-icon>
+                  } @else {
+                  <mat-icon class="text-red-400">cancel</mat-icon>
+                  }
+                </div>
+                }
                 <!-- Tipo phone (link clickeable a WhatsApp) -->
                 @if (column.type === 'phone') {
                 <a class="text-blue-600 hover:text-blue-800 cursor-pointer underline whitespace-no-wrap"
@@ -175,7 +185,8 @@ Este template implementa una tabla responsiva con las siguientes característica
                 column.type !== 'punctuality' &&
                 column.type !== 'onTime' &&
                 column.type !== 'late' &&
-                column.type !== 'rating'
+                column.type !== 'rating' &&
+                column.type !== 'boolean'
                 ) {
                 <p class="text-gray-900 whitespace-no-wrap" [ngClass]="getAppointmentTimeClass(column, row)">
                   {{ row[column.key] }}

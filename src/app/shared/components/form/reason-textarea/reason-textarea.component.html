@@ -1,10 +1,12 @@
-<div class="reason-textarea" [ngClass]="customClass()">
-  <label class="label" [for]="'textarea-' + label()">{{ label() }}</label>
+<div class="scout-field" [ngClass]="customClass()">
+  <label class="scout-label" [for]="'textarea-' + label()">
+    {{ label() }}
+  </label>
   <textarea
     [id]="'textarea-' + label()"
     [formControl]="control()"
     [placeholder]="placeholder()"
-    class="textarea"
+    class="scout-textarea"
     rows="4"
   ></textarea>
 </div>

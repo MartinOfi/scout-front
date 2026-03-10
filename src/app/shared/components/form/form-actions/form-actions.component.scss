@@ -1,1 +1,91 @@
-/* Contenedor de acciones: estilos mínimos; layout controlado por clases utilitarias */
+@use 'sass:color';
+@use '../form-tokens' as *;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.scout-form-actions {
+  padding: 20px 28px 28px;
+  background-color: $stone-50;
+  border-top: 1px solid $stone-200;
+
+  &--dense {
+    padding: 16px 28px 20px;
+  }
+}
+
+.scout-form-actions__row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  &--end {
+    justify-content: flex-end;
+  }
+
+  &--start {
+    justify-content: flex-start;
+  }
+
+  &--between {
+    justify-content: space-between;
+  }
+}
+
+// Button styling for actions area
+:host ::ng-deep {
+  button {
+    font-family: var(--font-family-base);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all $transition-fast;
+    border: none;
+
+    &:focus-visible {
+      outline: 2px solid $brand-burgundy;
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  // Primary button
+  button[type="submit"],
+  .btn-primary {
+    background-color: $brand-burgundy;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: $brand-burgundy-light;
+    }
+
+    &:active:not(:disabled) {
+      background-color: color.adjust($brand-burgundy, $lightness: -5%);
+    }
+  }
+
+  // Secondary button
+  button[type="button"]:not(.btn-primary),
+  .btn-secondary {
+    background-color: white;
+    color: $stone-700;
+    border: 1.5px solid $stone-300;
+
+    &:hover:not(:disabled) {
+      background-color: $stone-50;
+      border-color: $stone-400;
+    }
+
+    &:active:not(:disabled) {
+      background-color: $stone-100;
+    }
+  }
+}

@@ -1,1 +1,47 @@
-/* Estilo base coherente con JourneyCreatePage */
+@use '../form-tokens' as *;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.scout-input--search {
+  margin-bottom: 10px;
+}
+
+.scout-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.scout-select {
+  @include input-base;
+  appearance: none;
+  padding-right: 40px;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.scout-select-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: $stone-500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color $transition-fast;
+
+  .scout-select:focus + & {
+    color: $brand-burgundy;
+  }
+
+  .scout-select:disabled + & {
+    color: $stone-300;
+  }
+}

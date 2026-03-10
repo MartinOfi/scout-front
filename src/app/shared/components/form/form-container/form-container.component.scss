@@ -1,1 +1,86 @@
-/* Estilos específicos opcionales para afinado fino del contenedor */
+@use '../form-tokens' as *;
+
+:host {
+  display: block;
+}
+
+.scout-form-page {
+  min-height: 100vh;
+  background-color: $stone-100;
+  padding: 32px 16px;
+
+  @media (min-width: 640px) {
+    padding: 40px 24px;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 48px 32px;
+  }
+}
+
+.scout-form-wrapper {
+  margin: 0 auto;
+  width: 100%;
+
+  &--single {
+    max-width: 640px;
+  }
+
+  &--double {
+    max-width: 960px;
+  }
+}
+
+.scout-form-card {
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: $shadow-card;
+  overflow: hidden;
+  border: 1px solid $stone-200;
+}
+
+.scout-form-header {
+  padding: 24px 28px;
+
+  &--with-divider {
+    border-bottom: 1px solid $stone-200;
+  }
+}
+
+.scout-form-title {
+  font-family: var(--font-family-headings);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: $stone-900;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  letter-spacing: -0.01em;
+}
+
+.scout-form-icon {
+  color: $stone-500;
+  font-size: 1.25rem;
+}
+
+.scout-form-subtitle {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: $stone-500;
+  line-height: 1.5;
+}
+
+.scout-form-body {
+  padding: 0 28px;
+
+  &--comfortable {
+    padding-top: 28px;
+    padding-bottom: 28px;
+  }
+
+  &--compact {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+}

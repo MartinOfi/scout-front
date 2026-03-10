@@ -1,2 +1,6 @@
-// Estilos específicos del email input component
-// Los estilos principales están en las clases de Tailwind CSS en el template
+@use '../form-tokens' as *;
+
+:host {
+  display: block;
+  width: 100%;
+}

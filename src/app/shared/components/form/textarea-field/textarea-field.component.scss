@@ -1,1 +1,13 @@
-/* Estilo base coherente con JourneyCreatePage */
+@use '../form-tokens' as *;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.scout-textarea {
+  @include input-base;
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.6;
+}

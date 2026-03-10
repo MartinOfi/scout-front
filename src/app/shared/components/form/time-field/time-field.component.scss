@@ -1,1 +1,26 @@
-/* Estilo base coherente con JourneyCreatePage */
+@use '../form-tokens' as *;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+// Time input styling when used via ng-content
+:host ::ng-deep {
+  input[type="time"] {
+    @include input-base;
+    font-variant-numeric: tabular-nums;
+
+    &::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+      opacity: 0.6;
+      transition: opacity $transition-fast;
+      padding: 4px;
+      margin-right: -4px;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+}
