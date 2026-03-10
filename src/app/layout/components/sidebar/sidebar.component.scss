@@ -1,5 +1,6 @@
 .sidebar {
-  position: relative;
+  position: sticky;
+  top: 0;
   display: flex;
   flex-direction: column;
   width: var(--sidebar-width-expanded);
@@ -8,6 +9,7 @@
   color: var(--color-text-on-dark);
   transition: var(--sidebar-transition);
   overflow: visible;
+  flex-shrink: 0;
 
   &.collapsed {
     width: var(--sidebar-width-collapsed);
