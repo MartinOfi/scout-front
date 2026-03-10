@@ -2,10 +2,17 @@
  * Cajas State Service
  * Gestiona estado con Signals (Angular 21)
  * SIN any - tipado estricto
+ *
+ * Uses correct API endpoints:
+ * - GET /cajas - List all cajas
+ * - GET /cajas?tipo={tipo} - Get cajas by type
+ * - GET /cajas/grupo - Get caja de grupo
+ * - GET /movimientos/saldo/:cajaId - Get saldo of a caja
+ * - GET /movimientos/caja/:cajaId - Get movimientos of a caja
  */
 
 import { Injectable, Signal, WritableSignal, computed, signal, inject } from '@angular/core';
-import { Observable, forkJoin, map } from 'rxjs';
+import { Observable, forkJoin, map, switchMap, of } from 'rxjs';
 
 import {
   Caja,
@@ -14,9 +21,17 @@ import {
   CreateCajaDto,
 } from '../../../shared/models';
 
-import { Rama, RamaEnum } from '../../../shared/enums';
+import { Rama, RamaEnum, CajaType } from '../../../shared/enums';
 import { CajasApiService } from './cajas-api.service';
 import { NotificationService } from '../../../shared/services';
+
+/** Map Rama enum to CajaType for fondo de rama */
+const RAMA_TO_CAJA_TYPE: Record<Rama, CajaType> = {
+  [RamaEnum.MANADA]: CajaType.RAMA_MANADA,
+  [RamaEnum.UNIDAD]: CajaType.RAMA_UNIDAD,
+  [RamaEnum.CAMINANTES]: CajaType.RAMA_CAMINANTES,
+  [RamaEnum.ROVERS]: CajaType.RAMA_ROVERS,
+};
 
 @Injectable({
   providedIn: 'root',
@@ -113,17 +128,23 @@ export class CajasStateService {
 
   /**
    * Cargar caja de una rama
+   * Uses GET /cajas?tipo={cajaType} to get the caja
    */
   loadCajaRama(rama: Rama): void {
     this._loading.set(true);
     this._error.set(null);
 
-    this.apiService.getById(rama).subscribe({
-      next: (caja: CajaConSaldo) => {
-        this._cajasRama.update((prev) => ({
-          ...prev,
-          [rama]: caja,
-        }));
+    const cajaType = RAMA_TO_CAJA_TYPE[rama];
+    this.apiService.getByType(cajaType).pipe(
+      map((cajas) => cajas[0] as CajaConSaldo | undefined)
+    ).subscribe({
+      next: (caja: CajaConSaldo | undefined) => {
+        if (caja) {
+          this._cajasRama.update((prev) => ({
+            ...prev,
+            [rama]: caja,
+          }));
+        }
         this._loading.set(false);
       },
       error: (err: unknown) => {
@@ -137,23 +158,27 @@ export class CajasStateService {
 
   /**
    * Cargar todas las cajas de rama
+   * Uses GET /cajas?tipo={cajaType} for each rama
    */
   loadTodasCajasRama(): void {
     this._loading.set(true);
     this._error.set(null);
 
-    const ramas = Object.values(RamaEnum);
-    const requests = ramas.map((rama) =>
-      this.apiService.getById(rama).pipe(
-        map((caja) => ({ rama, caja }))
-      )
-    );
+    const ramas = Object.values(RamaEnum) as Rama[];
+    const requests = ramas.map((rama) => {
+      const cajaType = RAMA_TO_CAJA_TYPE[rama];
+      return this.apiService.getByType(cajaType).pipe(
+        map((cajas) => ({ rama, caja: cajas[0] as CajaConSaldo | undefined }))
+      );
+    });
 
     forkJoin(requests).subscribe({
-      next: (results: Array<{ rama: RamaEnum; caja: CajaConSaldo }>) => {
+      next: (results) => {
         const cajasMap: Record<string, CajaConSaldo> = {};
         results.forEach(({ rama, caja }) => {
-          cajasMap[rama] = caja;
+          if (caja) {
+            cajasMap[rama] = caja;
+          }
         });
         this._cajasRama.set(cajasMap);
         this._loading.set(false);
@@ -169,61 +194,120 @@ export class CajasStateService {
 
   /**
    * Cargar movimientos de caja de grupo
+   * First gets the grupo caja, then fetches its movimientos by ID
    */
   loadMovimientosGrupo(): void {
     this._loading.set(true);
     this._error.set(null);
 
-    this.apiService.getMovimientosGrupo().subscribe({
-      next: (movimientos: Movimiento[]) => {
-        this._movimientosGrupo.set(movimientos);
-        this._loading.set(false);
-      },
-      error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar movimientos';
-        this._error.set(errorMsg);
-        this._loading.set(false);
-        this.notificationService.showError(errorMsg);
-      },
-    });
+    // If we already have cajaGrupo loaded, use its ID
+    const cajaGrupo = this._cajaGrupo();
+    if (cajaGrupo) {
+      this.apiService.getMovimientos(cajaGrupo.id).subscribe({
+        next: (movimientos: Movimiento[]) => {
+          this._movimientosGrupo.set(movimientos);
+          this._loading.set(false);
+        },
+        error: (err: unknown) => {
+          const errorMsg = err instanceof Error ? err.message : 'Error al cargar movimientos';
+          this._error.set(errorMsg);
+          this._loading.set(false);
+          this.notificationService.showError(errorMsg);
+        },
+      });
+    } else {
+      // First load the caja grupo, then get movimientos
+      this.apiService.getCajaGrupo().pipe(
+        switchMap((caja: CajaConSaldo) => {
+          this._cajaGrupo.set(caja);
+          return this.apiService.getMovimientos(caja.id);
+        })
+      ).subscribe({
+        next: (movimientos: Movimiento[]) => {
+          this._movimientosGrupo.set(movimientos);
+          this._loading.set(false);
+        },
+        error: (err: unknown) => {
+          const errorMsg = err instanceof Error ? err.message : 'Error al cargar movimientos';
+          this._error.set(errorMsg);
+          this._loading.set(false);
+          this.notificationService.showError(errorMsg);
+        },
+      });
+    }
   }
 
   /**
    * Cargar movimientos de una rama
+   * First gets the rama caja by type, then fetches its movimientos by ID
    */
   loadMovimientosRama(rama: Rama): void {
     this._loading.set(true);
     this._error.set(null);
 
-    this.apiService.getMovimientosRama(rama.toString()).subscribe({
-      next: (movimientos: Movimiento[]) => {
-        this._movimientosRama.update((prev) => ({
-          ...prev,
-          [rama]: movimientos,
-        }));
-        this._loading.set(false);
-      },
-      error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : `Error al cargar movimientos de ${rama}`;
-        this._error.set(errorMsg);
-        this._loading.set(false);
-        this.notificationService.showError(errorMsg);
-      },
-    });
+    // Check if we already have this caja loaded
+    const existingCaja = this._cajasRama()[rama];
+    if (existingCaja) {
+      this.apiService.getMovimientos(existingCaja.id).subscribe({
+        next: (movimientos: Movimiento[]) => {
+          this._movimientosRama.update((prev) => ({
+            ...prev,
+            [rama]: movimientos,
+          }));
+          this._loading.set(false);
+        },
+        error: (err: unknown) => {
+          const errorMsg = err instanceof Error ? err.message : `Error al cargar movimientos de ${rama}`;
+          this._error.set(errorMsg);
+          this._loading.set(false);
+          this.notificationService.showError(errorMsg);
+        },
+      });
+    } else {
+      // First load the caja, then get movimientos
+      const cajaType = RAMA_TO_CAJA_TYPE[rama];
+      this.apiService.getByType(cajaType).pipe(
+        switchMap((cajas) => {
+          const caja = cajas[0] as CajaConSaldo | undefined;
+          if (!caja) {
+            return of([]);
+          }
+          this._cajasRama.update((prev) => ({
+            ...prev,
+            [rama]: caja,
+          }));
+          return this.apiService.getMovimientos(caja.id);
+        })
+      ).subscribe({
+        next: (movimientos: Movimiento[]) => {
+          this._movimientosRama.update((prev) => ({
+            ...prev,
+            [rama]: movimientos,
+          }));
+          this._loading.set(false);
+        },
+        error: (err: unknown) => {
+          const errorMsg = err instanceof Error ? err.message : `Error al cargar movimientos de ${rama}`;
+          this._error.set(errorMsg);
+          this._loading.set(false);
+          this.notificationService.showError(errorMsg);
+        },
+      });
+    }
   }
 
   /**
-   * Cargar movimientos de cuenta personal
+   * Cargar movimientos de cuenta personal by caja ID
    */
-  loadMovimientosPersonal(personaId: string): void {
+  loadMovimientosPersonal(cajaId: string): void {
     this._loading.set(true);
     this._error.set(null);
 
-    this.apiService.getMovimientosPersonal(personaId).subscribe({
+    this.apiService.getMovimientos(cajaId).subscribe({
       next: (movimientos: Movimiento[]) => {
         this._movimientosPersonal.update((prev) => ({
           ...prev,
-          [personaId]: movimientos,
+          [cajaId]: movimientos,
         }));
         this._loading.set(false);
       },

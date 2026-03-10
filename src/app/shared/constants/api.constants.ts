@@ -12,16 +12,19 @@ export const API_CONFIG = {
   ENDPOINTS: {
     // Personas
     PERSONAS: 'personas',
+    PROTAGONISTAS: 'personas/protagonistas',
+    EDUCADORES: 'personas/educadores',
+    PERSONAS_EXTERNAS: 'personas/externas',
     PERSONAS_CON_DEUDAS: 'personas/con-deudas',
 
     // Cajas
     CAJAS: 'cajas',
     CAJAS_GRUPO: 'cajas/grupo',
-    CAJAS_RAMA: 'cajas/rama',
-    CAJAS_PERSONAL: 'cajas/personal',
 
     // Movimientos
     MOVIMIENTOS: 'movimientos',
+    MOVIMIENTOS_SALDO: 'movimientos/saldo',
+    MOVIMIENTOS_CAJA: 'movimientos/caja',
     MOVIMIENTOS_REEMBOLSOS_PENDIENTES: 'movimientos/reembolsos-pendientes',
 
     // Inscripciones

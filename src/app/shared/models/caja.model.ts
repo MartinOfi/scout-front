@@ -44,3 +44,11 @@ export interface CreateCajaDto {
   nombre?: string;
   propietarioId?: string;
 }
+
+/**
+ * Response from GET /movimientos/saldo/:cajaId
+ */
+export interface SaldoCajaResponse {
+  cajaId: string;
+  saldo: number;
+}

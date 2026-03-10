@@ -2,14 +2,27 @@
  * Saldo Calculator Service
  * Calculates balances dynamically (RN6 - never store, always calculate)
  * SIN any - fully typed
+ *
+ * Uses correct API endpoints:
+ * - GET /cajas/grupo - Get caja de grupo
+ * - GET /cajas?tipo={tipo} - Get cajas by type
+ * - GET /movimientos/saldo/:cajaId - Get saldo of a caja
  */
 
 import { Injectable, inject } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, map, switchMap } from 'rxjs';
 import { CajasApiService } from '../../modules/cajas/services/cajas-api.service';
 import { MovimientosApiService } from '../../modules/movimientos/services/movimientos-api.service';
 import { Producto, VentaProducto } from '../models';
-import { Rama } from '../enums';
+import { Rama, RamaEnum, CajaType } from '../enums';
+
+/** Map Rama enum to CajaType for fondo de rama */
+const RAMA_TO_CAJA_TYPE: Record<Rama, CajaType> = {
+  [RamaEnum.MANADA]: CajaType.RAMA_MANADA,
+  [RamaEnum.UNIDAD]: CajaType.RAMA_UNIDAD,
+  [RamaEnum.CAMINANTES]: CajaType.RAMA_CAMINANTES,
+  [RamaEnum.ROVERS]: CajaType.RAMA_ROVERS,
+};
 
 /**
  * Saldo calculator service
@@ -23,37 +36,49 @@ export class SaldoCalculatorService {
   private readonly movimientosApi = inject(MovimientosApiService);
 
   /**
-   * Calculate saldo of a caja
+   * Calculate saldo of a caja by ID
+   * Uses GET /movimientos/saldo/:cajaId
    */
   calcularSaldoCaja(cajaId: string): Observable<number> {
-    return this.cajasApi.getById(cajaId).pipe(
-      map(caja => caja.saldo)
+    return this.cajasApi.getSaldo(cajaId).pipe(
+      map(response => response.saldo)
     );
   }
 
   /**
    * Calculate saldo of grupo caja
+   * First gets caja de grupo, then uses its ID for saldo
    */
   calcularSaldoGrupo(): Observable<number> {
-    return this.cajasApi.getSaldoGrupo().pipe(
+    return this.cajasApi.getCajaGrupo().pipe(
+      switchMap(caja => this.cajasApi.getSaldo(caja.id)),
       map(response => response.saldo)
     );
   }
 
   /**
    * Calculate saldo of a rama fund
+   * First gets caja by type, then uses its ID for saldo
    */
   calcularSaldoFondoRama(rama: Rama): Observable<number> {
-    return this.cajasApi.getSaldoRama(rama).pipe(
+    const cajaType = RAMA_TO_CAJA_TYPE[rama];
+    return this.cajasApi.getByType(cajaType).pipe(
+      switchMap(cajas => {
+        const caja = cajas[0];
+        if (!caja) {
+          throw new Error(`No se encontró caja para rama ${rama}`);
+        }
+        return this.cajasApi.getSaldo(caja.id);
+      }),
       map(response => response.saldo)
     );
   }
 
   /**
-   * Calculate saldo of a personal account
+   * Calculate saldo of a personal account by caja ID
    */
-  calcularSaldoCuentaPersonal(personaId: string): Observable<number> {
-    return this.cajasApi.getSaldoPersonal(personaId).pipe(
+  calcularSaldoCuentaPersonal(cajaId: string): Observable<number> {
+    return this.cajasApi.getSaldo(cajaId).pipe(
       map(response => response.saldo)
     );
   }

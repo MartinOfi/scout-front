@@ -72,7 +72,14 @@ export interface MockCajasStateService {
   cajasRama: WritableSignal<Record<string, CajaConSaldo>>;
   movimientosGrupo: WritableSignal<Movimiento[]>;
   movimientosRama: WritableSignal<Record<string, Movimiento[]>>;
+  movimientosPersonal: WritableSignal<Record<string, Movimiento[]>>;
   saldoGrupo: WritableSignal<number>;
+  saldoManada: WritableSignal<number>;
+  saldoUnidad: WritableSignal<number>;
+  saldoCaminantes: WritableSignal<number>;
+  saldoRovers: WritableSignal<number>;
+  totalSaldosRamas: WritableSignal<number>;
+  totalSaldos: WritableSignal<number>;
   loading: WritableSignal<boolean>;
   error: WritableSignal<string | null>;
   loadCajaGrupo: () => void;
@@ -80,7 +87,7 @@ export interface MockCajasStateService {
   loadTodasCajasRama: () => void;
   loadMovimientosGrupo: () => void;
   loadMovimientosRama: (rama: string) => void;
-  loadMovimientosPersonal: (personaId: string) => void;
+  loadMovimientosPersonal: (cajaId: string) => void;
 }
 
 /**
@@ -92,7 +99,14 @@ export function createMockCajasStateService(): MockCajasStateService {
     cajasRama: signal<Record<string, CajaConSaldo>>({}),
     movimientosGrupo: signal<Movimiento[]>([]),
     movimientosRama: signal<Record<string, Movimiento[]>>({}),
+    movimientosPersonal: signal<Record<string, Movimiento[]>>({}),
     saldoGrupo: signal<number>(0),
+    saldoManada: signal<number>(0),
+    saldoUnidad: signal<number>(0),
+    saldoCaminantes: signal<number>(0),
+    saldoRovers: signal<number>(0),
+    totalSaldosRamas: signal<number>(0),
+    totalSaldos: signal<number>(0),
     loading: signal<boolean>(false),
     error: signal<string | null>(null),
     loadCajaGrupo: () => {},
