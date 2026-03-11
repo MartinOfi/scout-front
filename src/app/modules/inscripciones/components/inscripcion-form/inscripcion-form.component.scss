@@ -13,7 +13,6 @@
 
 .scout-form-page {
   min-height: 100vh;
-  background-color: $stone-100;
   padding: 32px 16px;
 
   @media (min-width: 640px) {
@@ -121,6 +120,7 @@
 }
 
 .input-with-prefix ::ng-deep {
+
   .scout-input,
   input {
     padding-left: 32px;
