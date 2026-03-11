@@ -15,9 +15,10 @@ import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
-import { take } from 'rxjs';
+import { take, switchMap, from } from 'rxjs';
 
 import { InscripcionesStateService } from '../../services/inscripciones-state.service';
+import { CajasApiService } from '../../../cajas/services/cajas-api.service';
 import { ConfirmDialogService } from '../../../../shared/services';
 import {
   LoadingSpinnerComponent,
@@ -61,6 +62,7 @@ const MEDIO_PAGO_LABELS: Record<string, string> = {
 })
 export class InscripcionDetailComponent implements OnInit {
   private readonly state = inject(InscripcionesStateService);
+  private readonly cajasApi = inject(CajasApiService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly confirmDialog = inject(ConfirmDialogService);
@@ -186,38 +188,41 @@ export class InscripcionDetailComponent implements OnInit {
     const d = this.detail();
     if (!d || d.saldoPendiente <= 0) return;
 
-    const dialogData: PagoInscripcionDialogData = {
-      inscripcionId: d.id,
-      montoPendiente: d.saldoPendiente,
-      // TODO: Get saldoCuentaPersonal from persona's caja (future enhancement)
-    };
+    // Fetch saldo de cuenta personal before opening dialog
+    this.cajasApi.getSaldoCuentaPersonal(d.personaId).pipe(
+      switchMap((saldoCuentaPersonal: number) => {
+        const dialogData: PagoInscripcionDialogData = {
+          inscripcionId: d.id,
+          montoPendiente: d.saldoPendiente,
+          saldoCuentaPersonal,
+        };
 
-    // Dynamically import the dialog component
-    import('../shared/pago-inscripcion-dialog/pago-inscripcion-dialog.component').then(
-      ({ PagoInscripcionDialogComponent }) => {
-        const dialogRef = this.dialog.open<
-          typeof PagoInscripcionDialogComponent,
-          PagoInscripcionDialogData,
-          PagoInscripcionFormData
-        >(PagoInscripcionDialogComponent, {
-          width: '500px',
-          maxWidth: '90vw',
-          data: dialogData,
-          disableClose: false,
-        });
-
-        dialogRef.afterClosed().subscribe((result) => {
-          if (result) {
-            const dto: PagoInscripcionDto = {
-              montoPagado: result.montoPagado,
-              montoConSaldoPersonal: result.montoConSaldoPersonal,
-              medioPago: result.medioPago,
-              descripcion: result.descripcion,
-            };
-            this.state.pagarInscripcion(d.id, dto).subscribe();
-          }
-        });
+        // Dynamically import the dialog component and open it
+        return from(
+          import('../shared/pago-inscripcion-dialog/pago-inscripcion-dialog.component').then(
+            ({ PagoInscripcionDialogComponent }) => {
+              const dialogRef = this.dialog.open(PagoInscripcionDialogComponent, {
+                width: '500px',
+                maxWidth: '90vw',
+                data: dialogData,
+                disableClose: false,
+              });
+              return dialogRef;
+            }
+          )
+        );
+      }),
+      switchMap((dialogRef) => dialogRef.afterClosed())
+    ).subscribe((result: PagoInscripcionFormData | undefined) => {
+      if (result) {
+        const dto: PagoInscripcionDto = {
+          montoPagado: result.montoPagado,
+          montoConSaldoPersonal: result.montoConSaldoPersonal,
+          medioPago: result.medioPago,
+          descripcion: result.descripcion,
+        };
+        this.state.pagarInscripcion(d.id, dto).subscribe();
       }
-    );
+    });
   }
 }

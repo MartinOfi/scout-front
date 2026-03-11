@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import {
   Caja,
   CajaConSaldo,
@@ -80,5 +81,22 @@ export class CajasApiService {
    */
   create(dto: CreateCajaDto): Observable<Caja> {
     return this.http.post<Caja, CreateCajaDto>(this.endpoint, dto);
+  }
+
+  /**
+   * Get saldo de cuenta personal by personaId
+   * Fetches personal cajas and finds the one matching the propietarioId
+   * Returns 0 if no personal account found
+   */
+  getSaldoCuentaPersonal(personaId: string): Observable<number> {
+    return this.getByType(CajaType.PERSONAL).pipe(
+      map((cajas: Caja[]) => cajas.find((c) => c.propietarioId === personaId)),
+      switchMap((caja: Caja | undefined) => {
+        if (!caja) {
+          return of(0);
+        }
+        return this.getSaldo(caja.id).pipe(map((res) => res.saldo));
+      })
+    );
   }
 }

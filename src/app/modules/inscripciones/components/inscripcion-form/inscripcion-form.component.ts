@@ -4,15 +4,16 @@
  * SIN any - tipado estricto
  */
 
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, inject, signal, computed, Signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, inject, signal, computed, Signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { InscripcionesStateService } from '../../services/inscripciones-state.service';
 import { PersonasStateService } from '../../../personas/services/personas-state.service';
+import { CajasApiService } from '../../../cajas/services/cajas-api.service';
 import { CreateInscripcionDto, UpdateInscripcionDto, Inscripcion, PersonaUnion } from '../../../../shared/models';
-import { TipoInscripcion, TIPO_INSCRIPCION_LABELS } from '../../../../shared/enums';
+import { TipoInscripcion, TIPO_INSCRIPCION_LABELS, MedioPago, MedioPagoEnum, MEDIO_PAGO_LABELS } from '../../../../shared/enums';
 import { ConfiguracionService } from '../../../../shared/services';
 
 // Shared Form Components
@@ -23,6 +24,11 @@ import { CheckboxFieldComponent } from '../../../../shared/components/form/check
 
 interface TipoOption {
   value: TipoInscripcion;
+  label: string;
+}
+
+interface MedioPagoOption {
+  value: MedioPago;
   label: string;
 }
 
@@ -44,6 +50,7 @@ interface TipoOption {
 export class InscripcionFormComponent implements OnInit, OnDestroy {
   private readonly state: InscripcionesStateService = inject(InscripcionesStateService);
   private readonly personasState: PersonasStateService = inject(PersonasStateService);
+  private readonly cajasApi = inject(CajasApiService);
   private readonly configService = inject(ConfiguracionService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -61,6 +68,12 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
     label: TIPO_INSCRIPCION_LABELS[tipo]
   }));
 
+  /** Options for medioPago select (excluding saldo_personal for initial payment) */
+  readonly medioPagoOptions: MedioPagoOption[] = [
+    { value: 'efectivo', label: MEDIO_PAGO_LABELS['efectivo'] },
+    { value: 'transferencia', label: MEDIO_PAGO_LABELS['transferencia'] },
+  ];
+
   /** Track current tipo for conditional rendering */
   private readonly currentTipo = signal<TipoInscripcion>('scout_argentina');
 
@@ -69,7 +82,12 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
     return this.currentTipo() === 'scout_argentina';
   });
 
+  /** Saldo de cuenta personal de la persona seleccionada */
+  readonly saldoCuentaPersonal: WritableSignal<number> = signal(0);
+  readonly loadingSaldo: WritableSignal<boolean> = signal(false);
+
   private tipoSubscription: Subscription | null = null;
+  private personaSubscription: Subscription | null = null;
 
   inscripcionForm: FormGroup = this.fb.group({
     personaId: ['', Validators.required],
@@ -79,6 +97,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
     montoBonificado: [0, [Validators.min(0)]],
     montoPagado: [0, [Validators.min(0)]],
     montoConSaldoPersonal: [0, [Validators.min(0)]],
+    medioPago: [MedioPagoEnum.EFECTIVO],
     declaracionDeSalud: [false],
     autorizacionDeImagen: [false],
     salidasCercanas: [false],
@@ -93,6 +112,8 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
   formatPersonaForSelect = (persona: PersonaUnion): string => persona.nombre;
   getTipoValue = (option: TipoOption): TipoInscripcion => option.value;
   getTipoLabel = (option: TipoOption): string => option.label;
+  getMedioPagoValue = (option: MedioPagoOption): MedioPago => option.value;
+  getMedioPagoLabel = (option: MedioPagoOption): string => option.label;
 
   ngOnInit(): void {
     this.inscripcionId = this.route.snapshot.paramMap.get('id');
@@ -123,6 +144,17 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
       }
     ) ?? null;
 
+    // Listen to persona changes to fetch their personal account balance
+    this.personaSubscription = this.inscripcionForm.get('personaId')?.valueChanges.subscribe(
+      (personaId: string) => {
+        if (personaId && !this.isEditing) {
+          this.loadSaldoCuentaPersonal(personaId);
+        } else {
+          this.saldoCuentaPersonal.set(0);
+        }
+      }
+    ) ?? null;
+
     if (this.isEditing && this.inscripcionId) {
       this.loadInscripcion(this.inscripcionId);
     } else {
@@ -147,6 +179,40 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.tipoSubscription?.unsubscribe();
+    this.personaSubscription?.unsubscribe();
+  }
+
+  /**
+   * Load saldo de cuenta personal for the selected persona
+   */
+  private loadSaldoCuentaPersonal(personaId: string): void {
+    this.loadingSaldo.set(true);
+    this.cajasApi.getSaldoCuentaPersonal(personaId).subscribe({
+      next: (saldo: number) => {
+        this.saldoCuentaPersonal.set(saldo);
+        this.loadingSaldo.set(false);
+      },
+      error: () => {
+        this.saldoCuentaPersonal.set(0);
+        this.loadingSaldo.set(false);
+      },
+    });
+  }
+
+  /**
+   * Fill montoConSaldoPersonal with available balance
+   */
+  usarSaldoDisponible(): void {
+    const saldo = this.saldoCuentaPersonal();
+    if (saldo > 0) {
+      const montoTotal = this.inscripcionForm.get('montoTotal')?.value || 0;
+      const montoBonificado = this.inscripcionForm.get('montoBonificado')?.value || 0;
+      const montoAPagar = montoTotal - montoBonificado;
+      const montoAUsar = Math.min(saldo, montoAPagar);
+      this.inscripcionForm.patchValue({
+        montoConSaldoPersonal: montoAUsar,
+      });
+    }
   }
 
   private loadInscripcion(id: string): void {
@@ -193,6 +259,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
         this.router.navigate(['/inscripciones']);
       });
     } else {
+      const hasPago = formValue.montoPagado > 0 || formValue.montoConSaldoPersonal > 0;
       const dto: CreateInscripcionDto = {
         personaId: formValue.personaId,
         tipo: formValue.tipo,
@@ -201,6 +268,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
         montoBonificado: formValue.montoBonificado || undefined,
         montoPagado: formValue.montoPagado || undefined,
         montoConSaldoPersonal: formValue.montoConSaldoPersonal || undefined,
+        medioPago: hasPago ? formValue.medioPago : undefined,
         declaracionDeSalud: formValue.declaracionDeSalud || undefined,
         autorizacionDeImagen: formValue.autorizacionDeImagen || undefined,
         salidasCercanas: formValue.salidasCercanas || undefined,

@@ -134,9 +134,59 @@
                 </app-form-field>
 
                 <app-form-field
-                  label="Con Saldo Personal"
+                  label="Medio de Pago"
+                  [forId]="'medio-pago-select'"
+                  hint="Para el pago inicial"
+                >
+                  <app-select-field
+                    id="medio-pago-select"
+                    formControlName="medioPago"
+                    placeholder="Seleccionar medio"
+                    [options]="medioPagoOptions"
+                    [optionValueFn]="getMedioPagoValue"
+                    [optionLabelFn]="getMedioPagoLabel"
+                  />
+                </app-form-field>
+              }
+            </div>
+
+            <!-- Saldo Personal Row: Saldo disponible + Campo de monto a usar -->
+            @if (!isEditing && inscripcionForm.get('personaId')?.value) {
+              <div class="saldo-personal-row">
+                <!-- Saldo disponible (izquierda) -->
+                <div class="saldo-disponible">
+                  @if (loadingSaldo()) {
+                    <div class="saldo-loading">
+                      <span class="loading-spinner-small"></span>
+                      <span>Cargando...</span>
+                    </div>
+                  } @else {
+                    <div class="saldo-disponible__content" [class.saldo-disponible__content--available]="saldoCuentaPersonal() > 0">
+                      <div class="saldo-disponible__header">
+                        <i class="fas fa-wallet"></i>
+                        <span>Saldo Disponible</span>
+                      </div>
+                      <div class="saldo-disponible__value">
+                        ${{ saldoCuentaPersonal() | number:'1.0-0' }}
+                      </div>
+                      @if (saldoCuentaPersonal() > 0) {
+                        <button
+                          type="button"
+                          class="btn-use-saldo"
+                          (click)="usarSaldoDisponible()"
+                        >
+                          Usar todo
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+
+                <!-- Campo monto a usar (derecha) -->
+                <app-form-field
+                  label="Usar de Cuenta Personal"
                   [forId]="'monto-saldo-personal'"
-                  hint="Pago usando saldo de cuenta personal"
+                  class="saldo-input-field"
                 >
                   <div class="input-with-prefix">
                     <span class="input-prefix">$</span>
@@ -144,12 +194,13 @@
                       id="monto-saldo-personal"
                       formControlName="montoConSaldoPersonal"
                       [min]="0"
+                      [max]="saldoCuentaPersonal()"
                       placeholder="0"
                     />
                   </div>
                 </app-form-field>
-              }
-            </div>
+              </div>
+            }
 
             <!-- Autorizaciones Section -->
             @if (showAuthorizationFields()) {

@@ -3,7 +3,7 @@
  * Typed interfaces - NO any
  */
 
-import { TipoInscripcion, EstadoInscripcion } from '../enums';
+import { TipoInscripcion, EstadoInscripcion, MedioPago } from '../enums';
 import { Persona } from './persona.model';
 
 /**
@@ -63,6 +63,7 @@ export interface CreateInscripcionDto {
   montoBonificado?: number;
   montoPagado?: number;
   montoConSaldoPersonal?: number;
+  medioPago?: MedioPago;
   declaracionDeSalud?: boolean;
   autorizacionDeImagen?: boolean;
   salidasCercanas?: boolean;
