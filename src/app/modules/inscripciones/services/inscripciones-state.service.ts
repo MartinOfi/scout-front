@@ -13,6 +13,7 @@ import {
   InscripcionConEstado,
   CreateInscripcionDto,
   UpdateInscripcionDto,
+  PagoInscripcionDto,
 } from '../../../shared/models';
 import { TipoInscripcion } from '../../../shared/enums';
 
@@ -216,6 +217,36 @@ export class InscripcionesStateService {
       }),
       catchError((err: unknown) => {
         const errorMsg = err instanceof Error ? err.message : 'Error al eliminar inscripción';
+        this._error.set(errorMsg);
+        this.notificationService.showError(errorMsg);
+        return throwError(() => err);
+      }),
+      finalize(() => this._loading.set(false))
+    );
+  }
+
+  /**
+   * Registrar un pago posterior para una inscripción
+   * POST /api/v1/inscripciones/:id/pagar
+   */
+  pagarInscripcion(id: string, dto: PagoInscripcionDto): Observable<InscripcionConEstado> {
+    this._loading.set(true);
+    this._error.set(null);
+
+    return this.apiService.pagarInscripcion(id, dto).pipe(
+      tap((inscripcionConEstado: InscripcionConEstado) => {
+        // Update detail view if currently selected
+        if (this._selectedId() === id) {
+          this._selectedDetail.set(inscripcionConEstado);
+        }
+        // Update list item
+        this._inscripciones.update((prev) =>
+          prev.map((i) => (i.id === id ? inscripcionConEstado : i))
+        );
+        this.notificationService.showSuccess('Pago registrado exitosamente');
+      }),
+      catchError((err: unknown) => {
+        const errorMsg = err instanceof Error ? err.message : 'Error al registrar pago';
         this._error.set(errorMsg);
         this.notificationService.showError(errorMsg);
         return throwError(() => err);

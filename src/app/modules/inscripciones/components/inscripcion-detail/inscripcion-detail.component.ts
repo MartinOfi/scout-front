@@ -14,6 +14,7 @@ import {
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
 import { take } from 'rxjs';
 
 import { InscripcionesStateService } from '../../services/inscripciones-state.service';
@@ -22,17 +23,22 @@ import {
   LoadingSpinnerComponent,
   EmptyStateComponent,
 } from '../../../../shared';
-import { InscripcionConEstado } from '../../../../shared/models';
+import { InscripcionConEstado, PagoInscripcionDto } from '../../../../shared/models';
 import {
   TIPO_INSCRIPCION_LABELS,
   ESTADO_INSCRIPCION_LABELS,
   EstadoInscripcion,
 } from '../../../../shared/enums';
+import type {
+  PagoInscripcionDialogData,
+  PagoInscripcionFormData,
+} from '../shared/pago-inscripcion-dialog/pago-inscripcion-dialog.component';
 
 /** Mapping for payment method labels */
 const MEDIO_PAGO_LABELS: Record<string, string> = {
   efectivo: 'Efectivo',
   transferencia: 'Transferencia',
+  saldo_personal: 'Saldo Personal',
   debito: 'Débito',
   credito: 'Crédito',
   otro: 'Otro',
@@ -58,6 +64,7 @@ export class InscripcionDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly confirmDialog = inject(ConfirmDialogService);
+  private readonly dialog = inject(MatDialog);
 
   readonly loading: Signal<boolean> = this.state.loading;
   readonly error: Signal<string | null> = this.state.error;
@@ -176,16 +183,41 @@ export class InscripcionDetailComponent implements OnInit {
   }
 
   onRegisterPayment(): void {
-    const id = this.detail()?.id;
-    if (id) {
-      // Navigate to payment registration
-      // This could be a modal or a separate route depending on your app structure
-      this.router.navigate(['/movimientos/nuevo'], {
-        queryParams: {
-          concepto: 'inscripcion',
-          referenciaId: id,
-        },
-      });
-    }
+    const d = this.detail();
+    if (!d || d.saldoPendiente <= 0) return;
+
+    const dialogData: PagoInscripcionDialogData = {
+      inscripcionId: d.id,
+      montoPendiente: d.saldoPendiente,
+      // TODO: Get saldoCuentaPersonal from persona's caja (future enhancement)
+    };
+
+    // Dynamically import the dialog component
+    import('../shared/pago-inscripcion-dialog/pago-inscripcion-dialog.component').then(
+      ({ PagoInscripcionDialogComponent }) => {
+        const dialogRef = this.dialog.open<
+          typeof PagoInscripcionDialogComponent,
+          PagoInscripcionDialogData,
+          PagoInscripcionFormData
+        >(PagoInscripcionDialogComponent, {
+          width: '500px',
+          maxWidth: '90vw',
+          data: dialogData,
+          disableClose: false,
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+          if (result) {
+            const dto: PagoInscripcionDto = {
+              montoPagado: result.montoPagado,
+              montoConSaldoPersonal: result.montoConSaldoPersonal,
+              medioPago: result.medioPago,
+              descripcion: result.descripcion,
+            };
+            this.state.pagarInscripcion(d.id, dto).subscribe();
+          }
+        });
+      }
+    );
   }
 }

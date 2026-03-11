@@ -5,6 +5,7 @@ import {
   InscripcionConEstado,
   CreateInscripcionDto,
   UpdateInscripcionDto,
+  PagoInscripcionDto,
 } from '../../../shared/models';
 import { TipoInscripcion } from '../../../shared/enums';
 import { HttpService } from '../../../shared/services';
@@ -83,5 +84,16 @@ export class InscripcionesApiService {
    */
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.endpoint}/${id}`);
+  }
+
+  /**
+   * Register a subsequent payment for an inscription
+   * POST /api/v1/inscripciones/:id/pagar
+   */
+  pagarInscripcion(id: string, dto: PagoInscripcionDto): Observable<InscripcionConEstado> {
+    return this.http.post<InscripcionConEstado, PagoInscripcionDto>(
+      `${this.endpoint}/${id}/pagar`,
+      dto
+    );
   }
 }

@@ -120,13 +120,29 @@
                 <app-form-field
                   label="Monto Pagado"
                   [forId]="'monto-pagado'"
-                  hint="Pago inicial al momento de inscribirse"
+                  hint="Pago inicial en efectivo o transferencia"
                 >
                   <div class="input-with-prefix">
                     <span class="input-prefix">$</span>
                     <app-number-field
                       id="monto-pagado"
                       formControlName="montoPagado"
+                      [min]="0"
+                      placeholder="0"
+                    />
+                  </div>
+                </app-form-field>
+
+                <app-form-field
+                  label="Con Saldo Personal"
+                  [forId]="'monto-saldo-personal'"
+                  hint="Pago usando saldo de cuenta personal"
+                >
+                  <div class="input-with-prefix">
+                    <span class="input-prefix">$</span>
+                    <app-number-field
+                      id="monto-saldo-personal"
+                      formControlName="montoConSaldoPersonal"
                       [min]="0"
                       placeholder="0"
                     />

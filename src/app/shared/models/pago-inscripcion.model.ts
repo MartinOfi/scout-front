@@ -3,7 +3,7 @@
  * Registro de pagos realizados para inscripciones
  */
 
-import { MedioPagoEnum } from '../enums';
+import { MedioPago, MedioPagoEnum } from '../enums';
 
 export interface PagoInscripcion {
   id: string;
@@ -14,8 +14,13 @@ export interface PagoInscripcion {
   movimientoId: string;
 }
 
+/**
+ * DTO for registering a subsequent payment on an inscription
+ * POST /api/v1/inscripciones/:id/pagar
+ */
 export interface PagoInscripcionDto {
-  monto: number;
-  medioPago: MedioPagoEnum;
-  fecha?: string; // ISO format
+  montoPagado: number;
+  montoConSaldoPersonal?: number;
+  medioPago?: MedioPago;
+  descripcion?: string;
 }

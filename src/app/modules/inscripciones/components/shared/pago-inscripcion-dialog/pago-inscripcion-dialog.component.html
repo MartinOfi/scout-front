@@ -1,0 +1,125 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon>payments</mat-icon>
+  Registrar Pago
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="form" class="pago-form">
+    <!-- Summary Section -->
+    <div class="summary">
+      <div class="summary-item">
+        <span class="label">Saldo Pendiente:</span>
+        <span class="value">${{ montoPendiente | number:'1.0-0' }}</span>
+      </div>
+      @if (puedeUsarSaldo) {
+        <div class="summary-item">
+          <span class="label">Saldo Cuenta Personal:</span>
+          <span class="value success">${{ saldoCuentaPersonal | number:'1.0-0' }}</span>
+        </div>
+      }
+      <div class="summary-item">
+        <span class="label">Monto Restante:</span>
+        <span class="value" [class.success]="montoRestante === 0">
+          ${{ montoRestante | number:'1.0-0' }}
+        </span>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="form-fields">
+      <!-- Monto Pagado -->
+      <app-form-field
+        label="Monto en Efectivo/Transferencia"
+        [forId]="'monto-pagado'"
+        [invalid]="!!(form.get('montoPagado')?.invalid && form.get('montoPagado')?.touched)"
+      >
+        <div class="input-with-prefix">
+          <span class="input-prefix">$</span>
+          <app-number-field
+            id="monto-pagado"
+            formControlName="montoPagado"
+            [min]="0"
+            placeholder="0"
+          />
+        </div>
+        @if (form.get('montoPagado')?.hasError('max')) {
+          <span error>No puede exceder ${{ montoPendiente }}</span>
+        }
+      </app-form-field>
+
+      <!-- Monto con Saldo Personal -->
+      <app-form-field
+        label="Monto con Saldo Personal"
+        [forId]="'monto-saldo'"
+        hint="Pago usando saldo de cuenta personal"
+      >
+        <div class="input-with-prefix">
+          <span class="input-prefix">$</span>
+          <app-number-field
+            id="monto-saldo"
+            formControlName="montoConSaldoPersonal"
+            [min]="0"
+            placeholder="0"
+          />
+        </div>
+      </app-form-field>
+
+      <!-- Medio de Pago -->
+      <app-form-field
+        label="Medio de Pago"
+        [forId]="'medio-pago-select'"
+        [required]="true"
+        [invalid]="!!(form.get('medioPago')?.invalid && form.get('medioPago')?.touched)"
+      >
+        <app-select-field
+          id="medio-pago-select"
+          formControlName="medioPago"
+          placeholder="Seleccionar medio"
+          [options]="mediosPagoOptions"
+          [optionValueFn]="getMedioPagoValue"
+          [optionLabelFn]="getMedioPagoLabel"
+        />
+        <span error>Seleccione un medio de pago</span>
+      </app-form-field>
+
+      <!-- Descripcion -->
+      <app-form-field
+        label="Descripcion"
+        [forId]="'descripcion'"
+        hint="Opcional"
+        class="full-width"
+      >
+        <app-textarea-field
+          id="descripcion"
+          formControlName="descripcion"
+          placeholder="Notas adicionales..."
+          [rows]="2"
+        />
+      </app-form-field>
+    </div>
+
+    @if (puedeUsarSaldo) {
+      <div class="quick-actions">
+        <button type="button" class="btn-outline" (click)="usarSaldoDisponible()">
+          <mat-icon>account_balance_wallet</mat-icon>
+          Usar Saldo Disponible (${{ saldoCuentaPersonal | number:'1.0-0' }})
+        </button>
+      </div>
+    }
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions" align="end">
+  <button type="button" class="btn-secondary" (click)="onCancel()">
+    Cancelar
+  </button>
+  <button
+    type="button"
+    class="btn-primary"
+    [disabled]="formInvalid"
+    (click)="onSubmit()"
+  >
+    Registrar Pago
+  </button>
+</mat-dialog-actions>
