@@ -9,7 +9,7 @@
         {{ conceptoLabels[movimiento().concepto] || movimiento().concepto }}
       </span>
       @if (movimiento().descripcion) {
-        <span class="descripcion">{{ movimiento().descripcion }}</span>
+        <span class="descripcion">{{ movimiento().descripcion | humanize:'none' }}</span>
       }
     </div>
 

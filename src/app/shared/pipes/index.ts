@@ -3,4 +3,5 @@
  */
 
 export * from './date-format.pipe';
+export * from './humanize.pipe';
 export * from './service-status-format.pipe';

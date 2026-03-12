@@ -13,18 +13,26 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
 
 import { Movimiento } from '../../../../../../shared/models';
-import { 
-  TipoMovimientoEnum, 
+import {
+  TipoMovimientoEnum,
   CONCEPTO_MOVIMIENTO_LABELS,
-  ESTADO_PAGO_LABELS 
+  ESTADO_PAGO_LABELS,
 } from '../../../../../../shared/enums';
+import { HumanizePipe } from '../../../../../../shared/pipes';
 
 @Component({
   selector: 'app-movimiento-row',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatChipsModule, MatMenuModule],
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatIconModule,
+    MatChipsModule,
+    MatMenuModule,
+    HumanizePipe,
+  ],
   templateUrl: './movimiento-row.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MovimientoRowComponent {
   readonly movimiento = input.required<Movimiento>();

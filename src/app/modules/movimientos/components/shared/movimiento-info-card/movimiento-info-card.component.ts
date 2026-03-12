@@ -11,7 +11,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 
 import { Movimiento } from '../../../../../shared/models';
-import { CONCEPTO_MOVIMIENTO_LABELS, MEDIO_PAGO_LABELS, ESTADO_PAGO_LABELS } from '../../../../../shared/enums';
+import {
+  CONCEPTO_MOVIMIENTO_LABELS,
+  MEDIO_PAGO_LABELS,
+  ESTADO_PAGO_LABELS,
+} from '../../../../../shared/enums';
+import { HumanizePipe } from '../../../../../shared/pipes';
 
 @Component({
   selector: 'app-movimiento-info-card',
@@ -21,11 +26,12 @@ import { CONCEPTO_MOVIMIENTO_LABELS, MEDIO_PAGO_LABELS, ESTADO_PAGO_LABELS } fro
     MatCardModule,
     MatChipsModule,
     MatIconModule,
-    MatDividerModule
+    MatDividerModule,
+    HumanizePipe,
   ],
   templateUrl: './movimiento-info-card.component.html',
   styleUrl: './movimiento-info-card.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MovimientoInfoCardComponent {
   @Input({ required: true }) movimiento!: Movimiento;

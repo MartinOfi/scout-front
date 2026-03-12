@@ -1,9 +1,22 @@
 /**
  * Dashboard Component
  * Smart Component - Página principal con resumen financiero
+ * Conectado a servicios reales para datos dinámicos
  */
 
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  OnInit,
+  inject,
+  signal,
+  computed,
+  DestroyRef,
+} from '@angular/core';
+import { Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { forkJoin, map, catchError, of } from 'rxjs';
+
 import {
   StatCardComponent,
   StatCardVariant,
@@ -15,6 +28,27 @@ import {
   EventListItemComponent,
   EventCategoryConfig,
 } from '../../shared';
+
+import { CajasStateService } from '../cajas/services/cajas-state.service';
+import { CajasApiService } from '../cajas/services/cajas-api.service';
+import { MovimientosApiService } from '../movimientos/services/movimientos-api.service';
+import { EventosApiService } from '../eventos/services/eventos-api.service';
+import { PersonasApiService } from '../personas/services/personas-api.service';
+
+import {
+  Movimiento,
+  Evento,
+  ReembolsoPendiente,
+  CajaConSaldo,
+  PersonaUnion,
+} from '../../shared/models';
+import { TipoMovimientoEnum, CajaType, RamaEnum, TipoEvento } from '../../shared/enums';
+import { humanize } from '../../shared/pipes';
+import type { Rama } from '../../shared/enums';
+
+// ============================================================================
+// Config Interfaces
+// ============================================================================
 
 interface StatConfig {
   readonly icon: string;
@@ -53,6 +87,30 @@ interface UpcomingEventConfig {
   readonly categoria: EventCategoryConfig;
 }
 
+// ============================================================================
+// Constants
+// ============================================================================
+
+const RAMA_CONFIG: Record<Rama, { icon: string; iconVariant: IconVariant }> = {
+  [RamaEnum.MANADA]: { icon: 'pets', iconVariant: 'warning' },
+  [RamaEnum.UNIDAD]: { icon: 'explore', iconVariant: 'info' },
+  [RamaEnum.CAMINANTES]: { icon: 'hiking', iconVariant: 'success' },
+  [RamaEnum.ROVERS]: { icon: 'landscape', iconVariant: 'danger' },
+};
+
+const EVENT_CATEGORY_STYLES: Record<TipoEvento, EventCategoryConfig> = {
+  [TipoEvento.VENTA]: {
+    label: 'Venta',
+    backgroundColor: '#e8f5e9',
+    textColor: '#2e7d32',
+  },
+  [TipoEvento.GRUPO]: {
+    label: 'Grupo',
+    backgroundColor: '#e3f2fd',
+    textColor: '#1565c0',
+  },
+};
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -67,107 +125,291 @@ interface UpcomingEventConfig {
   styleUrl: './dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardComponent {
-  readonly stats: readonly StatConfig[] = [
-    { icon: 'account_balance', title: 'Caja de Grupo', value: 285600, variant: 'success' },
-    { icon: 'savings', title: 'Fondos de Rama', value: 176700, variant: 'info' },
-    { icon: 'person', title: 'Cuentas Personales', value: 83700, variant: 'warning' },
-    { icon: 'receipt_long', title: 'Reembolsos Pendientes', value: 20800, variant: 'danger' },
-  ];
+export class DashboardComponent implements OnInit {
+  // ============================================================================
+  // Dependency Injection
+  // ============================================================================
 
-  readonly movimientosRecientes: readonly MovimientoConfig[] = [
-    {
-      icon: 'south',
-      iconVariant: 'danger',
-      concepto: 'Pago inscripción campamento',
-      detalle: 'María García • 15/02/2024',
-      monto: -45000,
-    },
-    {
-      icon: 'north',
-      iconVariant: 'success',
-      concepto: 'Cuota mensual febrero',
-      detalle: 'Juan Pérez • 14/02/2024',
-      monto: 12500,
-    },
-    {
-      icon: 'south',
-      iconVariant: 'danger',
-      concepto: 'Gasto materiales campamento',
-      detalle: 'Compras varias • 13/02/2024',
-      monto: -8200,
-    },
-  ];
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly cajasState = inject(CajasStateService);
+  private readonly cajasApi = inject(CajasApiService);
+  private readonly movimientosApi = inject(MovimientosApiService);
+  private readonly eventosApi = inject(EventosApiService);
+  private readonly personasApi = inject(PersonasApiService);
 
-  readonly fondosRama: readonly FondoRamaConfig[] = [
+  // ============================================================================
+  // State Signals
+  // ============================================================================
+
+  private readonly _totalCuentasPersonales = signal<number>(0);
+  private readonly _totalReembolsosPendientes = signal<number>(0);
+  private readonly _movimientosRecientes = signal<Movimiento[]>([]);
+  private readonly _proximosEventos = signal<Evento[]>([]);
+  private readonly _protagonistasPorRama = signal<Record<Rama, number>>({
+    [RamaEnum.MANADA]: 0,
+    [RamaEnum.UNIDAD]: 0,
+    [RamaEnum.CAMINANTES]: 0,
+    [RamaEnum.ROVERS]: 0,
+  });
+  private readonly _isLoading = signal<boolean>(true);
+
+  // ============================================================================
+  // Computed Signals - Stats KPIs
+  // ============================================================================
+
+  readonly stats = computed<readonly StatConfig[]>(() => [
     {
-      icon: 'pets',
-      iconVariant: 'warning',
-      nombre: 'Manada',
-      protagonistas: 12,
-      saldo: 85400,
+      icon: 'account_balance',
+      title: 'Caja de Grupo',
+      value: this.cajasState.saldoGrupo(),
+      variant: 'success' as const,
     },
     {
-      icon: 'explore',
-      iconVariant: 'info',
-      nombre: 'Unidad Scout',
-      protagonistas: 18,
-      saldo: 52300,
+      icon: 'savings',
+      title: 'Fondos de Rama',
+      value: this.cajasState.totalSaldosRamas(),
+      variant: 'info' as const,
     },
     {
-      icon: 'hiking',
-      iconVariant: 'success',
-      nombre: 'Caminantes',
-      protagonistas: 15,
-      saldo: 39000,
+      icon: 'person',
+      title: 'Cuentas Personales',
+      value: this._totalCuentasPersonales(),
+      variant: 'warning' as const,
     },
-  ];
+    {
+      icon: 'receipt_long',
+      title: 'Reembolsos Pendientes',
+      value: this._totalReembolsosPendientes(),
+      variant: 'danger' as const,
+    },
+  ]);
+
+  // ============================================================================
+  // Computed Signals - Lists
+  // ============================================================================
+
+  readonly movimientosRecientes = computed<readonly MovimientoConfig[]>(() => {
+    const movimientos = this._movimientosRecientes();
+    return movimientos.slice(0, 5).map((mov) => this.mapMovimientoToConfig(mov));
+  });
+
+  readonly fondosRama = computed<readonly FondoRamaConfig[]>(() => {
+    const cajasRama = this.cajasState.cajasRama();
+    const protagonistasPorRama = this._protagonistasPorRama();
+
+    return (Object.values(RamaEnum) as Rama[])
+      .filter((rama) => cajasRama[rama])
+      .map((rama) => {
+        const caja = cajasRama[rama];
+        const config = RAMA_CONFIG[rama];
+        return {
+          icon: config.icon,
+          iconVariant: config.iconVariant,
+          nombre: rama,
+          protagonistas: protagonistasPorRama[rama] ?? 0,
+          saldo: caja?.saldo ?? 0,
+        };
+      });
+  });
+
+  readonly proximosEventos = computed<readonly UpcomingEventConfig[]>(() => {
+    const eventos = this._proximosEventos();
+    const now = new Date();
+
+    return eventos
+      .filter((evento) => new Date(evento.fecha) >= now)
+      .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())
+      .slice(0, 3)
+      .map((evento) => ({
+        id: evento.id,
+        titulo: evento.nombre,
+        fecha: new Date(evento.fecha),
+        categoria: EVENT_CATEGORY_STYLES[evento.tipo] ?? EVENT_CATEGORY_STYLES[TipoEvento.GRUPO],
+      }));
+  });
+
+  // ============================================================================
+  // Static Config - Quick Actions
+  // ============================================================================
 
   readonly quickActions: readonly QuickActionConfig[] = [
-    { icon: 'person_add', label: 'Registrar Inscripción', route: '/inscripciones/crear', variant: 'primary' },
-    { icon: 'event', label: 'Crear Evento', route: '/eventos/crear', variant: 'info' },
-    { icon: 'receipt_long', label: 'Registrar Gasto', route: '/movimientos/nuevo', variant: 'success' },
-    { icon: 'assessment', label: 'Ver Reportes', route: '/reportes', variant: 'warning' },
+    {
+      icon: 'person_add',
+      label: 'Registrar Inscripción',
+      route: '/inscripciones/crear',
+      variant: 'primary',
+    },
+    {
+      icon: 'event',
+      label: 'Crear Evento',
+      route: '/eventos/crear',
+      variant: 'info',
+    },
+    {
+      icon: 'receipt_long',
+      label: 'Registrar Gasto',
+      route: '/movimientos/nuevo',
+      variant: 'success',
+    },
+    {
+      icon: 'assessment',
+      label: 'Ver Reportes',
+      route: '/reportes',
+      variant: 'warning',
+    },
   ];
 
-  readonly proximosEventos: readonly UpcomingEventConfig[] = [
-    {
-      id: '1',
-      titulo: 'Venta de Empanadas',
-      fecha: new Date(2025, 1, 27),
-      categoria: { label: 'Venta', backgroundColor: '#e8f5e9', textColor: '#2e7d32' },
-    },
-    {
-      id: '2',
-      titulo: 'Campamento de Verano',
-      fecha: new Date(2025, 2, 14),
-      categoria: { label: 'Campamento', backgroundColor: '#fff3e0', textColor: '#ef6c00' },
-    },
-    {
-      id: '3',
-      titulo: 'Kermesse Anual',
-      fecha: new Date(2025, 3, 19),
-      categoria: { label: 'Grupo', backgroundColor: '#e3f2fd', textColor: '#1565c0' },
-    },
-  ];
+  // ============================================================================
+  // Public Signals
+  // ============================================================================
+
+  readonly isLoading = this._isLoading.asReadonly();
+
+  // ============================================================================
+  // Lifecycle
+  // ============================================================================
+
+  ngOnInit(): void {
+    this.loadDashboardData();
+  }
+
+  // ============================================================================
+  // Data Loading
+  // ============================================================================
+
+  private loadDashboardData(): void {
+    this._isLoading.set(true);
+
+    // Load cajas data via state service
+    this.cajasState.loadCajaGrupo();
+    this.cajasState.loadTodasCajasRama();
+
+    // Load additional data in parallel
+    forkJoin({
+      cuentasPersonales: this.cajasApi.getByType(CajaType.PERSONAL).pipe(catchError(() => of([]))),
+      reembolsos: this.movimientosApi.getReembolsosPendientes().pipe(catchError(() => of([]))),
+      eventos: this.eventosApi.getAll().pipe(catchError(() => of([]))),
+      personas: this.personasApi.getAll().pipe(catchError(() => of([]))),
+    })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ cuentasPersonales, reembolsos, eventos, personas }) => {
+          // Calculate total cuentas personales
+          this.loadCuentasPersonalesSaldos(cuentasPersonales as CajaConSaldo[]);
+
+          // Calculate total reembolsos pendientes
+          const totalReembolsos = reembolsos.reduce(
+            (acc: number, r: ReembolsoPendiente) => acc + r.totalPendiente,
+            0,
+          );
+          this._totalReembolsosPendientes.set(totalReembolsos);
+
+          // Set eventos
+          this._proximosEventos.set(eventos);
+
+          // Count protagonistas per rama
+          this.countProtagonistasPerRama(personas);
+
+          this._isLoading.set(false);
+        },
+        error: () => {
+          this._isLoading.set(false);
+        },
+      });
+
+    // Load movimientos for grupo caja
+    this.loadMovimientosRecientes();
+  }
+
+  private loadCuentasPersonalesSaldos(cajas: CajaConSaldo[]): void {
+    const total = cajas.reduce((acc, caja) => acc + (caja.saldo ?? 0), 0);
+    this._totalCuentasPersonales.set(total);
+  }
+
+  private loadMovimientosRecientes(): void {
+    // First ensure caja grupo is loaded, then get movimientos
+    this.cajasApi
+      .getCajaGrupo()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        map((caja) => caja.id),
+        catchError(() => of(null)),
+      )
+      .subscribe((cajaId) => {
+        if (cajaId) {
+          this.cajasApi
+            .getMovimientos(cajaId)
+            .pipe(
+              takeUntilDestroyed(this.destroyRef),
+              catchError(() => of([])),
+            )
+            .subscribe((movimientos) => {
+              // Sort by date descending and take first 5
+              const sorted = [...movimientos].sort(
+                (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime(),
+              );
+              this._movimientosRecientes.set(sorted);
+            });
+        }
+      });
+  }
+
+  private countProtagonistasPerRama(personas: PersonaUnion[]): void {
+    const counts: Record<Rama, number> = {
+      [RamaEnum.MANADA]: 0,
+      [RamaEnum.UNIDAD]: 0,
+      [RamaEnum.CAMINANTES]: 0,
+      [RamaEnum.ROVERS]: 0,
+    };
+
+    personas.forEach((persona) => {
+      if (persona.tipo === 'protagonista' && 'rama' in persona && persona.rama) {
+        const rama = persona.rama as Rama;
+        if (counts[rama] !== undefined) {
+          counts[rama]++;
+        }
+      }
+    });
+
+    this._protagonistasPorRama.set(counts);
+  }
+
+  // ============================================================================
+  // Mappers
+  // ============================================================================
+
+  private mapMovimientoToConfig(mov: Movimiento): MovimientoConfig {
+    const isIngreso = mov.tipo === TipoMovimientoEnum.INGRESO;
+    const fecha = new Date(mov.fecha);
+    const fechaStr = `${fecha.getDate().toString().padStart(2, '0')}/${(fecha.getMonth() + 1).toString().padStart(2, '0')}/${fecha.getFullYear()}`;
+
+    return {
+      icon: isIngreso ? 'north' : 'south',
+      iconVariant: isIngreso ? 'success' : 'danger',
+      concepto: humanize(mov.descripcion ?? mov.concepto, 'none'),
+      detalle: `${mov.responsable?.nombre ?? 'Sistema'} • ${fechaStr}`,
+      monto: isIngreso ? mov.monto : -mov.monto,
+    };
+  }
+
+  // ============================================================================
+  // Event Handlers - Navigation
+  // ============================================================================
 
   onVerMasMovimientos(): void {
-    // TODO: Navigate to movimientos list
-    console.log('Ver más movimientos');
+    this.router.navigate(['/movimientos']);
   }
 
   onQuickAction(route: string): void {
-    // TODO: Navigate to route
-    console.log('Quick action:', route);
+    this.router.navigate([route]);
   }
 
   onVerTodosEventos(): void {
-    // TODO: Navigate to eventos list
-    console.log('Ver todos los eventos');
+    this.router.navigate(['/eventos']);
   }
 
   onEventoClick(id: string): void {
-    // TODO: Navigate to evento detail
-    console.log('Evento click:', id);
+    this.router.navigate(['/eventos', id]);
   }
 }

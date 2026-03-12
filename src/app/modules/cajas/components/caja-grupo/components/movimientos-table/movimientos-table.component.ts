@@ -13,20 +13,19 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 
 import { Movimiento } from '../../../../../../shared/models';
-import { TipoMovimientoEnum, ConceptoMovimiento, CONCEPTO_MOVIMIENTO_LABELS } from '../../../../../../shared/enums';
+import {
+  TipoMovimientoEnum,
+  ConceptoMovimiento,
+  CONCEPTO_MOVIMIENTO_LABELS,
+} from '../../../../../../shared/enums';
+import { humanize } from '../../../../../../shared/pipes';
 
 @Component({
   selector: 'app-movimientos-table',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatTableModule,
-    MatButtonModule,
-    MatIconModule,
-    MatChipsModule
-  ],
+  imports: [CommonModule, MatTableModule, MatButtonModule, MatIconModule, MatChipsModule],
   templateUrl: './movimientos-table.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MovimientosTableComponent {
   readonly movimientos = input.required<Movimiento[]>();
@@ -40,6 +39,6 @@ export class MovimientosTableComponent {
     if (concepto in this.conceptoLabels) {
       return this.conceptoLabels[concepto as ConceptoMovimiento];
     }
-    return concepto;
+    return humanize(concepto, 'none');
   }
 }
