@@ -1,29 +1,43 @@
-<div class="scout-form-page">
-  <div class="scout-form-wrapper scout-form-wrapper--single">
-    <div class="scout-form-card">
-      <!-- Header -->
-      <header class="scout-form-header scout-form-header--with-divider">
-        <h1 class="scout-form-title">
-          <i class="fas fa-id-card scout-form-icon"></i>
-          {{ isEditing ? 'Editar Inscripción' : 'Nueva Inscripción' }}
-        </h1>
-        <p class="scout-form-subtitle">
-          {{ isEditing ? 'Modifica los datos de la inscripción' : 'Registra una nueva inscripción Scout Argentina o de Grupo' }}
-        </p>
-      </header>
+<div class="inscription-page">
+  <!-- Hero Header -->
+  <header class="inscription-header">
+    <div class="inscription-header__badge">
+      <span class="badge-year">{{ inscripcionForm.get('ano')?.value }}</span>
+    </div>
+    <div class="inscription-header__content">
+      <h1 class="inscription-title">
+        {{ isEditing ? 'Editar Inscripción' : 'Nueva Inscripción' }}
+      </h1>
+      <p class="inscription-lead">
+        {{ isEditing
+          ? 'Actualiza los datos y autorizaciones de esta inscripción'
+          : 'Registra una nueva inscripción para Scout Argentina o el Grupo'
+        }}
+      </p>
+    </div>
+  </header>
 
-      <!-- Content -->
-      <div class="scout-form-body">
-        @if (loading()) {
-          <div class="loading-state">
-            <div class="loading-spinner"></div>
-            <p class="loading-text">Cargando...</p>
-          </div>
-        } @else {
-          <form [formGroup]="inscripcionForm" (ngSubmit)="onSubmit()">
-            <!-- Persona Select -->
+  @if (loading()) {
+    <div class="inscription-loading">
+      <div class="loading-pulse"></div>
+      <p>Preparando formulario...</p>
+    </div>
+  } @else {
+    <form [formGroup]="inscripcionForm" (ngSubmit)="onSubmit()" class="inscription-form">
+
+      <!-- Section 1: Datos Principales -->
+      <section class="form-section">
+        <div class="section-marker">
+          <span class="marker-number">01</span>
+          <span class="marker-line"></span>
+        </div>
+
+        <div class="section-content">
+          <h2 class="section-heading">Datos de la Inscripción</h2>
+
+          <div class="field-group field-group--highlight">
             <app-form-field
-              label="Persona"
+              label="Persona a inscribir"
               [forId]="'persona-select'"
               [required]="true"
               [disabled]="isEditing"
@@ -39,12 +53,13 @@
                 [loading]="personasLoading()"
                 emptyText="No hay personas disponibles"
               />
-              <span error>La persona es requerida</span>
+              <span error>Selecciona una persona</span>
             </app-form-field>
+          </div>
 
-            <!-- Tipo de Inscripción -->
+          <div class="field-row field-row--2col">
             <app-form-field
-              label="Tipo de Inscripción"
+              label="Tipo"
               [forId]="'tipo-select'"
               [required]="true"
               [disabled]="isEditing"
@@ -58,10 +73,9 @@
                 [optionValueFn]="getTipoValue"
                 [optionLabelFn]="getTipoLabel"
               />
-              <span error>El tipo es requerido</span>
+              <span error>Requerido</span>
             </app-form-field>
 
-            <!-- Año -->
             <app-form-field
               label="Año"
               [forId]="'ano-input'"
@@ -74,183 +88,244 @@
                 formControlName="ano"
                 [min]="2000"
                 [max]="2100"
-                placeholder="Ej: 2026"
+                placeholder="2026"
               />
-              <span error>El año es requerido</span>
+              <span error>Requerido</span>
             </app-form-field>
+          </div>
+        </div>
+      </section>
 
-            <!-- Montos Row -->
-            <div class="form-row">
-              <app-form-field
-                label="Monto Total"
-                [forId]="'monto-total'"
-                [required]="true"
-                [disabled]="isEditing"
-                [invalid]="!!(inscripcionForm.get('montoTotal')?.invalid && inscripcionForm.get('montoTotal')?.touched)"
-              >
-                <div class="input-with-prefix">
-                  <span class="input-prefix">$</span>
-                  <app-number-field
-                    id="monto-total"
-                    formControlName="montoTotal"
-                    [min]="0"
-                    placeholder="0"
-                  />
-                </div>
-                <span error>El monto es requerido</span>
-              </app-form-field>
+      <!-- Section 2: Importes -->
+      <section class="form-section">
+        <div class="section-marker">
+          <span class="marker-number">02</span>
+          <span class="marker-line"></span>
+        </div>
 
-              <app-form-field
-                label="Monto Bonificado"
-                [forId]="'monto-bonificado'"
-                hint="Monto a descontar del total (bonificación)"
-              >
-                <div class="input-with-prefix">
-                  <span class="input-prefix">$</span>
-                  <app-number-field
-                    id="monto-bonificado"
-                    formControlName="montoBonificado"
-                    [min]="0"
-                    placeholder="0"
-                  />
-                </div>
-              </app-form-field>
+        <div class="section-content">
+          <h2 class="section-heading">Importes</h2>
 
-              @if (!isEditing) {
-                <app-form-field
-                  label="Monto Pagado"
-                  [forId]="'monto-pagado'"
-                  hint="Pago inicial en efectivo o transferencia"
-                >
-                  <div class="input-with-prefix">
-                    <span class="input-prefix">$</span>
-                    <app-number-field
-                      id="monto-pagado"
-                      formControlName="montoPagado"
-                      [min]="0"
-                      placeholder="0"
-                    />
-                  </div>
-                </app-form-field>
-
-                <app-form-field
-                  label="Medio de Pago"
-                  [forId]="'medio-pago-select'"
-                  hint="Para el pago inicial"
-                >
-                  <app-select-field
-                    id="medio-pago-select"
-                    formControlName="medioPago"
-                    placeholder="Seleccionar medio"
-                    [options]="medioPagoOptions"
-                    [optionValueFn]="getMedioPagoValue"
-                    [optionLabelFn]="getMedioPagoLabel"
-                  />
-                </app-form-field>
+          <!-- Monto Cards -->
+          <div class="amount-grid">
+            <div class="amount-card amount-card--primary">
+              <span class="amount-card__label">Monto Total</span>
+              <div class="amount-card__input">
+                <span class="currency">$</span>
+                <app-number-field
+                  id="monto-total"
+                  formControlName="montoTotal"
+                  [min]="0"
+                  placeholder="0"
+                />
+              </div>
+              @if (inscripcionForm.get('montoTotal')?.invalid && inscripcionForm.get('montoTotal')?.touched) {
+                <span class="amount-card__error">Requerido</span>
               }
             </div>
 
-            <!-- Saldo Personal Row: Saldo disponible + Campo de monto a usar -->
-            @if (!isEditing && inscripcionForm.get('personaId')?.value) {
-              <div class="saldo-personal-row">
-                <!-- Saldo disponible (izquierda) -->
-                <div class="saldo-disponible">
-                  @if (loadingSaldo()) {
-                    <div class="saldo-loading">
-                      <span class="loading-spinner-small"></span>
-                      <span>Cargando...</span>
-                    </div>
-                  } @else {
-                    <div class="saldo-disponible__content" [class.saldo-disponible__content--available]="saldoCuentaPersonal() > 0">
-                      <div class="saldo-disponible__header">
-                        <i class="fas fa-wallet"></i>
-                        <span>Saldo Disponible</span>
+            <div class="amount-card">
+              <span class="amount-card__label">Bonificación</span>
+              <div class="amount-card__input">
+                <span class="currency currency--discount">−$</span>
+                <app-number-field
+                  id="monto-bonificado"
+                  formControlName="montoBonificado"
+                  [min]="0"
+                  placeholder="0"
+                />
+              </div>
+              <span class="amount-card__hint">Descuento a aplicar</span>
+            </div>
+
+            @if (!isEditing) {
+              <div class="amount-card">
+                <span class="amount-card__label">Pago Inicial</span>
+                <div class="amount-card__input">
+                  <span class="currency">$</span>
+                  <app-number-field
+                    id="monto-pagado"
+                    formControlName="montoPagado"
+                    [min]="0"
+                    placeholder="0"
+                  />
+                </div>
+                <span class="amount-card__hint">Efectivo o transferencia</span>
+              </div>
+
+              <div class="amount-card">
+                <span class="amount-card__label">Medio de Pago</span>
+                <app-select-field
+                  id="medio-pago-select"
+                  formControlName="medioPago"
+                  placeholder="Seleccionar"
+                  [options]="medioPagoOptions"
+                  [optionValueFn]="getMedioPagoValue"
+                  [optionLabelFn]="getMedioPagoLabel"
+                />
+              </div>
+            }
+          </div>
+
+          <!-- Cuenta Personal Panel -->
+          @if (!isEditing && inscripcionForm.get('personaId')?.value) {
+            <div class="personal-account-panel" [class.personal-account-panel--has-funds]="saldoCuentaPersonal() > 0">
+              <div class="personal-account-panel__header">
+                <div class="panel-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
+                    <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
+                    <path d="M18 12a2 2 0 0 0 0 4h4v-4h-4z"/>
+                  </svg>
+                </div>
+                <span class="panel-title">Cuenta Personal</span>
+              </div>
+
+              @if (loadingSaldo()) {
+                <div class="personal-account-panel__loading">
+                  <span class="pulse-dot"></span>
+                  <span>Consultando saldo...</span>
+                </div>
+              } @else {
+                <div class="personal-account-panel__body">
+                  <div class="balance-display">
+                    <span class="balance-label">Saldo disponible</span>
+                    <span class="balance-value" [class.balance-value--positive]="saldoCuentaPersonal() > 0">
+                      ${{ saldoCuentaPersonal() | number:'1.0-0' }}
+                    </span>
+                    @if (saldoCuentaPersonal() > 0) {
+                      <button
+                        type="button"
+                        class="use-balance-btn"
+                        (click)="usarSaldoDisponible()"
+                      >
+                        Usar todo →
+                      </button>
+                    }
+                  </div>
+
+                  @if (saldoCuentaPersonal() > 0) {
+                    <div class="balance-input-wrapper">
+                      <label class="balance-input-label">Usar de cuenta personal</label>
+                      <div class="balance-input">
+                        <span class="currency">$</span>
+                        <app-number-field
+                          id="monto-saldo-personal"
+                          formControlName="montoConSaldoPersonal"
+                          [min]="0"
+                          [max]="saldoCuentaPersonal()"
+                          placeholder="0"
+                        />
                       </div>
-                      <div class="saldo-disponible__value">
-                        ${{ saldoCuentaPersonal() | number:'1.0-0' }}
-                      </div>
-                      @if (saldoCuentaPersonal() > 0) {
-                        <button
-                          type="button"
-                          class="btn-use-saldo"
-                          (click)="usarSaldoDisponible()"
-                        >
-                          Usar todo
-                        </button>
-                      }
                     </div>
                   }
                 </div>
+              }
+            </div>
+          }
 
-                <!-- Campo monto a usar (derecha) -->
-                <app-form-field
-                  label="Usar de Cuenta Personal"
-                  [forId]="'monto-saldo-personal'"
-                  class="saldo-input-field"
-                >
-                  <div class="input-with-prefix">
-                    <span class="input-prefix">$</span>
-                    <app-number-field
-                      id="monto-saldo-personal"
-                      formControlName="montoConSaldoPersonal"
-                      [min]="0"
-                      [max]="saldoCuentaPersonal()"
-                      placeholder="0"
-                    />
-                  </div>
-                </app-form-field>
+          <!-- Validation Error -->
+          @if (montosExcedenTotal()) {
+            <div class="validation-error">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span>Los montos de bonificación, pago inicial y saldo personal no pueden superar el monto total</span>
+            </div>
+          }
+
+          <!-- Summary Strip -->
+          <div class="summary-strip" [class.summary-strip--error]="montosExcedenTotal()">
+            <div class="summary-item">
+              <span class="summary-label">Total</span>
+              <span class="summary-value">${{ inscripcionForm.get('montoTotal')?.value | number:'1.0-0' }}</span>
+            </div>
+            <span class="summary-operator">−</span>
+            <div class="summary-item">
+              <span class="summary-label">Bonificación</span>
+              <span class="summary-value">${{ inscripcionForm.get('montoBonificado')?.value || 0 | number:'1.0-0' }}</span>
+            </div>
+            @if (!isEditing && (inscripcionForm.get('montoConSaldoPersonal')?.value || 0) > 0) {
+              <span class="summary-operator">−</span>
+              <div class="summary-item">
+                <span class="summary-label">Saldo Personal</span>
+                <span class="summary-value">${{ inscripcionForm.get('montoConSaldoPersonal')?.value || 0 | number:'1.0-0' }}</span>
               </div>
             }
-
-            <!-- Autorizaciones Section -->
-            @if (showAuthorizationFields()) {
-              <div class="authorization-section">
-                <h3 class="section-title">Autorizaciones</h3>
-                <p class="section-description">
-                  Marca las autorizaciones firmadas por el responsable
-                </p>
-
-                <div class="checkbox-grid">
-                  <app-checkbox-field formControlName="declaracionDeSalud">
-                    Declaración de Salud
-                  </app-checkbox-field>
-
-                  <app-checkbox-field formControlName="autorizacionDeImagen">
-                    Autorización de Imagen
-                  </app-checkbox-field>
-
-                  <app-checkbox-field formControlName="salidasCercanas">
-                    Autorización Salidas Cercanas
-                  </app-checkbox-field>
-
-                  <app-checkbox-field formControlName="autorizacionIngreso">
-                    Autorización de Ingreso
-                  </app-checkbox-field>
-                </div>
-              </div>
-            }
-          </form>
-        }
-      </div>
-
-      <!-- Actions -->
-      @if (!loading()) {
-        <div class="scout-form-actions">
-          <div class="scout-form-actions__row scout-form-actions__row--between">
-            <button type="button" class="btn-secondary" (click)="onCancel()">
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              class="btn-primary"
-              [disabled]="inscripcionForm.invalid || loading()"
-              (click)="onSubmit()"
-            >
-              {{ isEditing ? 'Actualizar' : 'Crear Inscripción' }}
-            </button>
+            <span class="summary-operator">=</span>
+            <div class="summary-item summary-item--result">
+              <span class="summary-label">A pagar</span>
+              <span class="summary-value">
+                ${{ (inscripcionForm.get('montoTotal')?.value || 0) - (inscripcionForm.get('montoBonificado')?.value || 0) - (inscripcionForm.get('montoConSaldoPersonal')?.value || 0) | number:'1.0-0' }}
+              </span>
+            </div>
           </div>
         </div>
+      </section>
+
+      <!-- Section 3: Autorizaciones (Solo Scout Argentina) -->
+      @if (showAuthorizationFields()) {
+        <section class="form-section">
+          <div class="section-marker">
+            <span class="marker-number">03</span>
+            <span class="marker-line"></span>
+          </div>
+
+          <div class="section-content">
+            <h2 class="section-heading">Autorizaciones</h2>
+            <p class="section-desc">Documentos firmados por el responsable del protagonista</p>
+
+            <div class="auth-grid">
+              <app-checkbox-field
+                formControlName="declaracionDeSalud"
+                variant="card"
+                description="Estado de salud y condiciones médicas"
+              >
+                Declaración de Salud
+              </app-checkbox-field>
+
+              <app-checkbox-field
+                formControlName="autorizacionDeImagen"
+                variant="card"
+                description="Uso de fotografías en actividades"
+              >
+                Autorización de Imagen
+              </app-checkbox-field>
+
+              <app-checkbox-field
+                formControlName="salidasCercanas"
+                variant="card"
+                description="Actividades en zonas próximas al grupo"
+              >
+                Salidas Cercanas
+              </app-checkbox-field>
+
+              <app-checkbox-field
+                formControlName="autorizacionIngreso"
+                variant="card"
+                description="Permiso de participación en el movimiento"
+              >
+                Autorización de Ingreso
+              </app-checkbox-field>
+            </div>
+          </div>
+        </section>
       }
-    </div>
-  </div>
+
+      <!-- Actions usando el componente reutilizable -->
+      <app-form-actions [align]="'between'" [borderTop]="false">
+        <button type="button" (click)="onCancel()">
+          ← Cancelar
+        </button>
+        <button
+          type="submit"
+          [disabled]="inscripcionForm.invalid || loading()"
+        >
+          {{ isEditing ? 'Guardar cambios' : 'Crear inscripción' }}
+        </button>
+      </app-form-actions>
+    </form>
+  }
 </div>

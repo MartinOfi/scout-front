@@ -6,6 +6,8 @@
 }
 
 .scout-input--number {
+  @include input-base;
+
   // Tabular numbers for alignment
   font-variant-numeric: tabular-nums;
 

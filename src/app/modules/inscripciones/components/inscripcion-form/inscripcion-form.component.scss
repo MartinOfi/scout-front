@@ -1,292 +1,132 @@
 // =============================================================================
-// INSCRIPCION FORM STYLES
+// INSCRIPCION FORM - EDITORIAL DESIGN
 // =============================================================================
-// Uses scout design tokens for consistent styling
+// Distinctive form design with numbered sections and visual hierarchy.
+// Avoids generic card-wrapper patterns for a more editorial feel.
 
-// Import form tokens
 @use 'sass:color';
 @use '../../../../shared/components/form/form-tokens' as *;
 
 // -----------------------------------------------------------------------------
-// PAGE LAYOUT
+// PAGE CONTAINER
 // -----------------------------------------------------------------------------
 
-.scout-form-page {
-  min-height: 100vh;
-  padding: 32px 16px;
+.inscription-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
 
   @media (min-width: 640px) {
-    padding: 40px 24px;
+    padding: 48px 32px 80px;
   }
-
-  @media (min-width: 1024px) {
-    padding: 48px 32px;
-  }
-}
-
-.scout-form-wrapper {
-  margin: 0 auto;
-  width: 100%;
-
-  &--single {
-    max-width: 600px;
-  }
-}
-
-.scout-form-card {
-  background-color: white;
-  border-radius: 16px;
-  box-shadow: $shadow-card;
-  overflow: hidden;
-  border: 1px solid $stone-200;
 }
 
 // -----------------------------------------------------------------------------
-// HEADER
+// HEADER - Editorial style with year badge
 // -----------------------------------------------------------------------------
 
-.scout-form-header {
-  padding: 24px 28px;
-
-  &--with-divider {
-    border-bottom: 1px solid $stone-200;
-  }
+.inscription-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 48px;
+  padding-bottom: 32px;
+  border-bottom: 2px solid $stone-200;
 }
 
-.scout-form-title {
-  font-family: var(--font-family-headings);
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: $stone-900;
-  margin: 0;
+.inscription-header__badge {
+  flex-shrink: 0;
+}
+
+.badge-year {
   display: flex;
   align-items: center;
-  gap: 12px;
-  letter-spacing: -0.01em;
-}
-
-.scout-form-icon {
-  color: $brand-burgundy;
-  font-size: 1.25rem;
-}
-
-.scout-form-subtitle {
-  margin: 6px 0 0;
-  font-size: 14px;
-  color: $stone-500;
-  line-height: 1.5;
-}
-
-// -----------------------------------------------------------------------------
-// BODY
-// -----------------------------------------------------------------------------
-
-.scout-form-body {
-  padding: 28px;
-}
-
-// -----------------------------------------------------------------------------
-// FORM ROWS
-// -----------------------------------------------------------------------------
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0 20px;
-
-  @media (min-width: 480px) {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-// -----------------------------------------------------------------------------
-// INPUT WITH PREFIX
-// -----------------------------------------------------------------------------
-
-.input-with-prefix {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.input-prefix {
-  position: absolute;
-  left: 14px;
-  color: $stone-500;
-  font-weight: 500;
-  font-size: 15px;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.input-with-prefix ::ng-deep {
-
-  .scout-input,
-  input {
-    padding-left: 32px;
-  }
-}
-
-// -----------------------------------------------------------------------------
-// AUTHORIZATION SECTION
-// -----------------------------------------------------------------------------
-
-.authorization-section {
-  margin-top: 8px;
-  padding-top: 24px;
-  border-top: 1px solid $stone-200;
-}
-
-.section-title {
-  font-family: var(--font-family-headings);
-  font-size: 1rem;
-  font-weight: 600;
-  color: $stone-800;
-  margin: 0 0 4px;
-}
-
-.section-description {
-  font-size: 13px;
-  color: $stone-500;
-  margin: 0 0 16px;
-}
-
-.checkbox-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-
-  @media (min-width: 480px) {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-// -----------------------------------------------------------------------------
-// ACTIONS
-// -----------------------------------------------------------------------------
-
-.scout-form-actions {
-  padding: 20px 28px 28px;
-  background-color: $stone-50;
-  border-top: 1px solid $stone-200;
-}
-
-.scout-form-actions__row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-
-  &--between {
-    justify-content: space-between;
-  }
-
-  &--end {
-    justify-content: flex-end;
-  }
-}
-
-// -----------------------------------------------------------------------------
-// BUTTONS
-// -----------------------------------------------------------------------------
-
-.btn-primary,
-.btn-secondary {
-  font-family: var(--font-family-base);
-  font-size: 14px;
-  font-weight: 500;
-  padding: 12px 24px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all $transition-fast;
-  border: none;
-
-  &:focus-visible {
-    outline: 2px solid $brand-burgundy;
-    outline-offset: 2px;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-}
-
-.btn-primary {
+  justify-content: center;
+  width: 64px;
+  height: 64px;
   background-color: $brand-burgundy;
   color: white;
-
-  &:hover:not(:disabled) {
-    background-color: $brand-burgundy-light;
-  }
-
-  &:active:not(:disabled) {
-    background-color: color.adjust($brand-burgundy, $lightness: -5%);
-  }
+  font-family: var(--font-family-headings);
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: 16px;
+  letter-spacing: -0.02em;
 }
 
-.btn-secondary {
-  background-color: white;
-  color: $stone-700;
-  border: 1.5px solid $stone-300;
+.inscription-header__content {
+  padding-top: 4px;
+}
 
-  &:hover:not(:disabled) {
-    background-color: $stone-50;
-    border-color: $stone-400;
-  }
+.inscription-title {
+  font-family: var(--font-family-headings);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 700;
+  color: $stone-900;
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
 
-  &:active:not(:disabled) {
-    background-color: $stone-100;
-  }
+.inscription-lead {
+  font-size: 15px;
+  color: $stone-500;
+  margin: 8px 0 0;
+  line-height: 1.5;
 }
 
 // -----------------------------------------------------------------------------
 // LOADING STATE
 // -----------------------------------------------------------------------------
 
-.loading-state {
+.inscription-loading {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 48px 24px;
-  gap: 16px;
-}
+  padding: 80px 24px;
+  gap: 20px;
 
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid $stone-200;
-  border-top-color: $brand-burgundy;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+  p {
+    font-size: 15px;
+    color: $stone-500;
+    margin: 0;
   }
 }
 
-.loading-text {
-  font-size: 14px;
-  color: $stone-500;
-  margin: 0;
+.loading-pulse {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: $brand-burgundy;
+  opacity: 0.2;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(0.8);
+    opacity: 0.2;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
 }
 
 // -----------------------------------------------------------------------------
-// SALDO PERSONAL ROW (Saldo disponible + Campo de monto)
+// FORM SECTIONS - Numbered sidebar pattern
 // -----------------------------------------------------------------------------
 
-.saldo-personal-row {
+.inscription-form {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.form-section {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-top: 8px;
-  padding: 16px;
-  background-color: $stone-50;
-  border-radius: 8px;
-  border: 1px solid $stone-200;
-  align-items: start;
+  grid-template-columns: 48px 1fr;
+  gap: 24px;
 
   @media (max-width: 479px) {
     grid-template-columns: 1fr;
@@ -294,85 +134,507 @@
   }
 }
 
-.saldo-disponible {
-  display: flex;
-  align-items: center;
-}
-
-.saldo-disponible__content {
+.section-marker {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 12px;
+  padding-top: 4px;
 
-  &--available {
-    .saldo-disponible__value {
-      color: #16a34a;
+  @media (max-width: 479px) {
+    flex-direction: row;
+    padding-top: 0;
+  }
+}
+
+.marker-number {
+  font-family: var(--font-family-headings);
+  font-size: 14px;
+  font-weight: 700;
+  color: $brand-burgundy;
+  background-color: rgba($brand-burgundy, 0.08);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.marker-line {
+  flex: 1;
+  width: 2px;
+  background: linear-gradient(to bottom, $stone-200, transparent);
+  min-height: 40px;
+
+  @media (max-width: 479px) {
+    flex: 1;
+    height: 2px;
+    width: auto;
+    min-height: unset;
+    background: linear-gradient(to right, $stone-200, transparent);
+  }
+}
+
+.section-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.section-heading {
+  font-family: var(--font-family-headings);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: $stone-800;
+  margin: 0 0 20px;
+  letter-spacing: -0.01em;
+}
+
+.section-desc {
+  font-size: 14px;
+  color: $stone-500;
+  margin: -12px 0 20px;
+  line-height: 1.5;
+}
+
+// -----------------------------------------------------------------------------
+// FIELD LAYOUTS
+// -----------------------------------------------------------------------------
+
+.field-group {
+  margin-bottom: 4px;
+
+  &--highlight {
+    padding: 20px;
+    margin: 0 -20px 20px;
+    background-color: $stone-50;
+    border-radius: 12px;
+    border: 1px solid $stone-100;
+
+    // Remove margin from last form-field inside
+    ::ng-deep .scout-field {
+      margin-bottom: 0;
     }
   }
 }
 
-.saldo-disponible__header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: $stone-500;
-  font-weight: 500;
+.field-row {
+  display: grid;
+  gap: 16px;
 
-  i {
-    color: $stone-400;
-    font-size: 14px;
+  &--2col {
+    grid-template-columns: 1fr 1fr;
+
+    @media (max-width: 479px) {
+      grid-template-columns: 1fr;
+    }
   }
 }
 
-.saldo-disponible__value {
-  font-size: 24px;
+// -----------------------------------------------------------------------------
+// AMOUNT CARDS - Financial input grid
+// -----------------------------------------------------------------------------
+
+.amount-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+
+  @media (max-width: 479px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.amount-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background-color: white;
+  border: 1.5px solid $stone-200;
+  border-radius: 12px;
+  transition: border-color $transition-fast;
+
+  &:focus-within {
+    border-color: $brand-burgundy;
+  }
+
+  &--primary {
+    border-color: $brand-burgundy;
+    background-color: rgba($brand-burgundy, 0.02);
+
+    .amount-card__label {
+      color: $brand-burgundy;
+    }
+  }
+}
+
+.amount-card__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: $stone-500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.amount-card__input {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  .currency {
+    font-size: 18px;
+    font-weight: 600;
+    color: $stone-400;
+
+    &--discount {
+      color: #16a34a;
+    }
+  }
+
+  // Override input styles for amount cards
+  ::ng-deep {
+    input {
+      border: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      font-size: 24px !important;
+      font-weight: 700 !important;
+      color: $stone-800 !important;
+      height: auto !important;
+
+      &::placeholder {
+        color: $stone-300 !important;
+      }
+
+      &:focus {
+        box-shadow: none !important;
+      }
+    }
+  }
+}
+
+.amount-card__hint {
+  font-size: 12px;
+  color: $stone-400;
+}
+
+.amount-card__error {
+  font-size: 12px;
+  color: $color-error;
+  font-weight: 500;
+}
+
+// -----------------------------------------------------------------------------
+// VALIDATION ERROR MESSAGE
+// -----------------------------------------------------------------------------
+
+.validation-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  background-color: #fef2f2;
+  border: 1.5px solid #fecaca;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  color: #dc2626;
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  span {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// PERSONAL ACCOUNT PANEL
+// -----------------------------------------------------------------------------
+
+.personal-account-panel {
+  background: linear-gradient(135deg, $stone-50 0%, white 100%);
+  border: 1.5px solid $stone-200;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all $transition-fast;
+
+  &--has-funds {
+    border-color: #22c55e;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.1);
+
+    .panel-icon {
+      color: #16a34a;
+      background-color: rgba(34, 197, 94, 0.1);
+      padding: 6px;
+      border-radius: 8px;
+    }
+
+    .panel-title {
+      color: #15803d;
+    }
+  }
+}
+
+.personal-account-panel__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.panel-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $stone-500;
+  transition: all $transition-fast;
+}
+
+.panel-title {
+  font-family: var(--font-family-headings);
+  font-size: 13px;
+  font-weight: 600;
+  color: $stone-600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.personal-account-panel__loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 16px;
+  font-size: 14px;
+  color: $stone-500;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: $brand-burgundy;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.personal-account-panel__body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 18px;
+
+  @media (max-width: 479px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+  }
+}
+
+.balance-display {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.balance-label {
+  font-size: 12px;
+  color: $stone-500;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.balance-value {
+  font-family: var(--font-family-headings);
+  font-size: 32px;
   font-weight: 700;
   color: $stone-700;
-  line-height: 1.2;
+  line-height: 1;
+  letter-spacing: -0.02em;
+
+  &--positive {
+    color: #16a34a;
+  }
 }
 
-.btn-use-saldo {
+.use-balance-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-family: var(--font-family-base);
-  font-size: 12px;
-  font-weight: 500;
-  padding: 4px 10px;
-  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #15803d;
+  background: rgba(34, 197, 94, 0.1);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all $transition-fast;
-  background-color: transparent;
-  color: $brand-burgundy;
-  border: 1px solid $brand-burgundy;
+  margin-top: 8px;
   align-self: flex-start;
-  margin-top: 4px;
+  transition: all $transition-fast;
 
   &:hover {
-    background-color: rgba($brand-burgundy, 0.05);
-  }
-
-  &:active {
-    background-color: rgba($brand-burgundy, 0.1);
+    background: rgba(34, 197, 94, 0.2);
+    color: #166534;
   }
 }
 
-.saldo-input-field {
-  // Override form-field margins for this context
-  margin-bottom: 0 !important;
+.balance-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.saldo-loading {
+.balance-input-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: $stone-600;
+}
+
+.balance-input {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: $stone-500;
-  font-size: 14px;
+  gap: 6px;
+  background-color: white;
+  border: 1.5px solid $stone-200;
+  border-radius: 8px;
+  padding: 8px 12px;
+
+  .currency {
+    font-size: 16px;
+    font-weight: 600;
+    color: $stone-400;
+  }
+
+  ::ng-deep {
+    input {
+      border: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      font-size: 18px !important;
+      font-weight: 600 !important;
+      width: 100px !important;
+
+      &:focus {
+        box-shadow: none !important;
+      }
+    }
+  }
 }
 
-.loading-spinner-small {
-  width: 16px;
-  height: 16px;
-  border: 2px solid $stone-200;
-  border-top-color: $brand-burgundy;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+// -----------------------------------------------------------------------------
+// SUMMARY STRIP
+// -----------------------------------------------------------------------------
+
+.summary-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background-color: $stone-100;
+  border-radius: 12px;
+  flex-wrap: wrap;
+  transition: all $transition-fast;
+
+  @media (max-width: 479px) {
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  &--error {
+    background-color: #fef2f2;
+    border: 1.5px solid #fecaca;
+
+    .summary-item--result .summary-value {
+      color: #dc2626;
+    }
+  }
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+
+  &--result {
+    .summary-value {
+      color: $brand-burgundy;
+      font-size: 20px;
+    }
+  }
+}
+
+.summary-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: $stone-500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.summary-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: $stone-700;
+}
+
+.summary-operator {
+  font-size: 18px;
+  font-weight: 500;
+  color: $stone-400;
+}
+
+// -----------------------------------------------------------------------------
+// AUTHORIZATION GRID
+// -----------------------------------------------------------------------------
+
+.auth-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+
+  @media (max-width: 599px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// FORM ACTIONS - Override for this page
+// -----------------------------------------------------------------------------
+
+:host ::ng-deep app-form-actions {
+  margin-top: 16px;
+
+  .scout-form-actions {
+    padding: 24px 0 0;
+    background: transparent;
+  }
+
+  button[type="submit"] {
+    padding: 14px 28px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+
+  button[type="button"] {
+    padding: 14px 20px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
 }

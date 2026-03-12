@@ -4,20 +4,49 @@
  * SIN any - tipado estricto
  */
 
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, inject, signal, computed, Signal, WritableSignal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ChangeDetectionStrategy,
+  inject,
+  signal,
+  computed,
+  Signal,
+  WritableSignal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { InscripcionesStateService } from '../../services/inscripciones-state.service';
 import { PersonasStateService } from '../../../personas/services/personas-state.service';
 import { CajasApiService } from '../../../cajas/services/cajas-api.service';
-import { CreateInscripcionDto, UpdateInscripcionDto, Inscripcion, PersonaUnion } from '../../../../shared/models';
-import { TipoInscripcion, TIPO_INSCRIPCION_LABELS, MedioPago, MedioPagoEnum, MEDIO_PAGO_LABELS } from '../../../../shared/enums';
+import {
+  CreateInscripcionDto,
+  UpdateInscripcionDto,
+  Inscripcion,
+  PersonaUnion,
+} from '../../../../shared/models';
+import {
+  TipoInscripcion,
+  TIPO_INSCRIPCION_LABELS,
+  MedioPago,
+  MedioPagoEnum,
+  MEDIO_PAGO_LABELS,
+} from '../../../../shared/enums';
 import { ConfiguracionService } from '../../../../shared/services';
 
 // Shared Form Components
 import { FormFieldComponent } from '../../../../shared/components/form/form-field/form-field.component';
+import { FormActionsComponent } from '../../../../shared/components/form/form-actions/form-actions.component';
 import { SelectFieldComponent } from '../../../../shared/components/form/select-field/select-field.component';
 import { NumberFieldComponent } from '../../../../shared/components/form/number-field/number-field.component';
 import { CheckboxFieldComponent } from '../../../../shared/components/form/checkbox-field/checkbox-field.component';
@@ -39,13 +68,14 @@ interface MedioPagoOption {
     CommonModule,
     ReactiveFormsModule,
     FormFieldComponent,
+    FormActionsComponent,
     SelectFieldComponent,
     NumberFieldComponent,
-    CheckboxFieldComponent
+    CheckboxFieldComponent,
   ],
   templateUrl: './inscripcion-form.component.html',
   styleUrls: ['./inscripcion-form.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InscripcionFormComponent implements OnInit, OnDestroy {
   private readonly state: InscripcionesStateService = inject(InscripcionesStateService);
@@ -63,9 +93,9 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
   readonly tipos: TipoInscripcion[] = ['grupo', 'scout_argentina'];
 
   /** Options for tipo select */
-  readonly tiposOptions: TipoOption[] = this.tipos.map(tipo => ({
+  readonly tiposOptions: TipoOption[] = this.tipos.map((tipo) => ({
     value: tipo,
-    label: TIPO_INSCRIPCION_LABELS[tipo]
+    label: TIPO_INSCRIPCION_LABELS[tipo],
   }));
 
   /** Options for medioPago select (excluding saldo_personal for initial payment) */
@@ -86,23 +116,33 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
   readonly saldoCuentaPersonal: WritableSignal<number> = signal(0);
   readonly loadingSaldo: WritableSignal<boolean> = signal(false);
 
+  /** Validation error message for amounts exceeding total */
+  readonly montosExcedenTotal: WritableSignal<boolean> = signal(false);
+
   private tipoSubscription: Subscription | null = null;
   private personaSubscription: Subscription | null = null;
+  private montosSubscription: Subscription | null = null;
 
-  inscripcionForm: FormGroup = this.fb.group({
-    personaId: ['', Validators.required],
-    tipo: ['scout_argentina' as TipoInscripcion, Validators.required],
-    ano: [new Date().getFullYear(), [Validators.required, Validators.min(2000), Validators.max(2100)]],
-    montoTotal: [0, [Validators.required, Validators.min(0)]],
-    montoBonificado: [0, [Validators.min(0)]],
-    montoPagado: [0, [Validators.min(0)]],
-    montoConSaldoPersonal: [0, [Validators.min(0)]],
-    medioPago: [MedioPagoEnum.EFECTIVO],
-    declaracionDeSalud: [false],
-    autorizacionDeImagen: [false],
-    salidasCercanas: [false],
-    autorizacionIngreso: [false],
-  });
+  inscripcionForm: FormGroup = this.fb.group(
+    {
+      personaId: ['', Validators.required],
+      tipo: ['scout_argentina' as TipoInscripcion, Validators.required],
+      ano: [
+        new Date().getFullYear(),
+        [Validators.required, Validators.min(2000), Validators.max(2100)],
+      ],
+      montoTotal: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
+      montoBonificado: [0, [Validators.min(0)]],
+      montoPagado: [0, [Validators.min(0)]],
+      montoConSaldoPersonal: [0, [Validators.min(0)]],
+      medioPago: [MedioPagoEnum.EFECTIVO],
+      declaracionDeSalud: [false],
+      autorizacionDeImagen: [false],
+      salidasCercanas: [false],
+      autorizacionIngreso: [false],
+    },
+    { validators: this.validateMontosNoExcedenTotal.bind(this) },
+  );
 
   isEditing = false;
   inscripcionId: string | null = null;
@@ -125,8 +165,8 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
     }
 
     // Listen to tipo changes to update authorization fields visibility
-    this.tipoSubscription = this.inscripcionForm.get('tipo')?.valueChanges.subscribe(
-      (tipo: TipoInscripcion) => {
+    this.tipoSubscription =
+      this.inscripcionForm.get('tipo')?.valueChanges.subscribe((tipo: TipoInscripcion) => {
         this.currentTipo.set(tipo);
         // Clear authorization fields when switching to grupo
         if (tipo === 'grupo') {
@@ -141,19 +181,17 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
         if (!this.isEditing) {
           this.inscripcionForm.get('montoTotal')?.setValue(this.configService.getMontoByTipo(tipo));
         }
-      }
-    ) ?? null;
+      }) ?? null;
 
     // Listen to persona changes to fetch their personal account balance
-    this.personaSubscription = this.inscripcionForm.get('personaId')?.valueChanges.subscribe(
-      (personaId: string) => {
+    this.personaSubscription =
+      this.inscripcionForm.get('personaId')?.valueChanges.subscribe((personaId: string) => {
         if (personaId && !this.isEditing) {
           this.loadSaldoCuentaPersonal(personaId);
         } else {
           this.saldoCuentaPersonal.set(0);
         }
-      }
-    ) ?? null;
+      }) ?? null;
 
     if (this.isEditing && this.inscripcionId) {
       this.loadInscripcion(this.inscripcionId);
@@ -180,6 +218,27 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.tipoSubscription?.unsubscribe();
     this.personaSubscription?.unsubscribe();
+    this.montosSubscription?.unsubscribe();
+  }
+
+  /**
+   * Custom validator: bonificación + pago inicial + saldo personal <= monto total
+   */
+  private validateMontosNoExcedenTotal(group: AbstractControl): ValidationErrors | null {
+    const montoTotal = group.get('montoTotal')?.value || 0;
+    const montoBonificado = group.get('montoBonificado')?.value || 0;
+    const montoPagado = group.get('montoPagado')?.value || 0;
+    const montoConSaldoPersonal = group.get('montoConSaldoPersonal')?.value || 0;
+
+    const totalPagos = montoBonificado + montoPagado + montoConSaldoPersonal;
+
+    if (totalPagos > montoTotal) {
+      this.montosExcedenTotal.set(true);
+      return { montosExcedenTotal: true };
+    }
+
+    this.montosExcedenTotal.set(false);
+    return null;
   }
 
   /**
@@ -216,7 +275,9 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
   }
 
   private loadInscripcion(id: string): void {
-    const inscripcion: Inscripcion | undefined = this.state.inscripciones().find((i: Inscripcion) => i.id === id);
+    const inscripcion: Inscripcion | undefined = this.state
+      .inscripciones()
+      .find((i: Inscripcion) => i.id === id);
     if (inscripcion) {
       // Update currentTipo for conditional rendering
       this.currentTipo.set(inscripcion.tipo);
