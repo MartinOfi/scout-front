@@ -4,16 +4,30 @@
  * SIN any - tipado estricto
  */
 
-import { Component, OnInit, ChangeDetectionStrategy, inject, computed, signal, effect } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  inject,
+  computed,
+  signal,
+  effect,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { InscripcionesStateService } from '../../services/inscripciones-state.service';
-import { StatCardComponent, StatCardVariant } from '../../../../shared/components/stat-card/stat-card.component';
-import { ButtonTabsComponent, TabConfig } from '../../../../shared/components/button-tabs/button-tabs.component';
+import {
+  StatCardComponent,
+  StatCardVariant,
+} from '../../../../shared/components/stat-card/stat-card.component';
+import {
+  ButtonTabsComponent,
+  TabConfig,
+} from '../../../../shared/components/button-tabs/button-tabs.component';
 import { DataTableComponent } from '../../../../shared/components/tables/data-table.component';
 import { GenericFiltersComponent } from '../../../../shared/components/filters/generic-filters/generic-filters.component';
 import { FilterConfig } from '../../../../shared/components/filters/generic-filters/filter-config.interface';
@@ -33,6 +47,7 @@ interface StatConfig {
 interface InscripcionFilters {
   search: string;
   ano: string;
+  soloDeudores: boolean;
 }
 
 interface InscripcionTableRow {
@@ -72,6 +87,7 @@ interface InscripcionTableRow {
 export class InscripcionesListComponent implements OnInit {
   readonly state: InscripcionesStateService = inject(InscripcionesStateService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly confirmDialog = inject(ConfirmDialogService);
 
   readonly inscripciones = this.state.inscripciones;
@@ -81,8 +97,35 @@ export class InscripcionesListComponent implements OnInit {
   /** Currently active tab (tipo) */
   readonly activeTab = signal<TipoInscripcion>('scout_argentina');
 
-  /** Current filter values */
-  readonly currentFilters = signal<InscripcionFilters>({ search: '', ano: '' });
+  /** Current year for default filter */
+  private readonly currentYear = new Date().getFullYear();
+
+  /** Current filter values - defaults to current year */
+  readonly currentFilters = signal<InscripcionFilters>({
+    search: '',
+    ano: String(this.currentYear),
+    soloDeudores: false,
+  });
+
+  /**
+   * Check if an inscripcion is considered a "debtor"
+   * A debtor has pending payment OR (for Scout Argentina only) is missing any of the 4 required documents
+   */
+  private isDeudor(inscripcion: Inscripcion): boolean {
+    const hasPendingPayment = (inscripcion.saldoPendiente ?? 0) > 0;
+
+    // Only check documents for Scout Argentina inscriptions
+    if (inscripcion.tipo === 'scout_argentina') {
+      const missingDocuments =
+        !inscripcion.declaracionDeSalud ||
+        !inscripcion.autorizacionDeImagen ||
+        !inscripcion.salidasCercanas ||
+        !inscripcion.autorizacionIngreso;
+      return hasPendingPayment || missingDocuments;
+    }
+
+    return hasPendingPayment;
+  }
 
   /** Filtered inscripciones by active tab and filters */
   readonly filteredInscripciones = computed((): Inscripcion[] => {
@@ -93,7 +136,7 @@ export class InscripcionesListComponent implements OnInit {
       // Filter by tipo (tab)
       if (inscripcion.tipo !== tipo) return false;
 
-      // Filter by year
+      // Filter by year (now handled by backend, but keep for local consistency)
       if (filters.ano && inscripcion.ano !== parseInt(filters.ano, 10)) return false;
 
       // Filter by search (persona name)
@@ -103,6 +146,9 @@ export class InscripcionesListComponent implements OnInit {
         if (!personaName.includes(searchLower)) return false;
       }
 
+      // Filter by deudores (pending payment OR missing documents)
+      if (filters.soloDeudores && !this.isDeudor(inscripcion)) return false;
+
       return true;
     });
   });
@@ -111,9 +157,19 @@ export class InscripcionesListComponent implements OnInit {
     const filtered = this.filteredInscripciones();
     const total = filtered.length;
     const totalEsperado = filtered.reduce((sum, i) => sum + (i.montoTotal - i.montoBonificado), 0);
+    const montoAdeudado = filtered.reduce((sum, i) => sum + (i.saldoPendiente ?? 0), 0);
+    const cantidadDeudores = filtered.filter((i) => this.isDeudor(i)).length;
+
     return [
       { icon: 'people', title: 'Total Inscripciones', value: total, variant: 'info' },
       { icon: 'payments', title: 'Monto Esperado', value: totalEsperado, variant: 'success' },
+      { icon: 'warning', title: 'Monto Adeudado', value: montoAdeudado, variant: 'warning' },
+      {
+        icon: 'person_off',
+        title: 'Cantidad Deudores',
+        value: cantidadDeudores,
+        variant: 'danger',
+      },
     ];
   });
 
@@ -167,33 +223,55 @@ export class InscripcionesListComponent implements OnInit {
       label: 'Año',
       placeholder: 'Todos los años',
       options: this.getYearOptions(),
-      defaultValue: '',
+      defaultValue: String(this.currentYear),
+    },
+    {
+      key: 'soloDeudores',
+      type: FilterType.BOOLEAN,
+      label: 'Solo deudores',
+      defaultValue: false,
     },
   ];
 
-  /** Table columns configuration */
-  readonly tableColumns: TableColumn[] = [
+  /** Base columns shared by all inscription types */
+  private readonly baseColumns: TableColumn[] = [
     { key: 'persona', header: 'Persona', type: 'text' },
     { key: 'montoPagado', header: 'Pagado', type: 'text' },
     { key: 'saldoPendiente', header: 'Pendiente', type: 'text' },
     { key: 'estado', header: 'Estado', type: 'status' },
-    { key: "declaracionDeSalud", header: "Declaración de Salud", type: "boolean" },
-    { key: "autorizacionDeImagen", header: "Autorización de Imagen", type: "boolean" },
-    { key: "salidasCercanas", header: "Salidas Cercanas", type: "boolean" },
-    { key: "autorizacionIngreso", header: "Autorización de Ingreso", type: "boolean" },
-    {
-      key: 'actions',
-      header: 'Acciones',
-      type: 'action',
-      actions: this.getTableActions(),
-    },
   ];
 
+  /** Document columns only for Scout Argentina */
+  private readonly documentColumns: TableColumn[] = [
+    { key: 'declaracionDeSalud', header: 'Declaración de Salud', type: 'boolean' },
+    { key: 'autorizacionDeImagen', header: 'Autorización de Imagen', type: 'boolean' },
+    { key: 'salidasCercanas', header: 'Salidas Cercanas', type: 'boolean' },
+    { key: 'autorizacionIngreso', header: 'Autorización de Ingreso', type: 'boolean' },
+  ];
+
+  /** Action column */
+  private readonly actionColumn: TableColumn = {
+    key: 'actions',
+    header: 'Acciones',
+    type: 'action',
+    actions: this.getTableActions(),
+  };
+
+  /** Dynamic table columns based on active tab */
+  readonly tableColumns = computed((): TableColumn[] => {
+    const isScoutArgentina = this.activeTab() === 'scout_argentina';
+    return isScoutArgentina
+      ? [...this.baseColumns, ...this.documentColumns, this.actionColumn]
+      : [...this.baseColumns, this.actionColumn];
+  });
+
   constructor() {
-    // Reload when tab changes
+    // Reload when tab or year filter changes
     effect(() => {
       const tipo = this.activeTab();
-      this.state.load({ tipo });
+      const filters = this.currentFilters();
+      const ano = filters.ano ? parseInt(filters.ano, 10) : undefined;
+      this.state.load({ tipo, ano });
     });
   }
 
@@ -206,7 +284,11 @@ export class InscripcionesListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.state.load({ tipo: this.activeTab() });
+    // Read deudores query param to initialize filter
+    const deudoresParam = this.route.snapshot.queryParamMap.get('deudores');
+    if (deudoresParam === 'true') {
+      this.currentFilters.update((f) => ({ ...f, soloDeudores: true }));
+    }
   }
 
   onTabChange(tabKey: string): void {
@@ -214,9 +296,17 @@ export class InscripcionesListComponent implements OnInit {
   }
 
   onFilterChange(filters: Record<string, unknown>): void {
+    const soloDeudores = (filters['soloDeudores'] as boolean) ?? false;
     this.currentFilters.set({
       search: (filters['search'] as string) ?? '',
       ano: (filters['ano'] as string) ?? '',
+      soloDeudores,
+    });
+    // Update URL with deudores query param
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { deudores: soloDeudores || null },
+      queryParamsHandling: 'merge',
     });
   }
 

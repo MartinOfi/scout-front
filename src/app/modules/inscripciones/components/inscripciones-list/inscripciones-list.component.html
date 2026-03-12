@@ -25,7 +25,7 @@
       <p>No hay inscripciones para mostrar</p>
     </div>
     } @else {
-    <app-data-table [data]="tableData()" [columns]="tableColumns" [config]="{ showHeader: true, hoverable: true }"
+    <app-data-table [data]="tableData()" [columns]="tableColumns()" [config]="{ showHeader: true, hoverable: true }"
       (actionClick)="onActionClick($event)" />
     }
   </div>
