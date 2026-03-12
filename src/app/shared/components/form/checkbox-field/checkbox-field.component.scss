@@ -5,9 +5,9 @@
 }
 
 .scout-checkbox-label {
-  display: inline-flex;
+  display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 12px;
   cursor: pointer;
   user-select: none;
 
@@ -15,12 +15,49 @@
     cursor: not-allowed;
     opacity: 0.6;
   }
+
+  // Card variant - elevated interactive cards
+  &--card {
+    padding: 16px;
+    background-color: white;
+    border: 1.5px solid $stone-200;
+    border-radius: 12px;
+    transition: all $transition-fast;
+
+    &:hover:not(:has(.scout-checkbox:disabled)) {
+      border-color: $stone-300;
+      background-color: $stone-50;
+    }
+
+    &.scout-checkbox-label--checked {
+      border-color: $brand-burgundy;
+      background-color: rgba($brand-burgundy, 0.02);
+
+      .scout-checkbox-text {
+        color: $stone-900;
+      }
+    }
+  }
+}
+
+.scout-checkbox-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 1px;
 }
 
 .scout-checkbox-text {
   font-family: var(--font-family-base);
   font-size: 14px;
-  line-height: 1.5;
+  font-weight: 500;
+  line-height: 1.4;
   color: $stone-700;
-  padding-top: 1px;
+}
+
+.scout-checkbox-description {
+  font-family: var(--font-family-base);
+  font-size: 13px;
+  line-height: 1.4;
+  color: $stone-500;
 }

@@ -58,6 +58,25 @@
               />
               <span error>La rama es requerida</span>
             </app-form-field>
+
+            <!-- Documentación entregada -->
+            <div class="scout-form-section">
+              <h3 class="scout-form-section-title">Documentación entregada</h3>
+              <div class="scout-form-checkbox-group">
+                <app-checkbox-field id="partidaNacimiento" formControlName="partidaNacimiento">
+                  Partida de nacimiento
+                </app-checkbox-field>
+                <app-checkbox-field id="dni" formControlName="dni">
+                  DNI
+                </app-checkbox-field>
+                <app-checkbox-field id="dniPadres" formControlName="dniPadres">
+                  DNI de los padres
+                </app-checkbox-field>
+                <app-checkbox-field id="carnetObraSocial" formControlName="carnetObraSocial">
+                  Carnet de obra social
+                </app-checkbox-field>
+              </div>
+            </div>
           </form>
         }
       </div>

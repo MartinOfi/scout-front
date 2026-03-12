@@ -33,7 +33,7 @@ export class PersonasFormBuilder {
 
   /**
    * Construir formulario para crear un nuevo protagonista
-   * Backend accepts: nombre, rama
+   * Backend accepts: nombre, rama, partidaNacimiento, dni, dniPadres, carnetObraSocial
    */
   buildCreateProtagonistaForm(): FormGroup {
     return this.fb.group({
@@ -47,12 +47,17 @@ export class PersonasFormBuilder {
         ],
       ],
       rama: ['', [Validators.required]],
+      // Documentación entregada
+      partidaNacimiento: [false],
+      dni: [false],
+      dniPadres: [false],
+      carnetObraSocial: [false],
     });
   }
 
   /**
    * Construir formulario para editar un protagonista
-   * Backend accepts: nombre, estado, rama
+   * Backend accepts: nombre, estado, rama, partidaNacimiento, dni, dniPadres, carnetObraSocial
    */
   buildEditProtagonistaForm(protagonista: Protagonista): FormGroup {
     return this.fb.group({
@@ -66,6 +71,11 @@ export class PersonasFormBuilder {
         ],
       ],
       rama: [protagonista.rama, [Validators.required]],
+      // Documentación entregada
+      partidaNacimiento: [protagonista.partidaNacimiento ?? false],
+      dni: [protagonista.dni ?? false],
+      dniPadres: [protagonista.dniPadres ?? false],
+      carnetObraSocial: [protagonista.carnetObraSocial ?? false],
     });
   }
 
@@ -76,6 +86,10 @@ export class PersonasFormBuilder {
     return {
       nombre: form.value.nombre as string,
       rama: form.value.rama as Rama,
+      partidaNacimiento: form.value.partidaNacimiento as boolean,
+      dni: form.value.dni as boolean,
+      dniPadres: form.value.dniPadres as boolean,
+      carnetObraSocial: form.value.carnetObraSocial as boolean,
     };
   }
 
@@ -86,6 +100,10 @@ export class PersonasFormBuilder {
     return {
       nombre: form.value.nombre as string,
       rama: form.value.rama as Rama,
+      partidaNacimiento: form.value.partidaNacimiento as boolean,
+      dni: form.value.dni as boolean,
+      dniPadres: form.value.dniPadres as boolean,
+      carnetObraSocial: form.value.carnetObraSocial as boolean,
     };
   }
 

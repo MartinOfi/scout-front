@@ -44,6 +44,11 @@ interface PersonaTableRow {
   deudaGrupo: string;
   tipo: PersonaType;
   rama?: Rama;
+  // Documentación entregada (solo protagonistas)
+  partidaNacimiento?: boolean;
+  dni?: boolean;
+  dniPadres?: boolean;
+  carnetObraSocial?: boolean;
 }
 
 /** Tab types: Rama tabs + persona type tabs + special tabs */
@@ -117,6 +122,10 @@ export class PersonasDashboardComponent implements OnInit {
     { key: 'nombreCompleto', header: 'Nombre y Apellido', type: 'text' },
     { key: 'saldoPersonal', header: 'Saldo Personal', type: 'text' },
     { key: 'deudaGrupo', header: 'Deuda Grupo', type: 'text' },
+    { key: 'partidaNacimiento', header: 'Partida', type: 'boolean' },
+    { key: 'dni', header: 'DNI', type: 'boolean' },
+    { key: 'dniPadres', header: 'DNI Padres', type: 'boolean' },
+    { key: 'carnetObraSocial', header: 'Obra Social', type: 'boolean' },
     {
       key: 'actions',
       header: 'Acciones',
@@ -210,13 +219,19 @@ export class PersonasDashboardComponent implements OnInit {
   }
 
   private mapToTableRow(persona: PersonaUnion): PersonaTableRow {
+    const protagonista = persona.tipo === PersonaType.PROTAGONISTA ? persona as Protagonista : null;
     return {
       id: persona.id,
       nombreCompleto: persona.nombre,
       saldoPersonal: '$0', // TODO: Connect to actual saldo data
       deudaGrupo: '$0', // TODO: Connect to actual deuda data
       tipo: persona.tipo,
-      rama: (persona as Protagonista).rama,
+      rama: protagonista?.rama,
+      // Documentación entregada (solo para protagonistas)
+      partidaNacimiento: protagonista?.partidaNacimiento ?? false,
+      dni: protagonista?.dni ?? false,
+      dniPadres: protagonista?.dniPadres ?? false,
+      carnetObraSocial: protagonista?.carnetObraSocial ?? false,
     };
   }
 

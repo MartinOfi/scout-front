@@ -26,6 +26,11 @@ export interface Persona {
 export interface Protagonista extends Persona {
   tipo: PersonaType.PROTAGONISTA;
   rama: Rama;
+  // Documentación entregada
+  partidaNacimiento: boolean;
+  dni: boolean;
+  dniPadres: boolean;
+  carnetObraSocial: boolean;
 }
 
 /**
@@ -58,6 +63,11 @@ export type PersonaUnion = Protagonista | Educador | PersonaExterna;
 export interface CreateProtagonistaDto {
   nombre: string;
   rama: Rama;
+  // Documentación entregada (opcionales, default: false)
+  partidaNacimiento?: boolean;
+  dni?: boolean;
+  dniPadres?: boolean;
+  carnetObraSocial?: boolean;
 }
 
 /**
@@ -91,4 +101,9 @@ export interface UpdatePersonaDto {
   cargo?: CargoEducador;
   contacto?: string;
   notas?: string;
+  // Documentación entregada (protagonistas)
+  partidaNacimiento?: boolean;
+  dni?: boolean;
+  dniPadres?: boolean;
+  carnetObraSocial?: boolean;
 }

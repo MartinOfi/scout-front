@@ -20,6 +20,7 @@ import { Rama, RAMAS } from '../../../../../shared/enums';
 import { FormFieldComponent } from '../../../../../shared/components/form/form-field/form-field.component';
 import { TextFieldComponent } from '../../../../../shared/components/form/text-field/text-field.component';
 import { SelectFieldComponent } from '../../../../../shared/components/form/select-field/select-field.component';
+import { CheckboxFieldComponent } from '../../../../../shared/components/form/checkbox-field/checkbox-field.component';
 
 @Component({
   selector: 'app-protagonistas-form',
@@ -30,7 +31,8 @@ import { SelectFieldComponent } from '../../../../../shared/components/form/sele
     EmptyStateComponent,
     FormFieldComponent,
     TextFieldComponent,
-    SelectFieldComponent
+    SelectFieldComponent,
+    CheckboxFieldComponent
   ],
   templateUrl: './protagonistas-form.component.html',
   styleUrls: ['./protagonistas-form.component.scss'],

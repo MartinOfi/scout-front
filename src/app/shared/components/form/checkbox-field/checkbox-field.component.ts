@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, Input, forwardRef, ChangeDetectorRef, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  forwardRef,
+  ChangeDetectorRef,
+  inject,
+  input,
+} from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
@@ -20,6 +28,12 @@ export class CheckboxFieldComponent implements ControlValueAccessor {
 
   @Input() disabled: boolean = false;
   readonly id = input<string>();
+
+  /** Optional description text shown below the label */
+  readonly description = input<string>();
+
+  /** Visual variant: 'default' | 'card' */
+  readonly variant = input<'default' | 'card'>('default');
 
   value: boolean = false;
 

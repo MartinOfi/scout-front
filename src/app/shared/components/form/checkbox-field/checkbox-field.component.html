@@ -1,4 +1,8 @@
-<label class="scout-checkbox-label">
+<label
+  class="scout-checkbox-label"
+  [class.scout-checkbox-label--card]="variant() === 'card'"
+  [class.scout-checkbox-label--checked]="value"
+>
   <input
     [id]="id() || null"
     type="checkbox"
@@ -7,7 +11,12 @@
     (change)="handleChange($event)"
     class="scout-checkbox"
   />
-  <span class="scout-checkbox-text">
-    <ng-content></ng-content>
+  <span class="scout-checkbox-content">
+    <span class="scout-checkbox-text">
+      <ng-content></ng-content>
+    </span>
+    @if (description()) {
+      <span class="scout-checkbox-description">{{ description() }}</span>
+    }
   </span>
 </label>
