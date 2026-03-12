@@ -140,7 +140,7 @@
           <div class="timeline" role="list" aria-label="Lista de pagos realizados">
             @if (d.movimientos.length > 0) {
               @for (mov of d.movimientos; track mov.id) {
-                <article class="timeline-item" role="listitem">
+                <article class="timeline-item timeline-item--editable" role="listitem">
                   <div class="timeline-item__marker" aria-hidden="true">
                     <mat-icon>payments</mat-icon>
                   </div>
@@ -153,6 +153,13 @@
                       <span class="timeline-item__method">{{ medioPagoLabel(mov.medioPago) }}</span>
                     </div>
                   </div>
+                  <button
+                    type="button"
+                    class="timeline-item__edit"
+                    (click)="onEditPayment(mov)"
+                    aria-label="Editar pago de {{ mov.monto | currency:'ARS':'symbol':'1.0-0' }}">
+                    <mat-icon>edit</mat-icon>
+                  </button>
                 </article>
               }
             } @else {

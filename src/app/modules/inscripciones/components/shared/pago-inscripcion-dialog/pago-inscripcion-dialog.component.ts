@@ -10,7 +10,7 @@ import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/materia
 import { MatIconModule } from '@angular/material/icon';
 
 import { MedioPago, MedioPagoEnum, MEDIO_PAGO_LABELS } from '../../../../../shared/enums';
-import { positiveNumberValidator } from '../../../../../shared/validators/custom-validators';
+import { ExistingPago } from '../../../../../shared/models';
 
 // Shared Form Components
 import { FormFieldComponent } from '../../../../../shared/components/form/form-field/form-field.component';
@@ -25,10 +25,13 @@ export interface PagoInscripcionDialogData {
   inscripcionId: string;
   montoPendiente: number;
   saldoCuentaPersonal?: number;
+  /** Edit mode: provide existing payment data */
+  mode?: 'create' | 'edit';
+  existingPago?: ExistingPago;
 }
 
 /**
- * Form data returned by the dialog
+ * Form data returned by the dialog (create mode)
  */
 export interface PagoInscripcionFormData {
   montoPagado: number;
@@ -36,6 +39,23 @@ export interface PagoInscripcionFormData {
   medioPago: MedioPago;
   descripcion?: string;
 }
+
+/**
+ * Form data returned by the dialog (edit mode)
+ */
+export interface PagoInscripcionEditData {
+  monto: number;
+  medioPago: MedioPago;
+  descripcion?: string;
+}
+
+/**
+ * Union type for dialog result
+ */
+export type PagoInscripcionDialogResult =
+  | { mode: 'create'; data: PagoInscripcionFormData }
+  | { mode: 'edit'; data: PagoInscripcionEditData; movimientoId: string }
+  | { mode: 'delete'; movimientoId: string };
 
 interface MedioPagoOption {
   value: MedioPago;
@@ -69,23 +89,46 @@ export class PagoInscripcionDialogComponent implements OnInit {
 
   constructor(
     private readonly fb: FormBuilder,
-    private readonly dialogRef: MatDialogRef<PagoInscripcionDialogComponent, PagoInscripcionFormData>,
-    @Inject(MAT_DIALOG_DATA) public readonly data: PagoInscripcionDialogData
+    private readonly dialogRef: MatDialogRef<
+      PagoInscripcionDialogComponent,
+      PagoInscripcionDialogResult
+    >,
+    @Inject(MAT_DIALOG_DATA) public readonly data: PagoInscripcionDialogData,
   ) {}
 
   ngOnInit(): void {
-    this.form = this.fb.group({
-      montoPagado: [
-        0,
-        [Validators.min(0), Validators.max(this.data.montoPendiente)],
-      ],
-      montoConSaldoPersonal: [0, [Validators.min(0)]],
-      medioPago: [MedioPagoEnum.EFECTIVO, [Validators.required]],
-      descripcion: [''],
-    });
+    if (this.isEditMode) {
+      // Edit mode: single amount field with existing values
+      const existing = this.data.existingPago!;
+      this.form = this.fb.group({
+        monto: [existing.monto, [Validators.required, Validators.min(1)]],
+        medioPago: [existing.medioPago, [Validators.required]],
+        descripcion: [existing.descripcion ?? ''],
+      });
+    } else {
+      // Create mode: both payment types available
+      this.form = this.fb.group({
+        montoPagado: [0, [Validators.min(0), Validators.max(this.data.montoPendiente)]],
+        montoConSaldoPersonal: [0, [Validators.min(0)]],
+        medioPago: [MedioPagoEnum.EFECTIVO, [Validators.required]],
+        descripcion: [''],
+      });
+    }
+  }
+
+  get isEditMode(): boolean {
+    return this.data.mode === 'edit' && !!this.data.existingPago;
   }
 
   get montoPendiente(): number {
+    return this.data.montoPendiente;
+  }
+
+  /** In edit mode, max allowed = pending + existing (since we're replacing) */
+  get maxAllowedMonto(): number {
+    if (this.isEditMode && this.data.existingPago) {
+      return this.data.montoPendiente + this.data.existingPago.monto;
+    }
     return this.data.montoPendiente;
   }
 
@@ -98,22 +141,39 @@ export class PagoInscripcionDialogComponent implements OnInit {
   }
 
   get montoTotalPago(): number {
+    if (this.isEditMode) {
+      return this.form.get('monto')?.value || 0;
+    }
     const montoPagado = this.form.get('montoPagado')?.value || 0;
     const montoConSaldo = this.form.get('montoConSaldoPersonal')?.value || 0;
     return montoPagado + montoConSaldo;
   }
 
   get montoRestante(): number {
+    if (this.isEditMode) {
+      // In edit mode, show remaining after this payment would be applied
+      const existingMonto = this.data.existingPago?.monto ?? 0;
+      const newMonto = this.form.get('monto')?.value || 0;
+      const pendienteWithExisting = this.montoPendiente + existingMonto;
+      return Math.max(0, pendienteWithExisting - newMonto);
+    }
     return Math.max(0, this.montoPendiente - this.montoTotalPago);
   }
 
   get formInvalid(): boolean {
     if (this.form.invalid) return true;
-    // At least one payment amount must be > 0
+
+    if (this.isEditMode) {
+      const monto = this.form.get('monto')?.value || 0;
+      if (monto <= 0) return true;
+      if (monto > this.maxAllowedMonto) return true;
+      return false;
+    }
+
+    // Create mode validation
     const montoPagado = this.form.get('montoPagado')?.value || 0;
     const montoConSaldo = this.form.get('montoConSaldoPersonal')?.value || 0;
     if (montoPagado <= 0 && montoConSaldo <= 0) return true;
-    // Total payment cannot exceed pending amount
     if (this.montoTotalPago > this.montoPendiente) return true;
     return false;
   }
@@ -137,13 +197,39 @@ export class PagoInscripcionDialogComponent implements OnInit {
     }
 
     const formValue = this.form.value;
-    const result: PagoInscripcionFormData = {
-      montoPagado: Number(formValue.montoPagado) || 0,
-      montoConSaldoPersonal: Number(formValue.montoConSaldoPersonal) || undefined,
-      medioPago: formValue.medioPago as MedioPago,
-      descripcion: formValue.descripcion || undefined,
-    };
 
+    if (this.isEditMode) {
+      const result: PagoInscripcionDialogResult = {
+        mode: 'edit',
+        movimientoId: this.data.existingPago!.movimientoId,
+        data: {
+          monto: Number(formValue.monto),
+          medioPago: formValue.medioPago as MedioPago,
+          descripcion: formValue.descripcion || undefined,
+        },
+      };
+      this.dialogRef.close(result);
+    } else {
+      const result: PagoInscripcionDialogResult = {
+        mode: 'create',
+        data: {
+          montoPagado: Number(formValue.montoPagado) || 0,
+          montoConSaldoPersonal: Number(formValue.montoConSaldoPersonal) || undefined,
+          medioPago: formValue.medioPago as MedioPago,
+          descripcion: formValue.descripcion || undefined,
+        },
+      };
+      this.dialogRef.close(result);
+    }
+  }
+
+  onDelete(): void {
+    if (!this.isEditMode || !this.data.existingPago) return;
+
+    const result: PagoInscripcionDialogResult = {
+      mode: 'delete',
+      movimientoId: this.data.existingPago.movimientoId,
+    };
     this.dialogRef.close(result);
   }
 

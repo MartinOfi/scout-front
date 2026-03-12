@@ -14,6 +14,7 @@ import {
   CreateInscripcionDto,
   UpdateInscripcionDto,
   PagoInscripcionDto,
+  UpdatePagoDto,
 } from '../../../shared/models';
 import { TipoInscripcion } from '../../../shared/enums';
 
@@ -68,10 +69,7 @@ export class InscripcionesStateService {
   });
 
   readonly totalMontoEsperado = computed((): number => {
-    return this._inscripciones().reduce(
-      (sum, i) => sum + (i.montoTotal - i.montoBonificado),
-      0
-    );
+    return this._inscripciones().reduce((sum, i) => sum + (i.montoTotal - i.montoBonificado), 0);
   });
 
   // ============================================================================
@@ -174,7 +172,7 @@ export class InscripcionesStateService {
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
-      finalize(() => this._loading.set(false))
+      finalize(() => this._loading.set(false)),
     );
   }
 
@@ -188,9 +186,7 @@ export class InscripcionesStateService {
 
     return this.apiService.update(id, dto).pipe(
       tap((inscripcion: Inscripcion) => {
-        this._inscripciones.update((prev) =>
-          prev.map((i) => (i.id === id ? inscripcion : i))
-        );
+        this._inscripciones.update((prev) => prev.map((i) => (i.id === id ? inscripcion : i)));
         this.notificationService.showSuccess('Inscripción actualizada exitosamente');
       }),
       catchError((err: unknown) => {
@@ -199,7 +195,7 @@ export class InscripcionesStateService {
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
-      finalize(() => this._loading.set(false))
+      finalize(() => this._loading.set(false)),
     );
   }
 
@@ -221,7 +217,7 @@ export class InscripcionesStateService {
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
-      finalize(() => this._loading.set(false))
+      finalize(() => this._loading.set(false)),
     );
   }
 
@@ -241,7 +237,7 @@ export class InscripcionesStateService {
         }
         // Update list item
         this._inscripciones.update((prev) =>
-          prev.map((i) => (i.id === id ? inscripcionConEstado : i))
+          prev.map((i) => (i.id === id ? inscripcionConEstado : i)),
         );
         this.notificationService.showSuccess('Pago registrado exitosamente');
       }),
@@ -251,7 +247,67 @@ export class InscripcionesStateService {
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
-      finalize(() => this._loading.set(false))
+      finalize(() => this._loading.set(false)),
+    );
+  }
+
+  /**
+   * Actualizar un pago existente
+   * PATCH /api/v1/inscripciones/:id/pagos/:movimientoId
+   */
+  updatePago(
+    inscripcionId: string,
+    movimientoId: string,
+    dto: UpdatePagoDto,
+  ): Observable<InscripcionConEstado> {
+    this._loading.set(true);
+    this._error.set(null);
+
+    return this.apiService.updatePago(inscripcionId, movimientoId, dto).pipe(
+      tap((inscripcionConEstado: InscripcionConEstado) => {
+        if (this._selectedId() === inscripcionId) {
+          this._selectedDetail.set(inscripcionConEstado);
+        }
+        this._inscripciones.update((prev) =>
+          prev.map((i) => (i.id === inscripcionId ? inscripcionConEstado : i)),
+        );
+        this.notificationService.showSuccess('Pago actualizado exitosamente');
+      }),
+      catchError((err: unknown) => {
+        const errorMsg = err instanceof Error ? err.message : 'Error al actualizar pago';
+        this._error.set(errorMsg);
+        this.notificationService.showError(errorMsg);
+        return throwError(() => err);
+      }),
+      finalize(() => this._loading.set(false)),
+    );
+  }
+
+  /**
+   * Eliminar un pago existente
+   * DELETE /api/v1/inscripciones/:id/pagos/:movimientoId
+   */
+  deletePago(inscripcionId: string, movimientoId: string): Observable<InscripcionConEstado> {
+    this._loading.set(true);
+    this._error.set(null);
+
+    return this.apiService.deletePago(inscripcionId, movimientoId).pipe(
+      tap((inscripcionConEstado: InscripcionConEstado) => {
+        if (this._selectedId() === inscripcionId) {
+          this._selectedDetail.set(inscripcionConEstado);
+        }
+        this._inscripciones.update((prev) =>
+          prev.map((i) => (i.id === inscripcionId ? inscripcionConEstado : i)),
+        );
+        this.notificationService.showSuccess('Pago eliminado exitosamente');
+      }),
+      catchError((err: unknown) => {
+        const errorMsg = err instanceof Error ? err.message : 'Error al eliminar pago';
+        this._error.set(errorMsg);
+        this.notificationService.showError(errorMsg);
+        return throwError(() => err);
+      }),
+      finalize(() => this._loading.set(false)),
     );
   }
 

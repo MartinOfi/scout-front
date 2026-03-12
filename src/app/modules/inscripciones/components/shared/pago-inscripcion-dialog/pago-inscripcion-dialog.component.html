@@ -1,24 +1,34 @@
 <h2 mat-dialog-title class="dialog-title">
-  <mat-icon>payments</mat-icon>
-  Registrar Pago
+  <mat-icon>{{ isEditMode ? 'edit' : 'payments' }}</mat-icon>
+  {{ isEditMode ? 'Editar Pago' : 'Registrar Pago' }}
 </h2>
 
 <mat-dialog-content class="dialog-content">
   <form [formGroup]="form" class="pago-form">
     <!-- Summary Section -->
     <div class="summary">
+      @if (isEditMode && data.existingPago) {
+        <div class="summary-item">
+          <span class="label">Pago Original:</span>
+          <span class="value">${{ data.existingPago.monto | number:'1.0-0' }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Fecha:</span>
+          <span class="value">{{ data.existingPago.fecha | date:'dd/MM/yyyy' }}</span>
+        </div>
+      }
       <div class="summary-item">
-        <span class="label">Saldo Pendiente:</span>
+        <span class="label">{{ isEditMode ? 'Saldo Pendiente Actual:' : 'Saldo Pendiente:' }}</span>
         <span class="value">${{ montoPendiente | number:'1.0-0' }}</span>
       </div>
-      @if (puedeUsarSaldo) {
+      @if (!isEditMode && puedeUsarSaldo) {
         <div class="summary-item">
           <span class="label">Saldo Cuenta Personal:</span>
           <span class="value success">${{ saldoCuentaPersonal | number:'1.0-0' }}</span>
         </div>
       }
       <div class="summary-item">
-        <span class="label">Monto Restante:</span>
+        <span class="label">{{ isEditMode ? 'Nuevo Saldo Pendiente:' : 'Monto Restante:' }}</span>
         <span class="value" [class.success]="montoRestante === 0">
           ${{ montoRestante | number:'1.0-0' }}
         </span>
@@ -28,42 +38,67 @@
     <hr class="divider" />
 
     <div class="form-fields">
-      <!-- Monto Pagado -->
-      <app-form-field
-        label="Monto en Efectivo/Transferencia"
-        [forId]="'monto-pagado'"
-        [invalid]="!!(form.get('montoPagado')?.invalid && form.get('montoPagado')?.touched)"
-      >
-        <div class="input-with-prefix">
-          <span class="input-prefix">$</span>
-          <app-number-field
-            id="monto-pagado"
-            formControlName="montoPagado"
-            [min]="0"
-            placeholder="0"
-          />
-        </div>
-        @if (form.get('montoPagado')?.hasError('max')) {
-          <span error>No puede exceder ${{ montoPendiente }}</span>
-        }
-      </app-form-field>
+      @if (isEditMode) {
+        <!-- Edit Mode: Single amount field -->
+        <app-form-field
+          label="Monto del Pago"
+          [forId]="'monto'"
+          [required]="true"
+          [invalid]="!!(form.get('monto')?.invalid && form.get('monto')?.touched)"
+        >
+          <div class="input-with-prefix">
+            <span class="input-prefix">$</span>
+            <app-number-field
+              id="monto"
+              formControlName="monto"
+              [min]="1"
+              placeholder="0"
+            />
+          </div>
+          @if (form.get('monto')?.hasError('max')) {
+            <span error>No puede exceder ${{ maxAllowedMonto }}</span>
+          }
+          @if (form.get('monto')?.hasError('min')) {
+            <span error>Debe ser mayor a 0</span>
+          }
+        </app-form-field>
+      } @else {
+        <!-- Create Mode: Dual payment inputs -->
+        <app-form-field
+          label="Monto en Efectivo/Transferencia"
+          [forId]="'monto-pagado'"
+          [invalid]="!!(form.get('montoPagado')?.invalid && form.get('montoPagado')?.touched)"
+        >
+          <div class="input-with-prefix">
+            <span class="input-prefix">$</span>
+            <app-number-field
+              id="monto-pagado"
+              formControlName="montoPagado"
+              [min]="0"
+              placeholder="0"
+            />
+          </div>
+          @if (form.get('montoPagado')?.hasError('max')) {
+            <span error>No puede exceder ${{ montoPendiente }}</span>
+          }
+        </app-form-field>
 
-      <!-- Monto con Saldo Personal -->
-      <app-form-field
-        label="Monto con Saldo Personal"
-        [forId]="'monto-saldo'"
-        hint="Pago usando saldo de cuenta personal"
-      >
-        <div class="input-with-prefix">
-          <span class="input-prefix">$</span>
-          <app-number-field
-            id="monto-saldo"
-            formControlName="montoConSaldoPersonal"
-            [min]="0"
-            placeholder="0"
-          />
-        </div>
-      </app-form-field>
+        <app-form-field
+          label="Monto con Saldo Personal"
+          [forId]="'monto-saldo'"
+          hint="Pago usando saldo de cuenta personal"
+        >
+          <div class="input-with-prefix">
+            <span class="input-prefix">$</span>
+            <app-number-field
+              id="monto-saldo"
+              formControlName="montoConSaldoPersonal"
+              [min]="0"
+              placeholder="0"
+            />
+          </div>
+        </app-form-field>
+      }
 
       <!-- Medio de Pago -->
       <app-form-field
@@ -99,7 +134,7 @@
       </app-form-field>
     </div>
 
-    @if (puedeUsarSaldo) {
+    @if (!isEditMode && puedeUsarSaldo) {
       <div class="quick-actions">
         <button type="button" class="btn-outline" (click)="usarSaldoDisponible()">
           <mat-icon>account_balance_wallet</mat-icon>
@@ -111,6 +146,12 @@
 </mat-dialog-content>
 
 <mat-dialog-actions class="dialog-actions" align="end">
+  @if (isEditMode) {
+    <button type="button" class="btn-danger" (click)="onDelete()">
+      <mat-icon>delete</mat-icon>
+      Eliminar
+    </button>
+  }
   <button type="button" class="btn-secondary" (click)="onCancel()">
     Cancelar
   </button>
@@ -120,6 +161,6 @@
     [disabled]="formInvalid"
     (click)="onSubmit()"
   >
-    Registrar Pago
+    {{ isEditMode ? 'Guardar Cambios' : 'Registrar Pago' }}
   </button>
 </mat-dialog-actions>

@@ -24,3 +24,24 @@ export interface PagoInscripcionDto {
   medioPago?: MedioPago;
   descripcion?: string;
 }
+
+/**
+ * Existing payment data for edit mode in dialog
+ */
+export interface ExistingPago {
+  movimientoId: string;
+  monto: number;
+  medioPago: MedioPago;
+  descripcion: string | null;
+  fecha: string;
+}
+
+/**
+ * DTO for updating an existing payment
+ * PATCH /api/v1/movimientos/:id
+ */
+export interface UpdatePagoDto {
+  monto?: number;
+  medioPago?: MedioPago;
+  descripcion?: string;
+}

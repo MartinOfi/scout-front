@@ -6,6 +6,7 @@ import {
   CreateInscripcionDto,
   UpdateInscripcionDto,
   PagoInscripcionDto,
+  UpdatePagoDto,
 } from '../../../shared/models';
 import { TipoInscripcion } from '../../../shared/enums';
 import { HttpService } from '../../../shared/services';
@@ -62,10 +63,7 @@ export class InscripcionesApiService {
    * Create a new inscripcion
    */
   create(dto: CreateInscripcionDto): Observable<Inscripcion> {
-    return this.http.post<Inscripcion, CreateInscripcionDto>(
-      this.endpoint,
-      dto
-    );
+    return this.http.post<Inscripcion, CreateInscripcionDto>(this.endpoint, dto);
   }
 
   /**
@@ -73,10 +71,7 @@ export class InscripcionesApiService {
    * Use to update authorization fields or montoBonificado
    */
   update(id: string, dto: UpdateInscripcionDto): Observable<Inscripcion> {
-    return this.http.patch<Inscripcion, UpdateInscripcionDto>(
-      `${this.endpoint}/${id}`,
-      dto
-    );
+    return this.http.patch<Inscripcion, UpdateInscripcionDto>(`${this.endpoint}/${id}`, dto);
   }
 
   /**
@@ -93,7 +88,32 @@ export class InscripcionesApiService {
   pagarInscripcion(id: string, dto: PagoInscripcionDto): Observable<InscripcionConEstado> {
     return this.http.post<InscripcionConEstado, PagoInscripcionDto>(
       `${this.endpoint}/${id}/pagar`,
-      dto
+      dto,
+    );
+  }
+
+  /**
+   * Update an existing payment (movimiento)
+   * PATCH /api/v1/inscripciones/:id/pagos/:movimientoId
+   */
+  updatePago(
+    inscripcionId: string,
+    movimientoId: string,
+    dto: UpdatePagoDto,
+  ): Observable<InscripcionConEstado> {
+    return this.http.patch<InscripcionConEstado, UpdatePagoDto>(
+      `${this.endpoint}/${inscripcionId}/pagos/${movimientoId}`,
+      dto,
+    );
+  }
+
+  /**
+   * Delete an existing payment (movimiento)
+   * DELETE /api/v1/inscripciones/:id/pagos/:movimientoId
+   */
+  deletePago(inscripcionId: string, movimientoId: string): Observable<InscripcionConEstado> {
+    return this.http.delete<InscripcionConEstado>(
+      `${this.endpoint}/${inscripcionId}/pagos/${movimientoId}`,
     );
   }
 }

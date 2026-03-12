@@ -36,7 +36,7 @@ export interface Inscripcion {
 export interface MovimientoInscripcion {
   id: string;
   monto: number;
-  medioPago: string;
+  medioPago: MedioPago;
   fecha: string;
   descripcion: string | null;
 }
