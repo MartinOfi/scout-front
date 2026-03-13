@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, Input, forwardRef, ChangeDetectorRef, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  forwardRef,
+  ChangeDetectorRef,
+  inject,
+  input,
+} from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
@@ -66,11 +74,28 @@ export class DateFieldComponent implements ControlValueAccessor {
     this.onTouched();
   }
 
+  /**
+   * Normalizes date input to ISO 8601 format (YYYY-MM-DD)
+   *
+   * For "date-only" ISO strings (e.g., "2026-03-13T00:00:00.000Z"),
+   * extracts the date part directly to avoid timezone offset issues.
+   */
   private normalizeToISO8601(input: string): string {
     if (!input) return '';
+
+    // Already in correct format
     if (/^\d{4}-\d{2}-\d{2}$/.test(input)) {
       return input;
     }
+
+    // Handle ISO strings: extract YYYY-MM-DD directly to avoid timezone issues
+    // Matches: "2026-03-13T00:00:00.000Z", "2026-03-13T15:30:00Z", etc.
+    const isoMatch = input.match(/^(\d{4}-\d{2}-\d{2})T/);
+    if (isoMatch) {
+      return isoMatch[1];
+    }
+
+    // Fallback: parse as Date (for other formats)
     const date = new Date(input);
     if (isNaN(date.getTime())) return input;
     const year = date.getFullYear();

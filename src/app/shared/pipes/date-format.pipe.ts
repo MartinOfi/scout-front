@@ -47,10 +47,7 @@ export class DateFormatPipe implements PipeTransform {
    * @param format - Format type: 'date', 'time', 'datetime', or 'datelong'
    * @returns Formatted date string or empty string if invalid
    */
-  transform(
-    value: unknown,
-    format: 'date' | 'time' | 'datetime' | 'datelong' = 'date'
-  ): string {
+  transform(value: unknown, format: 'date' | 'time' | 'datetime' | 'datelong' = 'date'): string {
     if (value === null || value === undefined || value === '') {
       return '';
     }
@@ -70,6 +67,10 @@ export class DateFormatPipe implements PipeTransform {
 
   /**
    * Parses various date formats into a Date object
+   *
+   * For "date-only" ISO strings (ending in T00:00:00.000Z), we parse them
+   * as local dates to avoid timezone offset issues where "2026-03-13T00:00:00.000Z"
+   * would display as "12/03/2026" in Argentina (UTC-3).
    */
   private parseDate(value: unknown): Date | null {
     if (value instanceof Date) {
@@ -103,10 +104,33 @@ export class DateFormatPipe implements PipeTransform {
         }
       }
 
-      // Try standard Date parsing
+      // Handle "date-only" ISO strings (e.g., "2026-03-13T00:00:00.000Z")
+      // These should be treated as local dates, not UTC
+      if (this.isDateOnlyIsoString(value)) {
+        return this.parseAsLocalDate(value);
+      }
+
+      // Try standard Date parsing for other formats
       return new Date(value);
     }
 
     return null;
+  }
+
+  /**
+   * Checks if a string is a "date-only" ISO format
+   * Pattern: YYYY-MM-DDT00:00:00.000Z or YYYY-MM-DDT00:00:00Z
+   */
+  private isDateOnlyIsoString(value: string): boolean {
+    return /^\d{4}-\d{2}-\d{2}T00:00:00(\.000)?Z$/.test(value);
+  }
+
+  /**
+   * Parses an ISO date string as a local date (ignoring timezone)
+   * "2026-03-13T00:00:00.000Z" → Date representing March 13, 2026 in local time
+   */
+  private parseAsLocalDate(isoString: string): Date {
+    const [year, month, day] = isoString.slice(0, 10).split('-').map(Number);
+    return new Date(year, month - 1, day);
   }
 }
