@@ -1,15 +1,40 @@
-<div class="cajas-page">
-  <mat-tab-group animationDuration="300ms" class="cajas-tabs">
-    <mat-tab label="Caja de Grupo">
-      <app-caja-grupo></app-caja-grupo>
-    </mat-tab>
+<mat-sidenav-container class="cajas-sidenav-container">
+  <!-- Main Content -->
+  <mat-sidenav-content>
+    <div class="cajas-page">
+      <app-button-tabs
+        [tabs]="tabs"
+        [activeTab]="activeTab()"
+        (tabChange)="onTabChange($event)"
+      />
 
-    <mat-tab label="Fondos de Rama">
-      <app-fondos-rama></app-fondos-rama>
-    </mat-tab>
+      @switch (activeTab()) {
+        @case ('grupo') {
+          <app-caja-grupo />
+        }
+        @case ('rama') {
+          <app-fondos-rama />
+        }
+        @case ('personal') {
+          <app-cuentas-personales />
+        }
+      }
+    </div>
+  </mat-sidenav-content>
 
-    <mat-tab label="Cuentas Personales">
-      <app-cuentas-personales></app-cuentas-personales>
-    </mat-tab>
-  </mat-tab-group>
-</div>
+  <!-- Drawer -->
+  <mat-sidenav
+    #drawer
+    mode="over"
+    position="end"
+    [opened]="drawerOpen()"
+    (closed)="onDrawerClosed()"
+    class="caja-sidenav"
+  >
+    <app-caja-drawer
+      (close)="onDrawerClosed()"
+      (registrarMovimiento)="onRegistrarMovimiento()"
+      (verTodosMovimientos)="onVerTodosMovimientos()"
+    />
+  </mat-sidenav>
+</mat-sidenav-container>
