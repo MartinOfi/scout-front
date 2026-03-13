@@ -1,42 +1,90 @@
+// =============================================================================
+// DASHBOARD LAYOUT - Main financial overview page
+// =============================================================================
+
+// ---------------------------------------------------------------------------
+// Stats Grid (KPI Cards)
+// ---------------------------------------------------------------------------
+
 .dashboard-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
 
-  @media (max-width: 1024px) {
+  @media (max-width: 1200px) {
     grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: 600px) {
     grid-template-columns: 1fr;
   }
 }
+
+// ---------------------------------------------------------------------------
+// Cards Grid (Quick Actions + Upcoming Events)
+// ---------------------------------------------------------------------------
 
 .dashboard-cards {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-lg);
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-xl);
 
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
     grid-template-columns: 1fr;
+    gap: var(--spacing-md);
   }
 }
+
+// ---------------------------------------------------------------------------
+// Quick Actions Grid
+// ---------------------------------------------------------------------------
 
 .actions-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--spacing-md);
-  padding: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg);
 }
+
+// ---------------------------------------------------------------------------
+// Lists Grid (Movements + Branch Funds)
+// ---------------------------------------------------------------------------
 
 .dashboard-lists {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-lg);
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-xl);
 
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
     grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Empty State
+// ---------------------------------------------------------------------------
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  color: #9ca3af; // Warmer gray
+
+  &__icon {
+    font-size: 40px;
+    opacity: 0.4;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  &__text {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
   }
 }
