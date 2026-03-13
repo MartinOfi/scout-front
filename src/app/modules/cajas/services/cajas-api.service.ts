@@ -4,6 +4,7 @@ import { map, switchMap } from 'rxjs/operators';
 import {
   Caja,
   CajaConSaldo,
+  ConsolidadoSaldosResponse,
   CreateCajaDto,
   Movimiento,
   SaldoCajaResponse,
@@ -57,13 +58,20 @@ export class CajasApiService {
   }
 
   /**
+   * Get consolidated financial summary
+   * Endpoint: GET /cajas/consolidado
+   * Returns all balances and debts in a single response
+   */
+  getConsolidado(): Observable<ConsolidadoSaldosResponse> {
+    return this.http.get<ConsolidadoSaldosResponse>(API_CONFIG.ENDPOINTS.CAJAS_CONSOLIDADO);
+  }
+
+  /**
    * Get saldo of a caja by its ID
    * Endpoint: GET /movimientos/saldo/:cajaId
    */
   getSaldo(cajaId: string): Observable<SaldoCajaResponse> {
-    return this.http.get<SaldoCajaResponse>(
-      `${API_CONFIG.ENDPOINTS.MOVIMIENTOS_SALDO}/${cajaId}`
-    );
+    return this.http.get<SaldoCajaResponse>(`${API_CONFIG.ENDPOINTS.MOVIMIENTOS_SALDO}/${cajaId}`);
   }
 
   /**
@@ -71,9 +79,7 @@ export class CajasApiService {
    * Endpoint: GET /movimientos/caja/:cajaId
    */
   getMovimientos(cajaId: string): Observable<Movimiento[]> {
-    return this.http.get<Movimiento[]>(
-      `${API_CONFIG.ENDPOINTS.MOVIMIENTOS_CAJA}/${cajaId}`
-    );
+    return this.http.get<Movimiento[]>(`${API_CONFIG.ENDPOINTS.MOVIMIENTOS_CAJA}/${cajaId}`);
   }
 
   /**
@@ -96,7 +102,7 @@ export class CajasApiService {
           return of(0);
         }
         return this.getSaldo(caja.id).pipe(map((res) => res.saldo));
-      })
+      }),
     );
   }
 }

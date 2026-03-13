@@ -17,6 +17,7 @@ import { Observable, forkJoin, map, switchMap, of } from 'rxjs';
 import {
   Caja,
   CajaConSaldo,
+  ConsolidadoSaldosResponse,
   Movimiento,
   CreateCajaDto,
 } from '../../../shared/models';
@@ -49,6 +50,7 @@ export class CajasStateService {
   private readonly _movimientosGrupo: WritableSignal<Movimiento[]> = signal([]);
   private readonly _movimientosRama: WritableSignal<Record<string, Movimiento[]>> = signal({});
   private readonly _movimientosPersonal: WritableSignal<Record<string, Movimiento[]>> = signal({});
+  private readonly _consolidado: WritableSignal<ConsolidadoSaldosResponse | null> = signal(null);
   private readonly _loading: WritableSignal<boolean> = signal(false);
   private readonly _error: WritableSignal<string | null> = signal(null);
   private readonly _selectedRama: WritableSignal<Rama | null> = signal(null);
@@ -60,8 +62,11 @@ export class CajasStateService {
   readonly cajaGrupo: Signal<CajaConSaldo | null> = this._cajaGrupo.asReadonly();
   readonly cajasRama: Signal<Record<string, CajaConSaldo>> = this._cajasRama.asReadonly();
   readonly movimientosGrupo: Signal<Movimiento[]> = this._movimientosGrupo.asReadonly();
-  readonly movimientosRama: Signal<Record<string, Movimiento[]>> = this._movimientosRama.asReadonly();
-  readonly movimientosPersonal: Signal<Record<string, Movimiento[]>> = this._movimientosPersonal.asReadonly();
+  readonly movimientosRama: Signal<Record<string, Movimiento[]>> =
+    this._movimientosRama.asReadonly();
+  readonly movimientosPersonal: Signal<Record<string, Movimiento[]>> =
+    this._movimientosPersonal.asReadonly();
+  readonly consolidado: Signal<ConsolidadoSaldosResponse | null> = this._consolidado.asReadonly();
   readonly loading: Signal<boolean> = this._loading.asReadonly();
   readonly error: Signal<string | null> = this._error.asReadonly();
 
@@ -71,6 +76,46 @@ export class CajasStateService {
 
   readonly saldoGrupo = computed((): number => {
     return this._cajaGrupo()?.saldo ?? 0;
+  });
+
+  /** Total de cuentas personales from consolidado */
+  readonly totalCuentasPersonales = computed((): number => {
+    return this._consolidado()?.cuentasPersonales.total ?? 0;
+  });
+
+  /** Cantidad de cuentas personales from consolidado */
+  readonly cantidadCuentasPersonales = computed((): number => {
+    return this._consolidado()?.cuentasPersonales.cantidad ?? 0;
+  });
+
+  /** Total de reembolsos pendientes from consolidado */
+  readonly totalReembolsosPendientes = computed((): number => {
+    return this._consolidado()?.reembolsosPendientes.total ?? 0;
+  });
+
+  /** Cantidad de reembolsos pendientes from consolidado */
+  readonly cantidadReembolsosPendientes = computed((): number => {
+    return this._consolidado()?.reembolsosPendientes.cantidad ?? 0;
+  });
+
+  /** Total general (grupo + ramas + personales) from consolidado */
+  readonly totalGeneral = computed((): number => {
+    return this._consolidado()?.resumen.totalGeneral ?? 0;
+  });
+
+  /** Total disponible (totalGeneral - reembolsos) from consolidado */
+  readonly totalDisponible = computed((): number => {
+    return this._consolidado()?.resumen.totalDisponible ?? 0;
+  });
+
+  /** Total por cobrar (deudas) from consolidado */
+  readonly totalPorCobrar = computed((): number => {
+    return this._consolidado()?.resumen.totalPorCobrar ?? 0;
+  });
+
+  /** Deudas totales from consolidado */
+  readonly deudasTotales = computed(() => {
+    return this._consolidado()?.deudasTotales ?? null;
   });
 
   readonly saldoManada = computed((): number => {
@@ -127,6 +172,67 @@ export class CajasStateService {
   }
 
   /**
+   * Cargar datos consolidados de todas las cajas y deudas
+   * Endpoint: GET /cajas/consolidado
+   * Updates all relevant signals from a single API call
+   */
+  loadConsolidado(): void {
+    this._loading.set(true);
+    this._error.set(null);
+
+    this.apiService.getConsolidado().subscribe({
+      next: (consolidado: ConsolidadoSaldosResponse) => {
+        // Store full consolidado response
+        this._consolidado.set(consolidado);
+
+        // Update cajaGrupo from consolidado
+        if (consolidado.cajaGrupo.id) {
+          this._cajaGrupo.set({
+            id: consolidado.cajaGrupo.id,
+            saldo: consolidado.cajaGrupo.saldo,
+          } as CajaConSaldo);
+        }
+
+        // Update cajasRama from consolidado.fondosRama.detalle
+        const cajasMap: Record<string, CajaConSaldo> = {};
+        consolidado.fondosRama.detalle.forEach((fondo) => {
+          // Map RAMA_X to the Rama enum value
+          const ramaKey = this.mapTipoToRama(fondo.tipo);
+          if (ramaKey) {
+            cajasMap[ramaKey] = {
+              id: fondo.id,
+              nombre: fondo.nombre,
+              saldo: fondo.saldo,
+            } as CajaConSaldo;
+          }
+        });
+        this._cajasRama.set(cajasMap);
+
+        this._loading.set(false);
+      },
+      error: (err: unknown) => {
+        const errorMsg = err instanceof Error ? err.message : 'Error al cargar datos consolidados';
+        this._error.set(errorMsg);
+        this._loading.set(false);
+        this.notificationService.showError(errorMsg);
+      },
+    });
+  }
+
+  /**
+   * Map fondo tipo string to Rama enum
+   */
+  private mapTipoToRama(tipo: string): Rama | null {
+    const mapping: Record<string, Rama> = {
+      RAMA_MANADA: RamaEnum.MANADA,
+      RAMA_UNIDAD: RamaEnum.UNIDAD,
+      RAMA_CAMINANTES: RamaEnum.CAMINANTES,
+      RAMA_ROVERS: RamaEnum.ROVERS,
+    };
+    return mapping[tipo] ?? null;
+  }
+
+  /**
    * Cargar caja de una rama
    * Uses GET /cajas?tipo={cajaType} to get the caja
    */
@@ -135,25 +241,26 @@ export class CajasStateService {
     this._error.set(null);
 
     const cajaType = RAMA_TO_CAJA_TYPE[rama];
-    this.apiService.getByType(cajaType).pipe(
-      map((cajas) => cajas[0] as CajaConSaldo | undefined)
-    ).subscribe({
-      next: (caja: CajaConSaldo | undefined) => {
-        if (caja) {
-          this._cajasRama.update((prev) => ({
-            ...prev,
-            [rama]: caja,
-          }));
-        }
-        this._loading.set(false);
-      },
-      error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : `Error al cargar caja de ${rama}`;
-        this._error.set(errorMsg);
-        this._loading.set(false);
-        this.notificationService.showError(errorMsg);
-      },
-    });
+    this.apiService
+      .getByType(cajaType)
+      .pipe(map((cajas) => cajas[0] as CajaConSaldo | undefined))
+      .subscribe({
+        next: (caja: CajaConSaldo | undefined) => {
+          if (caja) {
+            this._cajasRama.update((prev) => ({
+              ...prev,
+              [rama]: caja,
+            }));
+          }
+          this._loading.set(false);
+        },
+        error: (err: unknown) => {
+          const errorMsg = err instanceof Error ? err.message : `Error al cargar caja de ${rama}`;
+          this._error.set(errorMsg);
+          this._loading.set(false);
+          this.notificationService.showError(errorMsg);
+        },
+      });
   }
 
   /**
@@ -167,9 +274,9 @@ export class CajasStateService {
     const ramas = Object.values(RamaEnum) as Rama[];
     const requests = ramas.map((rama) => {
       const cajaType = RAMA_TO_CAJA_TYPE[rama];
-      return this.apiService.getByType(cajaType).pipe(
-        map((cajas) => ({ rama, caja: cajas[0] as CajaConSaldo | undefined }))
-      );
+      return this.apiService
+        .getByType(cajaType)
+        .pipe(map((cajas) => ({ rama, caja: cajas[0] as CajaConSaldo | undefined })));
     });
 
     forkJoin(requests).subscribe({
@@ -217,23 +324,26 @@ export class CajasStateService {
       });
     } else {
       // First load the caja grupo, then get movimientos
-      this.apiService.getCajaGrupo().pipe(
-        switchMap((caja: CajaConSaldo) => {
-          this._cajaGrupo.set(caja);
-          return this.apiService.getMovimientos(caja.id);
-        })
-      ).subscribe({
-        next: (movimientos: Movimiento[]) => {
-          this._movimientosGrupo.set(movimientos);
-          this._loading.set(false);
-        },
-        error: (err: unknown) => {
-          const errorMsg = err instanceof Error ? err.message : 'Error al cargar movimientos';
-          this._error.set(errorMsg);
-          this._loading.set(false);
-          this.notificationService.showError(errorMsg);
-        },
-      });
+      this.apiService
+        .getCajaGrupo()
+        .pipe(
+          switchMap((caja: CajaConSaldo) => {
+            this._cajaGrupo.set(caja);
+            return this.apiService.getMovimientos(caja.id);
+          }),
+        )
+        .subscribe({
+          next: (movimientos: Movimiento[]) => {
+            this._movimientosGrupo.set(movimientos);
+            this._loading.set(false);
+          },
+          error: (err: unknown) => {
+            const errorMsg = err instanceof Error ? err.message : 'Error al cargar movimientos';
+            this._error.set(errorMsg);
+            this._loading.set(false);
+            this.notificationService.showError(errorMsg);
+          },
+        });
     }
   }
 
@@ -257,7 +367,8 @@ export class CajasStateService {
           this._loading.set(false);
         },
         error: (err: unknown) => {
-          const errorMsg = err instanceof Error ? err.message : `Error al cargar movimientos de ${rama}`;
+          const errorMsg =
+            err instanceof Error ? err.message : `Error al cargar movimientos de ${rama}`;
           this._error.set(errorMsg);
           this._loading.set(false);
           this.notificationService.showError(errorMsg);
@@ -266,33 +377,37 @@ export class CajasStateService {
     } else {
       // First load the caja, then get movimientos
       const cajaType = RAMA_TO_CAJA_TYPE[rama];
-      this.apiService.getByType(cajaType).pipe(
-        switchMap((cajas) => {
-          const caja = cajas[0] as CajaConSaldo | undefined;
-          if (!caja) {
-            return of([]);
-          }
-          this._cajasRama.update((prev) => ({
-            ...prev,
-            [rama]: caja,
-          }));
-          return this.apiService.getMovimientos(caja.id);
-        })
-      ).subscribe({
-        next: (movimientos: Movimiento[]) => {
-          this._movimientosRama.update((prev) => ({
-            ...prev,
-            [rama]: movimientos,
-          }));
-          this._loading.set(false);
-        },
-        error: (err: unknown) => {
-          const errorMsg = err instanceof Error ? err.message : `Error al cargar movimientos de ${rama}`;
-          this._error.set(errorMsg);
-          this._loading.set(false);
-          this.notificationService.showError(errorMsg);
-        },
-      });
+      this.apiService
+        .getByType(cajaType)
+        .pipe(
+          switchMap((cajas) => {
+            const caja = cajas[0] as CajaConSaldo | undefined;
+            if (!caja) {
+              return of([]);
+            }
+            this._cajasRama.update((prev) => ({
+              ...prev,
+              [rama]: caja,
+            }));
+            return this.apiService.getMovimientos(caja.id);
+          }),
+        )
+        .subscribe({
+          next: (movimientos: Movimiento[]) => {
+            this._movimientosRama.update((prev) => ({
+              ...prev,
+              [rama]: movimientos,
+            }));
+            this._loading.set(false);
+          },
+          error: (err: unknown) => {
+            const errorMsg =
+              err instanceof Error ? err.message : `Error al cargar movimientos de ${rama}`;
+            this._error.set(errorMsg);
+            this._loading.set(false);
+            this.notificationService.showError(errorMsg);
+          },
+        });
     }
   }
 
@@ -312,7 +427,8 @@ export class CajasStateService {
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar movimientos personales';
+        const errorMsg =
+          err instanceof Error ? err.message : 'Error al cargar movimientos personales';
         this._error.set(errorMsg);
         this._loading.set(false);
         this.notificationService.showError(errorMsg);
@@ -359,6 +475,7 @@ export class CajasStateService {
   clear(): void {
     this._cajaGrupo.set(null);
     this._cajasRama.set({});
+    this._consolidado.set(null);
     this._movimientosGrupo.set([]);
     this._movimientosRama.set({});
     this._movimientosPersonal.set({});

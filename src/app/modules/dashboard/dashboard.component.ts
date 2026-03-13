@@ -31,18 +31,11 @@ import {
 
 import { CajasStateService } from '../cajas/services/cajas-state.service';
 import { CajasApiService } from '../cajas/services/cajas-api.service';
-import { MovimientosApiService } from '../movimientos/services/movimientos-api.service';
 import { EventosApiService } from '../eventos/services/eventos-api.service';
 import { PersonasApiService } from '../personas/services/personas-api.service';
 
-import {
-  Movimiento,
-  Evento,
-  ReembolsoPendiente,
-  CajaConSaldo,
-  PersonaUnion,
-} from '../../shared/models';
-import { TipoMovimientoEnum, CajaType, RamaEnum, TipoEvento } from '../../shared/enums';
+import { Movimiento, Evento, PersonaUnion } from '../../shared/models';
+import { TipoMovimientoEnum, RamaEnum, TipoEvento } from '../../shared/enums';
 import { humanize } from '../../shared/pipes';
 import type { Rama } from '../../shared/enums';
 
@@ -134,7 +127,6 @@ export class DashboardComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly cajasState = inject(CajasStateService);
   private readonly cajasApi = inject(CajasApiService);
-  private readonly movimientosApi = inject(MovimientosApiService);
   private readonly eventosApi = inject(EventosApiService);
   private readonly personasApi = inject(PersonasApiService);
 
@@ -142,8 +134,6 @@ export class DashboardComponent implements OnInit {
   // State Signals
   // ============================================================================
 
-  private readonly _totalCuentasPersonales = signal<number>(0);
-  private readonly _totalReembolsosPendientes = signal<number>(0);
   private readonly _movimientosRecientes = signal<Movimiento[]>([]);
   private readonly _proximosEventos = signal<Evento[]>([]);
   private readonly _protagonistasPorRama = signal<Record<Rama, number>>({
@@ -174,13 +164,13 @@ export class DashboardComponent implements OnInit {
     {
       icon: 'person',
       title: 'Cuentas Personales',
-      value: this._totalCuentasPersonales(),
+      value: this.cajasState.totalCuentasPersonales(),
       variant: 'warning' as const,
     },
     {
       icon: 'receipt_long',
       title: 'Reembolsos Pendientes',
-      value: this._totalReembolsosPendientes(),
+      value: this.cajasState.totalReembolsosPendientes(),
       variant: 'danger' as const,
     },
   ]);
@@ -281,30 +271,17 @@ export class DashboardComponent implements OnInit {
   private loadDashboardData(): void {
     this._isLoading.set(true);
 
-    // Load cajas data via state service
-    this.cajasState.loadCajaGrupo();
-    this.cajasState.loadTodasCajasRama();
+    // Load consolidated cajas data (replaces multiple individual API calls)
+    this.cajasState.loadConsolidado();
 
-    // Load additional data in parallel
+    // Load eventos and personas in parallel (not part of consolidado endpoint)
     forkJoin({
-      cuentasPersonales: this.cajasApi.getByType(CajaType.PERSONAL).pipe(catchError(() => of([]))),
-      reembolsos: this.movimientosApi.getReembolsosPendientes().pipe(catchError(() => of([]))),
       eventos: this.eventosApi.getAll().pipe(catchError(() => of([]))),
       personas: this.personasApi.getAll().pipe(catchError(() => of([]))),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: ({ cuentasPersonales, reembolsos, eventos, personas }) => {
-          // Calculate total cuentas personales
-          this.loadCuentasPersonalesSaldos(cuentasPersonales as CajaConSaldo[]);
-
-          // Calculate total reembolsos pendientes
-          const totalReembolsos = reembolsos.reduce(
-            (acc: number, r: ReembolsoPendiente) => acc + r.totalPendiente,
-            0,
-          );
-          this._totalReembolsosPendientes.set(totalReembolsos);
-
+        next: ({ eventos, personas }) => {
           // Set eventos
           this._proximosEventos.set(eventos);
 
@@ -320,11 +297,6 @@ export class DashboardComponent implements OnInit {
 
     // Load movimientos for grupo caja
     this.loadMovimientosRecientes();
-  }
-
-  private loadCuentasPersonalesSaldos(cajas: CajaConSaldo[]): void {
-    const total = cajas.reduce((acc, caja) => acc + (caja.saldo ?? 0), 0);
-    this._totalCuentasPersonales.set(total);
   }
 
   private loadMovimientosRecientes(): void {

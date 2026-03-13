@@ -1,11 +1,10 @@
-
 /**
  * API configuration constants
  * Centralized - NO hardcoded URLs
  * Uses environment configuration for BASE_URL
  */
 
-import { environment } from "../../../environments/environment";
+import { environment } from '../../../environments/environment';
 
 export const API_CONFIG = {
   BASE_URL: environment.apiUrl,
@@ -20,6 +19,7 @@ export const API_CONFIG = {
     // Cajas
     CAJAS: 'cajas',
     CAJAS_GRUPO: 'cajas/grupo',
+    CAJAS_CONSOLIDADO: 'cajas/consolidado',
 
     // Movimientos
     MOVIMIENTOS: 'movimientos',
