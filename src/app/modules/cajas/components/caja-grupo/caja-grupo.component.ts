@@ -6,7 +6,7 @@
  */
 
 import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, SlicePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,7 +15,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CajasStateService } from '../../services/cajas-state.service';
 import { CajaConSaldo, Movimiento } from '../../../../shared/models';
 
-// Dumb Components
+// Shared Components
+import { StatCardComponent } from '../../../../shared/components/stat-card/stat-card.component';
+import { ActionButtonComponent } from '../../../../shared/components/action-button/action-button.component';
+import { DataTableComponent } from '../../../../shared/components/tables/data-table.component';
+import { TableColumn, TableData, TableAction } from '../../../../shared/models/table.model';
+
+// Local Components
 import { SaldoCardComponent } from './components/saldo-card/saldo-card.component';
 import { MovimientosTableComponent } from './components/movimientos-table/movimientos-table.component';
 
@@ -24,14 +30,19 @@ import { MovimientosTableComponent } from './components/movimientos-table/movimi
   standalone: true,
   imports: [
     CommonModule,
+    SlicePipe,
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    StatCardComponent,
     SaldoCardComponent,
-    MovimientosTableComponent
+    ActionButtonComponent,
+    DataTableComponent,
+    MovimientosTableComponent, // TODO: Remove in Task 5 when template is updated
   ],
   templateUrl: './caja-grupo.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./caja-grupo.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CajaGrupoComponent implements OnInit {
   private readonly state = inject(CajasStateService);
@@ -44,6 +55,20 @@ export class CajaGrupoComponent implements OnInit {
   readonly loading = this.state.loading;
   readonly error = this.state.error;
 
+  // Table configuration
+  readonly movimientosColumns: TableColumn[] = [
+    { key: 'fecha', header: 'Fecha', type: 'date', sortable: true },
+    { key: 'concepto', header: 'Concepto', type: 'text', sortable: true },
+    { key: 'tipo', header: 'Tipo', type: 'status' },
+    { key: 'monto', header: 'Monto', type: 'number', sortable: true },
+    {
+      key: 'actions',
+      header: 'Acciones',
+      type: 'action',
+      actions: [{ key: 'view', label: 'Ver', icon: 'visibility' }],
+    },
+  ];
+
   ngOnInit(): void {
     this.state.loadCajaGrupo();
     this.state.loadMovimientosGrupo();
@@ -51,7 +76,7 @@ export class CajaGrupoComponent implements OnInit {
 
   onVerTodosMovimientos(): void {
     this.router.navigate(['/movimientos'], {
-      queryParams: { caja: 'grupo' }
+      queryParams: { caja: 'grupo' },
     });
   }
 
@@ -59,12 +84,25 @@ export class CajaGrupoComponent implements OnInit {
     const caja = this.cajaGrupo();
     if (caja) {
       this.router.navigate(['/movimientos/nuevo'], {
-        queryParams: { cajaId: caja.id }
+        queryParams: { cajaId: caja.id },
       });
     }
   }
 
   onVerMovimiento(id: string): void {
     this.router.navigate(['/movimientos', id]);
+  }
+
+  onOpenDrawer(): void {
+    const caja = this.cajaGrupo();
+    if (caja) {
+      this.state.selectCaja(caja);
+    }
+  }
+
+  onTableAction(event: { action: TableAction; row: TableData }): void {
+    if (event.action.key === 'view') {
+      this.onVerMovimiento(event.row['id'] as string);
+    }
   }
 }
