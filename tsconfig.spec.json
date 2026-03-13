@@ -5,11 +5,16 @@
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
     "types": [
-      "jasmine"
+      "vitest/globals"
     ]
   },
   "include": [
     "src/**/*.d.ts",
-    "src/**/*.spec.ts"
+    "src/app/modules/inscripciones/services/inscripciones-state.service.spec.ts",
+    "src/app/modules/inscripciones/services/inscripciones-api.service.spec.ts",
+    "src/app/modules/inscripciones/components/shared/pago-inscripcion-dialog/pago-inscripcion-dialog.component.spec.ts",
+    "src/app/modules/inscripciones/components/inscripcion-detail/inscripcion-detail.component.spec.ts",
+    "src/app/modules/inscripciones/testing/**/*.ts",
+    "src/app/shared/testing/**/*.ts"
   ]
 }
