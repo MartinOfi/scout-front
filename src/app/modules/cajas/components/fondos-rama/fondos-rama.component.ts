@@ -16,6 +16,9 @@ import { CajasStateService } from '../../services/cajas-state.service';
 import { Rama, RamaEnum, CajaType, CAJA_TYPE_LABELS } from '../../../../shared/enums';
 import { CajaConSaldo } from '../../../../shared/models';
 
+// Shared Components
+import { StatCardComponent } from '../../../../shared/components/stat-card/stat-card.component';
+
 // Dumb Component
 import { FondoCardComponent } from './components/fondo-card/fondo-card.component';
 
@@ -27,10 +30,12 @@ import { FondoCardComponent } from './components/fondo-card/fondo-card.component
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    FondoCardComponent
+    StatCardComponent,
+    FondoCardComponent,
   ],
   templateUrl: './fondos-rama.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./fondos-rama.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FondosRamaComponent implements OnInit {
   private readonly state = inject(CajasStateService);
@@ -62,14 +67,14 @@ export class FondosRamaComponent implements OnInit {
       [RamaEnum.MANADA]: CajaType.RAMA_MANADA,
       [RamaEnum.UNIDAD]: CajaType.RAMA_UNIDAD,
       [RamaEnum.CAMINANTES]: CajaType.RAMA_CAMINANTES,
-      [RamaEnum.ROVERS]: CajaType.RAMA_ROVERS
+      [RamaEnum.ROVERS]: CajaType.RAMA_ROVERS,
     };
     return this.ramaLabels[cajaTypeMap[rama]];
   }
 
   onVerMovimientosRama(rama: Rama): void {
     this.router.navigate(['/movimientos'], {
-      queryParams: { rama }
+      queryParams: { rama },
     });
   }
 
@@ -77,7 +82,7 @@ export class FondosRamaComponent implements OnInit {
     const caja = this.cajasRama()[rama];
     if (caja) {
       this.router.navigate(['/movimientos/nuevo'], {
-        queryParams: { cajaId: caja.id }
+        queryParams: { cajaId: caja.id },
       });
     }
   }
@@ -87,8 +92,15 @@ export class FondosRamaComponent implements OnInit {
       [RamaEnum.MANADA]: 'pets',
       [RamaEnum.UNIDAD]: 'groups',
       [RamaEnum.CAMINANTES]: 'hiking',
-      [RamaEnum.ROVERS]: 'terrain'
+      [RamaEnum.ROVERS]: 'terrain',
     };
     return icons[rama] || 'account_balance';
+  }
+
+  onOpenDrawer(rama: Rama): void {
+    const caja = this.cajasRama()[rama];
+    if (caja) {
+      this.state.selectCaja(caja);
+    }
   }
 }

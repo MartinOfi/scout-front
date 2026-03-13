@@ -1,0 +1,249 @@
+// ============================================================================
+// Quick Movimiento Dialog - Clean dialog for registering movements
+// ============================================================================
+
+@use '../../../../../shared/components/form/form-tokens' as tokens;
+
+// Local design tokens (dialog-specific)
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+
+$shadow-dialog: var(--shadow-xl);
+$transition-fast: 150ms ease-out;
+
+// ============================================================================
+// Host & Material Dialog Container Override
+// ============================================================================
+
+:host {
+  display: block;
+}
+
+:host ::ng-deep {
+  .mat-mdc-dialog-container {
+    --mdc-dialog-container-shape: #{$radius-xl};
+
+    .mdc-dialog__surface {
+      border-radius: $radius-xl !important;
+      box-shadow: $shadow-dialog !important;
+      overflow: hidden;
+    }
+  }
+
+  .mat-mdc-dialog-content {
+    padding: 0 !important;
+    max-height: 70vh;
+  }
+
+  .mat-mdc-dialog-actions {
+    padding: 0 !important;
+    min-height: auto;
+  }
+
+  .mat-mdc-dialog-title {
+    padding: 0 !important;
+    margin: 0 !important;
+
+    &::before {
+      display: none;
+    }
+  }
+}
+
+// ============================================================================
+// Dialog Title
+// ============================================================================
+
+.dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 20px 24px 16px;
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  border-bottom: 1px solid var(--border-default);
+  background-color: var(--surface-primary);
+
+  .title-icon {
+    color: tokens.$brand-burgundy;
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+}
+
+// ============================================================================
+// Dialog Content
+// ============================================================================
+
+.dialog-content {
+  padding: 20px 24px;
+  min-width: 440px;
+  max-width: 540px;
+  background-color: var(--surface-primary);
+}
+
+// ============================================================================
+// Loading State
+// ============================================================================
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+// ============================================================================
+// Caja Info
+// ============================================================================
+
+.caja-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: $radius-lg;
+  margin-bottom: 20px;
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--text-secondary);
+
+  mat-icon {
+    color: tokens.$brand-burgundy;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// ============================================================================
+// Form Layout
+// ============================================================================
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  &.full-width {
+    grid-column: 1 / -1;
+  }
+
+  // Remove bottom margin from form fields inside dialog
+  :host ::ng-deep .scout-field {
+    margin-bottom: 0;
+  }
+}
+
+// ============================================================================
+// Button Styles
+// ============================================================================
+
+.btn-secondary {
+  background-color: var(--surface-primary);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  padding: 10px 20px;
+  border-radius: $radius-md;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background-color: var(--surface-secondary);
+    border-color: var(--border-strong);
+  }
+
+  &:active {
+    background-color: var(--surface-tertiary);
+  }
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-primary-burgundy);
+  border: none;
+  color: var(--text-on-primary);
+  padding: 10px 20px;
+  border-radius: $radius-md;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+  box-shadow: var(--shadow-sm);
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--color-burgundy-light);
+    box-shadow: var(--shadow-md);
+  }
+
+  &:disabled {
+    background: var(--border-default);
+    color: var(--text-muted);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+// ============================================================================
+// Dialog Actions
+// ============================================================================
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px 20px;
+  background-color: var(--surface-secondary);
+  border-top: 1px solid var(--border-default);
+}
+
+// ============================================================================
+// Responsive
+// ============================================================================
+
+@media (max-width: 600px) {
+  .dialog-content {
+    min-width: auto;
+    padding: 16px;
+  }
+
+  .dialog-title {
+    padding: 16px 16px 12px;
+  }
+
+  .form-grid {
+    gap: 14px;
+  }
+
+  .caja-info {
+    padding: 10px 14px;
+    font-size: 0.875rem;
+  }
+
+  .dialog-actions {
+    padding: 12px 16px 16px;
+  }
+}

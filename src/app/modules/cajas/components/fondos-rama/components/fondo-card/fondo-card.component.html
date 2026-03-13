@@ -1,10 +1,20 @@
 <mat-card class="fondo-card" [class]="rama()">
-  <mat-card-content>
+  <mat-card-content
+    class="fondo-content"
+    matRipple
+    tabindex="0"
+    role="button"
+    (click)="cardClick.emit()"
+    (keydown.enter)="cardClick.emit()"
+    (keydown.space)="cardClick.emit(); $event.preventDefault()"
+    [attr.aria-label]="'Ver movimientos de ' + label()"
+  >
     <div class="fondo-header">
       <mat-icon class="rama-icon">{{ icon() }}</mat-icon>
       <span class="rama-label">{{ label() }}</span>
+      <mat-icon class="chevron-icon">chevron_right</mat-icon>
     </div>
-    
+
     <div class="saldo-display">
       <span class="saldo-amount" [class.negativo]="saldo() < 0">
         {{ saldo() | currency:'ARS':'symbol':'1.2-2' }}

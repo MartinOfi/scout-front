@@ -1,0 +1,131 @@
+// =============================================================================
+// FONDO CARD - Clickable rama fund card
+// =============================================================================
+
+.fondo-card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.fondo-content {
+  cursor: pointer;
+  transition:
+    background-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  padding: var(--spacing-md);
+  border-radius: 8px;
+
+  &:hover {
+    background-color: var(--hover-overlay);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-indigo);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: background-color 150ms ease;
+  }
+}
+
+.fondo-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.rama-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  color: var(--color-primary-indigo);
+}
+
+.rama-label {
+  flex: 1;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.chevron-icon {
+  color: var(--text-muted);
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  transition: transform 200ms ease;
+
+  .fondo-content:hover & {
+    transform: translateX(4px);
+    color: var(--color-primary-indigo);
+  }
+}
+
+.saldo-display {
+  padding-left: 36px; // Align with label after icon
+}
+
+.saldo-amount {
+  font-size: var(--text-3xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: var(--font-family-headings);
+  font-variant-numeric: tabular-nums lining-nums;
+
+  &.negativo {
+    color: var(--color-danger);
+  }
+}
+
+// Rama-specific icon colors using semantic tokens
+.fondo-card.manada {
+  .rama-icon {
+    color: var(--color-rama-manada-icon);
+  }
+
+  .chevron-icon {
+    .fondo-content:hover & {
+      color: var(--color-rama-manada);
+    }
+  }
+}
+
+.fondo-card.unidad {
+  .rama-icon {
+    color: var(--color-rama-unidad-icon);
+  }
+
+  .chevron-icon {
+    .fondo-content:hover & {
+      color: var(--color-rama-unidad);
+    }
+  }
+}
+
+.fondo-card.caminantes {
+  .rama-icon {
+    color: var(--color-rama-caminantes-icon);
+  }
+
+  .chevron-icon {
+    .fondo-content:hover & {
+      color: var(--color-rama-caminantes);
+    }
+  }
+}
+
+.fondo-card.rovers {
+  .rama-icon {
+    color: var(--color-rama-rovers-icon);
+  }
+
+  .chevron-icon {
+    .fondo-content:hover & {
+      color: var(--color-rama-rovers);
+    }
+  }
+}

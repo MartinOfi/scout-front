@@ -1,10 +1,15 @@
 <div class="fondos-rama-container">
+  <section class="fondos-stats">
+    <app-stat-card
+      icon="savings"
+      title="Total Fondos de Rama"
+      [value]="totalSaldosRamas()"
+      [variant]="totalSaldosRamas() >= 0 ? 'success' : 'danger'"
+    />
+  </section>
+
   <div class="header">
-    <h2>Fondos de Rama</h2>
-    <div class="total-saldos">
-      <span class="label">Total Fondos:</span>
-      <span class="amount">{{ totalSaldosRamas() | currency:'ARS':'symbol':'1.2-2' }}</span>
-    </div>
+    <h2>Fondos por Rama</h2>
   </div>
 
   @if (loading()) {
@@ -21,6 +26,7 @@
         [saldo]="getSaldoRama(rama)"
         [icon]="getRamaIcon(rama)"
         [label]="getRamaLabel(rama)"
+        (cardClick)="onOpenDrawer(rama)"
         (verMovimientos)="onVerMovimientosRama(rama)"
         (registrarMovimiento)="onRegistrarMovimiento(rama)">
       </app-fondo-card>

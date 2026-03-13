@@ -1,0 +1,116 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon class="title-icon">add_circle</mat-icon>
+  <span>Nuevo Movimiento</span>
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="32"></mat-spinner>
+      <span>Cargando datos...</span>
+    </div>
+  } @else {
+    <div class="caja-info">
+      <mat-icon>account_balance_wallet</mat-icon>
+      <span>{{ cajaDisplayName }}</span>
+    </div>
+
+    <form [formGroup]="form" class="form-grid">
+      <!-- Tipo -->
+      <div class="form-row">
+        <app-select-field
+          label="Tipo"
+          formControlName="tipo"
+          [options]="tipoOptions"
+          optionValue="value"
+          optionLabel="label"
+          placeholder="Seleccionar tipo"
+          (selectionChange)="onTipoChange()">
+        </app-select-field>
+      </div>
+
+      <!-- Concepto -->
+      <div class="form-row">
+        <app-concepto-selector
+          [tipo]="selectedTipo"
+          [selected]="selectedConcepto"
+          (conceptoChange)="onConceptoChange($event)">
+        </app-concepto-selector>
+      </div>
+
+      <!-- Monto -->
+      <div class="form-row">
+        <app-number-field
+          label="Monto"
+          formControlName="monto"
+          placeholder="0.00"
+          [min]="0.01"
+          prefix="$">
+        </app-number-field>
+      </div>
+
+      <!-- Responsable -->
+      <div class="form-row">
+        <app-select-field
+          label="Responsable"
+          formControlName="responsableId"
+          [options]="personas()"
+          optionValue="id"
+          optionLabel="nombre"
+          placeholder="Seleccionar responsable">
+        </app-select-field>
+      </div>
+
+      <!-- Medio de Pago -->
+      <div class="form-row">
+        <app-select-field
+          label="Medio de Pago"
+          formControlName="medioPago"
+          [options]="medioPagoOptions"
+          optionValue="value"
+          optionLabel="label"
+          placeholder="Seleccionar medio">
+        </app-select-field>
+      </div>
+
+      <!-- Estado del Pago -->
+      <div class="form-row">
+        <app-select-field
+          label="Estado"
+          formControlName="estadoPago"
+          [options]="estadoPagoOptions"
+          optionValue="value"
+          optionLabel="label"
+          placeholder="Seleccionar estado">
+        </app-select-field>
+      </div>
+
+      <!-- Descripción -->
+      <div class="form-row full-width">
+        <app-textarea-field
+          label="Descripción (opcional)"
+          formControlName="descripcion"
+          placeholder="Notas adicionales..."
+          [rows]="2">
+        </app-textarea-field>
+      </div>
+    </form>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button
+    type="button"
+    class="btn-secondary"
+    (click)="onCancel()">
+    Cancelar
+  </button>
+  <button
+    type="submit"
+    class="btn-primary"
+    [disabled]="form.invalid || loading()"
+    (click)="onSubmit()">
+    <mat-icon>save</mat-icon>
+    Registrar
+  </button>
+</mat-dialog-actions>

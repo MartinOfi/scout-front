@@ -1,4 +1,14 @@
-<mat-card class="saldo-card" [class]="tipo()">
+<mat-card
+  class="saldo-card"
+  [class]="tipo()"
+  matRipple
+  tabindex="0"
+  role="button"
+  (click)="cardClick.emit()"
+  (keydown.enter)="cardClick.emit()"
+  (keydown.space)="cardClick.emit(); $event.preventDefault()"
+  [attr.aria-label]="'Ver movimientos de ' + nombre()"
+>
   <mat-card-content>
     <div class="saldo-info">
       <mat-icon class="saldo-icon">
@@ -10,6 +20,7 @@
           {{ saldo() | currency:'ARS':'symbol':'1.2-2' }}
         </span>
       </div>
+      <mat-icon class="saldo-chevron">chevron_right</mat-icon>
     </div>
   </mat-card-content>
 </mat-card>

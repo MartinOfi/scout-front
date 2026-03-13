@@ -1,0 +1,93 @@
+<div class="caja-drawer">
+  <!-- Header -->
+  <header class="drawer-header">
+    <div class="drawer-header__row">
+      @if (selectedCaja(); as caja) {
+        <div class="drawer-header__info">
+          <h2 class="caja-name">{{ caja.nombre || 'Caja de Grupo' }}</h2>
+          <p class="caja-saldo" [class.negative]="caja.saldo < 0">
+            {{ caja.saldo | currency:'ARS':'symbol':'1.0-0' }}
+          </p>
+        </div>
+      }
+      <button mat-icon-button class="drawer-close" (click)="onClose()" aria-label="Cerrar drawer">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </header>
+
+  <!-- Filter tabs -->
+  <div class="drawer-filters">
+    <mat-button-toggle-group
+      [value]="currentFilter()"
+      (change)="onFilterChange($event.value)"
+      aria-label="Filtrar movimientos"
+      class="filter-toggles"
+    >
+      <mat-button-toggle value="todos">Todos</mat-button-toggle>
+      <mat-button-toggle value="ingresos">Ingresos</mat-button-toggle>
+      <mat-button-toggle value="egresos">Egresos</mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+  <!-- Content -->
+  <div class="drawer-content">
+    @if (loading()) {
+      <div class="drawer-loading">
+        <mat-spinner diameter="40"></mat-spinner>
+        <span>Cargando movimientos...</span>
+      </div>
+    } @else {
+      @if (movimientos().length === 0) {
+        <div class="drawer-empty">
+          <div class="empty-icon-wrapper">
+            <mat-icon>receipt_long</mat-icon>
+          </div>
+          <p class="empty-title">Sin movimientos</p>
+          <p class="empty-description">
+            @if (currentFilter() === 'todos') {
+              Esta caja aún no tiene movimientos registrados.
+            } @else if (currentFilter() === 'ingresos') {
+              No hay ingresos registrados en esta caja.
+            } @else {
+              No hay egresos registrados en esta caja.
+            }
+          </p>
+          <button class="empty-cta" (click)="onRegistrarMovimiento()">
+            <mat-icon>add</mat-icon>
+            Registrar primer movimiento
+          </button>
+        </div>
+      } @else {
+        <ul class="movimientos-list">
+          @for (mov of movimientos(); track mov.id) {
+            <li class="movimiento-item" [class.ingreso]="mov.tipo === TipoMovimiento.INGRESO" [class.egreso]="mov.tipo === TipoMovimiento.EGRESO">
+              <div class="movimiento-item__icon">
+                <mat-icon>{{ mov.tipo === TipoMovimiento.INGRESO ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+              </div>
+              <div class="movimiento-item__content">
+                <span class="movimiento-concepto">{{ getConceptoLabel(mov.concepto) }}</span>
+                <span class="movimiento-fecha">{{ mov.fecha | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <div class="movimiento-item__monto" [class.positive]="mov.tipo === TipoMovimiento.INGRESO" [class.negative]="mov.tipo === TipoMovimiento.EGRESO">
+                {{ mov.tipo === TipoMovimiento.INGRESO ? '+' : '-' }}{{ mov.monto | currency:'ARS':'symbol':'1.0-0' }}
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    }
+  </div>
+
+  <!-- Footer actions -->
+  <footer class="drawer-footer">
+    <button mat-stroked-button class="btn-secondary" (click)="onVerTodos()">
+      <mat-icon>list_alt</mat-icon>
+      Ver todos
+    </button>
+    <button mat-flat-button color="primary" class="btn-primary" (click)="onRegistrarMovimiento()">
+      <mat-icon>add</mat-icon>
+      Registrar
+    </button>
+  </footer>
+</div>

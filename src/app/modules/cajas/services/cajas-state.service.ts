@@ -22,7 +22,10 @@ import {
   CreateCajaDto,
 } from '../../../shared/models';
 
-import { Rama, RamaEnum, CajaType } from '../../../shared/enums';
+import { Rama, RamaEnum, CajaType, TipoMovimientoEnum } from '../../../shared/enums';
+
+/** Filter type for drawer movimientos */
+export type MovimientoFilterType = 'todos' | 'ingresos' | 'egresos';
 import { CajasApiService } from './cajas-api.service';
 import { NotificationService } from '../../../shared/services';
 
@@ -55,6 +58,13 @@ export class CajasStateService {
   private readonly _error: WritableSignal<string | null> = signal(null);
   private readonly _selectedRama: WritableSignal<Rama | null> = signal(null);
 
+  // Drawer state signals
+  private readonly _selectedCaja: WritableSignal<CajaConSaldo | null> = signal(null);
+  private readonly _drawerOpen: WritableSignal<boolean> = signal(false);
+  private readonly _selectedCajaMovimientos: WritableSignal<Movimiento[]> = signal([]);
+  private readonly _selectedCajaLoading: WritableSignal<boolean> = signal(false);
+  private readonly _movimientosFilter: WritableSignal<MovimientoFilterType> = signal('todos');
+
   // ============================================================================
   // Public Readonly Signals
   // ============================================================================
@@ -69,6 +79,14 @@ export class CajasStateService {
   readonly consolidado: Signal<ConsolidadoSaldosResponse | null> = this._consolidado.asReadonly();
   readonly loading: Signal<boolean> = this._loading.asReadonly();
   readonly error: Signal<string | null> = this._error.asReadonly();
+
+  // Drawer public signals
+  readonly selectedCaja: Signal<CajaConSaldo | null> = this._selectedCaja.asReadonly();
+  readonly drawerOpen: Signal<boolean> = this._drawerOpen.asReadonly();
+  readonly selectedCajaMovimientos: Signal<Movimiento[]> =
+    this._selectedCajaMovimientos.asReadonly();
+  readonly selectedCajaLoading: Signal<boolean> = this._selectedCajaLoading.asReadonly();
+  readonly movimientosFilter: Signal<MovimientoFilterType> = this._movimientosFilter.asReadonly();
 
   // ============================================================================
   // Computed Signals (derived state)
@@ -144,6 +162,20 @@ export class CajasStateService {
 
   readonly totalSaldos = computed((): number => {
     return this.saldoGrupo() + this.totalSaldosRamas();
+  });
+
+  /** Filtered movimientos for drawer based on current filter */
+  readonly filteredSelectedCajaMovimientos = computed((): Movimiento[] => {
+    const movimientos = this._selectedCajaMovimientos();
+    const filter = this._movimientosFilter();
+
+    if (filter === 'todos') {
+      return movimientos;
+    }
+
+    const tipoFilter =
+      filter === 'ingresos' ? TipoMovimientoEnum.INGRESO : TipoMovimientoEnum.EGRESO;
+    return movimientos.filter((m) => m.tipo === tipoFilter);
   });
 
   // ============================================================================
@@ -483,5 +515,71 @@ export class CajasStateService {
     this._loading.set(false);
     this._error.set(null);
     this._selectedRama.set(null);
+    this.closeDrawer();
+  }
+
+  // ============================================================================
+  // Drawer Actions
+  // ============================================================================
+
+  /**
+   * Select a caja and open the drawer
+   * Loads movimientos for the selected caja
+   */
+  selectCaja(caja: CajaConSaldo): void {
+    this._selectedCaja.set(caja);
+    this._drawerOpen.set(true);
+    this._movimientosFilter.set('todos');
+    this.loadMovimientosForSelectedCaja(caja.id);
+  }
+
+  /**
+   * Close the drawer and clear selection
+   */
+  closeDrawer(): void {
+    this._drawerOpen.set(false);
+    this._selectedCaja.set(null);
+    this._selectedCajaMovimientos.set([]);
+    this._selectedCajaLoading.set(false);
+    this._movimientosFilter.set('todos');
+  }
+
+  /**
+   * Set the movimientos filter for the drawer
+   */
+  setMovimientosFilter(filter: MovimientoFilterType): void {
+    this._movimientosFilter.set(filter);
+  }
+
+  /**
+   * Load movimientos for the selected caja
+   */
+  private loadMovimientosForSelectedCaja(cajaId: string): void {
+    this._selectedCajaLoading.set(true);
+
+    this.apiService.getMovimientos(cajaId).subscribe({
+      next: (movimientos: Movimiento[]) => {
+        this._selectedCajaMovimientos.set(movimientos);
+        this._selectedCajaLoading.set(false);
+      },
+      error: (err: unknown) => {
+        const errorMsg =
+          err instanceof Error ? err.message : 'Error al cargar movimientos de la caja';
+        this._error.set(errorMsg);
+        this._selectedCajaLoading.set(false);
+        this.notificationService.showError(errorMsg);
+      },
+    });
+  }
+
+  /**
+   * Refresh movimientos for the currently selected caja
+   * Useful after registering a new movimiento
+   */
+  refreshSelectedCajaMovimientos(): void {
+    const selectedCaja = this._selectedCaja();
+    if (selectedCaja) {
+      this.loadMovimientosForSelectedCaja(selectedCaja.id);
+    }
   }
 }

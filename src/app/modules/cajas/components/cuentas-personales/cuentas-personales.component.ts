@@ -26,10 +26,11 @@ import { TableColumn, TableData, ActionEvent } from '../../../../shared/models/t
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    DataTableComponent
+    DataTableComponent,
   ],
   templateUrl: './cuentas-personales.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./cuentas-personales.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CuentasPersonalesComponent implements OnInit {
   private readonly cajasState = inject(CajasStateService);
@@ -39,28 +40,39 @@ export class CuentasPersonalesComponent implements OnInit {
   readonly loading = this.cajasState.loading;
 
   readonly tableData = computed((): TableData[] => {
-    return this.personasState.protagonistas().map(p => ({
+    return this.personasState.protagonistas().map((p) => ({
       id: p.id,
       nombre: p.nombre,
       rama: this.getRama(p),
-      saldo: 0 // TODO: Get actual balance from state
+      saldo: 0, // TODO: Get actual balance from state
     }));
   });
 
   readonly tableColumns: TableColumn[] = [
     { key: 'nombre', header: 'Nombre', type: 'text', sortable: true },
     { key: 'rama', header: 'Rama', type: 'status', sortable: true },
-    { key: 'saldo', header: 'Saldo', type: 'number', sortable: true,
-      formatter: (value: unknown) => `$${(value as number).toLocaleString('es-AR', { minimumFractionDigits: 2 })}` },
+    {
+      key: 'saldo',
+      header: 'Saldo',
+      type: 'number',
+      sortable: true,
+      formatter: (value: unknown) =>
+        `$${(value as number).toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
+    },
     {
       key: 'actions',
       header: 'Acciones',
       type: 'action',
       actions: [
-        { key: 'movements', label: 'Movimientos', icon: 'receipt_long', tooltip: 'Ver movimientos' },
-        { key: 'register', label: 'Registrar', icon: 'add', tooltip: 'Registrar movimiento' }
-      ]
-    }
+        {
+          key: 'movements',
+          label: 'Movimientos',
+          icon: 'receipt_long',
+          tooltip: 'Ver movimientos',
+        },
+        { key: 'register', label: 'Registrar', icon: 'add', tooltip: 'Registrar movimiento' },
+      ],
+    },
   ];
 
   ngOnInit(): void {
@@ -79,12 +91,12 @@ export class CuentasPersonalesComponent implements OnInit {
     switch (event.action) {
       case 'movements':
         this.router.navigate(['/movimientos'], {
-          queryParams: { personaId: id, tipo: 'personal' }
+          queryParams: { personaId: id, tipo: 'personal' },
         });
         break;
       case 'register':
         this.router.navigate(['/movimientos/nuevo'], {
-          queryParams: { personaId: id, tipo: 'personal' }
+          queryParams: { personaId: id, tipo: 'personal' },
         });
         break;
     }
