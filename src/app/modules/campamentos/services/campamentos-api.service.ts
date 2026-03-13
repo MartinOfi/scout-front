@@ -9,6 +9,7 @@ import {
   AddParticipanteDto,
   RegistrarPagoCampamentoDto,
   RegistrarGastoCampamentoDto,
+  UpdatePagoDto,
 } from '../../../shared/models';
 import { HttpService } from '../../../shared/services';
 import { API_CONFIG } from '../../../shared/constants';
@@ -43,37 +44,27 @@ export class CampamentosApiService {
    * Create a new campamento
    */
   create(dto: CreateCampamentoDto): Observable<Campamento> {
-    return this.http.post<Campamento, CreateCampamentoDto>(
-      this.endpoint,
-      dto
-    );
+    return this.http.post<Campamento, CreateCampamentoDto>(this.endpoint, dto);
   }
 
   /**
    * Update a campamento (PATCH)
    */
   update(id: string, dto: UpdateCampamentoDto): Observable<Campamento> {
-    return this.http.patch<Campamento, UpdateCampamentoDto>(
-      `${this.endpoint}/${id}`,
-      dto
-    );
+    return this.http.patch<Campamento, UpdateCampamentoDto>(`${this.endpoint}/${id}`, dto);
   }
 
   /**
    * Get financial summary of campamento
    */
-  getResumenFinanciero(
-    id: string
-  ): Observable<{
+  getResumenFinanciero(id: string): Observable<{
     totalEsperado: number;
     totalRecaudado: number;
     totalGastado: number;
     saldo: number;
     participantes: number;
   }> {
-    return this.http.get(
-      `${this.endpoint}/${id}/resumen-financiero`
-    );
+    return this.http.get(`${this.endpoint}/${id}/resumen-financiero`);
   }
 
   /**
@@ -81,21 +72,16 @@ export class CampamentosApiService {
    * PRD F12: Control de pagos por participante
    */
   getPagosPorParticipante(id: string): Observable<PagoParticipante[]> {
-    return this.http.get<PagoParticipante[]>(
-      `${this.endpoint}/${id}/pagos-por-participante`
-    );
+    return this.http.get<PagoParticipante[]>(`${this.endpoint}/${id}/pagos-por-participante`);
   }
 
   /**
    * Add a participant to campamento
    */
-  addParticipante(
-    campamentoId: string,
-    dto: AddParticipanteDto
-  ): Observable<Campamento> {
+  addParticipante(campamentoId: string, dto: AddParticipanteDto): Observable<Campamento> {
     return this.http.post<Campamento, AddParticipanteDto>(
       `${this.endpoint}/${campamentoId}/participantes`,
-      dto
+      dto,
     );
   }
 
@@ -104,34 +90,47 @@ export class CampamentosApiService {
    */
   removeParticipante(campamentoId: string, personaId: string): Observable<Campamento> {
     return this.http.delete<Campamento>(
-      `${this.endpoint}/${campamentoId}/participantes/${personaId}`
+      `${this.endpoint}/${campamentoId}/participantes/${personaId}`,
     );
   }
 
   /**
    * Register a payment for campamento
    */
-  registrarPago(
-    campamentoId: string,
-    dto: RegistrarPagoCampamentoDto
-  ): Observable<void> {
+  registrarPago(campamentoId: string, dto: RegistrarPagoCampamentoDto): Observable<void> {
     return this.http.post<void, RegistrarPagoCampamentoDto>(
       `${this.endpoint}/${campamentoId}/pagos`,
-      dto
+      dto,
     );
   }
 
   /**
    * Register an expense for campamento
    */
-  registrarGasto(
-    campamentoId: string,
-    dto: RegistrarGastoCampamentoDto
-  ): Observable<void> {
+  registrarGasto(campamentoId: string, dto: RegistrarGastoCampamentoDto): Observable<void> {
     return this.http.post<void, RegistrarGastoCampamentoDto>(
       `${this.endpoint}/${campamentoId}/gastos`,
-      dto
+      dto,
     );
+  }
+
+  /**
+   * Update an existing payment (movimiento)
+   * PATCH /api/v1/campamentos/:id/pagos/:movimientoId
+   */
+  updatePago(campamentoId: string, movimientoId: string, dto: UpdatePagoDto): Observable<void> {
+    return this.http.patch<void, UpdatePagoDto>(
+      `${this.endpoint}/${campamentoId}/pagos/${movimientoId}`,
+      dto,
+    );
+  }
+
+  /**
+   * Delete an existing payment (movimiento)
+   * DELETE /api/v1/campamentos/:id/pagos/:movimientoId
+   */
+  deletePago(campamentoId: string, movimientoId: string): Observable<void> {
+    return this.http.delete<void>(`${this.endpoint}/${campamentoId}/pagos/${movimientoId}`);
   }
 
   /**

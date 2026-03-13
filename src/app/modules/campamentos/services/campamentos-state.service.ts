@@ -17,6 +17,7 @@ import {
   AddParticipanteDto,
   RegistrarPagoCampamentoDto,
   RegistrarGastoCampamentoDto,
+  UpdatePagoDto,
 } from '../../../shared/models';
 
 import { CampamentosApiService } from './campamentos-api.service';
@@ -34,7 +35,8 @@ export class CampamentosStateService {
   // ============================================================================
 
   private readonly _campamentos: WritableSignal<Campamento[]> = signal([]);
-  private readonly _pagosPorParticipante: WritableSignal<Record<string, PagoParticipante[]>> = signal({});
+  private readonly _pagosPorParticipante: WritableSignal<Record<string, PagoParticipante[]>> =
+    signal({});
   private readonly _loading: WritableSignal<boolean> = signal(false);
   private readonly _error: WritableSignal<string | null> = signal(null);
   private readonly _selectedId: WritableSignal<string | null> = signal(null);
@@ -44,7 +46,8 @@ export class CampamentosStateService {
   // ============================================================================
 
   readonly campamentos: Signal<Campamento[]> = this._campamentos.asReadonly();
-  readonly pagosPorParticipante: Signal<Record<string, PagoParticipante[]>> = this._pagosPorParticipante.asReadonly();
+  readonly pagosPorParticipante: Signal<Record<string, PagoParticipante[]>> =
+    this._pagosPorParticipante.asReadonly();
   readonly loading: Signal<boolean> = this._loading.asReadonly();
   readonly error: Signal<string | null> = this._error.asReadonly();
 
@@ -104,7 +107,7 @@ export class CampamentosStateService {
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
-      finalize(() => this._loading.set(false))
+      finalize(() => this._loading.set(false)),
     );
   }
 
@@ -117,9 +120,7 @@ export class CampamentosStateService {
 
     return this.apiService.update(id, dto).pipe(
       tap((campamento: Campamento) => {
-        this._campamentos.update((prev) =>
-          prev.map((c) => (c.id === id ? campamento : c))
-        );
+        this._campamentos.update((prev) => prev.map((c) => (c.id === id ? campamento : c)));
         this.notificationService.showSuccess('Campamento actualizado exitosamente');
       }),
       catchError((err: unknown) => {
@@ -128,7 +129,7 @@ export class CampamentosStateService {
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
-      finalize(() => this._loading.set(false))
+      finalize(() => this._loading.set(false)),
     );
   }
 
@@ -142,7 +143,7 @@ export class CampamentosStateService {
     return this.apiService.addParticipante(campamentoId, dto).pipe(
       tap((campamento: Campamento) => {
         this._campamentos.update((prev) =>
-          prev.map((c) => (c.id === campamentoId ? campamento : c))
+          prev.map((c) => (c.id === campamentoId ? campamento : c)),
         );
         this.notificationService.showSuccess('Participante agregado exitosamente');
       }),
@@ -152,7 +153,7 @@ export class CampamentosStateService {
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
-      finalize(() => this._loading.set(false))
+      finalize(() => this._loading.set(false)),
     );
   }
 
@@ -166,7 +167,7 @@ export class CampamentosStateService {
     return this.apiService.removeParticipante(campamentoId, personaId).pipe(
       tap((campamento: Campamento) => {
         this._campamentos.update((prev) =>
-          prev.map((c) => (c.id === campamentoId ? campamento : c))
+          prev.map((c) => (c.id === campamentoId ? campamento : c)),
         );
         this.notificationService.showSuccess('Participante removido exitosamente');
       }),
@@ -176,7 +177,7 @@ export class CampamentosStateService {
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
-      finalize(() => this._loading.set(false))
+      finalize(() => this._loading.set(false)),
     );
   }
 
@@ -197,7 +198,7 @@ export class CampamentosStateService {
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
-      finalize(() => this._loading.set(false))
+      finalize(() => this._loading.set(false)),
     );
   }
 
@@ -218,7 +219,53 @@ export class CampamentosStateService {
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
-      finalize(() => this._loading.set(false))
+      finalize(() => this._loading.set(false)),
+    );
+  }
+
+  /**
+   * Actualizar un pago existente
+   * PATCH /api/v1/campamentos/:id/pagos/:movimientoId
+   */
+  updatePago(campamentoId: string, movimientoId: string, dto: UpdatePagoDto): Observable<void> {
+    this._loading.set(true);
+    this._error.set(null);
+
+    return this.apiService.updatePago(campamentoId, movimientoId, dto).pipe(
+      tap(() => {
+        this.loadPagosPorParticipante(campamentoId);
+        this.notificationService.showSuccess('Pago actualizado exitosamente');
+      }),
+      catchError((err: unknown) => {
+        const errorMsg = err instanceof Error ? err.message : 'Error al actualizar pago';
+        this._error.set(errorMsg);
+        this.notificationService.showError(errorMsg);
+        return throwError(() => err);
+      }),
+      finalize(() => this._loading.set(false)),
+    );
+  }
+
+  /**
+   * Eliminar un pago existente
+   * DELETE /api/v1/campamentos/:id/pagos/:movimientoId
+   */
+  deletePago(campamentoId: string, movimientoId: string): Observable<void> {
+    this._loading.set(true);
+    this._error.set(null);
+
+    return this.apiService.deletePago(campamentoId, movimientoId).pipe(
+      tap(() => {
+        this.loadPagosPorParticipante(campamentoId);
+        this.notificationService.showSuccess('Pago eliminado exitosamente');
+      }),
+      catchError((err: unknown) => {
+        const errorMsg = err instanceof Error ? err.message : 'Error al eliminar pago';
+        this._error.set(errorMsg);
+        this.notificationService.showError(errorMsg);
+        return throwError(() => err);
+      }),
+      finalize(() => this._loading.set(false)),
     );
   }
 
