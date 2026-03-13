@@ -1,20 +1,31 @@
-<div class="scout-field">
-  <label class="scout-label" [for]="'email-input'">
+<div class="scout-field" [class.scout-field--focused]="focused()" [class.scout-field--error]="hasError" [class.scout-field--disabled]="disabled()">
+  <label class="scout-label" for="email-input">
     {{ label() }}
     @if (required()) {
       <span class="scout-required">*</span>
     }
   </label>
-  <input
-    [id]="'email-input'"
-    type="email"
-    [placeholder]="placeholder()"
-    [required]="required()"
-    [disabled]="disabled"
-    autocomplete="email"
-    [value]="value"
-    (input)="onInput($event)"
-    (blur)="onBlur()"
-    class="scout-input"
-  />
+  <div class="scout-input-wrapper">
+    @if (icon()) {
+      <mat-icon class="scout-input-icon" [class.scout-input-icon--focused]="focused()">{{ icon() }}</mat-icon>
+    }
+    <input
+      id="email-input"
+      type="email"
+      [placeholder]="placeholder()"
+      [required]="required()"
+      [disabled]="disabled()"
+      autocomplete="email"
+      [value]="value()"
+      (input)="onInput($event)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      class="scout-input"
+      [class.scout-input--with-icon]="icon()"
+      [class.scout-input--error]="hasError"
+    />
+  </div>
+  @if (currentError) {
+    <span class="scout-error">{{ currentError }}</span>
+  }
 </div>

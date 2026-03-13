@@ -1,0 +1,109 @@
+// =============================================================================
+// Color Tokens - Semantic color system using OKLCH
+// =============================================================================
+// OKLCH provides perceptually uniform colors that work better for accessibility
+// and dark mode transitions. These tokens extend the base palette in styles.scss.
+
+:root {
+  // ---------------------------------------------------------------------------
+  // Semantic Status Colors (OKLCH for perceptual uniformity)
+  // ---------------------------------------------------------------------------
+  --color-success: oklch(65% 0.18 145);
+  --color-success-light: oklch(92% 0.05 145);
+  --color-success-subtle: oklch(96% 0.02 145);
+
+  --color-danger: oklch(55% 0.22 25);
+  --color-danger-light: oklch(90% 0.06 25);
+  --color-danger-subtle: oklch(96% 0.02 25);
+
+  --color-warning: oklch(75% 0.15 85);
+  --color-warning-light: oklch(92% 0.05 85);
+  --color-warning-subtle: oklch(96% 0.02 85);
+
+  --color-info: oklch(60% 0.15 250);
+  --color-info-light: oklch(92% 0.04 250);
+  --color-info-subtle: oklch(96% 0.02 250);
+
+  // ---------------------------------------------------------------------------
+  // Rama Colors (Scout branch identity)
+  // ---------------------------------------------------------------------------
+  // Each rama has a distinctive color that's used consistently across the app
+  --color-rama-manada: oklch(72% 0.18 70);      // Warm orange-yellow
+  --color-rama-manada-light: oklch(92% 0.06 70);
+  --color-rama-manada-icon: oklch(65% 0.2 70);
+
+  --color-rama-unidad: oklch(62% 0.18 145);     // Scout green
+  --color-rama-unidad-light: oklch(92% 0.05 145);
+  --color-rama-unidad-icon: oklch(55% 0.2 145);
+
+  --color-rama-caminantes: oklch(60% 0.15 250); // Blue
+  --color-rama-caminantes-light: oklch(92% 0.04 250);
+  --color-rama-caminantes-icon: oklch(52% 0.18 250);
+
+  --color-rama-rovers: oklch(55% 0.18 310);     // Purple
+  --color-rama-rovers-light: oklch(92% 0.05 310);
+  --color-rama-rovers-icon: oklch(48% 0.2 310);
+
+  // ---------------------------------------------------------------------------
+  // Surface Colors (for cards, backgrounds)
+  // ---------------------------------------------------------------------------
+  --surface-primary: oklch(100% 0 0);
+  --surface-secondary: oklch(98% 0.002 250);
+  --surface-tertiary: oklch(96% 0.004 250);
+  --surface-elevated: oklch(100% 0 0);
+
+  // ---------------------------------------------------------------------------
+  // Text Colors
+  // ---------------------------------------------------------------------------
+  --text-primary: oklch(20% 0.01 250);
+  --text-secondary: oklch(40% 0.01 250);
+  --text-muted: oklch(55% 0.01 250);
+  --text-on-dark: oklch(98% 0 0);
+  --text-on-primary: oklch(100% 0 0);
+
+  // ---------------------------------------------------------------------------
+  // Border Colors
+  // ---------------------------------------------------------------------------
+  --border-light: oklch(92% 0.004 250);
+  --border-default: oklch(88% 0.006 250);
+  --border-strong: oklch(80% 0.01 250);
+
+  // ---------------------------------------------------------------------------
+  // Shadow Tokens (consistent depth)
+  // ---------------------------------------------------------------------------
+  --shadow-xs: 0 1px 2px oklch(0% 0 0 / 0.04);
+  --shadow-sm: 0 1px 3px oklch(0% 0 0 / 0.06), 0 1px 2px oklch(0% 0 0 / 0.04);
+  --shadow-md: 0 4px 6px oklch(0% 0 0 / 0.06), 0 2px 4px oklch(0% 0 0 / 0.04);
+  --shadow-lg: 0 10px 15px oklch(0% 0 0 / 0.08), 0 4px 6px oklch(0% 0 0 / 0.04);
+  --shadow-xl: 0 20px 25px oklch(0% 0 0 / 0.1), 0 8px 10px oklch(0% 0 0 / 0.04);
+
+  // ---------------------------------------------------------------------------
+  // Interactive States
+  // ---------------------------------------------------------------------------
+  --hover-overlay: oklch(0% 0 0 / 0.04);
+  --active-overlay: oklch(0% 0 0 / 0.08);
+  --focus-ring: oklch(60% 0.2 250 / 0.4);
+}
+
+// =============================================================================
+// Dark Mode Overrides (future-ready)
+// =============================================================================
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface-primary: oklch(18% 0.01 250);
+    --surface-secondary: oklch(22% 0.01 250);
+    --surface-tertiary: oklch(26% 0.01 250);
+    --surface-elevated: oklch(24% 0.015 250);
+
+    --text-primary: oklch(95% 0 0);
+    --text-secondary: oklch(75% 0.005 250);
+    --text-muted: oklch(60% 0.005 250);
+
+    --border-light: oklch(30% 0.01 250);
+    --border-default: oklch(35% 0.01 250);
+    --border-strong: oklch(45% 0.015 250);
+
+    --hover-overlay: oklch(100% 0 0 / 0.06);
+    --active-overlay: oklch(100% 0 0 / 0.1);
+  }
+}

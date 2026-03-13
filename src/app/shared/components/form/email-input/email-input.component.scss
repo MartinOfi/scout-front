@@ -4,3 +4,46 @@
   display: block;
   width: 100%;
 }
+
+.scout-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.scout-input-icon {
+  position: absolute;
+  left: $input-padding-x;
+  top: 50%;
+  transform: translateY(-50%);
+  color: $stone-400;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  transition: color $transition-fast;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &--focused {
+    color: $brand-burgundy;
+  }
+}
+
+.scout-input--with-icon {
+  padding-left: calc($input-padding-x + 20px + 12px) !important; // icon position + icon width + gap
+}
+
+.scout-field--focused {
+  .scout-input-icon {
+    color: $brand-burgundy;
+  }
+}
+
+.scout-field--error {
+  .scout-input-icon {
+    color: $color-error;
+  }
+}

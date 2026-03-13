@@ -1,18 +1,88 @@
-<div class="login-container">
-  <mat-card class="login-card">
-    <mat-card-header>
-      <mat-card-title>Iniciar Sesión</mat-card-title>
-      <mat-card-subtitle>Sistema de Gestión Financiera Scout</mat-card-subtitle>
-    </mat-card-header>
+<div class="login-page">
+  <!-- Hero Section (Left) -->
+  <section class="hero-section">
+    <div class="hero-background"></div>
+    <div class="hero-content">
+      <!-- Animated Logo -->
+      <div class="logo-container">
+        <div class="logo-placeholder">
+          <span class="logo-icon">⚜</span>
+        </div>
+      </div>
 
-    <mat-card-content>
-      <!-- Future: Add form fields here -->
-    </mat-card-content>
+      <!-- Animated Gradient Title -->
+      <h1 class="hero-title">Scout Finanzas</h1>
 
-    <mat-card-actions align="end">
-      <button mat-raised-button color="primary" class="login-button" (click)="onLogin()">
-        Ingresar
-      </button>
-    </mat-card-actions>
-  </mat-card>
+      <!-- Shiny Tagline -->
+      <p class="hero-tagline">Sistema de Gestión Financiera</p>
+
+      <!-- SEO Description -->
+      <div class="hero-description">
+        <p>
+          Administra las finanzas de tu grupo scout de manera simple y
+          transparente. Gestiona inscripciones, cuotas mensuales, campamentos y
+          eventos en un solo lugar.
+        </p>
+        <ul class="feature-list">
+          <li>Control de cajas y fondos por rama</li>
+          <li>Seguimiento de inscripciones Scout Argentina</li>
+          <li>Gestión de cuotas y pagos</li>
+          <li>Reportes financieros detallados</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Login Form Section (Right) -->
+  <section class="form-section">
+    <div class="form-container">
+      <!-- Form Card with Border Beam -->
+      <div class="form-card">
+        <h2 class="form-title">Iniciar Sesión</h2>
+        <p class="form-subtitle">Ingresa tus credenciales para continuar</p>
+
+        <!-- Error Message -->
+        @if (errorMessage()) {
+        <div class="error-alert" role="alert">
+          <mat-icon>error_outline</mat-icon>
+          <span>{{ errorMessage() }}</span>
+        </div>
+        }
+
+        <!-- Login Form -->
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+          <!-- Email Field -->
+          <app-email-input formControlName="email" [required]="true"></app-email-input>
+
+          <!-- Password Field -->
+          <app-password-input formControlName="password" [required]="true"></app-password-input>
+
+          <!-- Submit Button with Shimmer Effect -->
+          <button mat-raised-button type="submit" class="submit-button" [disabled]="isLoading()">
+            @if (isLoading()) {
+            <mat-spinner diameter="20"></mat-spinner>
+            <span>Ingresando...</span>
+            } @else {
+            <ng-container>
+              <span>Ingresar</span>
+              <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+            </ng-container>
+            }
+          </button>
+        </form>
+
+        <!-- Footer Links -->
+        <div class="form-footer">
+          <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+        </div>
+      </div>
+
+      <!-- Scout Branding Footer -->
+      <p class="scout-footer">
+        <span>Scouts de Argentina</span>
+        <span class="separator">•</span>
+        <span>Grupo Scout Santa Fe</span>
+      </p>
+    </div>
+  </section>
 </div>
