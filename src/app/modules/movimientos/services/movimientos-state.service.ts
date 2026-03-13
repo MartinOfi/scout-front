@@ -14,6 +14,7 @@ import {
   UpdateMovimientoDto,
   MovimientosFilters,
   ReembolsoPendiente,
+  PaginationMeta,
 } from '../../../shared/models';
 
 import { MovimientosApiService } from './movimientos-api.service';
@@ -38,15 +39,43 @@ export class MovimientosStateService {
   private readonly _error: WritableSignal<string | null> = signal(null);
   private readonly _selectedId: WritableSignal<string | null> = signal(null);
 
+  // Pagination Signals
+  private readonly _currentPage: WritableSignal<number> = signal(1);
+  private readonly _pageSize: WritableSignal<number> = signal(25);
+  private readonly _totalItems: WritableSignal<number> = signal(0);
+  private readonly _paginationMeta: WritableSignal<PaginationMeta | null> = signal(null);
+
   // ============================================================================
   // Public Readonly Signals
   // ============================================================================
 
   readonly movimientos: Signal<Movimiento[]> = this._movimientos.asReadonly();
-  readonly reembolsosPendientes: Signal<ReembolsoPendiente[]> = this._reembolsosPendientes.asReadonly();
+  readonly reembolsosPendientes: Signal<ReembolsoPendiente[]> =
+    this._reembolsosPendientes.asReadonly();
   readonly filters: Signal<MovimientosFilters> = this._filters.asReadonly();
   readonly loading: Signal<boolean> = this._loading.asReadonly();
   readonly error: Signal<string | null> = this._error.asReadonly();
+
+  // Pagination Readonly Signals
+  readonly currentPage: Signal<number> = this._currentPage.asReadonly();
+  readonly pageSize: Signal<number> = this._pageSize.asReadonly();
+  readonly totalItems: Signal<number> = this._totalItems.asReadonly();
+  readonly paginationMeta: Signal<PaginationMeta | null> = this._paginationMeta.asReadonly();
+
+  // Pagination Computed Signals
+  readonly totalPages = computed((): number => {
+    const total = this._totalItems();
+    const size = this._pageSize();
+    return size > 0 ? Math.ceil(total / size) : 0;
+  });
+
+  readonly hasNextPage = computed((): boolean => {
+    return this._currentPage() < this.totalPages();
+  });
+
+  readonly hasPreviousPage = computed((): boolean => {
+    return this._currentPage() > 1;
+  });
 
   // ============================================================================
   // Computed Signals (derived state)
@@ -141,7 +170,7 @@ export class MovimientosStateService {
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
-      finalize(() => this._loading.set(false))
+      finalize(() => this._loading.set(false)),
     );
   }
 
@@ -154,9 +183,7 @@ export class MovimientosStateService {
 
     return this.apiService.update(id, dto).pipe(
       tap((movimiento: Movimiento) => {
-        this._movimientos.update((prev) =>
-          prev.map((m) => (m.id === id ? movimiento : m))
-        );
+        this._movimientos.update((prev) => prev.map((m) => (m.id === id ? movimiento : m)));
         this.notificationService.showSuccess('Movimiento actualizado exitosamente');
       }),
       catchError((err: unknown) => {
@@ -165,7 +192,7 @@ export class MovimientosStateService {
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
-      finalize(() => this._loading.set(false))
+      finalize(() => this._loading.set(false)),
     );
   }
 
@@ -187,7 +214,7 @@ export class MovimientosStateService {
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
-      finalize(() => this._loading.set(false))
+      finalize(() => this._loading.set(false)),
     );
   }
 
@@ -221,31 +248,26 @@ export class MovimientosStateService {
     descripcion: string,
     responsableId: string,
     medioPago: MedioPago,
-    estadoPago: EstadoPago
+    estadoPago: EstadoPago,
   ): Observable<Movimiento> {
     this._loading.set(true);
     this._error.set(null);
 
-    return this.apiService.registrarGastoGeneral(
-      cajaId,
-      monto,
-      descripcion,
-      responsableId,
-      medioPago,
-      estadoPago
-    ).pipe(
-      tap((movimiento: Movimiento) => {
-        this._movimientos.update((prev) => [...prev, movimiento]);
-        this.notificationService.showSuccess('Gasto general registrado exitosamente');
-      }),
-      catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al registrar gasto';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
-        return throwError(() => err);
-      }),
-      finalize(() => this._loading.set(false))
-    );
+    return this.apiService
+      .registrarGastoGeneral(cajaId, monto, descripcion, responsableId, medioPago, estadoPago)
+      .pipe(
+        tap((movimiento: Movimiento) => {
+          this._movimientos.update((prev) => [...prev, movimiento]);
+          this.notificationService.showSuccess('Gasto general registrado exitosamente');
+        }),
+        catchError((err: unknown) => {
+          const errorMsg = err instanceof Error ? err.message : 'Error al registrar gasto';
+          this._error.set(errorMsg);
+          this.notificationService.showError(errorMsg);
+          return throwError(() => err);
+        }),
+        finalize(() => this._loading.set(false)),
+      );
   }
 
   /**
@@ -269,6 +291,91 @@ export class MovimientosStateService {
     this._selectedId.set(id);
   }
 
+  // ============================================================================
+  // Pagination Actions
+  // ============================================================================
+
+  /**
+   * Cargar una página específica con filtros (server-side pagination)
+   */
+  loadPage(page: number = 1, filters?: MovimientosFilters): void {
+    this._loading.set(true);
+    this._error.set(null);
+
+    const activeFilters = filters ?? this._filters();
+
+    this.apiService.getPaginated({ page, limit: this._pageSize() }, activeFilters).subscribe({
+      next: (response) => {
+        this._movimientos.set(response.data);
+        this._paginationMeta.set(response.meta);
+        this._currentPage.set(response.meta.page);
+        this._totalItems.set(response.meta.total);
+        this._loading.set(false);
+      },
+      error: (err: unknown) => {
+        const errorMsg = err instanceof Error ? err.message : 'Error al cargar movimientos';
+        this._error.set(errorMsg);
+        this._loading.set(false);
+        this.notificationService.showError(errorMsg);
+      },
+    });
+  }
+
+  /**
+   * Navegar a una página específica
+   */
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages()) {
+      return;
+    }
+    this.loadPage(page);
+  }
+
+  /**
+   * Ir a la página siguiente
+   */
+  nextPage(): void {
+    if (this.hasNextPage()) {
+      this.goToPage(this._currentPage() + 1);
+    }
+  }
+
+  /**
+   * Ir a la página anterior
+   */
+  previousPage(): void {
+    if (this.hasPreviousPage()) {
+      this.goToPage(this._currentPage() - 1);
+    }
+  }
+
+  /**
+   * Cambiar el tamaño de página y recargar desde la primera página
+   */
+  setPageSize(size: number): void {
+    if (size <= 0 || size > 100) {
+      return;
+    }
+    this._pageSize.set(size);
+    this.loadPage(1);
+  }
+
+  /**
+   * Aplicar filtros y recargar desde la primera página
+   */
+  applyFilters(filters: MovimientosFilters): void {
+    this._filters.set(filters);
+    this.loadPage(1, filters);
+  }
+
+  /**
+   * Limpiar filtros y recargar desde la primera página
+   */
+  resetFilters(): void {
+    this._filters.set({});
+    this.loadPage(1, {});
+  }
+
   /**
    * Limpiar estado
    */
@@ -279,5 +386,10 @@ export class MovimientosStateService {
     this._loading.set(false);
     this._error.set(null);
     this._selectedId.set(null);
+    // Reset pagination
+    this._currentPage.set(1);
+    this._pageSize.set(25);
+    this._totalItems.set(0);
+    this._paginationMeta.set(null);
   }
 }

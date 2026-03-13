@@ -3,15 +3,22 @@
   [forId]="'concepto-select'"
   [required]="true"
 >
-  <select
-    id="concepto-select"
-    class="scout-select"
-    [value]="selected()"
-    (change)="onSelectChange($event)"
-  >
-    <option value="">Seleccionar concepto</option>
-    @for (concepto of conceptosFiltrados(); track concepto) {
-      <option [value]="concepto">{{ conceptoLabels[concepto] }}</option>
-    }
-  </select>
+  <div class="scout-select-wrapper">
+    <select
+      id="concepto-select"
+      class="scout-select"
+      [value]="selected()"
+      (change)="onSelectChange($event)"
+    >
+      <option value="">Seleccionar concepto</option>
+      @for (concepto of conceptosFiltrados(); track concepto) {
+        <option [value]="concepto">{{ conceptoLabels[concepto] }}</option>
+      }
+    </select>
+    <span class="scout-select-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </span>
+  </div>
 </app-form-field>

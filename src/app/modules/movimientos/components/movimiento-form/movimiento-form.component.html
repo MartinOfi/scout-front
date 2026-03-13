@@ -1,113 +1,60 @@
 <div class="payment-page">
   <div class="payment-container">
 
-    <!-- Inscripción Context Card (when paying for inscription) -->
-    @if (inscripcion(); as insc) {
-    <section class="context-card" aria-labelledby="context-heading">
-      <!-- Back link -->
-      <button type="button" class="context-back" (click)="onCancel()" aria-label="Volver al detalle de inscripción">
-        <mat-icon aria-hidden="true">arrow_back</mat-icon>
-        <span>Volver a inscripción</span>
-      </button>
-
-      <!-- Identity row -->
-      <div class="context-identity">
-        <div class="context-avatar" aria-hidden="true">
-          {{ (insc.persona?.nombre ?? 'X')[0] }}
-        </div>
-        <div class="context-info">
-          <h2 id="context-heading" class="context-name">{{ insc.persona?.nombre ?? 'Sin nombre' }}</h2>
-          <p class="context-meta">
-            {{ tipoInscripcionLabels[insc.tipo] }} · {{ insc.ano }}
-          </p>
-        </div>
-      </div>
-
-      <!-- Payment progress -->
-      <div class="context-payment">
-        <div class="context-amounts">
-          <div class="context-amount context-amount--pending">
-            <span class="context-amount__label">Saldo pendiente</span>
-            <span class="context-amount__value">
-              {{ insc.saldoPendiente | currency:'ARS':'symbol':'1.0-0' }}
-            </span>
-          </div>
-          <div class="context-amount">
-            <span class="context-amount__label">Pagado</span>
-            <span class="context-amount__value context-amount__value--success">
-              {{ insc.montoPagado | currency:'ARS':'symbol':'1.0-0' }}
-            </span>
-          </div>
-          <div class="context-amount">
-            <span class="context-amount__label">Total</span>
-            <span class="context-amount__value">
-              {{ montoAPagar() | currency:'ARS':'symbol':'1.0-0' }}
-            </span>
-          </div>
-        </div>
-
-        <!-- Progress bar -->
-        <div class="context-progress" role="progressbar" [attr.aria-valuenow]="progressPercent()" aria-valuemin="0"
-          aria-valuemax="100" [attr.aria-label]="progressPercent() + '% del pago completado'">
-          <div class="context-progress__bar">
-            <div class="context-progress__fill" [ngClass]="progressClass()" [style.width.%]="progressPercent()">
-            </div>
-          </div>
-          <span class="context-progress__label">{{ progressPercent() }}% completado</span>
-        </div>
-      </div>
-    </section>
-    }
+    <!-- Loading State -->
+    @if (loadingData()) {
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Cargando datos...</p>
+    </div>
+    } @else {
 
     <!-- Form Card -->
     <div class="form-card">
       <!-- Header -->
       <header class="form-header">
-        @if (inscripcion()) {
-        <h1 class="form-title">Registrar Pago</h1>
-        <p class="form-subtitle">Completá los datos del pago de inscripción</p>
-        } @else {
         <h1 class="form-title">
           <mat-icon aria-hidden="true">receipt_long</mat-icon>
-          {{ isEditing ? 'Editar' : 'Nuevo' }} Movimiento
+          {{ isEditing() ? 'Editar' : 'Nuevo' }} Movimiento
         </h1>
-        <p class="form-subtitle">Registra un ingreso o egreso en la caja</p>
-        }
+        <p class="form-subtitle">
+          {{ isEditing() ? 'Modifica los datos editables del movimiento' : 'Registra un ingreso o egreso en la caja' }}
+        </p>
       </header>
 
       <!-- Form Content -->
       <div class="form-body">
         <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
-          <!-- Quick amount fill (when inscripcion context) -->
-          @if (inscripcion(); as insc) {
-          @if (insc.saldoPendiente > 0) {
-          <div class="quick-amount">
-            <button type="button" class="quick-amount__btn" (click)="fillPendingAmount()"
-              [class.quick-amount__btn--active]="form.get('monto')?.value === insc.saldoPendiente">
-              <mat-icon aria-hidden="true">bolt</mat-icon>
-              Pagar saldo completo
-              <span class="quick-amount__value">{{ insc.saldoPendiente | currency:'ARS':'symbol':'1.0-0' }}</span>
-            </button>
-          </div>
-          }
-          }
+          <!-- CREATE MODE: Full form -->
+          @if (!isEditing()) {
+
+          <!-- Caja Selector (CRITICAL - was missing!) -->
+          <app-form-field label="Caja" [forId]="'caja-select'" [required]="true"
+            [invalid]="!!(form.get('cajaId')?.invalid && form.get('cajaId')?.touched)">
+            <app-select-field
+              id="caja-select"
+              formControlName="cajaId"
+              placeholder="Seleccionar caja"
+              [options]="cajas()"
+              optionValue="id"
+              optionLabel="nombre"
+              [searchable]="true" />
+            <span error>La caja es requerida</span>
+          </app-form-field>
 
           <div class="form-row">
-            <!-- Tipo (hidden when inscripcion - always INGRESO) -->
-            @if (!inscripcion()) {
+            <!-- Tipo -->
             <app-form-field label="Tipo" [forId]="'tipo-select'" [required]="true"
               [invalid]="!!(form.get('tipo')?.invalid && form.get('tipo')?.touched)">
               <app-select-field id="tipo-select" formControlName="tipo" placeholder="Seleccionar tipo"
                 [options]="tipoOptions" optionValue="value" optionLabel="label" />
               <span error>El tipo es requerido</span>
             </app-form-field>
-            }
 
             <!-- Monto -->
-            <app-form-field label="Monto a pagar" [forId]="'monto-input'" [required]="true"
-              [invalid]="!!(form.get('monto')?.invalid && form.get('monto')?.touched)"
-              [class.form-field--full]="inscripcion()">
+            <app-form-field label="Monto" [forId]="'monto-input'" [required]="true"
+              [invalid]="!!(form.get('monto')?.invalid && form.get('monto')?.touched)">
               <div class="input-with-prefix">
                 <span class="input-prefix">$</span>
                 <app-number-field id="monto-input" formControlName="monto" [min]="0" [step]="0.01" placeholder="0.00" />
@@ -116,12 +63,24 @@
             </app-form-field>
           </div>
 
-          <!-- Concepto (hidden when inscripcion - pre-selected) -->
-          @if (!inscripcion()) {
+          <!-- Concepto -->
           <app-concepto-selector [tipo]="form.get('tipo')?.value" [selected]="form.get('concepto')?.value"
             (conceptoChange)="onConceptoChange($event)">
           </app-concepto-selector>
-          }
+
+          <!-- Responsable Selector (CRITICAL - was missing!) -->
+          <app-form-field label="Responsable" [forId]="'responsable-select'" [required]="true"
+            [invalid]="!!(form.get('responsableId')?.invalid && form.get('responsableId')?.touched)">
+            <app-select-field
+              id="responsable-select"
+              formControlName="responsableId"
+              placeholder="Seleccionar responsable"
+              [options]="personas()"
+              optionValue="id"
+              optionLabel="nombre"
+              [searchable]="true" />
+            <span error>El responsable es requerido</span>
+          </app-form-field>
 
           <div class="form-row">
             <!-- Medio de Pago -->
@@ -146,24 +105,84 @@
               placeholder="Notas adicionales (opcional)" />
           </app-form-field>
 
+          <!-- Estado de Pago -->
+          <app-form-field label="Estado de Pago" [forId]="'estado-pago-select'" [required]="true"
+            [invalid]="!!(form.get('estadoPago')?.invalid && form.get('estadoPago')?.touched)">
+            <app-select-field id="estado-pago-select" formControlName="estadoPago" placeholder="Seleccionar estado"
+              [options]="estadoPagoOptions" optionValue="value" optionLabel="label" />
+            <span error>El estado es requerido</span>
+          </app-form-field>
 
-          @if (!inscripcion()) {
-          <div class="form-row">
-            <!-- Estado de Pago -->
-            <app-form-field label="Estado de Pago" [forId]="'estado-pago-select'" [required]="true"
-              [invalid]="!!(form.get('estadoPago')?.invalid && form.get('estadoPago')?.touched)">
-              <app-select-field id="estado-pago-select" formControlName="estadoPago" placeholder="Seleccionar estado"
-                [options]="estadoPagoOptions" optionValue="value" optionLabel="label" />
-              <span error>El estado es requerido</span>
-            </app-form-field>
+          } @else {
+          <!-- EDIT MODE: Limited editable fields -->
 
-            <!-- Requiere Comprobante -->
-            <div class="toggle-field">
-              <mat-slide-toggle formControlName="requiereComprobante">
-                Requiere Comprobante
-              </mat-slide-toggle>
+          <div class="edit-info-banner">
+            <mat-icon>info</mat-icon>
+            <span>Solo puedes editar la descripción, estado de pago y comprobante entregado. Los demás campos son inmutables por integridad contable.</span>
+          </div>
+
+          <!-- Read-only summary of immutable fields -->
+          @if (currentMovimiento) {
+          <div class="readonly-summary">
+            <h3 class="readonly-summary__title">Datos del Movimiento</h3>
+            <div class="readonly-summary__grid">
+              <div class="readonly-field">
+                <span class="readonly-field__label">Tipo</span>
+                <span class="readonly-field__value readonly-field__value--{{ currentMovimiento.tipo }}">
+                  {{ currentMovimiento.tipo === 'ingreso' ? 'Ingreso' : 'Egreso' }}
+                </span>
+              </div>
+              <div class="readonly-field">
+                <span class="readonly-field__label">Monto</span>
+                <span class="readonly-field__value readonly-field__value--amount">
+                  {{ currentMovimiento.monto | currency:'ARS':'symbol':'1.2-2' }}
+                </span>
+              </div>
+              <div class="readonly-field">
+                <span class="readonly-field__label">Concepto</span>
+                <span class="readonly-field__value">{{ currentMovimiento.concepto | titlecase }}</span>
+              </div>
+              <div class="readonly-field">
+                <span class="readonly-field__label">Medio de Pago</span>
+                <span class="readonly-field__value">{{ currentMovimiento.medioPago | titlecase }}</span>
+              </div>
+              <div class="readonly-field">
+                <span class="readonly-field__label">Fecha</span>
+                <span class="readonly-field__value">{{ currentMovimiento.fecha | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <div class="readonly-field">
+                <span class="readonly-field__label">Responsable</span>
+                <span class="readonly-field__value">{{ currentMovimiento.responsable?.nombre || 'N/A' }}</span>
+              </div>
             </div>
           </div>
+          }
+
+          <div class="edit-fields-divider">
+            <span>Campos Editables</span>
+          </div>
+
+          <!-- Descripción -->
+          <app-form-field label="Descripción" [forId]="'descripcion-input'">
+            <app-textarea-field id="descripcion-input" formControlName="descripcion" [rows]="3"
+              placeholder="Notas adicionales (opcional)" />
+          </app-form-field>
+
+          <!-- Estado de Pago -->
+          <app-form-field label="Estado de Pago" [forId]="'estado-pago-select'" [required]="true"
+            [invalid]="!!(form.get('estadoPago')?.invalid && form.get('estadoPago')?.touched)">
+            <app-select-field id="estado-pago-select" formControlName="estadoPago" placeholder="Seleccionar estado"
+              [options]="estadoPagoOptions" optionValue="value" optionLabel="label" />
+            <span error>El estado es requerido</span>
+          </app-form-field>
+
+          <!-- Comprobante Entregado -->
+          <div class="toggle-field">
+            <mat-slide-toggle formControlName="comprobanteEntregado">
+              Comprobante Entregado
+            </mat-slide-toggle>
+          </div>
+
           }
         </form>
       </div>
@@ -173,17 +192,16 @@
         <button type="button" class="btn-secondary" (click)="onCancel()">
           Cancelar
         </button>
-        <button type="submit" class="btn-primary" (click)="onSubmit()">
+        <button type="submit" class="btn-primary" [disabled]="form.invalid || loading()" (click)="onSubmit()">
           @if (loading()) {
           <span class="loading-spinner"></span>
-          } @else if (inscripcion()) {
-          <mat-icon aria-hidden="true">check</mat-icon>
-          Registrar Pago
           } @else {
-          {{ isEditing ? 'Guardar Cambios' : 'Crear Movimiento' }}
+          {{ isEditing() ? 'Guardar Cambios' : 'Crear Movimiento' }}
           }
         </button>
       </div>
     </div>
+
+    }
   </div>
 </div>

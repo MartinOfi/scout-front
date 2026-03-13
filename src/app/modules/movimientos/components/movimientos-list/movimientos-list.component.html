@@ -1,32 +1,35 @@
 <div class="movimientos-list-container">
+  <!-- Header -->
   <div class="header">
-    <h2>Movimientos</h2>
-    <button mat-raised-button color="primary" (click)="onNuevoMovimiento()">
-      <mat-icon>add</mat-icon>
+    <div class="header-left">
+      <h1 class="text-2xl font-semibold text-gray-900">Movimientos</h1>
+      <span class="text-sm text-gray-500 ml-2">
+        {{ totalItems() }} registros
+      </span>
+    </div>
+    <button type="button" class="btn btn-primary" (click)="onNuevoMovimiento()">
       Nuevo Movimiento
     </button>
   </div>
 
-  <app-movimiento-filters
-    (filterChange)="onFilterChange($event)"
-    (clearFilters)="onClearFilters()">
-  </app-movimiento-filters>
+  <!-- Tabs -->
+  <app-button-tabs
+    [tabs]="tabs"
+    [activeTab]="activeTab()"
+    (tabChange)="onTabChange($event)"
+    aria-label="Filtrar movimientos por tipo" />
 
-  <div class="resumen">
-    <div class="resumen-item ingresos">
-      <span class="label">Total Ingresos</span>
-      <span class="amount">{{ totalIngresos() | currency:'ARS':'symbol':'1.2-2' }}</span>
-    </div>
-    <div class="resumen-item egresos">
-      <span class="label">Total Egresos</span>
-      <span class="amount">{{ totalEgresos() | currency:'ARS':'symbol':'1.2-2' }}</span>
-    </div>
-    <div class="resumen-item saldo" [class.negativo]="saldoNeto() < 0">
-      <span class="label">Saldo Neto</span>
-      <span class="amount">{{ saldoNeto() | currency:'ARS':'symbol':'1.2-2' }}</span>
-    </div>
+  <!-- Filters -->
+  <div class="filters-section">
+    <app-generic-filters
+      [filterConfigs]="filterConfigs"
+      [autoApply]="true"
+      [showClearButton]="true"
+      (filtersChanged)="onFiltersChanged($event)"
+      (filterCleared)="onFilterCleared()" />
   </div>
 
+  <!-- Content -->
   @if (loading()) {
     <div class="loading-state">
       <mat-spinner diameter="40"></mat-spinner>
@@ -36,18 +39,85 @@
     <div class="error-state">
       <mat-icon color="warn">error</mat-icon>
       <span>{{ error() }}</span>
+      <button
+        mat-stroked-button
+        color="primary"
+        (click)="state.loadPage(1)"
+        class="mt-4">
+        Reintentar
+      </button>
     </div>
   } @else if (tableData().length === 0) {
     <div class="empty-state">
       <mat-icon>receipt_long</mat-icon>
       <span>No se encontraron movimientos</span>
+      <p class="text-sm text-gray-500 mt-2">
+        @if (activeTab() === 'ingreso') {
+          No hay ingresos registrados con los filtros seleccionados.
+        } @else if (activeTab() === 'egreso') {
+          No hay egresos registrados con los filtros seleccionados.
+        } @else {
+          No hay movimientos registrados con los filtros seleccionados.
+        }
+      </p>
     </div>
   } @else {
+    <!-- Data Table -->
     <app-data-table
       [data]="tableData()"
-      [columns]="tableColumns"
+      [columns]="tableColumns()"
       [config]="{ showHeader: true, hoverable: true }"
+      [pageSize]="pageSize()"
+      [currentPage]="currentPage()"
       (actionClick)="onActionClick($event)"
-      (rowClick)="onRowClick($event)" />
+      (rowClick)="onRowClick($event)"
+      (pageChange)="onPageChange($event)" />
+
+    <!-- Pagination Controls -->
+    <div class="pagination-controls">
+      <div class="pagination-info">
+        <span class="text-sm text-gray-600">
+          Mostrando {{ (currentPage() - 1) * pageSize() + 1 }} -
+          {{ Math.min(currentPage() * pageSize(), totalItems()) }}
+          de {{ totalItems() }}
+        </span>
+      </div>
+
+      <div class="pagination-center">
+        <button
+          mat-icon-button
+          [disabled]="!hasPreviousPage()"
+          (click)="state.previousPage()"
+          aria-label="Página anterior">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+
+        <span class="page-indicator">
+          Página {{ currentPage() }} de {{ totalPages() }}
+        </span>
+
+        <button
+          mat-icon-button
+          [disabled]="!hasNextPage()"
+          (click)="state.nextPage()"
+          aria-label="Página siguiente">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+
+      <div class="pagination-size">
+        <span class="text-sm text-gray-600 mr-2">Por página:</span>
+        <mat-form-field appearance="outline" class="page-size-select">
+          <mat-select
+            [value]="pageSize()"
+            (selectionChange)="onPageSizeChange($event.value)"
+            aria-label="Seleccionar cantidad por página">
+            @for (option of pageSizeOptions; track option) {
+              <mat-option [value]="option">{{ option }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
   }
 </div>

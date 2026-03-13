@@ -1,23 +1,31 @@
 /**
  * Movimiento Form Component
- * Smart Component - Formulario de creación/edición de movimientos
- * Soporta contexto de inscripción cuando viene de ese flujo
+ * Smart Component - Generic form for creating/editing movimientos
  * SIN any - tipado estricto
  */
 
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
-import { CommonModule, CurrencyPipe } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  inject,
+  signal,
+  computed,
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { take } from 'rxjs';
+import { take, switchMap, of, tap, catchError, forkJoin } from 'rxjs';
 
 import { MovimientosStateService } from '../../services/movimientos-state.service';
-import { InscripcionesApiService } from '../../../inscripciones/services/inscripciones-api.service';
+import { MovimientosApiService } from '../../services/movimientos-api.service';
+import { MovimientosFormBuilder } from '../../services/movimientos-form.builder';
 import { CajasApiService } from '../../../cajas/services/cajas-api.service';
-import { CreateMovimientoDto, InscripcionConEstado, CajaConSaldo } from '../../../../shared/models';
-import { TipoMovimientoEnum, MedioPagoEnum, EstadoPago, TIPO_INSCRIPCION_LABELS, ConceptoMovimiento } from '../../../../shared/enums';
+import { PersonasApiService } from '../../../personas/services/personas-api.service';
+import { TipoMovimientoEnum, MedioPagoEnum, EstadoPago, CajaType } from '../../../../shared/enums';
+import { CajaConSaldo, PersonaUnion, Movimiento } from '../../../../shared/models';
 
 // Shared Form Components
 import { FormFieldComponent } from '../../../../shared/components/form/form-field/form-field.component';
@@ -34,12 +42,23 @@ interface SelectOption {
   label: string;
 }
 
+interface CajaOption {
+  id: string;
+  nombre: string;
+  tipo: CajaType;
+  saldo: number;
+}
+
+interface PersonaOption {
+  id: string;
+  nombre: string;
+}
+
 @Component({
   selector: 'app-movimiento-form',
   standalone: true,
   imports: [
     CommonModule,
-    CurrencyPipe,
     ReactiveFormsModule,
     MatIconModule,
     MatSlideToggleModule,
@@ -48,56 +67,34 @@ interface SelectOption {
     TextareaFieldComponent,
     SelectFieldComponent,
     DateFieldComponent,
-    ConceptoSelectorComponent
+    ConceptoSelectorComponent,
   ],
   templateUrl: './movimiento-form.component.html',
   styleUrls: ['./movimiento-form.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MovimientoFormComponent implements OnInit {
   private readonly state = inject(MovimientosStateService);
-  private readonly inscripcionesApi = inject(InscripcionesApiService);
+  private readonly movimientosApi = inject(MovimientosApiService);
   private readonly cajasApi = inject(CajasApiService);
+  private readonly personasApi = inject(PersonasApiService);
+  private readonly formBuilder = inject(MovimientosFormBuilder);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  private readonly fb = inject(FormBuilder);
 
   readonly loading = this.state.loading;
-  readonly isEditing = false;
 
-  // Inscripción context (when paying for an inscription)
-  readonly inscripcion = signal<InscripcionConEstado | null>(null);
-  readonly loadingInscripcion = signal(false);
-  readonly tipoInscripcionLabels = TIPO_INSCRIPCION_LABELS;
+  // Edit mode state
+  readonly isEditing = signal(false);
+  readonly movimientoId = signal<string | null>(null);
+  readonly loadingData = signal(false);
+  currentMovimiento: Movimiento | null = null;
 
-  // Caja de grupo (for inscription payments)
-  readonly cajaGrupo = signal<CajaConSaldo | null>(null);
+  // Cajas and personas for selectors
+  readonly cajas = signal<CajaOption[]>([]);
+  readonly personas = signal<PersonaOption[]>([]);
 
-
-  // Computed values for inscripcion context
-  readonly montoAPagar = computed(() => {
-    const insc = this.inscripcion();
-    if (!insc) return 0;
-    return insc.montoTotal - insc.montoBonificado;
-  });
-
-  readonly progressPercent = computed(() => {
-    const insc = this.inscripcion();
-    if (!insc) return 0;
-    const total = this.montoAPagar();
-    if (total <= 0) return 100;
-    return Math.min(100, Math.round((insc.montoPagado / total) * 100));
-  });
-
-  readonly progressClass = computed(() => {
-    const insc = this.inscripcion();
-    if (!insc) return 'progress--pending';
-    if (insc.saldoPendiente === 0) return 'progress--success';
-    if (insc.montoPagado > 0) return 'progress--partial';
-    return 'progress--pending';
-  });
-
-  form: FormGroup;
+  form!: FormGroup;
   readonly tipos = Object.values(TipoMovimientoEnum);
   readonly mediosPago = Object.values(MedioPagoEnum);
   readonly estadosPago = Object.values(EstadoPago);
@@ -105,79 +102,154 @@ export class MovimientoFormComponent implements OnInit {
   // Options for select fields
   readonly tipoOptions: SelectOption[] = [
     { value: TipoMovimientoEnum.INGRESO, label: 'Ingreso' },
-    { value: TipoMovimientoEnum.EGRESO, label: 'Egreso' }
+    { value: TipoMovimientoEnum.EGRESO, label: 'Egreso' },
   ];
 
   readonly medioPagoOptions: SelectOption[] = [
     { value: MedioPagoEnum.EFECTIVO, label: 'Efectivo' },
-    { value: MedioPagoEnum.TRANSFERENCIA, label: 'Transferencia' }
+    { value: MedioPagoEnum.TRANSFERENCIA, label: 'Transferencia' },
   ];
 
   readonly estadoPagoOptions: SelectOption[] = [
     { value: EstadoPago.PAGADO, label: 'Pagado' },
-    { value: EstadoPago.PENDIENTE_REEMBOLSO, label: 'Pendiente de Reembolso' }
+    { value: EstadoPago.PENDIENTE_REEMBOLSO, label: 'Pendiente de Reembolso' },
   ];
 
-  constructor() {
-    this.form = this.fb.group({
-      cajaId: ['', Validators.required],
-      tipo: [TipoMovimientoEnum.INGRESO, Validators.required],
-      monto: [0, [Validators.required, Validators.min(0.01)]],
-      concepto: ['', Validators.required],
-      descripcion: [''],
-      responsableId: ['', Validators.required],
-      medioPago: [MedioPagoEnum.EFECTIVO, Validators.required],
-      requiereComprobante: [false],
-      estadoPago: [EstadoPago.PAGADO, Validators.required],
-      fecha: [new Date().toISOString().split('T')[0], Validators.required]
-    });
-  }
-
   ngOnInit(): void {
-    this.route.queryParams.pipe(take(1)).subscribe((params) => {
-      if (params['cajaId']) {
-        this.form.patchValue({ cajaId: params['cajaId'] });
-      }
+    this.loadingData.set(true);
 
-      // Handle inscripcion context
-      if (params['concepto'] === 'inscripcion' && params['referenciaId']) {
-        this.loadInscripcionContext(params['referenciaId']);
-      }
-    });
+    // Detect edit mode from route params
+    const id = this.route.snapshot.paramMap.get('id');
+
+    if (id) {
+      // Edit mode
+      this.isEditing.set(true);
+      this.movimientoId.set(id);
+      this.loadDataForEdit(id);
+    } else {
+      // Create mode
+      this.setupCreateMode();
+    }
   }
 
-  private loadInscripcionContext(inscripcionId: string): void {
-    this.loadingInscripcion.set(true);
+  /**
+   * Load cajas, personas, and movimiento data for edit mode
+   */
+  private loadDataForEdit(id: string): void {
+    forkJoin({
+      cajas: this.cajasApi.getAll(),
+      personas: this.personasApi.getAll(),
+      movimiento: this.movimientosApi.getById(id),
+    })
+      .pipe(
+        tap(({ cajas, personas, movimiento }) => {
+          this.setCajaOptions(cajas);
+          this.setPersonaOptions(personas);
+          this.currentMovimiento = movimiento;
 
-    // Load inscription data
-    this.inscripcionesApi.getById(inscripcionId).pipe(take(1)).subscribe({
-      next: (insc) => {
-        this.inscripcion.set(insc);
-        this.loadingInscripcion.set(false);
+          // Build edit form with movimiento data
+          this.form = this.formBuilder.buildEditForm(movimiento);
+        }),
+        catchError((error) => {
+          console.error('Error loading data for edit:', error);
+          this.router.navigate(['/movimientos']);
+          return of(null);
+        }),
+      )
+      .subscribe(() => {
+        this.loadingData.set(false);
+      });
+  }
 
-        // Pre-fill form with inscription context
-        this.form.patchValue({
-          concepto: ConceptoMovimiento.INSCRIPCION_GRUPO,
-          tipo: TipoMovimientoEnum.INGRESO,
-          // Suggest the pending amount
-          monto: insc.saldoPendiente > 0 ? insc.saldoPendiente : 0,
-          descripcion: `Pago inscripción ${this.tipoInscripcionLabels[insc.tipo]} ${insc.ano}`,
-          // The responsable is the persona from the inscription
-          responsableId: insc.personaId
-        });
-      },
-      error: () => {
-        this.loadingInscripcion.set(false);
-      }
+  /**
+   * Setup create mode: load cajas and personas, build create form
+   */
+  private setupCreateMode(): void {
+    // Build create form first
+    this.form = this.formBuilder.buildCreateForm();
+
+    // Set sensible defaults
+    this.form.patchValue({
+      tipo: TipoMovimientoEnum.INGRESO,
+      medioPago: MedioPagoEnum.EFECTIVO,
+      estadoPago: EstadoPago.PAGADO,
     });
 
-    // Load caja de grupo for inscription payments
-    this.cajasApi.getCajaGrupo().pipe(take(1)).subscribe({
-      next: (caja) => {
-        this.cajaGrupo.set(caja);
-        this.form.patchValue({ cajaId: caja.id });
-      }
-    });
+    // Load cajas and personas in parallel
+    forkJoin({
+      cajas: this.cajasApi.getAll(),
+      personas: this.personasApi.getAll(),
+    })
+      .pipe(
+        tap(({ cajas, personas }) => {
+          this.setCajaOptions(cajas);
+          this.setPersonaOptions(personas);
+
+          // Check for query params to pre-fill caja
+          this.route.queryParams.pipe(take(1)).subscribe((params) => {
+            if (params['cajaId']) {
+              this.form.patchValue({ cajaId: params['cajaId'] });
+            }
+          });
+        }),
+        catchError((error) => {
+          console.error('Error loading data:', error);
+          return of(null);
+        }),
+      )
+      .subscribe(() => {
+        this.loadingData.set(false);
+      });
+  }
+
+  /**
+   * Transform cajas to select options
+   */
+  private setCajaOptions(cajas: CajaConSaldo[]): void {
+    const options: CajaOption[] = cajas.map((caja) => ({
+      id: caja.id,
+      nombre: this.getCajaDisplayName(caja),
+      tipo: caja.tipo,
+      saldo: caja.saldo,
+    }));
+    this.cajas.set(options);
+  }
+
+  /**
+   * Generate display name for caja
+   */
+  private getCajaDisplayName(caja: CajaConSaldo): string {
+    if (caja.nombre) {
+      return caja.nombre;
+    }
+    // Generate name based on type
+    switch (caja.tipo) {
+      case CajaType.GRUPO:
+        return 'Caja del Grupo';
+      case CajaType.RAMA_MANADA:
+        return 'Fondo Manada';
+      case CajaType.RAMA_UNIDAD:
+        return 'Fondo Unidad';
+      case CajaType.RAMA_CAMINANTES:
+        return 'Fondo Caminantes';
+      case CajaType.RAMA_ROVERS:
+        return 'Fondo Rovers';
+      case CajaType.PERSONAL:
+        return caja.propietario ? `Cuenta de ${caja.propietario.nombre}` : 'Cuenta Personal';
+      default:
+        return `Caja ${caja.id.slice(0, 8)}`;
+    }
+  }
+
+  /**
+   * Transform personas to select options
+   */
+  private setPersonaOptions(personas: PersonaUnion[]): void {
+    const options: PersonaOption[] = personas.map((p) => ({
+      id: p.id,
+      nombre: p.nombre,
+    }));
+    this.personas.set(options);
   }
 
   onConceptoChange(concepto: string): void {
@@ -187,51 +259,37 @@ export class MovimientoFormComponent implements OnInit {
   onSubmit(): void {
     if (this.form.invalid) return;
 
-    const rawValue = this.form.value;
-    const insc = this.inscripcion();
+    if (this.isEditing()) {
+      // Update existing movimiento
+      const dto = this.formBuilder.extractUpdateDto(this.form);
+      const id = this.movimientoId();
 
-    const dto: CreateMovimientoDto = {
-      cajaId: rawValue.cajaId,
-      tipo: rawValue.tipo,
-      monto: rawValue.monto,
-      concepto: rawValue.concepto,
-      descripcion: rawValue.descripcion,
-      responsableId: rawValue.responsableId,
-      medioPago: rawValue.medioPago,
-      requiereComprobante: rawValue.requiereComprobante,
-      estadoPago: rawValue.estadoPago,
-      fecha: rawValue.fecha,
-      // Include inscripcionId when paying for an inscription
-      ...(insc ? { inscripcionId: insc.id } : {})
-    };
+      if (!id) return;
 
-    this.state.create(dto).subscribe({
-      next: () => {
-        // Navigate back to inscripcion detail if we came from there
-        if (insc) {
-          this.router.navigate(['/inscripciones', insc.id]);
-        } else {
+      this.state.update(id, dto).subscribe({
+        next: () => {
           this.router.navigate(['/movimientos']);
-        }
-      },
-      error: () => { }
-    });
+        },
+        error: () => {
+          // Error handled by state service
+        },
+      });
+    } else {
+      // Create new movimiento
+      const dto = this.formBuilder.extractCreateDto(this.form);
+
+      this.state.create(dto).subscribe({
+        next: () => {
+          this.router.navigate(['/movimientos']);
+        },
+        error: () => {
+          // Error handled by state service
+        },
+      });
+    }
   }
 
   onCancel(): void {
-    const insc = this.inscripcion();
-    if (insc) {
-      this.router.navigate(['/inscripciones', insc.id]);
-    } else {
-      this.router.navigate(['/movimientos']);
-    }
-  }
-
-  /** Fill monto with remaining balance */
-  fillPendingAmount(): void {
-    const insc = this.inscripcion();
-    if (insc && insc.saldoPendiente > 0) {
-      this.form.patchValue({ monto: insc.saldoPendiente });
-    }
+    this.router.navigate(['/movimientos']);
   }
 }

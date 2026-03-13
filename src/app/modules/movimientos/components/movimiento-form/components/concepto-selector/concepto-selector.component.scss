@@ -1,0 +1,43 @@
+@use '../../../../../../shared/components/form/form-tokens' as *;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.scout-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.scout-select {
+  @include input-base;
+  appearance: none;
+  padding-right: 40px;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.scout-select-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: $stone-500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color $transition-fast;
+
+  .scout-select:focus + & {
+    color: $brand-burgundy;
+  }
+
+  .scout-select:disabled + & {
+    color: $stone-300;
+  }
+}

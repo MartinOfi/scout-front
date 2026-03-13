@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 import {
   ConceptoMovimiento,
   TipoMovimientoEnum,
-  CONCEPTO_MOVIMIENTO_LABELS
+  CONCEPTO_MOVIMIENTO_LABELS,
 } from '../../../../../../shared/enums';
 
 // Shared Form Components
@@ -22,7 +22,8 @@ import { FormFieldComponent } from '../../../../../../shared/components/form/for
   standalone: true,
   imports: [CommonModule, FormFieldComponent],
   templateUrl: './concepto-selector.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./concepto-selector.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConceptoSelectorComponent {
   readonly tipo = input<TipoMovimientoEnum | null>(null);
@@ -37,7 +38,7 @@ export class ConceptoSelectorComponent {
 
     if (!tipo) return todos;
 
-    return todos.filter(c => {
+    return todos.filter((c) => {
       const esIngreso = tipo === TipoMovimientoEnum.INGRESO;
       const conceptoIngreso = [
         ConceptoMovimiento.INSCRIPCION_GRUPO,
