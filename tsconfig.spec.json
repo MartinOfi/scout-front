@@ -10,11 +10,10 @@
   },
   "include": [
     "src/**/*.d.ts",
-    "src/app/modules/inscripciones/services/inscripciones-state.service.spec.ts",
-    "src/app/modules/inscripciones/services/inscripciones-api.service.spec.ts",
-    "src/app/modules/inscripciones/components/shared/pago-inscripcion-dialog/pago-inscripcion-dialog.component.spec.ts",
-    "src/app/modules/inscripciones/components/inscripcion-detail/inscripcion-detail.component.spec.ts",
-    "src/app/modules/inscripciones/testing/**/*.ts",
+    "src/app/modules/cajas/components/caja-grupo/caja-grupo.component.spec.ts",
+    "src/app/modules/cajas/components/fondos-rama/fondos-rama.component.spec.ts",
+    "src/app/modules/cajas/components/cuentas-personales/cuentas-personales.component.spec.ts",
+    "src/app/modules/cajas/testing/**/*.ts",
     "src/app/shared/testing/**/*.ts"
   ]
 }
