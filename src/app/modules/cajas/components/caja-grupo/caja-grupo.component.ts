@@ -23,7 +23,6 @@ import { TableColumn, TableData, ActionEvent } from '../../../../shared/models/t
 
 // Local Components
 import { SaldoCardComponent } from './components/saldo-card/saldo-card.component';
-import { MovimientosTableComponent } from './components/movimientos-table/movimientos-table.component';
 
 @Component({
   selector: 'app-caja-grupo',
@@ -38,7 +37,6 @@ import { MovimientosTableComponent } from './components/movimientos-table/movimi
     SaldoCardComponent,
     ActionButtonComponent,
     DataTableComponent,
-    MovimientosTableComponent, // TODO: Remove in Task 5 when template is updated
   ],
   templateUrl: './caja-grupo.component.html',
   styleUrls: ['./caja-grupo.component.scss'],
