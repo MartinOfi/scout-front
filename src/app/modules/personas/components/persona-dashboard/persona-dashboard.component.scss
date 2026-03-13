@@ -1,0 +1,79 @@
+// =============================================================================
+// PERSONA DASHBOARD - UNIFIED DETAIL VIEW
+// =============================================================================
+// Warm, editorial layout for displaying persona financial and membership data.
+// Reuses patterns from inscripcion-detail with stone palette and burgundy accents.
+
+@use '../../../../shared/components/form/form-tokens' as tokens;
+
+// -----------------------------------------------------------------------------
+// LAYOUT TOKENS
+// -----------------------------------------------------------------------------
+
+$card-radius: 16px;
+$section-gap: 24px;
+
+// -----------------------------------------------------------------------------
+// REDUCED MOTION
+// -----------------------------------------------------------------------------
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// PAGE CONTAINER
+// -----------------------------------------------------------------------------
+
+.dashboard-page {
+  min-height: 100%;
+  padding: 24px;
+  padding-bottom: 48px;
+
+  @media (max-width: 640px) {
+    padding: 16px;
+    padding-bottom: 32px;
+  }
+}
+
+.dashboard-content {
+  display: flex;
+  flex-direction: column;
+  gap: $section-gap;
+}
+
+// -----------------------------------------------------------------------------
+// CARDS ROW - Documentación + Inscripciones + Cuotas
+// -----------------------------------------------------------------------------
+
+.dashboard-cards-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// LOADING & ERROR STATES
+// -----------------------------------------------------------------------------
+
+.dashboard-loading,
+.dashboard-error,
+.dashboard-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  padding: 32px;
+}

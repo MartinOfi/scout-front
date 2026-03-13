@@ -19,6 +19,7 @@ import {
   CreatePersonaExternaDto,
   UpdatePersonaDto,
 } from '../../../shared/models';
+import { PersonaDashboardDto } from '../models';
 
 import { PersonasApiService } from './personas-api.service';
 import { NotificationService } from '../../../shared/services';
@@ -42,6 +43,11 @@ export class PersonasStateService {
   private readonly _error: WritableSignal<string | null> = signal(null);
   private readonly _selectedId: WritableSignal<string | null> = signal(null);
 
+  // Dashboard state
+  private readonly _dashboard: WritableSignal<PersonaDashboardDto | null> = signal(null);
+  private readonly _dashboardLoading: WritableSignal<boolean> = signal(false);
+  private readonly _dashboardError: WritableSignal<string | null> = signal(null);
+
   // ============================================================================
   // Public Readonly Signals
   // ============================================================================
@@ -51,6 +57,11 @@ export class PersonasStateService {
   readonly personasExternas: Signal<PersonaExterna[]> = this._personasExternas.asReadonly();
   readonly loading: Signal<boolean> = this._loading.asReadonly();
   readonly error: Signal<string | null> = this._error.asReadonly();
+
+  // Dashboard public signals
+  readonly dashboard: Signal<PersonaDashboardDto | null> = this._dashboard.asReadonly();
+  readonly dashboardLoading: Signal<boolean> = this._dashboardLoading.asReadonly();
+  readonly dashboardError: Signal<string | null> = this._dashboardError.asReadonly();
 
   // ============================================================================
   // Computed Signals (derived state)
@@ -73,11 +84,7 @@ export class PersonasStateService {
   });
 
   readonly allPersonas = computed((): PersonaUnion[] => {
-    return [
-      ...this._protagonistas(),
-      ...this._educadores(),
-      ...this._personasExternas(),
-    ];
+    return [...this._protagonistas(), ...this._educadores(), ...this._personasExternas()];
   });
 
   readonly totalCount = computed((): number => {
@@ -94,6 +101,15 @@ export class PersonasStateService {
 
   readonly personasExternasCount = computed((): number => {
     return this._personasExternas().length;
+  });
+
+  // Dashboard computed
+  readonly isProtagonista = computed((): boolean => {
+    return this._dashboard()?.persona.tipo === PersonaType.PROTAGONISTA;
+  });
+
+  readonly isEducador = computed((): boolean => {
+    return this._dashboard()?.persona.tipo === PersonaType.EDUCADOR;
   });
 
   // ============================================================================
@@ -160,7 +176,7 @@ export class PersonasStateService {
         this._loading.set(false);
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
-      })
+      }),
     );
   }
 
@@ -183,7 +199,7 @@ export class PersonasStateService {
         this._loading.set(false);
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
-      })
+      }),
     );
   }
 
@@ -206,7 +222,7 @@ export class PersonasStateService {
         this._loading.set(false);
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
-      })
+      }),
     );
   }
 
@@ -229,7 +245,7 @@ export class PersonasStateService {
         this._loading.set(false);
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
-      })
+      }),
     );
   }
 
@@ -252,7 +268,7 @@ export class PersonasStateService {
         this._loading.set(false);
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
-      })
+      }),
     );
   }
 
@@ -268,7 +284,7 @@ export class PersonasStateService {
         this._removeFromState(id);
         this._loading.set(false);
         this.notificationService.showSuccess(
-          `Persona dada de baja. Saldo transferido: $${result.saldoTransferido}`
+          `Persona dada de baja. Saldo transferido: $${result.saldoTransferido}`,
         );
       }),
       catchError((err: unknown) => {
@@ -277,8 +293,39 @@ export class PersonasStateService {
         this._loading.set(false);
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
-      })
+      }),
     );
+  }
+
+  /**
+   * Cargar dashboard de una persona
+   * Incluye cuenta personal, inscripciones, cuotas, y movimientos
+   */
+  loadDashboard(personaId: string): void {
+    this._dashboardLoading.set(true);
+    this._dashboardError.set(null);
+
+    this.apiService.getDashboard(personaId).subscribe({
+      next: (dashboard: PersonaDashboardDto) => {
+        this._dashboard.set(dashboard);
+        this._dashboardLoading.set(false);
+      },
+      error: (err: unknown) => {
+        const errorMsg = err instanceof Error ? err.message : 'Error al cargar dashboard';
+        this._dashboardError.set(errorMsg);
+        this._dashboardLoading.set(false);
+        this.notificationService.showError(errorMsg);
+      },
+    });
+  }
+
+  /**
+   * Limpiar dashboard
+   */
+  clearDashboard(): void {
+    this._dashboard.set(null);
+    this._dashboardLoading.set(false);
+    this._dashboardError.set(null);
   }
 
   /**
@@ -298,6 +345,7 @@ export class PersonasStateService {
     this._loading.set(false);
     this._error.set(null);
     this._selectedId.set(null);
+    this.clearDashboard();
   }
 
   // ============================================================================
@@ -308,17 +356,17 @@ export class PersonasStateService {
     switch (persona.tipo) {
       case PersonaType.PROTAGONISTA:
         this._protagonistas.update((prev) =>
-          prev.map((p) => (p.id === persona.id ? (persona as Protagonista) : p))
+          prev.map((p) => (p.id === persona.id ? (persona as Protagonista) : p)),
         );
         break;
       case PersonaType.EDUCADOR:
         this._educadores.update((prev) =>
-          prev.map((e) => (e.id === persona.id ? (persona as Educador) : e))
+          prev.map((e) => (e.id === persona.id ? (persona as Educador) : e)),
         );
         break;
       case PersonaType.EXTERNA:
         this._personasExternas.update((prev) =>
-          prev.map((pe) => (pe.id === persona.id ? (persona as PersonaExterna) : pe))
+          prev.map((pe) => (pe.id === persona.id ? (persona as PersonaExterna) : pe)),
         );
         break;
     }

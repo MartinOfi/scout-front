@@ -1,0 +1,37 @@
+<header class="persona-header">
+  <div class="persona-header__left">
+    <h1 class="persona-header__name">{{ persona().nombre }}</h1>
+    <div class="persona-header__meta">
+      <span class="persona-header__type">{{ tipoLabel }}</span>
+      @if (persona().rama) {
+        <span class="persona-header__separator">·</span>
+        <span class="persona-header__rama">{{ ramaLabels[persona().rama!] }}</span>
+      }
+      @if (persona().cargo) {
+        <span class="persona-header__separator">·</span>
+        <span class="persona-header__cargo">{{ cargoLabels[persona().cargo!] }}</span>
+      }
+    </div>
+  </div>
+
+  <div class="persona-header__right">
+    <span
+      class="status-badge"
+      [ngClass]="'status-badge--' + persona().estado"
+      role="status"
+      [attr.aria-label]="'Estado: ' + estadoLabels[persona().estado]"
+    >
+      <mat-icon aria-hidden="true">{{ estadoIcon }}</mat-icon>
+      {{ estadoLabels[persona().estado] }}
+    </span>
+
+    <button
+      class="persona-header__back"
+      (click)="back.emit()"
+      aria-label="Volver al listado de personas"
+    >
+      <mat-icon aria-hidden="true">arrow_back</mat-icon>
+      Volver
+    </button>
+  </div>
+</header>

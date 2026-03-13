@@ -1,0 +1,91 @@
+<section class="obligaciones" aria-label="Obligaciones financieras">
+  <!-- Inscripciones Card -->
+  <article class="oblig-card">
+    <header class="oblig-card__header">
+      <mat-icon aria-hidden="true">how_to_reg</mat-icon>
+      <h3 class="oblig-card__title">Inscripciones</h3>
+      @if (inscripciones().deudaTotal > 0) {
+        <span class="oblig-card__badge oblig-card__badge--danger">
+          {{ inscripciones().deudaTotal | currency: 'ARS' : 'symbol' : '1.0-0' }}
+        </span>
+      }
+    </header>
+
+    <div class="oblig-card__body">
+      @if (inscripciones().items.length === 0) {
+        <div class="oblig-card__empty">
+          <span>Sin inscripciones registradas</span>
+        </div>
+      } @else {
+        <ul class="oblig-list" role="list">
+          @for (item of inscripciones().items; track item.id) {
+            <li class="oblig-list__item" (click)="inscripcionClick.emit(item.id)">
+              <div class="oblig-list__main">
+                <div class="oblig-list__info">
+                  <span class="oblig-list__type">{{ tipoInscripcionLabels[item.tipo] }}</span>
+                  <span class="oblig-list__year">{{ item.ano }}</span>
+                </div>
+                <span class="status-badge" [class]="'status-badge--' + item.estado">
+                  {{ estadoInscripcionLabels[item.estado] }}
+                </span>
+              </div>
+              @if (item.saldoPendiente > 0) {
+                <div class="oblig-list__saldo">
+                  <span class="oblig-list__saldo-label">Saldo pendiente:</span>
+                  <span class="oblig-list__saldo-amount">
+                    {{ item.saldoPendiente | currency: 'ARS' : 'symbol' : '1.0-0' }}
+                  </span>
+                </div>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </article>
+
+  <!-- Cuotas Card -->
+  <article class="oblig-card">
+    <header class="oblig-card__header">
+      <mat-icon aria-hidden="true">calendar_month</mat-icon>
+      <h3 class="oblig-card__title">Cuotas</h3>
+      @if (cuotas().deudaTotal > 0) {
+        <span class="oblig-card__badge oblig-card__badge--danger">
+          {{ cuotas().deudaTotal | currency: 'ARS' : 'symbol' : '1.0-0' }}
+        </span>
+      }
+    </header>
+
+    <div class="oblig-card__body">
+      @if (cuotas().items.length === 0) {
+        <div class="oblig-card__empty">
+          <span>Sin cuotas registradas</span>
+        </div>
+      } @else {
+        <ul class="oblig-list" role="list">
+          @for (item of cuotas().items; track item.id) {
+            <li class="oblig-list__item" (click)="cuotaClick.emit(item.id)">
+              <div class="oblig-list__main">
+                <div class="oblig-list__info">
+                  <span class="oblig-list__type">{{ item.nombre }}</span>
+                  <span class="oblig-list__year">{{ item.ano }}</span>
+                </div>
+                <span class="status-badge" [class]="'status-badge--' + item.estado">
+                  {{ estadoCuotaLabels[item.estado] }}
+                </span>
+              </div>
+              @if (item.saldoPendiente > 0) {
+                <div class="oblig-list__saldo">
+                  <span class="oblig-list__saldo-label">Saldo pendiente:</span>
+                  <span class="oblig-list__saldo-amount">
+                    {{ item.saldoPendiente | currency: 'ARS' : 'symbol' : '1.0-0' }}
+                  </span>
+                </div>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </article>
+</section>

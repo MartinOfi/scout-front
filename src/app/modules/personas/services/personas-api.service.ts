@@ -8,6 +8,7 @@ import {
   UpdatePersonaDto,
   PersonaUnion,
 } from '../../../shared/models';
+import { PersonaDashboardDto } from '../models';
 import { HttpService } from '../../../shared/services';
 import { API_CONFIG } from '../../../shared/constants';
 
@@ -64,10 +65,7 @@ export class PersonasApiService {
    * Update a persona (PATCH)
    */
   update(id: string, dto: UpdatePersonaDto): Observable<PersonaUnion> {
-    return this.http.patch<PersonaUnion, UpdatePersonaDto>(
-      `${this.endpoint}/${id}`,
-      dto
-    );
+    return this.http.patch<PersonaUnion, UpdatePersonaDto>(`${this.endpoint}/${id}`, dto);
   }
 
   /**
@@ -81,9 +79,7 @@ export class PersonasApiService {
    * Get personas with pending debts (including inactive)
    */
   getConDeudas(): Observable<PersonaUnion[]> {
-    return this.http.get<PersonaUnion[]>(
-      API_CONFIG.ENDPOINTS.PERSONAS_CON_DEUDAS
-    );
+    return this.http.get<PersonaUnion[]>(API_CONFIG.ENDPOINTS.PERSONAS_CON_DEUDAS);
   }
 
   /**
@@ -93,7 +89,15 @@ export class PersonasApiService {
   darDeBaja(id: string): Observable<{ saldoTransferido: number }> {
     return this.http.post<{ saldoTransferido: number }, null>(
       `${this.endpoint}/${id}/dar-de-baja`,
-      null
+      null,
     );
+  }
+
+  /**
+   * Get persona dashboard data
+   * Includes cuenta personal, inscripciones, cuotas, and movimientos
+   */
+  getDashboard(id: string): Observable<PersonaDashboardDto> {
+    return this.http.get<PersonaDashboardDto>(`${this.endpoint}/${id}/dashboard`);
   }
 }

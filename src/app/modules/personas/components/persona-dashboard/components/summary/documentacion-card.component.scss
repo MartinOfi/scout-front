@@ -1,0 +1,83 @@
+@use '../../../../../../shared/components/form/form-tokens' as tokens;
+
+$card-radius: 16px;
+
+.doc-card {
+  background: white;
+  border-radius: $card-radius;
+  box-shadow: tokens.$shadow-card;
+  padding: 16px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: tokens.$brand-burgundy;
+    }
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: tokens.$stone-800;
+    letter-spacing: -0.01em;
+  }
+}
+
+.doc-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.doc-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background-color: tokens.$stone-50;
+  border-radius: 8px;
+
+  &__check {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+
+    &--yes {
+      background-color: tokens.$color-success;
+      color: white;
+    }
+
+    &--no {
+      background-color: tokens.$stone-200;
+      color: tokens.$stone-400;
+    }
+  }
+
+  &__label {
+    font-size: 13px;
+    font-weight: 500;
+    color: tokens.$stone-700;
+  }
+}

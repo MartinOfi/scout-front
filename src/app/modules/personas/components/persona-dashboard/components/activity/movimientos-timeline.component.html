@@ -1,0 +1,52 @@
+<article class="movimientos-card" aria-labelledby="movimientos-heading">
+  <header class="movimientos-card__header">
+    <mat-icon aria-hidden="true">history</mat-icon>
+    <h3 id="movimientos-heading" class="movimientos-card__title">
+      Últimos Movimientos
+    </h3>
+    @if (movimientos().length > 0) {
+      <button
+        class="movimientos-card__link"
+        (click)="verTodos.emit()"
+        type="button"
+      >
+        Ver todos
+        <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+      </button>
+    }
+  </header>
+
+  <div class="movimientos-card__body">
+    @if (movimientos().length === 0) {
+      <div class="movimientos-card__empty">
+        <span>Sin movimientos recientes</span>
+      </div>
+    } @else {
+      <ul class="timeline" role="list">
+        @for (mov of movimientos(); track mov.id) {
+          <li class="timeline__item">
+            <span class="timeline__marker">
+              <mat-icon aria-hidden="true">{{ getConceptoIcon(mov.concepto) }}</mat-icon>
+            </span>
+            <div class="timeline__content">
+              <div class="timeline__main">
+                <span class="timeline__amount">
+                  {{ mov.monto | currency:'ARS':'symbol':'1.0-0' }}
+                </span>
+                <span class="timeline__date">
+                  {{ mov.fecha | date:'d MMM yyyy' }}
+                </span>
+              </div>
+              <div class="timeline__details">
+                <span>{{ conceptoLabels[mov.concepto] }}</span>
+                <span class="timeline__method">
+                  {{ medioPagoLabels[mov.medioPago] }}
+                </span>
+              </div>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</article>

@@ -1,0 +1,63 @@
+<div class="dashboard-page">
+  @if (loading()) {
+  <div class="dashboard-loading">
+    <app-loading-spinner message="Cargando datos..." />
+  </div>
+  } @else if (error()) {
+  <div class="dashboard-error">
+    <app-empty-state
+      icon="error_outline"
+      [message]="error() ?? 'Error al cargar'"
+      actionLabel="Volver"
+      (onAction)="onBack()"
+    />
+  </div>
+  } @else if (dashboard(); as d) {
+  <div class="dashboard-content">
+    <!-- Header: Identity + Status + Navigation -->
+    <app-persona-header
+      [persona]="persona()!"
+      (back)="onBack()"
+      (edit)="onEdit()"
+      (darDeBaja)="onDarDeBaja()"
+    />
+
+    <!-- Financial Summary Cards -->
+    <app-cuenta-resumen-cards
+      [cuentaPersonal]="cuentaPersonal()!"
+      [deudaTotal]="deudaTotal()!"
+    />
+
+    <!-- Row: Documentación + Inscripciones + Cuotas -->
+    <div class="dashboard-cards-row">
+      <!-- Documentation Checklist (Protagonista only) -->
+      @if (isProtagonista() && documentacion()) {
+        <app-documentacion-card [documentacion]="documentacion()!" />
+      }
+
+      <!-- Obligations: Inscripciones & Cuotas -->
+      <app-obligaciones-section
+        [inscripciones]="inscripciones()!"
+        [cuotas]="cuotas()!"
+        (inscripcionClick)="onInscripcionClick($event)"
+        (cuotaClick)="onCuotaClick($event)"
+      />
+    </div>
+
+    <!-- Recent Movements Timeline (full width) -->
+    <app-movimientos-timeline
+      [movimientos]="movimientos()"
+      (verTodos)="onVerTodosMovimientos()"
+    />
+  </div>
+  } @else {
+  <div class="dashboard-empty">
+    <app-empty-state
+      icon="person_off"
+      message="Persona no encontrada"
+      actionLabel="Volver al listado"
+      (onAction)="onBack()"
+    />
+  </div>
+  }
+</div>

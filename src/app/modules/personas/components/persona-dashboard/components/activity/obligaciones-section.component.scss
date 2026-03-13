@@ -1,0 +1,181 @@
+@use '../../../../../../shared/components/form/form-tokens' as tokens;
+
+$card-radius: 16px;
+
+// Host and section use display: contents so child cards participate in parent grid
+:host {
+  display: contents;
+}
+
+.obligaciones {
+  display: contents;
+}
+
+.oblig-card {
+  background: white;
+  border-radius: $card-radius;
+  box-shadow: tokens.$shadow-card;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-bottom: 1px solid tokens.$stone-100;
+    background: tokens.$stone-50;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: tokens.$brand-burgundy;
+    }
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: tokens.$stone-800;
+    flex: 1;
+  }
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+
+    &--danger {
+      background-color: color-mix(in srgb, tokens.$color-error 12%, transparent);
+      color: tokens.$color-error;
+    }
+  }
+
+  &__body {
+    flex: 1;
+    min-height: 120px;
+  }
+
+  &__empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 120px;
+    padding: 24px 16px;
+    color: tokens.$stone-400;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+.oblig-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 16px;
+    border-bottom: 1px solid tokens.$stone-100;
+    cursor: pointer;
+    transition: background-color tokens.$transition-fast;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background-color: tokens.$stone-50;
+    }
+  }
+
+  &__main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  &__info {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  &__type {
+    font-size: 14px;
+    font-weight: 600;
+    color: tokens.$stone-800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__year {
+    font-size: 12px;
+    color: tokens.$stone-500;
+    font-weight: 500;
+  }
+
+  &__saldo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__saldo-label {
+    font-size: 12px;
+    color: tokens.$stone-500;
+  }
+
+  &__saldo-amount {
+    font-size: 13px;
+    font-weight: 600;
+    color: tokens.$color-error;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+// Status badge variants
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &--pendiente {
+    background-color: color-mix(in srgb, tokens.$brand-amber 15%, transparent);
+    color: tokens.$brand-amber;
+  }
+
+  &--parcial {
+    background-color: color-mix(in srgb, tokens.$color-info 15%, transparent);
+    color: tokens.$color-info;
+  }
+
+  &--pagado {
+    background-color: color-mix(in srgb, tokens.$color-success 12%, transparent);
+    color: tokens.$color-success;
+  }
+
+  &--bonificado {
+    background-color: color-mix(in srgb, tokens.$brand-burgundy 12%, transparent);
+    color: tokens.$brand-burgundy;
+  }
+}

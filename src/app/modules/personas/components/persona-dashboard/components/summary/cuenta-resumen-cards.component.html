@@ -1,0 +1,37 @@
+<section class="cuenta-resumen" aria-labelledby="cuenta-heading">
+  <h2 id="cuenta-heading" class="sr-only">Resumen financiero</h2>
+
+  <div class="cuenta-resumen__grid">
+    <!-- Saldo cuenta personal -->
+    <div class="cuenta-resumen__primary">
+      <app-stat-card
+        icon="account_balance_wallet"
+        title="Saldo cuenta personal"
+        [value]="cuentaPersonal().saldo"
+        [variant]="saldoVariant"
+      />
+    </div>
+
+    <!-- Deuda total breakdown -->
+    <div class="cuenta-resumen__secondary">
+      <app-stat-card
+        icon="warning"
+        title="Deuda total"
+        [value]="deudaTotal().total"
+        [variant]="deudaVariant"
+      />
+      <app-stat-card
+        icon="how_to_reg"
+        title="Deuda de inscripciones"
+        [value]="deudaTotal().inscripciones"
+        variant="info"
+      />
+      <app-stat-card
+        icon="calendar_month"
+        title="Deuda de cuotas"
+        [value]="deudaTotal().cuotas"
+        variant="info"
+      />
+    </div>
+  </div>
+</section>

@@ -1,0 +1,26 @@
+<section class="doc-card" aria-labelledby="doc-heading">
+  <header class="doc-card__header">
+    <mat-icon aria-hidden="true">folder_open</mat-icon>
+    <h2 id="doc-heading" class="doc-card__title">Documentación</h2>
+  </header>
+
+  <div class="doc-grid">
+    @for (item of docItems; track item.key) {
+    <div
+      class="doc-item"
+      [attr.aria-label]="item.label + ': ' + (documentacion()[item.key] ? 'Entregado' : 'Pendiente')"
+    >
+      <span
+        class="doc-item__check"
+        [class.doc-item__check--yes]="documentacion()[item.key]"
+        [class.doc-item__check--no]="!documentacion()[item.key]"
+      >
+        <mat-icon aria-hidden="true">
+          {{ documentacion()[item.key] ? 'check' : 'close' }}
+        </mat-icon>
+      </span>
+      <span class="doc-item__label">{{ item.label }}</span>
+    </div>
+    }
+  </div>
+</section>

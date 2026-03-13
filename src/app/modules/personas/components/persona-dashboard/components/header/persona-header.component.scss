@@ -1,0 +1,141 @@
+@use '../../../../../../shared/components/form/form-tokens' as tokens;
+
+$card-radius: 16px;
+
+.persona-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  background: white;
+  border-radius: $card-radius;
+  box-shadow: tokens.$shadow-card;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+
+    @media (max-width: 640px) {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+
+  &__name {
+    margin: 0;
+    font-size: clamp(1.25rem, 3vw, 1.5rem);
+    font-weight: 600;
+    color: tokens.$stone-900;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 14px;
+    color: tokens.$stone-500;
+  }
+
+  &__type {
+    font-weight: 500;
+    color: tokens.$stone-700;
+  }
+
+  &__rama,
+  &__cargo {
+    font-weight: 500;
+    color: tokens.$brand-burgundy;
+  }
+
+  &__separator {
+    color: tokens.$stone-300;
+  }
+
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px 8px 8px;
+    background: transparent;
+    border: 1px solid tokens.$stone-200;
+    border-radius: 8px;
+    color: tokens.$stone-600;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background-color tokens.$transition-fast,
+      border-color tokens.$transition-fast,
+      color tokens.$transition-fast;
+    white-space: nowrap;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      background-color: tokens.$stone-50;
+      border-color: tokens.$stone-300;
+      color: tokens.$stone-800;
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: tokens.$shadow-focus;
+    }
+
+    &:active {
+      background-color: tokens.$stone-100;
+    }
+  }
+}
+
+// Status badge variants
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &--activo {
+    background-color: color-mix(in srgb, tokens.$color-success 12%, transparent);
+    color: tokens.$color-success;
+  }
+
+  &--inactivo {
+    background-color: tokens.$stone-200;
+    color: tokens.$stone-600;
+  }
+}
