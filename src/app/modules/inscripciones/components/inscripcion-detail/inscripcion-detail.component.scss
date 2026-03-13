@@ -532,7 +532,7 @@ $card-padding-compact: 20px;
     color: tokens.$stone-600;
   }
 
-  // Edit button - appears on hover
+  // Edit button - always visible for better discoverability
   &__edit {
     flex-shrink: 0;
     display: flex;
@@ -546,9 +546,8 @@ $card-padding-compact: 20px;
     border-radius: 6px;
     color: tokens.$stone-400;
     cursor: pointer;
-    opacity: 0;
+    opacity: 1;
     transition:
-      opacity tokens.$transition-fast,
       background-color tokens.$transition-fast,
       color tokens.$transition-fast;
 
@@ -566,24 +565,10 @@ $card-padding-compact: 20px;
     &:focus-visible {
       outline: none;
       box-shadow: tokens.$shadow-focus;
-      opacity: 1;
     }
 
     &:active {
       background-color: tokens.$stone-300;
-    }
-  }
-
-  // Show edit button on hover
-  &--editable:hover &__edit,
-  &--editable:focus-within &__edit {
-    opacity: 1;
-  }
-
-  // Always visible on touch devices
-  @media (hover: none) {
-    &__edit {
-      opacity: 1;
     }
   }
 }

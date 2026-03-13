@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import {
   Inscripcion,
   InscripcionConEstado,
@@ -30,6 +31,7 @@ export interface InscripcionesQueryParams {
 export class InscripcionesApiService {
   private readonly http = inject(HttpService);
   private readonly endpoint = API_CONFIG.ENDPOINTS.INSCRIPCIONES;
+  private readonly movimientosEndpoint = API_CONFIG.ENDPOINTS.MOVIMIENTOS;
 
   /**
    * Get all inscripciones with optional filters
@@ -94,26 +96,25 @@ export class InscripcionesApiService {
 
   /**
    * Update an existing payment (movimiento)
-   * PATCH /api/v1/inscripciones/:id/pagos/:movimientoId
+   * Uses PATCH /api/v1/movimientos/:id then refreshes inscripcion state
    */
   updatePago(
     inscripcionId: string,
     movimientoId: string,
     dto: UpdatePagoDto,
   ): Observable<InscripcionConEstado> {
-    return this.http.patch<InscripcionConEstado, UpdatePagoDto>(
-      `${this.endpoint}/${inscripcionId}/pagos/${movimientoId}`,
-      dto,
-    );
+    return this.http
+      .patch<unknown, UpdatePagoDto>(`${this.movimientosEndpoint}/${movimientoId}`, dto)
+      .pipe(switchMap(() => this.getById(inscripcionId)));
   }
 
   /**
    * Delete an existing payment (movimiento)
-   * DELETE /api/v1/inscripciones/:id/pagos/:movimientoId
+   * Uses DELETE /api/v1/movimientos/:id then refreshes inscripcion state
    */
   deletePago(inscripcionId: string, movimientoId: string): Observable<InscripcionConEstado> {
-    return this.http.delete<InscripcionConEstado>(
-      `${this.endpoint}/${inscripcionId}/pagos/${movimientoId}`,
-    );
+    return this.http
+      .delete<void>(`${this.movimientosEndpoint}/${movimientoId}`)
+      .pipe(switchMap(() => this.getById(inscripcionId)));
   }
 }

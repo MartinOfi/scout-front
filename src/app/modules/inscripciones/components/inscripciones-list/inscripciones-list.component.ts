@@ -323,11 +323,17 @@ export class InscripcionesListComponent implements OnInit {
   }
 
   onDelete(id: string): void {
-    this.confirmDialog.confirmDelete('inscripción').subscribe((confirmed: boolean) => {
-      if (confirmed) {
-        this.state.delete(id).subscribe();
-      }
-    });
+    this.confirmDialog
+      .delete('inscripción', () => this.state.deleteAsync(id))
+      .subscribe((result) => {
+        if (result.deleted) {
+          // Reload the list after successful deletion
+          const tipo = this.activeTab();
+          const filters = this.currentFilters();
+          const ano = filters.ano ? parseInt(filters.ano, 10) : undefined;
+          this.state.load({ tipo, ano });
+        }
+      });
   }
 
   onActionClick(event: ActionEvent): void {

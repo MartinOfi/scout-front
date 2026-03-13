@@ -1,34 +1,133 @@
-.dialog-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 500;
+// ============================================================================
+// Pago Inscripcion Dialog - Polished Styling
+// Modern, clean design with proper spacing, typography, and visual hierarchy
+// Supports create and edit modes
+// ============================================================================
 
-  mat-icon {
-    color: var(--mat-primary-500, #3f51b5);
+// Import design tokens from shared form system
+@use 'sass:color';
+@use '../../../../../shared/components/form/form-tokens' as tokens;
+
+// Additional design tokens for dialog
+$primary-500: #3b82f6;
+$primary-600: #2563eb;
+$primary-700: #1d4ed8;
+$success-500: #22c55e;
+$success-600: #16a34a;
+$danger-500: #ef4444;
+$danger-600: #dc2626;
+
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+
+$shadow-dialog: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+$transition-fast: 150ms ease-out;
+
+// ============================================================================
+// Host & Material Dialog Container Override
+// ============================================================================
+
+:host {
+  display: block;
+}
+
+// Override Material Dialog container styling
+:host ::ng-deep {
+  .mat-mdc-dialog-container {
+    --mdc-dialog-container-shape: #{$radius-xl};
+
+    .mdc-dialog__surface {
+      border-radius: $radius-xl !important;
+      box-shadow: $shadow-dialog !important;
+      overflow: hidden;
+    }
+  }
+
+  // Remove default Material dialog padding
+  .mat-mdc-dialog-content {
+    padding: 0 !important;
+    max-height: 70vh;
+  }
+
+  .mat-mdc-dialog-actions {
+    padding: 0 !important;
+    min-height: auto;
+  }
+
+  .mat-mdc-dialog-title {
+    padding: 0 !important;
+    margin: 0 !important;
+
+    &::before {
+      display: none;
+    }
   }
 }
 
-.dialog-content {
-  min-width: 400px;
-  max-width: 500px;
+.dialog-container {
+  padding: 1rem;
 }
+
+// ============================================================================
+// Dialog Title
+// ============================================================================
+
+.dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 20px 24px 16px;
+  margin-bottom: 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: tokens.$stone-900;
+  letter-spacing: -0.01em;
+  border-bottom: 1px solid tokens.$stone-200;
+  background-color: white;
+
+  mat-icon {
+    color: tokens.$brand-burgundy;
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+}
+
+// ============================================================================
+// Dialog Content
+// ============================================================================
+
+.dialog-content {
+  padding: 20px 24px;
+  min-width: 420px;
+  max-width: 520px;
+  background-color: white;
+}
+
+// ============================================================================
+// Form Layout
+// ============================================================================
 
 .pago-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
+
+// ============================================================================
+// Summary Section
+// ============================================================================
 
 .summary {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   padding: 16px;
-  background-color: #f5f5f5;
-  border-radius: 4px;
+  background: linear-gradient(135deg, tokens.$stone-50 0%, tokens.$stone-100 100%);
+  border: 1px solid tokens.$stone-200;
+  border-radius: $radius-lg;
 
   .summary-item {
     display: flex;
@@ -36,26 +135,41 @@
     align-items: center;
 
     .label {
-      font-size: 14px;
-      color: rgba(0, 0, 0, 0.6);
+      font-size: 0.8125rem;
+      color: tokens.$stone-500;
+      font-weight: 400;
     }
 
     .value {
-      font-size: 16px;
+      font-size: 0.9375rem;
       font-weight: 600;
+      color: tokens.$stone-800;
+      font-variant-numeric: tabular-nums;
 
       &.success {
-        color: #4caf50;
+        color: $success-600;
+      }
+
+      &.danger {
+        color: $danger-500;
       }
     }
   }
 }
 
+// ============================================================================
+// Divider
+// ============================================================================
+
 .divider {
   border: none;
-  border-top: 1px solid rgba(0, 0, 0, 0.12);
-  margin: 8px 0;
+  border-top: 1px solid tokens.$stone-200;
+  margin: 4px 0;
 }
+
+// ============================================================================
+// Form Fields Grid
+// ============================================================================
 
 .form-fields {
   display: grid;
@@ -65,69 +179,219 @@
   .full-width {
     grid-column: 1 / -1;
   }
-}
 
-.quick-actions {
-  display: flex;
-  gap: 8px;
-
-  button {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-}
-
-.dialog-actions {
-  padding: 16px 24px;
-  gap: 8px;
-
-  .btn-danger {
-    margin-right: auto;
-    background-color: transparent;
-    color: #d32f2f;
-    border: 1px solid #d32f2f;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 14px;
-    transition: all 0.2s ease;
-
-    mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
-
-    &:hover {
-      background-color: rgba(211, 47, 47, 0.08);
-    }
+  // Remove bottom margin from form fields inside dialog
+  :host ::ng-deep .scout-field {
+    margin-bottom: 0;
   }
 }
 
 .input-with-prefix {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 
   .input-prefix {
-    color: rgba(0, 0, 0, 0.54);
+    color: tokens.$stone-500;
     font-weight: 500;
+    font-size: 0.9375rem;
   }
 }
 
+// ============================================================================
+// Quick Actions
+// ============================================================================
+
+.quick-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  button {
+    flex: 1;
+    min-width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+// ============================================================================
+// Button Styles
+// ============================================================================
+
+.btn-outline {
+  background-color: white;
+  border: 1px solid tokens.$stone-300;
+  color: tokens.$stone-700;
+
+  mat-icon {
+    color: tokens.$brand-burgundy;
+  }
+
+  &:hover {
+    background-color: tokens.$stone-50;
+    border-color: tokens.$brand-burgundy;
+    color: tokens.$brand-burgundy;
+
+    mat-icon {
+      color: tokens.$brand-burgundy;
+    }
+  }
+
+  &:active {
+    background-color: tokens.$stone-100;
+  }
+}
+
+.btn-secondary {
+  background-color: white;
+  border: 1px solid tokens.$stone-300;
+  color: tokens.$stone-700;
+  padding: 10px 20px;
+  border-radius: $radius-md;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background-color: tokens.$stone-50;
+    border-color: tokens.$stone-400;
+  }
+
+  &:active {
+    background-color: tokens.$stone-100;
+  }
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, tokens.$brand-burgundy 0%, tokens.$brand-burgundy-light 100%);
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: $radius-md;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-fast;
+  box-shadow: 0 1px 2px 0 rgba(tokens.$brand-burgundy, 0.2);
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, color.adjust(tokens.$brand-burgundy, $lightness: -5%) 0%, tokens.$brand-burgundy 100%);
+    box-shadow: 0 2px 4px 0 rgba(tokens.$brand-burgundy, 0.25);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    background: tokens.$stone-200;
+    color: tokens.$stone-400;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: auto;
+  background-color: white;
+  border: 1px solid $danger-500;
+  color: $danger-600;
+  padding: 10px 16px;
+  border-radius: $radius-md;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background-color: rgba($danger-500, 0.06);
+    border-color: $danger-600;
+  }
+
+  &:active {
+    background-color: rgba($danger-500, 0.1);
+  }
+}
+
+// ============================================================================
+// Dialog Actions
+// ============================================================================
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px 20px;
+  background-color: tokens.$stone-50;
+  border-top: 1px solid tokens.$stone-200;
+}
+
+// ============================================================================
 // Responsive
+// ============================================================================
+
 @media (max-width: 600px) {
   .dialog-content {
     min-width: auto;
+    padding: 16px;
+  }
+
+  .dialog-title {
+    padding: 16px 16px 12px;
   }
 
   .form-fields {
     grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .quick-actions {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .dialog-actions {
+    padding: 12px 16px 16px;
+    flex-wrap: wrap;
+
+    .btn-danger {
+      margin-right: 0;
+      width: 100%;
+      justify-content: center;
+      order: 3;
+      margin-top: 8px;
+    }
+  }
+
+  .summary {
+    padding: 14px;
   }
 }

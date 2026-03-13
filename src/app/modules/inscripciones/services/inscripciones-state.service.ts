@@ -5,7 +5,7 @@
  */
 
 import { Injectable, Signal, WritableSignal, computed, signal, inject } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, firstValueFrom } from 'rxjs';
 import { tap, catchError, finalize } from 'rxjs/operators';
 
 import {
@@ -200,7 +200,7 @@ export class InscripcionesStateService {
   }
 
   /**
-   * Eliminar una inscripción
+   * Eliminar una inscripción (Observable)
    */
   delete(id: string): Observable<void> {
     this._loading.set(true);
@@ -219,6 +219,16 @@ export class InscripcionesStateService {
       }),
       finalize(() => this._loading.set(false)),
     );
+  }
+
+  /**
+   * Eliminar una inscripción (Promise)
+   * Used by DeleteDialogComponent for async/await pattern
+   */
+  async deleteAsync(id: string): Promise<void> {
+    return firstValueFrom(this.apiService.delete(id)).then(() => {
+      this._inscripciones.update((prev) => prev.filter((i) => i.id !== id));
+    });
   }
 
   /**
