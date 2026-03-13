@@ -50,9 +50,11 @@ export interface PagoParticipante {
  * Individual payment detail
  */
 export interface PagoDetalle {
+  movimientoId: string;
   fecha: Date;
   monto: number;
   medioPago: MedioPago;
+  descripcion?: string;
 }
 
 /**
@@ -93,6 +95,7 @@ export interface RegistrarPagoCampamentoDto {
   personaId: string;
   monto: number;
   medioPago: MedioPago;
+  descripcion?: string;
 }
 
 /**

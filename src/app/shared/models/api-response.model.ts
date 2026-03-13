@@ -27,10 +27,23 @@ export interface PaginationParams {
   limit: number;
 }
 
-export interface PaginatedResponse<T> {
-  data: T[];
-  total: number;
+/**
+ * Pagination metadata from backend response
+ */
+export interface PaginationMeta {
   page: number;
   limit: number;
+  total: number;
   totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}
+
+/**
+ * Paginated response from backend
+ * Structure: { data: T[], meta: PaginationMeta }
+ */
+export interface PaginatedResponse<T> {
+  data: T[];
+  meta: PaginationMeta;
 }

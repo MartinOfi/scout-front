@@ -1,0 +1,94 @@
+<div class="dialog-container">
+  <!-- Confirm State -->
+  @if (state() === 'confirm') {
+  <div class="dialog-icon">
+    <div class="icon-circle danger">
+      <mat-icon>delete_outline</mat-icon>
+    </div>
+  </div>
+
+  <h2 mat-dialog-title class="dialog-title">{{ title }}</h2>
+
+  <mat-dialog-content class="dialog-content">
+    <p class="message">{{ message }}</p>
+    @if (data.warning) {
+    <div class="warning-box">
+      <mat-icon>warning_amber</mat-icon>
+      <span>{{ data.warning }}</span>
+    </div>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions">
+    <button type="button" class="btn-secondary" (click)="onCancel()">
+      Cancelar
+    </button>
+    <button type="button" class="btn-danger-filled" (click)="onConfirm()">
+      <mat-icon>delete</mat-icon>
+      Eliminar
+    </button>
+  </mat-dialog-actions>
+  }
+
+  <!-- Loading State -->
+  @if (state() === 'loading') {
+  <div class="dialog-icon">
+    <mat-spinner diameter="48" color="primary"></mat-spinner>
+  </div>
+
+  <h2 mat-dialog-title class="dialog-title">Eliminando...</h2>
+
+  <mat-dialog-content class="dialog-content">
+    <p class="message message--muted">
+      Eliminando {{ data.entityName }}. Por favor espera.
+    </p>
+  </mat-dialog-content>
+  }
+
+  <!-- Error State -->
+  @if (state() === 'error') {
+  <div class="dialog-icon">
+    <div class="icon-circle danger">
+      <mat-icon>error_outline</mat-icon>
+    </div>
+  </div>
+
+  <h2 mat-dialog-title class="dialog-title dialog-title--danger">
+    No se pudo eliminar
+  </h2>
+
+  <mat-dialog-content class="dialog-content">
+    <div class="error-box">
+      <p class="error-message">{{ errorMessage() }}</p>
+      @if (errorHint()) {
+      <p class="error-hint">{{ errorHint() }}</p>
+      }
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions dialog-actions--center">
+    <button type="button" class="btn-primary" (click)="onClose()">
+      Entendido
+    </button>
+  </mat-dialog-actions>
+  }
+
+  <!-- Success State -->
+  @if (state() === 'success') {
+  <div class="dialog-icon">
+    <div class="icon-circle success">
+      <mat-icon>check_circle_outline</mat-icon>
+    </div>
+  </div>
+
+  <h2 mat-dialog-title class="dialog-title dialog-title--success">
+    Eliminado correctamente
+  </h2>
+
+  <mat-dialog-content class="dialog-content">
+    <p class="message message--success">
+      {{ data.entityName | titlecase }} eliminado exitosamente.
+    </p>
+  </mat-dialog-content>
+  }
+</div>

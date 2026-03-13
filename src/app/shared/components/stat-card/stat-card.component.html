@@ -1,4 +1,4 @@
-<article class="stat-card">
+<article class="stat-card" [class]="'stat-card--' + variant()">
   <header class="stat-card__header">
     <span class="stat-card__icon" [class]="'stat-card__icon--' + variant()">
       <mat-icon>{{ icon() }}</mat-icon>

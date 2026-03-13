@@ -9,6 +9,14 @@ import { environment } from '../../../environments/environment';
 export const API_CONFIG = {
   BASE_URL: environment.apiUrl,
   ENDPOINTS: {
+    // Auth
+    AUTH_LOGIN: 'auth/login',
+    AUTH_REGISTER: 'auth/register',
+    AUTH_REFRESH: 'auth/refresh',
+    AUTH_LOGOUT: 'auth/logout',
+    AUTH_ME: 'auth/me',
+    AUTH_PASSWORD: 'auth/password',
+
     // Personas
     PERSONAS: 'personas',
     PROTAGONISTAS: 'personas/protagonistas',

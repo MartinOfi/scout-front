@@ -1,66 +1,165 @@
+// =============================================================================
+// EVENT LIST ITEM - Upcoming event row with date badge
+// =============================================================================
+
 .event-list-item {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
   padding: var(--spacing-md) var(--spacing-lg);
+  margin: 0 var(--spacing-xs);
+  border-radius: 10px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-  border-bottom: 1px solid var(--gray-100);
+  transition:
+    background-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
 
-  &:last-child {
-    border-bottom: none;
+  // Divider between items (not on last)
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: calc(var(--spacing-lg) + 56px);
+    right: var(--spacing-lg);
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.06) 0%,
+      rgba(0, 0, 0, 0.06) 80%,
+      transparent 100%
+    );
   }
 
   &:hover {
-    background-color: var(--gray-50);
+    background-color: rgba(21, 101, 192, 0.04);
+    transform: translateX(4px);
+
+    .event-list-item__date-badge {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(21, 101, 192, 0.2);
+    }
   }
+
+  &:active {
+    transform: translateX(2px);
+  }
+
+  // Focus state for keyboard navigation
+  &:focus {
+    outline: none;
+    box-shadow: inset 0 0 0 2px rgba(21, 101, 192, 0.3);
+    border-radius: 10px;
+  }
+
+  // Reduced motion support
+  @media (prefers-reduced-motion: reduce) {
+    transition: background-color 150ms ease;
+
+    &:hover {
+      transform: none;
+    }
+
+    .event-list-item__date-badge {
+      transition: none;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Date Badge - Calendar-style display
+  // ---------------------------------------------------------------------------
 
   &__date-badge {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-width: 48px;
-    height: 48px;
-    background-color: #e3f2fd;
-    border-radius: 8px;
+    min-width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border-radius: 12px;
     padding: var(--spacing-xs);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(21, 101, 192, 0.12);
+    transition:
+      transform 200ms cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    // Top accent stripe
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #1565c0 0%, #1976d2 100%);
+      border-radius: 12px 12px 0 0;
+    }
   }
 
   &__month {
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 700;
     color: #1565c0;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
+    margin-top: 2px;
   }
 
   &__day {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
-    color: #1565c0;
+    color: #0d47a1;
     line-height: 1;
+    font-family: var(--font-family-headings);
+    font-feature-settings: 'tnum' 1;
   }
+
+  // ---------------------------------------------------------------------------
+  // Content
+  // ---------------------------------------------------------------------------
 
   &__content {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xs);
+    gap: 6px;
+    min-width: 0;
   }
 
   &__title {
     font-size: 14px;
     font-weight: 500;
     margin: 0;
+    color: var(--gray-900);
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
+  // ---------------------------------------------------------------------------
+  // Category Chip
+  // ---------------------------------------------------------------------------
+
   &__category {
-    display: inline-block;
-    font-size: 14px;
-    font-weight: 550;
-    padding: 2px 8px;
-    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 100px; // Pill shape
     width: fit-content;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: transform 200ms ease;
+
+    &:hover {
+      transform: scale(1.02);
+    }
   }
 }

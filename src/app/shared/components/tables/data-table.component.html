@@ -219,7 +219,7 @@ Este template implementa una tabla responsiva con las siguientes característica
   <div class="pagination-controls">
     <div class="flex items-center justify-center space-x-2 mb-3">
       <!-- Botón Anterior -->
-      <button type="button" class="pagination-btn" [disabled]="currentPage === 1"
+      <button type="button" class="pagination-btn unstyled" [disabled]="currentPage === 1"
         (click)="onPageChange(currentPage - 1)">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
@@ -229,14 +229,14 @@ Este template implementa una tabla responsiva con las siguientes característica
       <!-- Números de página -->
       <div class="flex items-center space-x-1">
         @for (page of getPageNumbers(); track page) {
-        <button type="button" class="page-number-btn" [class.active]="page === currentPage"
+        <button type="button" class="page-number-btn unstyled" [class.active]="page === currentPage"
           (click)="onPageChange(page)">
           {{ page }}
         </button>
         }
       </div>
       <!-- Botón Siguiente -->
-      <button type="button" class="pagination-btn" [disabled]="currentPage === totalPages"
+      <button type="button" class="pagination-btn unstyled" [disabled]="currentPage === totalPages"
         (click)="onPageChange(currentPage + 1)">
         Siguiente
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

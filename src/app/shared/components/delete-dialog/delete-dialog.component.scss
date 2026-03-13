@@ -1,0 +1,301 @@
+/**
+ * Delete Dialog Component Styles
+ * Uses design system tokens and consistent patterns
+ */
+
+@use 'sass:color';
+@use '../form/form-tokens' as tokens;
+
+// Design tokens
+$danger-500: #ef4444;
+$danger-600: #dc2626;
+$danger-100: #fee2e2;
+$success-500: #22c55e;
+$success-600: #16a34a;
+$success-100: #dcfce7;
+$amber-50: #fffbeb;
+$amber-200: #fde68a;
+$amber-500: #f59e0b;
+$amber-700: #b45309;
+
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+
+$shadow-dialog: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+$transition-fast: 150ms ease-out;
+
+// ============================================================================
+// Host & Material Dialog Container Override
+// ============================================================================
+
+:host {
+  display: block;
+}
+
+:host ::ng-deep {
+  .mat-mdc-dialog-container {
+    --mdc-dialog-container-shape: #{$radius-xl};
+
+    .mdc-dialog__surface {
+      border-radius: $radius-xl !important;
+      box-shadow: $shadow-dialog !important;
+      overflow: hidden;
+    }
+  }
+
+  .mat-mdc-dialog-content {
+    padding: 0 !important;
+  }
+
+  .mat-mdc-dialog-actions {
+    padding: 0 !important;
+    min-height: auto;
+  }
+
+  .mat-mdc-dialog-title {
+    padding: 0 !important;
+    margin: 0 !important;
+
+    &::before {
+      display: none;
+    }
+  }
+}
+
+// ============================================================================
+// Dialog Container
+// ============================================================================
+
+.dialog-container {
+  padding: 24px;
+  text-align: center;
+  min-width: 320px;
+  max-width: 400px;
+}
+
+// ============================================================================
+// Dialog Icon
+// ============================================================================
+
+.dialog-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.icon-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+  }
+
+  &.danger {
+    background-color: $danger-100;
+    color: $danger-600;
+  }
+
+  &.success {
+    background-color: $success-100;
+    color: $success-600;
+  }
+}
+
+// ============================================================================
+// Dialog Title
+// ============================================================================
+
+.dialog-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: tokens.$stone-900;
+  margin: 0 0 8px;
+
+  &--danger {
+    color: $danger-600;
+  }
+
+  &--success {
+    color: $success-600;
+  }
+}
+
+// ============================================================================
+// Dialog Content
+// ============================================================================
+
+.dialog-content {
+  padding-bottom: 24px;
+}
+
+.message {
+  color: tokens.$stone-600;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+
+  &--muted {
+    color: tokens.$stone-500;
+    font-style: italic;
+  }
+
+  &--success {
+    color: $success-600;
+  }
+}
+
+// ============================================================================
+// Warning Box
+// ============================================================================
+
+.warning-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 12px;
+  background-color: $amber-50;
+  border: 1px solid $amber-200;
+  border-radius: $radius-lg;
+  color: $amber-700;
+  font-size: 0.875rem;
+
+  mat-icon {
+    color: $amber-500;
+    flex-shrink: 0;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  span {
+    line-height: 1.4;
+    text-align: left;
+  }
+}
+
+// ============================================================================
+// Error Box
+// ============================================================================
+
+.error-box {
+  padding: 16px;
+  background-color: rgba($danger-500, 0.05);
+  border: 1px solid rgba($danger-500, 0.2);
+  border-radius: $radius-lg;
+  text-align: left;
+}
+
+.error-message {
+  color: $danger-600;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.error-hint {
+  color: $danger-500;
+  font-size: 0.75rem;
+  margin: 8px 0 0;
+}
+
+// ============================================================================
+// Dialog Actions
+// ============================================================================
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 16px;
+  margin-top: 8px;
+  border-top: 1px solid tokens.$stone-100;
+
+  &--center {
+    justify-content: center;
+  }
+}
+
+// ============================================================================
+// Button Styles
+// ============================================================================
+
+.btn-secondary {
+  padding: 10px 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: tokens.$stone-700;
+  background-color: white;
+  border: 1px solid tokens.$stone-300;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background-color: tokens.$stone-50;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px tokens.$stone-200;
+  }
+}
+
+.btn-primary {
+  padding: 10px 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: white;
+  background: linear-gradient(135deg, tokens.$brand-burgundy 0%, tokens.$brand-burgundy-light 100%);
+  border: 1px solid transparent;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: linear-gradient(135deg, tokens.$brand-burgundy-light 0%, tokens.$brand-burgundy 100%);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(tokens.$brand-burgundy, 0.3);
+  }
+}
+
+.btn-danger-filled {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: white;
+  background-color: $danger-600;
+  border: 1px solid transparent;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background-color: $danger-500;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba($danger-500, 0.3);
+  }
+}

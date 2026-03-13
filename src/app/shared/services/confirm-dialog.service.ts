@@ -6,10 +6,18 @@
 
 import { Injectable, inject } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { Observable } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { ConfirmDialogComponent, ConfirmDialogData } from '../components/confirm-dialog/confirm-dialog.component';
+import {
+  ConfirmDialogComponent,
+  ConfirmDialogData,
+} from '../components/confirm-dialog/confirm-dialog.component';
+import {
+  DeleteDialogComponent,
+  DeleteDialogData,
+  DeleteDialogResult,
+} from '../components/delete-dialog/delete-dialog.component';
 
 @Injectable({
   providedIn: 'root',
@@ -32,7 +40,7 @@ export class ConfirmDialogService {
       confirmText?: string;
       cancelText?: string;
       isDestructive?: boolean;
-    }
+    },
   ): Observable<boolean> {
     const data: ConfirmDialogData = {
       title,
@@ -50,14 +58,14 @@ export class ConfirmDialogService {
         width: '400px',
         maxWidth: '90vw',
         disableClose: false,
-      }
+      },
     );
 
-    return dialogRef.afterClosed().pipe(map(result => result ?? false));
+    return dialogRef.afterClosed().pipe(map((result) => result ?? false));
   }
 
   /**
-   * Confirm deletion with standard parameters
+   * Confirm deletion with standard parameters (legacy - simple confirmation)
    * @param entityName Name of entity being deleted (e.g., "protagonista", "campamento")
    * @returns Observable<boolean> - true if confirmed, false if cancelled
    */
@@ -70,7 +78,68 @@ export class ConfirmDialogService {
         confirmText: 'Eliminar',
         cancelText: 'Cancelar',
         isDestructive: true,
-      }
+      },
     );
+  }
+
+  /**
+   * Enhanced delete dialog with loading, error, and success states
+   * Handles backend validation errors gracefully
+   *
+   * @param entityName Name of entity being deleted (e.g., "inscripción", "campamento")
+   * @param deleteFn Function that performs the actual deletion (returns Observable or Promise)
+   * @param options Optional configuration (warning message, custom title/message)
+   * @returns Observable<DeleteDialogResult> - result with deleted status and optional error
+   *
+   * @example
+   * ```typescript
+   * this.confirmDialog.delete(
+   *   'inscripción',
+   *   () => firstValueFrom(this.api.delete(id))
+   * ).subscribe(result => {
+   *   if (result.deleted) {
+   *     // Refresh list
+   *   }
+   * });
+   * ```
+   */
+  delete(
+    entityName: string,
+    deleteFn: () => Promise<void> | Observable<void>,
+    options?: {
+      title?: string;
+      message?: string;
+      warning?: string;
+    },
+  ): Observable<DeleteDialogResult> {
+    const onDelete = async (): Promise<void> => {
+      const result = deleteFn();
+      if (result instanceof Promise) {
+        await result;
+      } else {
+        await firstValueFrom(result);
+      }
+    };
+
+    const data: DeleteDialogData = {
+      entityName,
+      title: options?.title,
+      message: options?.message,
+      warning: options?.warning,
+      onDelete,
+    };
+
+    const dialogRef: MatDialogRef<DeleteDialogComponent, DeleteDialogResult> = this.dialog.open(
+      DeleteDialogComponent,
+      {
+        data,
+        width: '440px',
+        maxWidth: '95vw',
+        panelClass: 'delete-dialog-panel',
+        disableClose: false,
+      },
+    );
+
+    return dialogRef.afterClosed().pipe(map((result) => result ?? { deleted: false }));
   }
 }

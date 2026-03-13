@@ -54,10 +54,10 @@ export enum RamaEnum {
  * Labels for Rama (for UI display)
  */
 export const RAMA_LABELS: Record<Rama, string> = {
-  'Manada': 'Manada',
-  'Unidad': 'Unidad',
-  'Caminantes': 'Caminantes',
-  'Rovers': 'Rovers',
+  Manada: 'Manada',
+  Unidad: 'Unidad',
+  Caminantes: 'Caminantes',
+  Rovers: 'Rovers',
 } as const;
 
 /**
