@@ -1,0 +1,144 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon>payments</mat-icon>
+  Registrar Pago de Cuota
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="form" class="pago-form">
+    <!-- Participant Info -->
+    <div class="participant-info">
+      <div class="avatar">{{ data.personaNombre[0] }}</div>
+      <div class="info">
+        <span class="name">{{ data.personaNombre }}</span>
+        <span class="label">{{ data.cuotaNombre }} - {{ data.ano }}</span>
+      </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="summary">
+      <div class="summary-item">
+        <span class="label">Monto Total:</span>
+        <span class="value">${{ data.montoTotal | number:'1.0-0' }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Total Pagado:</span>
+        <span class="value success">${{ data.montoPagado | number:'1.0-0' }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Saldo Pendiente:</span>
+        <span class="value" [class.danger]="montoPendiente > 0">${{ montoPendiente | number:'1.0-0' }}</span>
+      </div>
+      @if (puedeUsarSaldo) {
+        <div class="summary-item">
+          <span class="label">Saldo Cuenta Personal:</span>
+          <span class="value success">${{ saldoCuentaPersonal | number:'1.0-0' }}</span>
+        </div>
+      }
+
+      <!-- Progress bar -->
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="progressPercent"></div>
+      </div>
+      <span class="progress-label">{{ progressPercent }}% completado</span>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="form-fields">
+      <!-- Monto -->
+      <app-form-field
+        label="Monto del Pago"
+        [forId]="'monto'"
+        [required]="true"
+        [invalid]="!!(form.get('monto')?.invalid && form.get('monto')?.touched)"
+      >
+        <div class="input-with-prefix">
+          <span class="input-prefix">$</span>
+          <app-number-field
+            id="monto"
+            formControlName="monto"
+            [min]="1"
+            placeholder="0"
+          />
+        </div>
+        @if (form.get('monto')?.hasError('max')) {
+          <span error>No puede exceder ${{ montoPendiente }}</span>
+        }
+        @if (form.get('monto')?.hasError('min')) {
+          <span error>Debe ser mayor a 0</span>
+        }
+      </app-form-field>
+
+      <!-- Medio de Pago -->
+      <app-form-field
+        label="Medio de Pago"
+        [forId]="'medio-pago-select'"
+        [required]="true"
+        [invalid]="!!(form.get('medioPago')?.invalid && form.get('medioPago')?.touched)"
+      >
+        <app-select-field
+          id="medio-pago-select"
+          formControlName="medioPago"
+          placeholder="Seleccionar medio"
+          [options]="mediosPagoOptions"
+          [optionValueFn]="getMedioPagoValue"
+          [optionLabelFn]="getMedioPagoLabel"
+        />
+        <span error>Seleccione un medio de pago</span>
+      </app-form-field>
+
+      <!-- Descripción -->
+      <app-form-field
+        label="Descripción"
+        [forId]="'descripcion'"
+        hint="Opcional"
+        class="full-width"
+      >
+        <app-textarea-field
+          id="descripcion"
+          formControlName="descripcion"
+          placeholder="Notas adicionales..."
+          [rows]="2"
+        />
+      </app-form-field>
+    </div>
+
+    <!-- Remaining after payment -->
+    <div class="remaining-info">
+      <span class="label">Saldo Restante:</span>
+      <span class="value" [class.success]="montoRestante === 0">
+        ${{ montoRestante | number:'1.0-0' }}
+      </span>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      @if (puedeUsarSaldo) {
+        <button type="button" class="btn-outline" (click)="usarSaldoDisponible()">
+          <mat-icon>account_balance_wallet</mat-icon>
+          Usar Saldo (${{ saldoCuentaPersonal | number:'1.0-0' }})
+        </button>
+      }
+      @if (montoPendiente > 0) {
+        <button type="button" class="btn-outline" (click)="pagarTodo()">
+          <mat-icon>bolt</mat-icon>
+          Pagar Todo (${{ montoPendiente | number:'1.0-0' }})
+        </button>
+      }
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions" align="end">
+  <button type="button" class="btn-secondary" (click)="onCancel()">
+    Cancelar
+  </button>
+  <button
+    type="button"
+    class="btn-primary"
+    [disabled]="formInvalid"
+    (click)="onSubmit()"
+  >
+    Registrar Pago
+  </button>
+</mat-dialog-actions>
