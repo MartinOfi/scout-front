@@ -221,15 +221,16 @@ export class CajasStateService {
 
   /**
    * Map fondo tipo string to Rama enum
+   * Handles both uppercase (RAMA_MANADA) and lowercase (rama_manada)
    */
   private mapTipoToRama(tipo: string): Rama | null {
     const mapping: Record<string, Rama> = {
-      RAMA_MANADA: RamaEnum.MANADA,
-      RAMA_UNIDAD: RamaEnum.UNIDAD,
-      RAMA_CAMINANTES: RamaEnum.CAMINANTES,
-      RAMA_ROVERS: RamaEnum.ROVERS,
+      rama_manada: RamaEnum.MANADA,
+      rama_unidad: RamaEnum.UNIDAD,
+      rama_caminantes: RamaEnum.CAMINANTES,
+      rama_rovers: RamaEnum.ROVERS,
     };
-    return mapping[tipo] ?? null;
+    return mapping[tipo.toLowerCase()] ?? null;
   }
 
   /**

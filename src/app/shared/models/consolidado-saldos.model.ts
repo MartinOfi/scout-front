@@ -6,9 +6,10 @@
 
 /**
  * Detail of a single rama fund
+ * Note: Backend returns lowercase tipo values (rama_manada, rama_unidad, etc.)
  */
 export interface FondoRamaDetalle {
-  readonly tipo: 'RAMA_MANADA' | 'RAMA_UNIDAD' | 'RAMA_CAMINANTES' | 'RAMA_ROVERS';
+  readonly tipo: 'rama_manada' | 'rama_unidad' | 'rama_caminantes' | 'rama_rovers';
   readonly id: string;
   readonly nombre: string;
   readonly saldo: number;
