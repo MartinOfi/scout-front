@@ -205,7 +205,6 @@ export class MovimientosListComponent implements OnInit {
         header: 'Acciones',
         type: 'action',
         actions: [
-          { key: 'view', label: 'Ver', icon: 'visibility', tooltip: 'Ver detalle' },
           { key: 'edit', label: 'Editar', icon: 'edit', tooltip: 'Editar' },
           {
             key: 'delete',
