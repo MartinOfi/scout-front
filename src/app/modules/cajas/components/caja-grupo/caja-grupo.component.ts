@@ -19,7 +19,7 @@ import { CajaConSaldo, Movimiento } from '../../../../shared/models';
 import { StatCardComponent } from '../../../../shared/components/stat-card/stat-card.component';
 import { ActionButtonComponent } from '../../../../shared/components/action-button/action-button.component';
 import { DataTableComponent } from '../../../../shared/components/tables/data-table.component';
-import { TableColumn, TableData, TableAction } from '../../../../shared/models/table.model';
+import { TableColumn, TableData, ActionEvent } from '../../../../shared/models/table.model';
 
 // Local Components
 import { SaldoCardComponent } from './components/saldo-card/saldo-card.component';
@@ -100,8 +100,8 @@ export class CajaGrupoComponent implements OnInit {
     }
   }
 
-  onTableAction(event: { action: TableAction; row: TableData }): void {
-    if (event.action.key === 'view') {
+  onTableAction(event: ActionEvent): void {
+    if (event.action === 'view') {
       this.onVerMovimiento(event.row['id'] as string);
     }
   }
