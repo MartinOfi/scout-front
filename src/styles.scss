@@ -3,7 +3,15 @@
 // =============================================================================
 
 // -----------------------------------------------------------------------------
-// 1. IMPORTS
+// 1. SCSS MODULES (must be first)
+// -----------------------------------------------------------------------------
+
+// Design Token System (OKLCH-based)
+@use 'app/shared/styles/color-tokens';
+@use 'app/shared/styles/typography-scale';
+
+// -----------------------------------------------------------------------------
+// 2. EXTERNAL IMPORTS
 // -----------------------------------------------------------------------------
 
 // Google Fonts - Inter & Inter Tight
@@ -13,7 +21,7 @@
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
 // -----------------------------------------------------------------------------
-// 2. CSS CUSTOM PROPERTIES (DESIGN TOKENS)
+// 3. CSS CUSTOM PROPERTIES (DESIGN TOKENS)
 // -----------------------------------------------------------------------------
 
 :root {
@@ -236,8 +244,7 @@ textarea:not([matInput]):not(.unstyled) {
   font-family: var(--font-family-base);
   font-size: 16px;
   padding: 12px;
-  border: 1px solid var(--gray-400);
-  border-radius: 4px;
+  border-radius: 10px;
   transition: border-color 0.2s ease;
 
   &:focus {
@@ -397,4 +404,29 @@ textarea:not([matInput]):not(.unstyled) {
 // Ensure all mat-form-fields are full-width by default in forms
 form .mat-mdc-form-field {
   width: 100%;
+}
+
+// Caja drawer - Material button toggle overrides (avoids ::ng-deep)
+.caja-drawer {
+  .mat-button-toggle-group {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid var(--border-default, #e0e0e0);
+    background: var(--surface-primary, #ffffff);
+  }
+
+  .mat-button-toggle {
+    flex: 1;
+
+    .mat-button-toggle-button {
+      font-size: var(--text-sm, 0.875rem);
+      font-weight: 500;
+      padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+    }
+  }
+
+  .mat-button-toggle-checked {
+    background-color: var(--color-primary-burgundy);
+    color: #ffffff;
+  }
 }

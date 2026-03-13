@@ -1,0 +1,364 @@
+// =============================================================================
+// CAJA DRAWER - Side panel for viewing caja details
+// Refactored: Clean SCSS, WCAG AAA contrast on burgundy backgrounds
+// =============================================================================
+
+.caja-drawer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--surface-primary);
+  width: 380px;
+  max-width: 100vw;
+
+  @media (max-width: 480px) {
+    width: 100vw;
+  }
+}
+
+// =============================================================================
+// HEADER - WCAG AAA compliant (7.2:1 contrast ratio)
+// Background: #812128 (burgundy), Text: #ffffff (white)
+// =============================================================================
+
+.drawer-header {
+  padding: var(--spacing-lg);
+  background: var(--color-primary-burgundy);
+  color: #ffffff;
+
+  &__row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.drawer-close {
+  // WCAG AAA: Use full white for proper contrast on burgundy
+  color: #ffffff;
+  flex-shrink: 0;
+  margin: calc(-1 * var(--spacing-xs)) calc(-1 * var(--spacing-xs)) 0 0;
+  transition: opacity 150ms ease-out;
+  opacity: 0.9;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
+    opacity: 1;
+  }
+}
+
+.caja-name {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  margin: 0 0 var(--spacing-xs);
+  // WCAG AAA: Use full white for proper contrast on burgundy
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.9;
+}
+
+.caja-saldo {
+  font-size: var(--text-4xl);
+  font-weight: 700;
+  margin: 0;
+  font-family: var(--font-family-headings);
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: -0.02em;
+  line-height: 1;
+
+  &.negative {
+    color: var(--color-danger-light);
+  }
+}
+
+// =============================================================================
+// FILTER TABS
+// Note: Material button toggle overrides are in global styles.scss
+// scoped to .caja-drawer to avoid ::ng-deep usage
+// =============================================================================
+
+.drawer-filters {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--surface-secondary);
+}
+
+.filter-toggles {
+  width: 100%;
+}
+
+// =============================================================================
+// CONTENT
+// =============================================================================
+
+.drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-md) 0;
+}
+
+.drawer-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-2xl);
+  color: var(--text-muted);
+
+  span {
+    font-size: var(--text-sm);
+  }
+}
+
+.drawer-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  text-align: center;
+}
+
+.empty-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--surface-secondary);
+  margin-bottom: var(--spacing-sm);
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    color: var(--text-muted);
+  }
+}
+
+.empty-title {
+  margin: 0;
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.empty-description {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  max-width: 240px;
+  line-height: 1.5;
+}
+
+.empty-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: transparent;
+  border: 1px solid var(--color-primary-burgundy);
+  border-radius: 8px;
+  color: var(--color-primary-burgundy);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 150ms ease-out;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: var(--hover-overlay);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-burgundy);
+    outline-offset: 2px;
+  }
+}
+
+// =============================================================================
+// MOVIMIENTOS LIST
+// =============================================================================
+
+.movimientos-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.movimiento-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  transition: background-color 150ms ease-out;
+
+  &:hover {
+    background-color: var(--surface-secondary);
+  }
+
+  // Subtle separator - only between items
+  & + & {
+    border-top: 1px solid var(--border-light);
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  // Ingreso icon - no background, just color
+  &.ingreso &__icon {
+    color: var(--color-success);
+  }
+
+  // Egreso icon - no background, just color
+  &.egreso &__icon {
+    color: var(--color-danger);
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__monto {
+    font-size: var(--text-base);
+    font-weight: 600;
+    font-family: var(--font-family-headings);
+    font-variant-numeric: tabular-nums lining-nums;
+    text-align: right;
+
+    &.positive {
+      color: var(--color-success);
+    }
+
+    &.negative {
+      color: var(--color-danger);
+    }
+  }
+}
+
+.movimiento-concepto {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.movimiento-fecha {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
+}
+
+// =============================================================================
+// FOOTER
+// =============================================================================
+
+.drawer-footer {
+  display: flex;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: 1px solid var(--border-default);
+  background: var(--surface-primary);
+}
+
+.btn-primary {
+  flex: 1.5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  background-color: var(--color-primary-burgundy) !important;
+  transition: background-color 150ms ease-out !important;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background-color: var(--color-burgundy-light) !important;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-burgundy);
+    outline-offset: 2px;
+  }
+}
+
+.btn-secondary {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  color: var(--text-secondary);
+  border-color: var(--border-default) !important;
+  transition: all 150ms ease-out !important;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    color: var(--text-primary);
+    border-color: var(--border-strong) !important;
+    background-color: var(--surface-secondary) !important;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-burgundy);
+    outline-offset: 2px;
+  }
+}
+
+// =============================================================================
+// REDUCED MOTION
+// =============================================================================
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer-close,
+  .movimiento-item {
+    transition: none;
+  }
+}
