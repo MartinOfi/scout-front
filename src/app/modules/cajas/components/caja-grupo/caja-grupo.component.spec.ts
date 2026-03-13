@@ -5,7 +5,7 @@
  */
 
 import { vi } from 'vitest';
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 
 import { CajaGrupoComponent } from './caja-grupo.component';
@@ -41,7 +41,6 @@ describe('CajaGrupoComponent', () => {
     component = fixture.componentInstance;
   });
 
-
   describe('Component Initialization', () => {
     it('should create the component', () => {
       expect(component).toBeTruthy();
@@ -69,15 +68,14 @@ describe('CajaGrupoComponent', () => {
       const mockCaja = createMockCajaConSaldo({ saldo: 1000 });
 
       mockStateService.cajaGrupo.set(mockCaja);
-      TestBed.flushEffects();
 
+      // Direct signal read - no change detection needed
       expect(component.cajaGrupo()).toEqual(mockCaja);
       expect(component.cajaGrupo()?.saldo).toBe(1000);
     });
 
     it('should expose saldoGrupo signal from state service', () => {
       mockStateService.saldoGrupo.set(1500);
-      TestBed.flushEffects();
 
       expect(component.saldoGrupo()).toBe(1500);
     });
@@ -87,17 +85,14 @@ describe('CajaGrupoComponent', () => {
       const caja2 = createMockCajaConSaldo({ saldo: 2000 });
 
       mockStateService.cajaGrupo.set(caja1);
-      TestBed.flushEffects();
       expect(component.cajaGrupo()?.saldo).toBe(1000);
 
       mockStateService.cajaGrupo.set(caja2);
-      TestBed.flushEffects();
       expect(component.cajaGrupo()?.saldo).toBe(2000);
     });
 
     it('should handle null cajaGrupo', () => {
       mockStateService.cajaGrupo.set(null);
-      TestBed.flushEffects();
 
       expect(component.cajaGrupo()).toBeNull();
     });
@@ -111,7 +106,6 @@ describe('CajaGrupoComponent', () => {
       ];
 
       mockStateService.movimientosGrupo.set(mockMovimientos);
-      TestBed.flushEffects();
 
       const result = component.movimientosGrupo();
 
@@ -121,7 +115,6 @@ describe('CajaGrupoComponent', () => {
 
     it('should handle empty movimientos list', () => {
       mockStateService.movimientosGrupo.set([]);
-      TestBed.flushEffects();
 
       expect(component.movimientosGrupo().length).toBe(0);
     });
@@ -134,11 +127,9 @@ describe('CajaGrupoComponent', () => {
       ];
 
       mockStateService.movimientosGrupo.set(m1);
-      TestBed.flushEffects();
       expect(component.movimientosGrupo().length).toBe(1);
 
       mockStateService.movimientosGrupo.set(m2);
-      TestBed.flushEffects();
       expect(component.movimientosGrupo().length).toBe(2);
     });
   });
@@ -146,25 +137,21 @@ describe('CajaGrupoComponent', () => {
   describe('Loading and Error States', () => {
     it('should expose loading signal from state service', () => {
       mockStateService.loading.set(true);
-      TestBed.flushEffects();
       expect(component.loading()).toBe(true);
 
       mockStateService.loading.set(false);
-      TestBed.flushEffects();
       expect(component.loading()).toBe(false);
     });
 
     it('should expose error signal from state service', () => {
       const errorMsg = 'Failed to load caja grupo';
       mockStateService.error.set(errorMsg);
-      TestBed.flushEffects();
 
       expect(component.error()).toBe(errorMsg);
     });
 
     it('should handle loading state', () => {
       mockStateService.loading.set(true);
-      TestBed.flushEffects();
 
       expect(component.loading()).toBe(true);
       expect(component.error()).toBeNull();
@@ -173,7 +160,6 @@ describe('CajaGrupoComponent', () => {
     it('should handle error state', () => {
       const errorMsg = 'Network error';
       mockStateService.error.set(errorMsg);
-      TestBed.flushEffects();
 
       expect(component.error()).toBe(errorMsg);
       expect(component.loading()).toBe(false);
@@ -222,25 +208,20 @@ describe('CajaGrupoComponent', () => {
   });
 
   describe('Component Lifecycle', () => {
-    it('should load data on initialization', fakeAsync(() => {
-      fixture.detectChanges();
-      tick();
+    it('should load data on initialization', () => {
+      component.ngOnInit();
 
       expect(mockStateService.loadCajaGrupo).toHaveBeenCalled();
       expect(mockStateService.loadMovimientosGrupo).toHaveBeenCalled();
-    }));
+    });
 
     it('should maintain state signals throughout lifecycle', () => {
       const mockCaja = createMockCajaConSaldo({ saldo: 1000 });
 
       mockStateService.cajaGrupo.set(mockCaja);
-      TestBed.flushEffects();
-
       const caja1 = component.cajaGrupo();
 
       mockStateService.cajaGrupo.set(mockCaja);
-      TestBed.flushEffects();
-
       const caja2 = component.cajaGrupo();
 
       expect(caja1).toEqual(caja2);

@@ -5,9 +5,8 @@
  */
 
 import { vi } from 'vitest';
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
 import { signal } from '@angular/core';
 
 import { CuentasPersonalesComponent } from './cuentas-personales.component';
@@ -15,34 +14,57 @@ import { CajasStateService } from '../../services/cajas-state.service';
 import { PersonasStateService } from '../../../personas/services/personas-state.service';
 import { Protagonista } from '../../../../shared/models';
 import { PersonaType, EstadoPersona, RamaEnum } from '../../../../shared/enums';
-import { MockRouter } from '../../../../shared/testing/common-mocks';
+import { ActionEvent, TableData } from '../../../../shared/models/table.model';
 
 describe('CuentasPersonalesComponent', () => {
   let component: CuentasPersonalesComponent;
   let fixture: ComponentFixture<CuentasPersonalesComponent>;
-  let mockCajasStateService: any; // Cajas service
-  let mockPersonasStateService: any;
-  let mockRouter: MockRouter;
-  let mockDialog: any;
+  let mockCajasStateService: ReturnType<typeof createMockCajasStateService>;
+  let mockPersonasStateService: ReturnType<typeof createMockPersonasStateService>;
+  let mockRouter: { navigate: ReturnType<typeof vi.fn> };
+
+  function createMockCajasStateService() {
+    return {
+      loading: signal<boolean>(false),
+      movimientosPersonal: signal<Record<string, unknown>>({}),
+    };
+  }
+
+  function createMockPersonasStateService() {
+    return {
+      protagonistas: signal<Protagonista[]>([]),
+      load: vi.fn(),
+    };
+  }
+
+  function createMockProtagonista(overrides: Partial<Protagonista> = {}): Protagonista {
+    return {
+      id: 'p-1',
+      nombre: 'Juan',
+      apellido: 'Perez',
+      tipo: PersonaType.PROTAGONISTA,
+      estado: EstadoPersona.ACTIVO,
+      rama: RamaEnum.MANADA,
+      fechaIngreso: '2024-01-01',
+      fueBonificado: false,
+      partidaNacimiento: false,
+      dni: false,
+      dniPadres: false,
+      carnetObraSocial: false,
+      createdAt: '2024-01-01',
+      updatedAt: '2024-01-01',
+      deletedAt: null,
+      ...overrides,
+    } as Protagonista;
+  }
 
   beforeEach(async () => {
     mockRouter = {
       navigate: vi.fn().mockResolvedValue(true),
     };
 
-    mockDialog = {
-      open: vi.fn(),
-    };
-
-    mockCajasStateService = {
-      loading: signal<boolean>(false),
-      movimientosPersonal: signal<Record<string, any>>({})
-    };
-
-    mockPersonasStateService = {
-      protagonistas: signal<Protagonista[]>([]),
-      load: vi.fn(),
-    };
+    mockCajasStateService = createMockCajasStateService();
+    mockPersonasStateService = createMockPersonasStateService();
 
     await TestBed.configureTestingModule({
       imports: [CuentasPersonalesComponent],
@@ -50,7 +72,6 @@ describe('CuentasPersonalesComponent', () => {
         { provide: CajasStateService, useValue: mockCajasStateService },
         { provide: PersonasStateService, useValue: mockPersonasStateService },
         { provide: Router, useValue: mockRouter },
-        { provide: MatDialog, useValue: mockDialog },
       ],
     }).compileComponents();
 
@@ -67,11 +88,6 @@ describe('CuentasPersonalesComponent', () => {
       expect(component).toBeTruthy();
     });
 
-    it('should inject dependencies correctly', () => {
-      expect(component.personas).toBe(mockPersonasStateService.protagonistas);
-      expect(component['router']).toBe(mockRouter);
-    });
-
     it('should call personasState.load on ngOnInit', () => {
       component.ngOnInit();
       expect(mockPersonasStateService.load).toHaveBeenCalledTimes(1);
@@ -82,149 +98,117 @@ describe('CuentasPersonalesComponent', () => {
     });
   });
 
-  describe('Personas Signal Handling', () => {
-    it('should expose protagonistas signal from personas state service', () => {
-      const mockPersonas: Protagonista[] = [
-        {
-          id: '1',
-          nombre: 'Juan',
-          apellido: 'Pérez',
-          dni: '12345678',
-          tipo: PersonaType.PROTAGONISTA,
-          estado: EstadoPersona.ACTIVO,
-          rama: RamaEnum.MANADA,
-          fechaIngreso: new Date('2024-01-01'),
-          fueBonificado: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: '2',
-          nombre: 'María',
-          apellido: 'González',
-          dni: '87654321',
-          tipo: PersonaType.PROTAGONISTA,
-          estado: EstadoPersona.ACTIVO,
-          rama: RamaEnum.UNIDAD,
-          fechaIngreso: new Date('2024-01-01'),
-          fueBonificado: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
+  describe('Table Data Computed Signal', () => {
+    it('should compute tableData from protagonistas', () => {
+      const mockPersonas = [
+        createMockProtagonista({ id: 'p-1', nombre: 'Juan', rama: RamaEnum.MANADA }),
+        createMockProtagonista({ id: 'p-2', nombre: 'Maria', rama: RamaEnum.UNIDAD }),
       ];
 
       mockPersonasStateService.protagonistas.set(mockPersonas);
       TestBed.flushEffects();
 
-      const result = component.personas();
+      const tableData = component.tableData();
 
-      expect(result).toEqual(mockPersonas);
-      expect(result.length).toBe(2);
+      expect(tableData.length).toBe(2);
+      expect(tableData[0]['id']).toBe('p-1');
+      expect(tableData[0]['nombre']).toBe('Juan');
+      expect(tableData[0]['rama']).toBe(RamaEnum.MANADA);
     });
 
-    it('should handle empty personas list', () => {
+    it('should handle empty protagonistas list', () => {
       mockPersonasStateService.protagonistas.set([]);
       TestBed.flushEffects();
 
-      expect(component.personas().length).toBe(0);
+      expect(component.tableData().length).toBe(0);
     });
 
-    it('should update personas when state service signal changes', () => {
-      const persona1: Protagonista[] = [
-        {
-          id: '1',
-          nombre: 'Juan',
-          apellido: 'Juan Apellido',
-          dni: '12345678',
-          tipo: PersonaType.PROTAGONISTA,
-          estado: EstadoPersona.ACTIVO,
-          rama: RamaEnum.MANADA,
-          fechaIngreso: new Date(),
-          fueBonificado: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
+    it('should update tableData when protagonistas signal changes', () => {
+      const personas1 = [createMockProtagonista({ id: 'p-1' })];
+      const personas2 = [
+        createMockProtagonista({ id: 'p-1' }),
+        createMockProtagonista({ id: 'p-2' }),
       ];
 
-      const persona2: Protagonista[] = [
-        {
-          id: '1',
-          nombre: 'Juan',
-          apellido: 'Juan Apellido',
-          dni: '12345678',
-          tipo: PersonaType.PROTAGONISTA,
-          estado: EstadoPersona.ACTIVO,
-          rama: RamaEnum.MANADA,
-          fechaIngreso: new Date(),
-          fueBonificado: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: '2',
-          nombre: 'María',
-          apellido: 'María Apellido',
-          dni: '12345678',
-          tipo: PersonaType.PROTAGONISTA,
-          estado: EstadoPersona.ACTIVO,
-          rama: RamaEnum.UNIDAD,
-          fechaIngreso: new Date(),
-          fueBonificado: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
-
-      mockPersonasStateService.protagonistas.set(persona1 as any);
+      mockPersonasStateService.protagonistas.set(personas1);
       TestBed.flushEffects();
-      expect(component.personas().length).toBe(1);
+      expect(component.tableData().length).toBe(1);
 
-      mockPersonasStateService.protagonistas.set(persona2 as any);
+      mockPersonasStateService.protagonistas.set(personas2);
       TestBed.flushEffects();
-      expect(component.personas().length).toBe(2);
+      expect(component.tableData().length).toBe(2);
     });
   });
 
-  describe('Navigation Actions', () => {
-    it('should navigate to movimientos with personaId filter on onVerMovimientos', () => {
-      const personaId = 'persona-123';
+  describe('Table Columns', () => {
+    it('should have required table columns', () => {
+      expect(component.tableColumns.length).toBe(4);
 
-      component.onVerMovimientos(personaId);
+      const columnKeys = component.tableColumns.map((c) => c.key);
+      expect(columnKeys).toContain('nombre');
+      expect(columnKeys).toContain('rama');
+      expect(columnKeys).toContain('saldo');
+      expect(columnKeys).toContain('actions');
+    });
+
+    it('should have sortable columns configured', () => {
+      const nombreCol = component.tableColumns.find((c) => c.key === 'nombre');
+      const ramaCol = component.tableColumns.find((c) => c.key === 'rama');
+      const saldoCol = component.tableColumns.find((c) => c.key === 'saldo');
+
+      expect(nombreCol?.sortable).toBe(true);
+      expect(ramaCol?.sortable).toBe(true);
+      expect(saldoCol?.sortable).toBe(true);
+    });
+
+    it('should have actions column with proper actions', () => {
+      const actionsCol = component.tableColumns.find((c) => c.key === 'actions');
+
+      expect(actionsCol?.type).toBe('action');
+      expect(actionsCol?.actions?.length).toBe(2);
+      expect(actionsCol?.actions?.map((a) => a.key)).toContain('movements');
+      expect(actionsCol?.actions?.map((a) => a.key)).toContain('register');
+    });
+  });
+
+  describe('Action Click Handler', () => {
+    it('should navigate to movimientos on movements action', () => {
+      const event: ActionEvent = {
+        action: 'movements',
+        row: { id: 'p-123' } as TableData,
+      };
+
+      component.onActionClick(event);
 
       expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/movimientos'], {
-        queryParams: { personaId, tipo: 'personal' },
+        queryParams: { personaId: 'p-123', tipo: 'personal' },
       });
     });
 
-    it('should navigate to nuevo movimiento with personaId on onRegistrarMovimiento', () => {
-      const personaId = 'persona-456';
+    it('should navigate to nuevo movimiento on register action', () => {
+      const event: ActionEvent = {
+        action: 'register',
+        row: { id: 'p-456' } as TableData,
+      };
 
-      component.onRegistrarMovimiento(personaId);
+      component.onActionClick(event);
 
       expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/movimientos/nuevo'], {
-        queryParams: { personaId, tipo: 'personal' },
+        queryParams: { personaId: 'p-456', tipo: 'personal' },
       });
     });
+  });
 
-    it('should navigate to persona detail on onVerDetalle', () => {
-      const personaId = 'persona-789';
+  describe('Row Click Handler', () => {
+    it('should navigate to persona detail on row click', () => {
+      const row: TableData = { id: 'p-789' };
 
-      component.onVerDetalle(personaId);
+      component.onRowClick(row);
 
       expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/personas/protagonistas', personaId]);
-    });
-
-    it('should handle multiple navigation calls in sequence', () => {
-      const personaId = 'persona-123';
-
-      component.onVerMovimientos(personaId);
-      component.onRegistrarMovimiento(personaId);
-      component.onVerDetalle(personaId);
-
-      expect(mockRouter.navigate).toHaveBeenCalledTimes(3);
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/personas/protagonistas', 'p-789']);
     });
   });
 
@@ -238,159 +222,12 @@ describe('CuentasPersonalesComponent', () => {
       TestBed.flushEffects();
       expect(component.loading()).toBe(false);
     });
-
-    it('should handle loading state transitions', () => {
-      mockCajasStateService.loading.set(true);
-      TestBed.flushEffects();
-      expect(component.loading()).toBe(true);
-
-      mockCajasStateService.loading.set(false);
-      TestBed.flushEffects();
-      expect(component.loading()).toBe(false);
-    });
-  });
-
-  describe('TrackBy Function', () => {
-    it('should return personaId for trackBy', () => {
-      const persona: Protagonista = {
-        id: 'persona-123',
-        nombre: 'Test',
-          apellido: 'Test Apellido',
-          dni: '12345678',
-        tipo: PersonaType.PROTAGONISTA,
-        estado: EstadoPersona.ACTIVO,
-        rama: RamaEnum.MANADA,
-        fechaIngreso: new Date(),
-          fueBonificado: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      const result = component.trackByPersonaId(0, persona);
-
-      expect(result).toBe('persona-123');
-    });
-
-    it('should work with different personas', () => {
-      const personas = [
-        { id: 'p1' } as any,
-        { id: 'p2' } as any,
-        { id: 'p3' } as any,
-      ];
-
-      personas.forEach((persona, index) => {
-        const result = component.trackByPersonaId(index, persona);
-        expect(result).toBe(persona.id);
-      });
-    });
   });
 
   describe('Component Lifecycle', () => {
-    it('should load personas data on initialization', fakeAsync(() => {
-      fixture.detectChanges();
-
-      setTimeout(() => {
-        expect(mockPersonasStateService.load).toHaveBeenCalled();
-        });
-      tick();
-    });
-
-    it('should maintain personas signal throughout lifecycle', () => {
-      const mockPersonas: Protagonista[] = [
-        {
-          id: '1',
-          nombre: 'Juan',
-          apellido: 'Juan Apellido',
-          dni: '12345678',
-          tipo: PersonaType.PROTAGONISTA,
-          estado: EstadoPersona.ACTIVO,
-          rama: RamaEnum.MANADA,
-          fechaIngreso: new Date(),
-          fueBonificado: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
-
-      mockPersonasStateService.protagonistas.set(mockPersonas);
-      TestBed.flushEffects();
-
-      const personas1 = component.personas();
-
-      mockPersonasStateService.protagonistas.set(mockPersonas);
-      TestBed.flushEffects();
-
-      const personas2 = component.personas();
-
-      expect(personas1).toEqual(personas2);
-      expect(personas1.length).toBe(1);
-    });
-  });
-
-  describe('Error Handling', () => {
-    it('should handle null personas gracefully', () => {
-      mockPersonasStateService.protagonistas.set(null as any);
-      TestBed.flushEffects();
-
-      // Should not throw
-      const result = component.personas();
-      expect(result).toBeNull();
-    });
-
-    it('should display personas even with loading state', () => {
-      const mockPersonas: Protagonista[] = [
-        {
-          id: '1',
-          nombre: 'Juan',
-          apellido: 'Juan Apellido',
-          dni: '12345678',
-          tipo: PersonaType.PROTAGONISTA,
-          estado: EstadoPersona.ACTIVO,
-          rama: RamaEnum.MANADA,
-          fechaIngreso: new Date(),
-          fueBonificado: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
-
-      mockCajasStateService.loading.set(true);
-      mockPersonasStateService.protagonistas.set(mockPersonas);
-      TestBed.flushEffects();
-
-      expect(component.loading()).toBe(true);
-      expect(component.personas().length).toBe(1);
-    });
-  });
-
-  describe('Personas Iteration', () => {
-    it('should handle large list of personas', () => {
-      const personas: Protagonista[] = Array.from({ length: 100 }, (_, i) => ({
-        id: `p${i}`,
-        nombre: `Persona ${i}`,
-        tipo: PersonaType.PROTAGONISTA,
-        estado: EstadoPersona.ACTIVO,
-        rama: RamaEnum.MANADA,
-        fechaIngreso: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-
-      mockPersonasStateService.protagonistas.set(personas);
-      TestBed.flushEffects();
-
-      expect(component.personas().length).toBe(100);
-    });
-
-    it('should update trackBy index correctly', () => {
-      const personas = Array.from({ length: 5 }, (_, i) => ({
-        id: `p${i}`,
-      } as any));
-
-      personas.forEach((p, index) => {
-        const result = component.trackByPersonaId(index, p);
-        expect(result).toBe(`p${index}`);
-      });
+    it('should load personas data on initialization', () => {
+      component.ngOnInit();
+      expect(mockPersonasStateService.load).toHaveBeenCalled();
     });
   });
 });

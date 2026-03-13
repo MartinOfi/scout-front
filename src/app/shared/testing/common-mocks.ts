@@ -4,21 +4,23 @@
  * Used across all test suites to eliminate `any` types
  */
 
+import { vi } from 'vitest';
 import { Router, ActivatedRoute, Params, NavigationExtras } from '@angular/router';
 import { Observable, of } from 'rxjs';
 
 /**
  * Typed Mock Router - Compatible with Vitest
+ * Uses vi.fn() for spy capabilities (toHaveBeenCalled, toHaveBeenCalledWith)
  */
 export interface MockRouter {
-  navigate: (commands: any[], extras?: NavigationExtras) => Promise<boolean>;
-  navigateByUrl: (url: string) => Promise<boolean>;
+  navigate: ReturnType<typeof vi.fn>;
+  navigateByUrl: ReturnType<typeof vi.fn>;
 }
 
 export function createMockRouter(): MockRouter {
   return {
-    navigate: () => Promise.resolve(true),
-    navigateByUrl: () => Promise.resolve(true),
+    navigate: vi.fn().mockResolvedValue(true),
+    navigateByUrl: vi.fn().mockResolvedValue(true),
   };
 }
 
@@ -33,7 +35,7 @@ export interface MockActivatedRoute {
 
 export function createMockActivatedRoute(
   params: Params = {},
-  queryParams: Params = {}
+  queryParams: Params = {},
 ): MockActivatedRoute {
   return {
     params: of(params),

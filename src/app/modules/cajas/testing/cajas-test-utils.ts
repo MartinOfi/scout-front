@@ -3,11 +3,18 @@
  * Provides typed mock factories for Cajas module testing
  */
 
+import { vi } from 'vitest';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { signal, WritableSignal } from '@angular/core';
-import { of, Observable } from 'rxjs';
 import { Caja, CajaConSaldo, Movimiento } from '../../../shared/models';
-import { CajaTipoEnum, RamaEnum, TipoMovimientoEnum, ConceptoMovimiento, MedioPagoEnum, EstadoPago } from '../../../shared/enums';
+import {
+  CajaType,
+  RamaEnum,
+  TipoMovimientoEnum,
+  ConceptoMovimiento,
+  MedioPagoEnum,
+  EstadoPago,
+} from '../../../shared/enums';
 
 /**
  * Create mock Caja
@@ -15,9 +22,7 @@ import { CajaTipoEnum, RamaEnum, TipoMovimientoEnum, ConceptoMovimiento, MedioPa
 export function createMockCaja(overrides: Partial<Caja> = {}): Caja {
   return {
     id: 'caja-1',
-    tipo: CajaTipoEnum.GRUPO,
-    rama: null,
-    saldoTeoricoInicial: 1000,
+    tipo: CajaType.GRUPO,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),
     ...overrides,
@@ -27,14 +32,10 @@ export function createMockCaja(overrides: Partial<Caja> = {}): Caja {
 /**
  * Create mock CajaConSaldo
  */
-export function createMockCajaConSaldo(
-  overrides: Partial<CajaConSaldo> = {}
-): CajaConSaldo {
+export function createMockCajaConSaldo(overrides: Partial<CajaConSaldo> = {}): CajaConSaldo {
   return {
     id: 'caja-1',
-    tipo: CajaTipoEnum.GRUPO,
-    rama: null,
-    saldoTeoricoInicial: 1000,
+    tipo: CajaType.GRUPO,
     saldo: 1000,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),
@@ -66,6 +67,7 @@ export function createMockMovimiento(overrides: Partial<Movimiento> = {}): Movim
 
 /**
  * Typed Mock CajasStateService
+ * Uses vi.fn() for spy capabilities (toHaveBeenCalled, toHaveBeenCalledWith)
  */
 export interface MockCajasStateService {
   cajaGrupo: WritableSignal<CajaConSaldo | null>;
@@ -82,12 +84,13 @@ export interface MockCajasStateService {
   totalSaldos: WritableSignal<number>;
   loading: WritableSignal<boolean>;
   error: WritableSignal<string | null>;
-  loadCajaGrupo: () => void;
-  loadCajaRama: (rama: string) => void;
-  loadTodasCajasRama: () => void;
-  loadMovimientosGrupo: () => void;
-  loadMovimientosRama: (rama: string) => void;
-  loadMovimientosPersonal: (cajaId: string) => void;
+  loadCajaGrupo: ReturnType<typeof vi.fn>;
+  loadCajaRama: ReturnType<typeof vi.fn>;
+  loadTodasCajasRama: ReturnType<typeof vi.fn>;
+  loadMovimientosGrupo: ReturnType<typeof vi.fn>;
+  loadMovimientosRama: ReturnType<typeof vi.fn>;
+  loadMovimientosPersonal: ReturnType<typeof vi.fn>;
+  selectCaja: ReturnType<typeof vi.fn>;
 }
 
 /**
@@ -109,12 +112,13 @@ export function createMockCajasStateService(): MockCajasStateService {
     totalSaldos: signal<number>(0),
     loading: signal<boolean>(false),
     error: signal<string | null>(null),
-    loadCajaGrupo: () => {},
-    loadCajaRama: () => {},
-    loadTodasCajasRama: () => {},
-    loadMovimientosGrupo: () => {},
-    loadMovimientosRama: () => {},
-    loadMovimientosPersonal: () => {},
+    loadCajaGrupo: vi.fn(),
+    loadCajaRama: vi.fn(),
+    loadTodasCajasRama: vi.fn(),
+    loadMovimientosGrupo: vi.fn(),
+    loadMovimientosRama: vi.fn(),
+    loadMovimientosPersonal: vi.fn(),
+    selectCaja: vi.fn(),
   };
 }
 
@@ -138,9 +142,7 @@ export function createMockCajasFormBuilder(): MockCajasFormBuilder {
         rama: [''],
         monto: [0],
       }),
-    extractAsignacionDto: (
-      form: FormGroup
-    ): { rama: RamaEnum; monto: number } =>
+    extractAsignacionDto: (form: FormGroup): { rama: RamaEnum; monto: number } =>
       form.value as { rama: RamaEnum; monto: number },
   };
 }

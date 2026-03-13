@@ -19,10 +19,7 @@ import { CajaConSaldo, Movimiento } from '../../../../shared/models';
 import { StatCardComponent } from '../../../../shared/components/stat-card/stat-card.component';
 import { ActionButtonComponent } from '../../../../shared/components/action-button/action-button.component';
 import { DataTableComponent } from '../../../../shared/components/tables/data-table.component';
-import { TableColumn, TableData, ActionEvent } from '../../../../shared/models/table.model';
-
-// Local Components
-import { SaldoCardComponent } from './components/saldo-card/saldo-card.component';
+import { TableColumn, ActionEvent } from '../../../../shared/models/table.model';
 
 @Component({
   selector: 'app-caja-grupo',
@@ -34,7 +31,6 @@ import { SaldoCardComponent } from './components/saldo-card/saldo-card.component
     MatIconModule,
     MatProgressSpinnerModule,
     StatCardComponent,
-    SaldoCardComponent,
     ActionButtonComponent,
     DataTableComponent,
   ],

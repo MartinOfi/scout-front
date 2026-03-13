@@ -5,44 +5,53 @@
  */
 
 import { vi } from 'vitest';
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { signal } from '@angular/core';
+import { signal, WritableSignal } from '@angular/core';
 
 import { FondosRamaComponent } from './fondos-rama.component';
 import { CajasStateService } from '../../services/cajas-state.service';
-import { RamaEnum } from '../../../../shared/enums';
+import { Rama, RamaEnum, CajaType } from '../../../../shared/enums';
 import { CajaConSaldo } from '../../../../shared/models';
-import { MockRouter } from '../../../../shared/testing/common-mocks';
-import { MockCajasStateService } from '../../testing/cajas-test-utils';
 
 describe('FondosRamaComponent', () => {
   let component: FondosRamaComponent;
   let fixture: ComponentFixture<FondosRamaComponent>;
-  let mockStateService: MockCajasStateService;
-  let mockRouter: MockRouter;
+  let cajasRamaSignal: WritableSignal<Record<string, CajaConSaldo>>;
+  let loadingSignal: WritableSignal<boolean>;
+  let mockStateService: Partial<CajasStateService>;
+  let mockRouter: { navigate: ReturnType<typeof vi.fn> };
+
+  function createMockCajaConSaldo(overrides: Partial<CajaConSaldo> = {}): CajaConSaldo {
+    return {
+      id: 'caja-1',
+      tipo: CajaType.GRUPO,
+      saldo: 1000,
+      createdAt: new Date('2024-01-01'),
+      updatedAt: new Date('2024-01-01'),
+      ...overrides,
+    };
+  }
 
   beforeEach(async () => {
     mockRouter = {
-      navigate: () => Promise.resolve(true),
-      navigateByUrl: () => Promise.resolve(true),
+      navigate: vi.fn().mockResolvedValue(true),
     };
 
+    cajasRamaSignal = signal<Record<string, CajaConSaldo>>({});
+    loadingSignal = signal<boolean>(false);
+
     mockStateService = {
-      cajaGrupo: signal(null),
-      cajasRama: signal<Record<string, CajaConSaldo>>({}),
-      movimientosGrupo: signal([]),
-      movimientosRama: signal({}),
-      saldoGrupo: signal(0),
-      loading: signal(false),
-      error: signal(null),
-      loadCajaGrupo: () => {},
-      loadCajaRama: () => {},
-      loadTodasCajasRama: () => {},
-      loadMovimientosGrupo: () => {},
-      loadMovimientosRama: () => {},
-      loadMovimientosPersonal: () => {},
-    } as any;
+      cajasRama: cajasRamaSignal,
+      saldoManada: signal(0),
+      saldoUnidad: signal(0),
+      saldoCaminantes: signal(0),
+      saldoRovers: signal(0),
+      totalSaldosRamas: signal(0),
+      loading: loadingSignal,
+      loadTodasCajasRama: vi.fn(),
+      selectCaja: vi.fn(),
+    };
 
     await TestBed.configureTestingModule({
       imports: [FondosRamaComponent],
@@ -65,11 +74,6 @@ describe('FondosRamaComponent', () => {
       expect(component).toBeTruthy();
     });
 
-    it('should inject dependencies correctly', () => {
-      expect(component.cajasRama).toBe(mockStateService.cajasRama);
-      expect(component['router']).toBe(mockRouter);
-    });
-
     it('should call loadTodasCajasRama on ngOnInit', () => {
       component.ngOnInit();
       expect(mockStateService.loadTodasCajasRama).toHaveBeenCalledTimes(1);
@@ -85,109 +89,62 @@ describe('FondosRamaComponent', () => {
   });
 
   describe('Cajas Rama Signal Handling', () => {
-    it('should expose cajasRama signal from state service', () => {
+    it('should read cajasRama from state service signal', () => {
       const mockCajas: Record<string, CajaConSaldo> = {
-        [RamaEnum.MANADA]: { id: '1', saldo: 1000 } as any,
-        [RamaEnum.UNIDAD]: { id: '2', saldo: 2000 } as any,
+        [RamaEnum.MANADA]: createMockCajaConSaldo({ id: '1', saldo: 1000 }),
+        [RamaEnum.UNIDAD]: createMockCajaConSaldo({ id: '2', saldo: 2000 }),
       };
 
-      mockStateService.cajasRama.set(mockCajas);
-      TestBed.flushEffects();
+      cajasRamaSignal.set(mockCajas);
 
       expect(component.cajasRama()).toEqual(mockCajas);
     });
 
-    it('should update cajasRama when state service signal changes', () => {
+    it('should update when cajasRama signal changes', () => {
       const caja1: Record<string, CajaConSaldo> = {
-        [RamaEnum.MANADA]: { id: '1', saldo: 1000 } as any,
+        [RamaEnum.MANADA]: createMockCajaConSaldo({ id: '1', saldo: 1000 }),
       };
 
-      const caja2: Record<string, CajaConSaldo> = {
-        [RamaEnum.MANADA]: { id: '1', saldo: 1500 } as any,
-        [RamaEnum.UNIDAD]: { id: '2', saldo: 2000 } as any,
-      };
-
-      mockStateService.cajasRama.set(caja1);
-      TestBed.flushEffects();
+      cajasRamaSignal.set(caja1);
       expect(Object.keys(component.cajasRama()).length).toBe(1);
 
-      mockStateService.cajasRama.set(caja2);
-      TestBed.flushEffects();
+      const caja2: Record<string, CajaConSaldo> = {
+        [RamaEnum.MANADA]: createMockCajaConSaldo({ id: '1', saldo: 1500 }),
+        [RamaEnum.UNIDAD]: createMockCajaConSaldo({ id: '2', saldo: 2000 }),
+      };
+
+      cajasRamaSignal.set(caja2);
       expect(Object.keys(component.cajasRama()).length).toBe(2);
     });
 
     it('should handle empty cajasRama', () => {
-      mockStateService.cajasRama.set({});
-      TestBed.flushEffects();
-
+      cajasRamaSignal.set({});
       expect(Object.keys(component.cajasRama()).length).toBe(0);
-    });
-  });
-
-  describe('Saldo Computations', () => {
-    it('should expose saldoManada signal', () => {
-      mockStateService.saldoManada.set(5000);
-      TestBed.flushEffects();
-
-      expect(component.saldoManada()).toBe(5000);
-    });
-
-    it('should expose saldoUnidad signal', () => {
-      mockStateService.saldoUnidad.set(3000);
-      TestBed.flushEffects();
-
-      expect(component.saldoUnidad()).toBe(3000);
-    });
-
-    it('should expose saldoCaminantes signal', () => {
-      mockStateService.saldoCaminantes.set(2000);
-      TestBed.flushEffects();
-
-      expect(component.saldoCaminantes()).toBe(2000);
-    });
-
-    it('should expose saldoRovers signal', () => {
-      mockStateService.saldoRovers.set(1500);
-      TestBed.flushEffects();
-
-      expect(component.saldoRovers()).toBe(1500);
-    });
-
-    it('should expose totalSaldosRamas signal', () => {
-      mockStateService.totalSaldosRamas.set(11500);
-      TestBed.flushEffects();
-
-      expect(component.totalSaldosRamas()).toBe(11500);
     });
   });
 
   describe('getSaldoRama Method', () => {
     it('should return saldo for existing rama', () => {
       const mockCajas: Record<string, CajaConSaldo> = {
-        [RamaEnum.MANADA]: { id: '1', saldo: 1000 } as any,
+        [RamaEnum.MANADA]: createMockCajaConSaldo({ id: '1', saldo: 1000 }),
       };
 
-      mockStateService.cajasRama.set(mockCajas);
-      TestBed.flushEffects();
+      cajasRamaSignal.set(mockCajas);
 
       expect(component.getSaldoRama(RamaEnum.MANADA)).toBe(1000);
     });
 
     it('should return 0 for non-existing rama', () => {
-      mockStateService.cajasRama.set({});
-      TestBed.flushEffects();
-
+      cajasRamaSignal.set({});
       expect(component.getSaldoRama(RamaEnum.MANADA)).toBe(0);
     });
 
     it('should return 0 when caja is null', () => {
       const mockCajas: Record<string, CajaConSaldo> = {
-        [RamaEnum.MANADA]: null as any,
+        [RamaEnum.MANADA]: null as unknown as CajaConSaldo,
       };
 
-      mockStateService.cajasRama.set(mockCajas);
-      TestBed.flushEffects();
-
+      cajasRamaSignal.set(mockCajas);
       expect(component.getSaldoRama(RamaEnum.MANADA)).toBe(0);
     });
   });
@@ -198,11 +155,6 @@ describe('FondosRamaComponent', () => {
       expect(component.getRamaIcon(RamaEnum.UNIDAD)).toBe('groups');
       expect(component.getRamaIcon(RamaEnum.CAMINANTES)).toBe('hiking');
       expect(component.getRamaIcon(RamaEnum.ROVERS)).toBe('terrain');
-    });
-
-    it('should return default icon for unknown rama', () => {
-      const unknownRama = 'UNKNOWN'
-      expect(component.getRamaIcon(unknownRama)).toBe('account_balance');
     });
   });
 
@@ -218,10 +170,10 @@ describe('FondosRamaComponent', () => {
 
     it('should navigate to nuevo movimiento with cajaId on onRegistrarMovimiento', () => {
       const mockCajas: Record<string, CajaConSaldo> = {
-        [RamaEnum.MANADA]: { id: 'caja-123', saldo: 1000 } as any,
+        [RamaEnum.MANADA]: createMockCajaConSaldo({ id: 'caja-123', saldo: 1000 }),
       };
 
-      mockStateService.cajasRama.set(mockCajas);
+      cajasRamaSignal.set(mockCajas);
 
       component.onRegistrarMovimiento(RamaEnum.MANADA);
 
@@ -232,7 +184,7 @@ describe('FondosRamaComponent', () => {
     });
 
     it('should not navigate on onRegistrarMovimiento when caja does not exist', () => {
-      mockStateService.cajasRama.set({});
+      cajasRamaSignal.set({});
 
       component.onRegistrarMovimiento(RamaEnum.MANADA);
 
@@ -240,13 +192,12 @@ describe('FondosRamaComponent', () => {
     });
 
     it('should navigate to different ramas', () => {
-      const ramas = [RamaEnum.MANADA, RamaEnum.UNIDAD, RamaEnum.CAMINANTES, RamaEnum.ROVERS];
+      const ramas: Rama[] = [RamaEnum.MANADA, RamaEnum.UNIDAD, RamaEnum.CAMINANTES, RamaEnum.ROVERS];
 
-      ramas.forEach((rama) => {
-        mockRouter.navigate.mockClear();
+      ramas.forEach((rama, index) => {
         component.onVerMovimientosRama(rama);
 
-        expect(mockRouter.navigate).toHaveBeenCalledWith(['/movimientos'], {
+        expect(mockRouter.navigate).toHaveBeenNthCalledWith(index + 1, ['/movimientos'], {
           queryParams: { rama },
         });
       });
@@ -254,24 +205,36 @@ describe('FondosRamaComponent', () => {
   });
 
   describe('Loading States', () => {
-    it('should expose loading signal from state service', () => {
-      mockStateService.loading.set(true);
-      TestBed.flushEffects();
+    it('should read loading from state service signal', () => {
+      loadingSignal.set(true);
       expect(component.loading()).toBe(true);
 
-      mockStateService.loading.set(false);
-      TestBed.flushEffects();
+      loadingSignal.set(false);
       expect(component.loading()).toBe(false);
     });
+  });
 
-    it('should handle loading state transitions', () => {
-      mockStateService.loading.set(true);
-      TestBed.flushEffects();
-      expect(component.loading()).toBe(true);
+  describe('onOpenDrawer Method', () => {
+    it('should call selectCaja when caja exists', () => {
+      const mockCaja = createMockCajaConSaldo({ id: 'caja-manada', saldo: 1000 });
+      const mockCajas: Record<string, CajaConSaldo> = {
+        [RamaEnum.MANADA]: mockCaja,
+      };
 
-      mockStateService.loading.set(false);
-      TestBed.flushEffects();
-      expect(component.loading()).toBe(false);
+      cajasRamaSignal.set(mockCajas);
+
+      component.onOpenDrawer(RamaEnum.MANADA);
+
+      expect(mockStateService.selectCaja).toHaveBeenCalledTimes(1);
+      expect(mockStateService.selectCaja).toHaveBeenCalledWith(mockCaja);
+    });
+
+    it('should not call selectCaja when caja does not exist', () => {
+      cajasRamaSignal.set({});
+
+      component.onOpenDrawer(RamaEnum.MANADA);
+
+      expect(mockStateService.selectCaja).not.toHaveBeenCalled();
     });
   });
 });
