@@ -7,55 +7,40 @@
 import { vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { signal } from '@angular/core';
+import { signal, WritableSignal } from '@angular/core';
 
 import { CuentasPersonalesComponent } from './cuentas-personales.component';
 import { CajasStateService } from '../../services/cajas-state.service';
-import { PersonasStateService } from '../../../personas/services/personas-state.service';
-import { Protagonista } from '../../../../shared/models';
-import { PersonaType, EstadoPersona, RamaEnum } from '../../../../shared/enums';
+import { CajaConSaldo } from '../../../../shared/models';
+import { CajaType, RamaEnum } from '../../../../shared/enums';
 import { ActionEvent, TableData } from '../../../../shared/models/table.model';
 
 describe('CuentasPersonalesComponent', () => {
   let component: CuentasPersonalesComponent;
   let fixture: ComponentFixture<CuentasPersonalesComponent>;
   let mockCajasStateService: ReturnType<typeof createMockCajasStateService>;
-  let mockPersonasStateService: ReturnType<typeof createMockPersonasStateService>;
   let mockRouter: { navigate: ReturnType<typeof vi.fn> };
 
   function createMockCajasStateService() {
     return {
       loading: signal<boolean>(false),
-      movimientosPersonal: signal<Record<string, unknown>>({}),
+      cajasPersonales: signal<CajaConSaldo[]>([]),
+      loadCajasPersonales: vi.fn(),
     };
   }
 
-  function createMockPersonasStateService() {
+  function createMockCajaConSaldo(overrides: Partial<CajaConSaldo> = {}): CajaConSaldo {
     return {
-      protagonistas: signal<Protagonista[]>([]),
-      load: vi.fn(),
-    };
-  }
-
-  function createMockProtagonista(overrides: Partial<Protagonista> = {}): Protagonista {
-    return {
-      id: 'p-1',
-      nombre: 'Juan',
-      apellido: 'Perez',
-      tipo: PersonaType.PROTAGONISTA,
-      estado: EstadoPersona.ACTIVO,
-      rama: RamaEnum.MANADA,
-      fechaIngreso: '2024-01-01',
-      fueBonificado: false,
-      partidaNacimiento: false,
-      dni: false,
-      dniPadres: false,
-      carnetObraSocial: false,
-      createdAt: '2024-01-01',
-      updatedAt: '2024-01-01',
-      deletedAt: null,
+      id: 'caja-1',
+      tipo: CajaType.PERSONAL,
+      nombre: null,
+      propietarioId: 'p-1',
+      propietario: { id: 'p-1', nombre: 'Juan Perez' },
+      saldoActual: 1000,
+      createdAt: new Date('2024-01-01'),
+      updatedAt: new Date('2024-01-01'),
       ...overrides,
-    } as Protagonista;
+    };
   }
 
   beforeEach(async () => {
@@ -64,13 +49,11 @@ describe('CuentasPersonalesComponent', () => {
     };
 
     mockCajasStateService = createMockCajasStateService();
-    mockPersonasStateService = createMockPersonasStateService();
 
     await TestBed.configureTestingModule({
       imports: [CuentasPersonalesComponent],
       providers: [
         { provide: CajasStateService, useValue: mockCajasStateService },
-        { provide: PersonasStateService, useValue: mockPersonasStateService },
         { provide: Router, useValue: mockRouter },
       ],
     }).compileComponents();
@@ -88,9 +71,9 @@ describe('CuentasPersonalesComponent', () => {
       expect(component).toBeTruthy();
     });
 
-    it('should call personasState.load on ngOnInit', () => {
+    it('should call cajasState.loadCajasPersonales on ngOnInit', () => {
       component.ngOnInit();
-      expect(mockPersonasStateService.load).toHaveBeenCalledTimes(1);
+      expect(mockCajasStateService.loadCajasPersonales).toHaveBeenCalledTimes(1);
     });
 
     it('should expose loading signal from cajas state', () => {
@@ -99,44 +82,83 @@ describe('CuentasPersonalesComponent', () => {
   });
 
   describe('Table Data Computed Signal', () => {
-    it('should compute tableData from protagonistas', () => {
-      const mockPersonas = [
-        createMockProtagonista({ id: 'p-1', nombre: 'Juan', rama: RamaEnum.MANADA }),
-        createMockProtagonista({ id: 'p-2', nombre: 'Maria', rama: RamaEnum.UNIDAD }),
+    it('should compute tableData from cajasPersonales', () => {
+      const mockCajas = [
+        createMockCajaConSaldo({
+          id: 'caja-1',
+          propietarioId: 'p-1',
+          propietario: { id: 'p-1', nombre: 'Juan Perez' },
+          saldoActual: 1000,
+        }),
+        createMockCajaConSaldo({
+          id: 'caja-2',
+          propietarioId: 'p-2',
+          propietario: { id: 'p-2', nombre: 'Maria Lopez' },
+          saldoActual: 2000,
+        }),
       ];
 
-      mockPersonasStateService.protagonistas.set(mockPersonas);
-      TestBed.flushEffects();
+      mockCajasStateService.cajasPersonales.set(mockCajas);
 
       const tableData = component.tableData();
 
       expect(tableData.length).toBe(2);
-      expect(tableData[0]['id']).toBe('p-1');
-      expect(tableData[0]['nombre']).toBe('Juan');
-      expect(tableData[0]['rama']).toBe(RamaEnum.MANADA);
+      expect(tableData[0]['id']).toBe('caja-1');
+      expect(tableData[0]['nombre']).toBe('Juan Perez');
+      expect(tableData[0]['saldo']).toBe(1000);
+      expect(tableData[0]['propietarioId']).toBe('p-1');
     });
 
-    it('should handle empty protagonistas list', () => {
-      mockPersonasStateService.protagonistas.set([]);
-      TestBed.flushEffects();
+    it('should handle empty cajasPersonales list', () => {
+      mockCajasStateService.cajasPersonales.set([]);
 
       expect(component.tableData().length).toBe(0);
     });
 
-    it('should update tableData when protagonistas signal changes', () => {
-      const personas1 = [createMockProtagonista({ id: 'p-1' })];
-      const personas2 = [
-        createMockProtagonista({ id: 'p-1' }),
-        createMockProtagonista({ id: 'p-2' }),
+    it('should update tableData when cajasPersonales signal changes', () => {
+      const cajas1 = [createMockCajaConSaldo({ id: 'caja-1' })];
+      const cajas2 = [
+        createMockCajaConSaldo({ id: 'caja-1' }),
+        createMockCajaConSaldo({ id: 'caja-2' }),
       ];
 
-      mockPersonasStateService.protagonistas.set(personas1);
-      TestBed.flushEffects();
+      mockCajasStateService.cajasPersonales.set(cajas1);
       expect(component.tableData().length).toBe(1);
 
-      mockPersonasStateService.protagonistas.set(personas2);
-      TestBed.flushEffects();
+      mockCajasStateService.cajasPersonales.set(cajas2);
       expect(component.tableData().length).toBe(2);
+    });
+
+    it('should use caja.nombre as fallback when propietario is null', () => {
+      const mockCajas = [
+        createMockCajaConSaldo({
+          id: 'caja-1',
+          propietario: null,
+          propietarioId: null,
+          nombre: 'Cuenta Sin Propietario',
+        }),
+      ];
+
+      mockCajasStateService.cajasPersonales.set(mockCajas);
+
+      const tableData = component.tableData();
+      expect(tableData[0]['nombre']).toBe('Cuenta Sin Propietario');
+    });
+
+    it('should display dash when propietario and nombre are null', () => {
+      const mockCajas = [
+        createMockCajaConSaldo({
+          id: 'caja-1',
+          propietario: null,
+          propietarioId: null,
+          nombre: null,
+        }),
+      ];
+
+      mockCajasStateService.cajasPersonales.set(mockCajas);
+
+      const tableData = component.tableData();
+      expect(tableData[0]['nombre']).toBe('-');
     });
   });
 
@@ -175,59 +197,73 @@ describe('CuentasPersonalesComponent', () => {
     it('should navigate to movimientos on movements action', () => {
       const event: ActionEvent = {
         action: 'movements',
-        row: { id: 'p-123' } as TableData,
+        row: { id: 'caja-123' } as TableData,
       };
 
       component.onActionClick(event);
 
       expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/movimientos'], {
-        queryParams: { personaId: 'p-123', tipo: 'personal' },
+        queryParams: { cajaId: 'caja-123', tipo: 'personal' },
       });
     });
 
     it('should navigate to nuevo movimiento on register action', () => {
       const event: ActionEvent = {
         action: 'register',
-        row: { id: 'p-456' } as TableData,
+        row: { id: 'caja-456' } as TableData,
       };
 
       component.onActionClick(event);
 
       expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/movimientos/nuevo'], {
-        queryParams: { personaId: 'p-456', tipo: 'personal' },
+        queryParams: { cajaId: 'caja-456', tipo: 'personal' },
       });
     });
   });
 
   describe('Row Click Handler', () => {
-    it('should navigate to persona detail on row click', () => {
-      const row: TableData = { id: 'p-789' };
+    it('should navigate to persona detail on row click when propietarioId exists', () => {
+      const row: TableData = { id: 'caja-789', propietarioId: 'p-789' };
 
       component.onRowClick(row);
 
       expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/personas/protagonistas', 'p-789']);
     });
+
+    it('should not navigate when propietarioId is null', () => {
+      const row: TableData = { id: 'caja-789', propietarioId: null };
+
+      component.onRowClick(row);
+
+      expect(mockRouter.navigate).not.toHaveBeenCalled();
+    });
+
+    it('should not navigate when propietarioId is undefined', () => {
+      const row: TableData = { id: 'caja-789' };
+
+      component.onRowClick(row);
+
+      expect(mockRouter.navigate).not.toHaveBeenCalled();
+    });
   });
 
   describe('Loading States', () => {
     it('should expose loading signal from cajas state service', () => {
       mockCajasStateService.loading.set(true);
-      TestBed.flushEffects();
       expect(component.loading()).toBe(true);
 
       mockCajasStateService.loading.set(false);
-      TestBed.flushEffects();
       expect(component.loading()).toBe(false);
     });
   });
 
   describe('Component Lifecycle', () => {
-    it('should load personas data on initialization', () => {
+    it('should load cajas personales data on initialization', () => {
       component.ngOnInit();
-      expect(mockPersonasStateService.load).toHaveBeenCalled();
+      expect(mockCajasStateService.loadCajasPersonales).toHaveBeenCalled();
     });
   });
 });

@@ -13,8 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { CajasStateService } from '../../services/cajas-state.service';
-import { PersonasStateService } from '../../../personas/services/personas-state.service';
-import { Protagonista, Educador } from '../../../../shared/models';
+import { CajaConSaldo } from '../../../../shared/models';
 import { DataTableComponent } from '../../../../shared/components/tables/data-table.component';
 import { TableColumn, TableData, ActionEvent } from '../../../../shared/models/table.model';
 
@@ -34,17 +33,17 @@ import { TableColumn, TableData, ActionEvent } from '../../../../shared/models/t
 })
 export class CuentasPersonalesComponent implements OnInit {
   private readonly cajasState = inject(CajasStateService);
-  private readonly personasState = inject(PersonasStateService);
   private readonly router = inject(Router);
 
   readonly loading = this.cajasState.loading;
 
   readonly tableData = computed((): TableData[] => {
-    return this.personasState.protagonistas().map((p) => ({
-      id: p.id,
-      nombre: p.nombre,
-      rama: this.getRama(p),
-      saldo: 0, // TODO: Get actual balance from state
+    return this.cajasState.cajasPersonales().map((caja) => ({
+      id: caja.id,
+      nombre: this.getNombrePropietario(caja),
+      rama: this.getRamaPropietario(caja),
+      saldo: caja.saldoActual,
+      propietarioId: caja.propietarioId,
     }));
   });
 
@@ -76,33 +75,44 @@ export class CuentasPersonalesComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.personasState.load();
+    this.cajasState.loadCajasPersonales();
   }
 
-  private getRama(persona: Protagonista | Educador): string {
-    if ('rama' in persona && persona.rama) {
-      return persona.rama;
+  private getNombrePropietario(caja: CajaConSaldo): string {
+    if (caja.propietario) {
+      return caja.propietario.nombre;
+    }
+    return caja.nombre ?? '-';
+  }
+
+  private getRamaPropietario(caja: CajaConSaldo): string {
+    const propietario = caja.propietario;
+    if (propietario && 'rama' in propietario && propietario.rama) {
+      return propietario.rama as string;
     }
     return '-';
   }
 
   onActionClick(event: ActionEvent): void {
-    const id = event.row['id'] as string;
+    const cajaId = event.row['id'] as string;
     switch (event.action) {
       case 'movements':
         this.router.navigate(['/movimientos'], {
-          queryParams: { personaId: id, tipo: 'personal' },
+          queryParams: { cajaId, tipo: 'personal' },
         });
         break;
       case 'register':
         this.router.navigate(['/movimientos/nuevo'], {
-          queryParams: { personaId: id, tipo: 'personal' },
+          queryParams: { cajaId, tipo: 'personal' },
         });
         break;
     }
   }
 
   onRowClick(row: TableData): void {
-    this.router.navigate(['/personas/protagonistas', row['id']]);
+    const propietarioId = row['propietarioId'] as string;
+    if (propietarioId) {
+      this.router.navigate(['/personas/protagonistas', propietarioId]);
+    }
   }
 }

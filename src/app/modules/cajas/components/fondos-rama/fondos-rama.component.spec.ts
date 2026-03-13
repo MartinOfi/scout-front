@@ -26,7 +26,10 @@ describe('FondosRamaComponent', () => {
     return {
       id: 'caja-1',
       tipo: CajaType.GRUPO,
-      saldo: 1000,
+      saldoActual: 1000,
+      nombre: null,
+      propietarioId: null,
+      propietario: null,
       createdAt: new Date('2024-01-01'),
       updatedAt: new Date('2024-01-01'),
       ...overrides,
@@ -91,8 +94,8 @@ describe('FondosRamaComponent', () => {
   describe('Cajas Rama Signal Handling', () => {
     it('should read cajasRama from state service signal', () => {
       const mockCajas: Record<string, CajaConSaldo> = {
-        [RamaEnum.MANADA]: createMockCajaConSaldo({ id: '1', saldo: 1000 }),
-        [RamaEnum.UNIDAD]: createMockCajaConSaldo({ id: '2', saldo: 2000 }),
+        [RamaEnum.MANADA]: createMockCajaConSaldo({ id: '1', saldoActual: 1000 }),
+        [RamaEnum.UNIDAD]: createMockCajaConSaldo({ id: '2', saldoActual: 2000 }),
       };
 
       cajasRamaSignal.set(mockCajas);
@@ -102,15 +105,15 @@ describe('FondosRamaComponent', () => {
 
     it('should update when cajasRama signal changes', () => {
       const caja1: Record<string, CajaConSaldo> = {
-        [RamaEnum.MANADA]: createMockCajaConSaldo({ id: '1', saldo: 1000 }),
+        [RamaEnum.MANADA]: createMockCajaConSaldo({ id: '1', saldoActual: 1000 }),
       };
 
       cajasRamaSignal.set(caja1);
       expect(Object.keys(component.cajasRama()).length).toBe(1);
 
       const caja2: Record<string, CajaConSaldo> = {
-        [RamaEnum.MANADA]: createMockCajaConSaldo({ id: '1', saldo: 1500 }),
-        [RamaEnum.UNIDAD]: createMockCajaConSaldo({ id: '2', saldo: 2000 }),
+        [RamaEnum.MANADA]: createMockCajaConSaldo({ id: '1', saldoActual: 1500 }),
+        [RamaEnum.UNIDAD]: createMockCajaConSaldo({ id: '2', saldoActual: 2000 }),
       };
 
       cajasRamaSignal.set(caja2);
@@ -126,7 +129,7 @@ describe('FondosRamaComponent', () => {
   describe('getSaldoRama Method', () => {
     it('should return saldo for existing rama', () => {
       const mockCajas: Record<string, CajaConSaldo> = {
-        [RamaEnum.MANADA]: createMockCajaConSaldo({ id: '1', saldo: 1000 }),
+        [RamaEnum.MANADA]: createMockCajaConSaldo({ id: '1', saldoActual: 1000 }),
       };
 
       cajasRamaSignal.set(mockCajas);
@@ -170,7 +173,7 @@ describe('FondosRamaComponent', () => {
 
     it('should navigate to nuevo movimiento with cajaId on onRegistrarMovimiento', () => {
       const mockCajas: Record<string, CajaConSaldo> = {
-        [RamaEnum.MANADA]: createMockCajaConSaldo({ id: 'caja-123', saldo: 1000 }),
+        [RamaEnum.MANADA]: createMockCajaConSaldo({ id: 'caja-123', saldoActual: 1000 }),
       };
 
       cajasRamaSignal.set(mockCajas);
@@ -192,7 +195,12 @@ describe('FondosRamaComponent', () => {
     });
 
     it('should navigate to different ramas', () => {
-      const ramas: Rama[] = [RamaEnum.MANADA, RamaEnum.UNIDAD, RamaEnum.CAMINANTES, RamaEnum.ROVERS];
+      const ramas: Rama[] = [
+        RamaEnum.MANADA,
+        RamaEnum.UNIDAD,
+        RamaEnum.CAMINANTES,
+        RamaEnum.ROVERS,
+      ];
 
       ramas.forEach((rama, index) => {
         component.onVerMovimientosRama(rama);
@@ -216,7 +224,7 @@ describe('FondosRamaComponent', () => {
 
   describe('onOpenDrawer Method', () => {
     it('should call selectCaja when caja exists', () => {
-      const mockCaja = createMockCajaConSaldo({ id: 'caja-manada', saldo: 1000 });
+      const mockCaja = createMockCajaConSaldo({ id: 'caja-manada', saldoActual: 1000 });
       const mockCajas: Record<string, CajaConSaldo> = {
         [RamaEnum.MANADA]: mockCaja,
       };

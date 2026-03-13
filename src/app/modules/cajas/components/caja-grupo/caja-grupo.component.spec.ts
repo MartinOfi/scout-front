@@ -65,13 +65,13 @@ describe('CajaGrupoComponent', () => {
 
   describe('Caja Grupo Signal Handling', () => {
     it('should expose cajaGrupo signal from state service', () => {
-      const mockCaja = createMockCajaConSaldo({ saldo: 1000 });
+      const mockCaja = createMockCajaConSaldo({ saldoActual: 1000 });
 
       mockStateService.cajaGrupo.set(mockCaja);
 
       // Direct signal read - no change detection needed
       expect(component.cajaGrupo()).toEqual(mockCaja);
-      expect(component.cajaGrupo()?.saldo).toBe(1000);
+      expect(component.cajaGrupo()?.saldoActual).toBe(1000);
     });
 
     it('should expose saldoGrupo signal from state service', () => {
@@ -81,14 +81,14 @@ describe('CajaGrupoComponent', () => {
     });
 
     it('should update cajaGrupo when state service signal changes', () => {
-      const caja1 = createMockCajaConSaldo({ saldo: 1000 });
-      const caja2 = createMockCajaConSaldo({ saldo: 2000 });
+      const caja1 = createMockCajaConSaldo({ saldoActual: 1000 });
+      const caja2 = createMockCajaConSaldo({ saldoActual: 2000 });
 
       mockStateService.cajaGrupo.set(caja1);
-      expect(component.cajaGrupo()?.saldo).toBe(1000);
+      expect(component.cajaGrupo()?.saldoActual).toBe(1000);
 
       mockStateService.cajaGrupo.set(caja2);
-      expect(component.cajaGrupo()?.saldo).toBe(2000);
+      expect(component.cajaGrupo()?.saldoActual).toBe(2000);
     });
 
     it('should handle null cajaGrupo', () => {
@@ -177,7 +177,7 @@ describe('CajaGrupoComponent', () => {
     });
 
     it('should navigate to nuevo movimiento with cajaId on onRegistrarMovimiento', () => {
-      const mockCaja = createMockCajaConSaldo({ id: 'caja-123', saldo: 1000 });
+      const mockCaja = createMockCajaConSaldo({ id: 'caja-123', saldoActual: 1000 });
 
       mockStateService.cajaGrupo.set(mockCaja);
 
@@ -216,7 +216,7 @@ describe('CajaGrupoComponent', () => {
     });
 
     it('should maintain state signals throughout lifecycle', () => {
-      const mockCaja = createMockCajaConSaldo({ saldo: 1000 });
+      const mockCaja = createMockCajaConSaldo({ saldoActual: 1000 });
 
       mockStateService.cajaGrupo.set(mockCaja);
       const caja1 = component.cajaGrupo();

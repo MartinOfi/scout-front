@@ -5,8 +5,8 @@
       @if (selectedCaja(); as caja) {
         <div class="drawer-header__info">
           <h2 class="caja-name">{{ caja.nombre || 'Caja de Grupo' }}</h2>
-          <p class="caja-saldo" [class.negative]="caja.saldo < 0">
-            {{ caja.saldo | currency:'ARS':'symbol':'1.0-0' }}
+          <p class="caja-saldo" [class.negative]="caja.saldoActual < 0">
+            {{ caja.saldoActual | currency:'ARS':'symbol':'1.0-0' }}
           </p>
         </div>
       }

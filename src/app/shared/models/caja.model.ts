@@ -4,26 +4,34 @@
  */
 
 import { CajaType } from '../enums';
-import { Persona } from './persona.model';
 
 /**
- * Caja (financial account)
+ * Propietario info returned from API
+ */
+export interface CajaPropietario {
+  id: string;
+  nombre: string;
+}
+
+/**
+ * Caja base (financial account)
  */
 export interface Caja {
   id: string;
   tipo: CajaType;
-  nombre?: string;
-  propietarioId?: string;
-  propietario?: Persona;
+  nombre: string | null;
+  propietarioId: string | null;
+  propietario: CajaPropietario | null;
   createdAt: Date;
   updatedAt: Date;
 }
 
 /**
- * Caja with calculated saldo
+ * Caja response from API with calculated saldoActual
+ * Matches CajaResponseDto from backend
  */
 export interface CajaConSaldo extends Caja {
-  saldo: number;
+  saldoActual: number;
 }
 
 /**
@@ -33,7 +41,7 @@ export interface CajaSummary {
   id: string;
   tipo: CajaType;
   nombre: string;
-  saldo: number;
+  saldoActual: number;
 }
 
 /**

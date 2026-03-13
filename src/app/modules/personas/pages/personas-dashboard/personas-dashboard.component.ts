@@ -120,8 +120,6 @@ export class PersonasDashboardComponent implements OnInit {
   /** Table columns configuration */
   readonly tableColumns: TableColumn[] = [
     { key: 'nombreCompleto', header: 'Nombre y Apellido', type: 'text' },
-    { key: 'saldoPersonal', header: 'Saldo Personal', type: 'text' },
-    { key: 'deudaGrupo', header: 'Deuda Grupo', type: 'text' },
     { key: 'partidaNacimiento', header: 'Partida', type: 'boolean' },
     { key: 'dni', header: 'DNI', type: 'boolean' },
     { key: 'dniPadres', header: 'DNI Padres', type: 'boolean' },

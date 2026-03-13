@@ -63,15 +63,15 @@
     </div>
   } @else {
     <!-- Data Table -->
+    <!-- Server-side pagination: data is already paginated, so always pass currentPage=1 -->
     <app-data-table
       [data]="tableData()"
       [columns]="tableColumns()"
       [config]="{ showHeader: true, hoverable: true }"
       [pageSize]="pageSize()"
-      [currentPage]="currentPage()"
+      [currentPage]="1"
       (actionClick)="onActionClick($event)"
-      (rowClick)="onRowClick($event)"
-      (pageChange)="onPageChange($event)" />
+      (rowClick)="onRowClick($event)" />
 
     <!-- Pagination Controls -->
     <div class="pagination-controls">

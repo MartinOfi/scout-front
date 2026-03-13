@@ -59,7 +59,7 @@ export class FondosRamaComponent implements OnInit {
 
   getSaldoRama(rama: Rama): number {
     const caja = this.cajasRama()[rama];
-    return caja?.saldo ?? 0;
+    return caja?.saldoActual ?? 0;
   }
 
   getRamaLabel(rama: Rama): string {

@@ -198,7 +198,7 @@ export class DashboardComponent implements OnInit {
           iconVariant: config.iconVariant,
           nombre: rama,
           protagonistas: protagonistasPorRama[rama] ?? 0,
-          saldo: caja?.saldo ?? 0,
+          saldo: caja?.saldoActual ?? 0,
         };
       });
   });

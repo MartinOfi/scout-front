@@ -23,6 +23,9 @@ export function createMockCaja(overrides: Partial<Caja> = {}): Caja {
   return {
     id: 'caja-1',
     tipo: CajaType.GRUPO,
+    nombre: null,
+    propietarioId: null,
+    propietario: null,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),
     ...overrides,
@@ -36,7 +39,10 @@ export function createMockCajaConSaldo(overrides: Partial<CajaConSaldo> = {}): C
   return {
     id: 'caja-1',
     tipo: CajaType.GRUPO,
-    saldo: 1000,
+    nombre: null,
+    propietarioId: null,
+    propietario: null,
+    saldoActual: 1000,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),
     ...overrides,

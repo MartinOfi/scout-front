@@ -50,6 +50,7 @@ export class CajasStateService {
 
   private readonly _cajaGrupo: WritableSignal<CajaConSaldo | null> = signal(null);
   private readonly _cajasRama: WritableSignal<Record<string, CajaConSaldo>> = signal({});
+  private readonly _cajasPersonales: WritableSignal<CajaConSaldo[]> = signal([]);
   private readonly _movimientosGrupo: WritableSignal<Movimiento[]> = signal([]);
   private readonly _movimientosRama: WritableSignal<Record<string, Movimiento[]>> = signal({});
   private readonly _movimientosPersonal: WritableSignal<Record<string, Movimiento[]>> = signal({});
@@ -71,6 +72,7 @@ export class CajasStateService {
 
   readonly cajaGrupo: Signal<CajaConSaldo | null> = this._cajaGrupo.asReadonly();
   readonly cajasRama: Signal<Record<string, CajaConSaldo>> = this._cajasRama.asReadonly();
+  readonly cajasPersonales: Signal<CajaConSaldo[]> = this._cajasPersonales.asReadonly();
   readonly movimientosGrupo: Signal<Movimiento[]> = this._movimientosGrupo.asReadonly();
   readonly movimientosRama: Signal<Record<string, Movimiento[]>> =
     this._movimientosRama.asReadonly();
@@ -93,7 +95,7 @@ export class CajasStateService {
   // ============================================================================
 
   readonly saldoGrupo = computed((): number => {
-    return this._cajaGrupo()?.saldo ?? 0;
+    return this._cajaGrupo()?.saldoActual ?? 0;
   });
 
   /** Total de cuentas personales from consolidado */
@@ -138,22 +140,22 @@ export class CajasStateService {
 
   readonly saldoManada = computed((): number => {
     const caja = this._cajasRama()[RamaEnum.MANADA];
-    return caja?.saldo ?? 0;
+    return caja?.saldoActual ?? 0;
   });
 
   readonly saldoUnidad = computed((): number => {
     const caja = this._cajasRama()[RamaEnum.UNIDAD];
-    return caja?.saldo ?? 0;
+    return caja?.saldoActual ?? 0;
   });
 
   readonly saldoCaminantes = computed((): number => {
     const caja = this._cajasRama()[RamaEnum.CAMINANTES];
-    return caja?.saldo ?? 0;
+    return caja?.saldoActual ?? 0;
   });
 
   readonly saldoRovers = computed((): number => {
     const caja = this._cajasRama()[RamaEnum.ROVERS];
-    return caja?.saldo ?? 0;
+    return caja?.saldoActual ?? 0;
   });
 
   readonly totalSaldosRamas = computed((): number => {
@@ -221,7 +223,7 @@ export class CajasStateService {
         if (consolidado.cajaGrupo.id) {
           this._cajaGrupo.set({
             id: consolidado.cajaGrupo.id,
-            saldo: consolidado.cajaGrupo.saldo,
+            saldoActual: consolidado.cajaGrupo.saldo,
           } as CajaConSaldo);
         }
 
@@ -234,7 +236,7 @@ export class CajasStateService {
             cajasMap[ramaKey] = {
               id: fondo.id,
               nombre: fondo.nombre,
-              saldo: fondo.saldo,
+              saldoActual: fondo.saldo,
             } as CajaConSaldo;
           }
         });
@@ -325,6 +327,28 @@ export class CajasStateService {
       },
       error: (err: unknown) => {
         const errorMsg = err instanceof Error ? err.message : 'Error al cargar cajas de rama';
+        this._error.set(errorMsg);
+        this._loading.set(false);
+        this.notificationService.showError(errorMsg);
+      },
+    });
+  }
+
+  /**
+   * Cargar todas las cajas personales
+   * Uses GET /cajas?tipo=personal
+   */
+  loadCajasPersonales(): void {
+    this._loading.set(true);
+    this._error.set(null);
+
+    this.apiService.getByType(CajaType.PERSONAL).subscribe({
+      next: (cajas) => {
+        this._cajasPersonales.set(cajas as CajaConSaldo[]);
+        this._loading.set(false);
+      },
+      error: (err: unknown) => {
+        const errorMsg = err instanceof Error ? err.message : 'Error al cargar cuentas personales';
         this._error.set(errorMsg);
         this._loading.set(false);
         this.notificationService.showError(errorMsg);
@@ -508,6 +532,7 @@ export class CajasStateService {
   clear(): void {
     this._cajaGrupo.set(null);
     this._cajasRama.set({});
+    this._cajasPersonales.set([]);
     this._consolidado.set(null);
     this._movimientosGrupo.set([]);
     this._movimientosRama.set({});

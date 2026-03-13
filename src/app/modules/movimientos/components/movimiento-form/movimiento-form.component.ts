@@ -210,7 +210,7 @@ export class MovimientoFormComponent implements OnInit {
       id: caja.id,
       nombre: this.getCajaDisplayName(caja),
       tipo: caja.tipo,
-      saldo: caja.saldo,
+      saldo: caja.saldoActual,
     }));
     this.cajas.set(options);
   }
