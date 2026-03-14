@@ -124,13 +124,18 @@
         <div class="timeline" role="list" aria-label="Lista de pagos realizados">
           @if (d.movimientos.length > 0) {
           @for (mov of d.movimientos; track mov.id) {
-          <article class="timeline-item timeline-item--editable" role="listitem">
+          <article class="timeline-item timeline-item--editable"
+            [class.timeline-item--egreso]="mov.tipo === 'egreso'"
+            role="listitem">
             <div class="timeline-item__marker" aria-hidden="true">
-              <mat-icon>payments</mat-icon>
+              <mat-icon>{{ mov.tipo === 'egreso' ? 'account_balance_wallet' : 'payments' }}</mat-icon>
             </div>
             <div class="timeline-item__content">
               <div class="timeline-item__main">
-                <span class="timeline-item__amount">{{ mov.monto | currency:'ARS':'symbol':'1.0-0' }}</span>
+                <span class="timeline-item__amount"
+                  [class.timeline-item__amount--egreso]="mov.tipo === 'egreso'">
+                  @if (mov.tipo === 'egreso') { - }{{ mov.monto | currency:'ARS':'symbol':'1.0-0' }}
+                </span>
                 <span class="timeline-item__date">{{ mov.fecha | date:'d MMM' }}</span>
               </div>
               <div class="timeline-item__details">

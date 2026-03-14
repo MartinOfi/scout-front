@@ -3,7 +3,13 @@
  * Typed interfaces - NO any
  */
 
-import { TipoInscripcion, EstadoInscripcion, MedioPago } from '../enums';
+import {
+  TipoInscripcion,
+  EstadoInscripcion,
+  MedioPago,
+  TipoMovimiento,
+  ConceptoMovimiento,
+} from '../enums';
 import { Persona } from './persona.model';
 
 /**
@@ -39,6 +45,8 @@ export interface MovimientoInscripcion {
   medioPago: MedioPago;
   fecha: string;
   descripcion: string | null;
+  tipo: TipoMovimiento;
+  concepto: ConceptoMovimiento;
 }
 
 /**

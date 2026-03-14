@@ -23,6 +23,7 @@ import { ConfirmDialogService } from '../../../../shared/services';
 import { LoadingSpinnerComponent, EmptyStateComponent } from '../../../../shared';
 import {
   InscripcionConEstado,
+  MovimientoInscripcion,
   PagoInscripcionDto,
   UpdatePagoDto,
   ExistingPago,
@@ -211,13 +212,7 @@ export class InscripcionDetailComponent implements OnInit {
   }
 
   /** Edit an existing payment from the timeline */
-  onEditPayment(mov: {
-    id: string;
-    monto: number;
-    medioPago: MedioPago;
-    descripcion: string | null;
-    fecha: string;
-  }): void {
+  onEditPayment(mov: MovimientoInscripcion): void {
     const d = this.detail();
     if (!d) return;
 

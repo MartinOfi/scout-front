@@ -466,6 +466,19 @@ $card-padding-compact: 20px;
     background-color: tokens.$stone-50;
   }
 
+  // Egreso variant - red styling for personal account withdrawals
+  &--egreso {
+    .timeline-item__marker {
+      background-color: color-mix(in srgb, tokens.$color-error 12%, transparent);
+      color: tokens.$color-error;
+    }
+
+    .timeline-item__method {
+      background-color: color-mix(in srgb, tokens.$color-error 10%, transparent);
+      color: tokens.$color-error;
+    }
+  }
+
   &__marker {
     flex-shrink: 0;
     width: 28px;
@@ -505,6 +518,10 @@ $card-padding-compact: 20px;
     font-weight: 600;
     color: tokens.$stone-900;
     font-variant-numeric: tabular-nums;
+
+    &--egreso {
+      color: tokens.$color-error;
+    }
   }
 
   &__date {

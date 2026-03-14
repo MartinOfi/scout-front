@@ -53,6 +53,9 @@ export enum ConceptoMovimiento {
 
   // Transferencias internas
   TRANSFERENCIA_BAJA = 'transferencia_baja',
+
+  // Uso de saldo personal (egreso de cuenta personal)
+  USO_SALDO_PERSONAL = 'uso_saldo_personal',
 }
 
 /**
@@ -74,6 +77,7 @@ export const CONCEPTO_MOVIMIENTO_LABELS: Record<ConceptoMovimiento, string> = {
   [ConceptoMovimiento.AJUSTE_INICIAL]: 'Ajuste Inicial',
   [ConceptoMovimiento.ASIGNACION_FONDO_RAMA]: 'Asignación a Fondo de Rama',
   [ConceptoMovimiento.TRANSFERENCIA_BAJA]: 'Transferencia por Baja',
+  [ConceptoMovimiento.USO_SALDO_PERSONAL]: 'Uso de Saldo Personal',
 } as const;
 
 /**

@@ -223,6 +223,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
 
   /**
    * Custom validator: bonificación + pago inicial + saldo personal <= monto total
+   * La suma de todos los conceptos no puede exceder el monto total de la inscripción
    */
   private validateMontosNoExcedenTotal(group: AbstractControl): ValidationErrors | null {
     const montoTotal = group.get('montoTotal')?.value || 0;
@@ -230,6 +231,8 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
     const montoPagado = group.get('montoPagado')?.value || 0;
     const montoConSaldoPersonal = group.get('montoConSaldoPersonal')?.value || 0;
 
+    // Validamos que la suma de todos los pagos no exceda el monto total
+    // saldoRestante = montoTotal - montoBonificado - montoPagado - montoConSaldoPersonal >= 0
     const totalPagos = montoBonificado + montoPagado + montoConSaldoPersonal;
 
     if (totalPagos > montoTotal) {
