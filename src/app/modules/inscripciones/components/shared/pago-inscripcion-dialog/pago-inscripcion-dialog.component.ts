@@ -3,7 +3,14 @@
  * Dialog for registering subsequent payments on inscriptions
  */
 
-import { Component, Inject, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import {
+  Component,
+  Inject,
+  ChangeDetectionStrategy,
+  OnInit,
+  signal,
+  computed,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
@@ -87,6 +94,12 @@ export class PagoInscripcionDialogComponent implements OnInit {
     { value: 'transferencia', label: MEDIO_PAGO_LABELS['transferencia'] },
   ];
 
+  /** Signal to track if amounts exceed pending amount */
+  readonly montosExcedenPendiente = signal(false);
+
+  /** Computed: saldo restante después del pago */
+  readonly saldoRestanteCalculado = signal(0);
+
   constructor(
     private readonly fb: FormBuilder,
     private readonly dialogRef: MatDialogRef<
@@ -108,12 +121,29 @@ export class PagoInscripcionDialogComponent implements OnInit {
     } else {
       // Create mode: both payment types available
       this.form = this.fb.group({
-        montoPagado: [0, [Validators.min(0), Validators.max(this.data.montoPendiente)]],
+        montoPagado: [0, [Validators.min(0)]],
         montoConSaldoPersonal: [0, [Validators.min(0)]],
         medioPago: [MedioPagoEnum.EFECTIVO, [Validators.required]],
         descripcion: [''],
       });
+
+      // Subscribe to form changes to validate amounts
+      this.form.valueChanges.subscribe(() => {
+        this.validateMontos();
+      });
     }
+  }
+
+  /**
+   * Validate that montoPagado + montoConSaldoPersonal <= montoPendiente
+   */
+  private validateMontos(): void {
+    const montoPagado = this.form.get('montoPagado')?.value || 0;
+    const montoConSaldo = this.form.get('montoConSaldoPersonal')?.value || 0;
+    const total = montoPagado + montoConSaldo;
+
+    this.montosExcedenPendiente.set(total > this.montoPendiente);
+    this.saldoRestanteCalculado.set(Math.max(0, this.montoPendiente - total));
   }
 
   get isEditMode(): boolean {
@@ -174,8 +204,14 @@ export class PagoInscripcionDialogComponent implements OnInit {
     const montoPagado = this.form.get('montoPagado')?.value || 0;
     const montoConSaldo = this.form.get('montoConSaldoPersonal')?.value || 0;
     if (montoPagado <= 0 && montoConSaldo <= 0) return true;
-    if (this.montoTotalPago > this.montoPendiente) return true;
+    if (this.montosExcedenPendiente()) return true;
     return false;
+  }
+
+  /** Check if saldo personal exceeds available balance */
+  get saldoExcedeDisponible(): boolean {
+    const montoConSaldo = this.form?.get('montoConSaldoPersonal')?.value || 0;
+    return montoConSaldo > this.saldoCuentaPersonal;
   }
 
   // Callbacks for select field

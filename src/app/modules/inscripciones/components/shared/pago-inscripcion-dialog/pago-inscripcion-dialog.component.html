@@ -19,21 +19,9 @@
           <span class="value">{{ data.existingPago.fecha | date:'dd/MM/yyyy' }}</span>
         </div>
         }
-        <div class="summary-item">
+        <div class="summary-item summary-item--highlight">
           <span class="label">{{ isEditMode ? 'Saldo Pendiente Actual:' : 'Saldo Pendiente:' }}</span>
-          <span class="value">${{ montoPendiente | number:'1.0-0' }}</span>
-        </div>
-        @if (!isEditMode && puedeUsarSaldo) {
-        <div class="summary-item">
-          <span class="label">Saldo Cuenta Personal:</span>
-          <span class="value success">${{ saldoCuentaPersonal | number:'1.0-0' }}</span>
-        </div>
-        }
-        <div class="summary-item">
-          <span class="label">{{ isEditMode ? 'Nuevo Saldo Pendiente:' : 'Monto Restante:' }}</span>
-          <span class="value" [class.success]="montoRestante === 0">
-            ${{ montoRestante | number:'1.0-0' }}
-          </span>
+          <span class="value value--pending">${{ montoPendiente | number:'1.0-0' }}</span>
         </div>
       </div>
 
@@ -55,27 +43,6 @@
           <span error>Debe ser mayor a 0</span>
           }
         </app-form-field>
-        } @else {
-        <!-- Create Mode: Dual payment inputs -->
-        <app-form-field label="Monto en Efectivo/Transferencia" [forId]="'monto-pagado'"
-          [invalid]="!!(form.get('montoPagado')?.invalid && form.get('montoPagado')?.touched)">
-          <div class="input-with-prefix">
-            <span class="input-prefix">$</span>
-            <app-number-field id="monto-pagado" formControlName="montoPagado" [min]="0" placeholder="0" />
-          </div>
-          @if (form.get('montoPagado')?.hasError('max')) {
-          <span error>No puede exceder ${{ montoPendiente }}</span>
-          }
-        </app-form-field>
-
-        <app-form-field label="Monto con Saldo Personal" [forId]="'monto-saldo'"
-          hint="Pago usando saldo de cuenta personal">
-          <div class="input-with-prefix">
-            <span class="input-prefix">$</span>
-            <app-number-field id="monto-saldo" formControlName="montoConSaldoPersonal" [min]="0" placeholder="0" />
-          </div>
-        </app-form-field>
-        }
 
         <!-- Medio de Pago -->
         <app-form-field label="Medio de Pago" [forId]="'medio-pago-select'" [required]="true"
@@ -85,19 +52,101 @@
           <span error>Seleccione un medio de pago</span>
         </app-form-field>
 
-        <!-- Descripcion -->
-        <app-form-field label="Descripcion" [forId]="'descripcion'" hint="Opcional" class="full-width">
+        <!-- Descripcion (full width in edit mode) -->
+        <app-form-field label="Descripción" [forId]="'descripcion'" hint="Opcional" class="full-width">
           <app-textarea-field id="descripcion" formControlName="descripcion" placeholder="Notas adicionales..."
             [rows]="2" />
         </app-form-field>
+        } @else {
+        <!-- Create Mode: Row 1 - Pago + Medio de Pago -->
+        <app-form-field label="Pago en Efectivo/Transferencia" [forId]="'monto-pagado'"
+          [invalid]="!!(form.get('montoPagado')?.invalid && form.get('montoPagado')?.touched)">
+          <div class="input-with-prefix">
+            <span class="input-prefix">$</span>
+            <app-number-field id="monto-pagado" formControlName="montoPagado" [min]="0" placeholder="0" />
+          </div>
+        </app-form-field>
+
+        <app-form-field label="Medio de Pago" [forId]="'medio-pago-select'" [required]="true"
+          [invalid]="!!(form.get('medioPago')?.invalid && form.get('medioPago')?.touched)">
+          <app-select-field id="medio-pago-select" formControlName="medioPago" placeholder="Seleccionar medio"
+            [options]="mediosPagoOptions" [optionValueFn]="getMedioPagoValue" [optionLabelFn]="getMedioPagoLabel" />
+          <span error>Seleccione un medio de pago</span>
+        </app-form-field>
+
+        <!-- Create Mode: Row 2 - Saldo Personal + Descripción -->
+        <div class="saldo-personal-section" [class.saldo-personal-section--available]="puedeUsarSaldo">
+          <app-form-field label="Usar Saldo Personal" [forId]="'monto-saldo'"
+            [invalid]="saldoExcedeDisponible">
+            <div class="input-with-prefix">
+              <span class="input-prefix">$</span>
+              <app-number-field id="monto-saldo" formControlName="montoConSaldoPersonal" [min]="0"
+                [max]="saldoCuentaPersonal" placeholder="0" />
+            </div>
+            @if (saldoExcedeDisponible) {
+            <span error>Excede el saldo disponible (${{ saldoCuentaPersonal | number:'1.0-0' }})</span>
+            }
+          </app-form-field>
+          @if (puedeUsarSaldo) {
+          <div class="saldo-info">
+            <span class="saldo-disponible">
+              <mat-icon>account_balance_wallet</mat-icon>
+              Disponible: ${{ saldoCuentaPersonal | number:'1.0-0' }}
+            </span>
+            <button type="button" class="btn-use-saldo" (click)="usarSaldoDisponible()">
+              Usar todo
+            </button>
+          </div>
+          } @else {
+          <div class="saldo-info saldo-info--empty">
+            <mat-icon>info_outline</mat-icon>
+            <span>Sin saldo disponible</span>
+          </div>
+          }
+        </div>
+
+        <app-form-field label="Descripción" [forId]="'descripcion'" hint="Opcional">
+          <app-textarea-field id="descripcion" formControlName="descripcion" placeholder="Notas adicionales..."
+            [rows]="3" />
+        </app-form-field>
+        }
       </div>
 
-      @if (!isEditMode && puedeUsarSaldo) {
-      <div class="quick-actions">
-        <button type="button" class="btn-outline" (click)="usarSaldoDisponible()">
-          <mat-icon>account_balance_wallet</mat-icon>
-          Usar Saldo Disponible (${{ saldoCuentaPersonal | number:'1.0-0' }})
-        </button>
+      <!-- Validation Error & Summary Strip -->
+      @if (!isEditMode) {
+      <div class="payment-summary" [class.payment-summary--error]="montosExcedenPendiente()"
+        [class.payment-summary--complete]="montoRestante === 0 && !montosExcedenPendiente()">
+        @if (montosExcedenPendiente()) {
+        <div class="validation-error">
+          <mat-icon>error_outline</mat-icon>
+          <span>El monto total no puede superar el saldo pendiente (${{ montoPendiente | number:'1.0-0' }})</span>
+        </div>
+        } @else {
+        <div class="summary-row">
+          <div class="summary-calc">
+            <span class="calc-item">
+              <span class="calc-label">Efectivo:</span>
+              <span class="calc-value">${{ form.get('montoPagado')?.value || 0 | number:'1.0-0' }}</span>
+            </span>
+            <span class="calc-operator">+</span>
+            <span class="calc-item">
+              <span class="calc-label">Saldo:</span>
+              <span class="calc-value">${{ form.get('montoConSaldoPersonal')?.value || 0 | number:'1.0-0' }}</span>
+            </span>
+            <span class="calc-operator">=</span>
+            <span class="calc-item calc-item--total">
+              <span class="calc-label">Total:</span>
+              <span class="calc-value">${{ montoTotalPago | number:'1.0-0' }}</span>
+            </span>
+          </div>
+          <div class="summary-result">
+            <span class="result-label">Restante:</span>
+            <span class="result-value" [class.result-value--zero]="montoRestante === 0">
+              ${{ montoRestante | number:'1.0-0' }}
+            </span>
+          </div>
+        </div>
+        }
       </div>
       }
     </form>

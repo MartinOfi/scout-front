@@ -245,8 +245,8 @@ export class InscripcionDetailComponent implements OnInit {
       import('../shared/pago-inscripcion-dialog/pago-inscripcion-dialog.component').then(
         ({ PagoInscripcionDialogComponent }) => {
           const dialogRef = this.dialog.open(PagoInscripcionDialogComponent, {
-            width: '500px',
-            maxWidth: '90vw',
+            width: '720px',
+            maxWidth: '95vw',
             data: dialogData,
             disableClose: false,
           });

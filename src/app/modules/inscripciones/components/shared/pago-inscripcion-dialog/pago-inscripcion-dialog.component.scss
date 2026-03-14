@@ -36,18 +36,22 @@ $transition-fast: 150ms ease-out;
 :host ::ng-deep {
   .mat-mdc-dialog-container {
     --mdc-dialog-container-shape: #{$radius-xl};
+    max-width: 90vw !important;
 
     .mdc-dialog__surface {
       border-radius: $radius-xl !important;
       box-shadow: $shadow-dialog !important;
       overflow: hidden;
+      max-width: none !important;
+      width: auto !important;
     }
   }
 
   // Remove default Material dialog padding
   .mat-mdc-dialog-content {
     padding: 0 !important;
-    max-height: 70vh;
+    max-height: 85vh;
+    overflow-y: auto;
   }
 
   .mat-mdc-dialog-actions {
@@ -101,8 +105,6 @@ $transition-fast: 150ms ease-out;
 
 .dialog-content {
   padding: 20px 24px;
-  min-width: 420px;
-  max-width: 520px;
   background-color: white;
 }
 
@@ -123,8 +125,8 @@ $transition-fast: 150ms ease-out;
 .summary {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 16px;
+  gap: 8px;
+  padding: 14px 16px;
   background: linear-gradient(135deg, tokens.$stone-50 0%, tokens.$stone-100 100%);
   border: 1px solid tokens.$stone-200;
   border-radius: $radius-lg;
@@ -152,6 +154,24 @@ $transition-fast: 150ms ease-out;
 
       &.danger {
         color: $danger-500;
+      }
+
+      &--pending {
+        font-size: 1.125rem;
+        color: tokens.$brand-burgundy;
+      }
+    }
+
+    &--highlight {
+      padding: 8px 12px;
+      margin: 4px -4px -2px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid rgba(tokens.$brand-burgundy, 0.15);
+
+      .label {
+        font-weight: 500;
+        color: tokens.$stone-600;
       }
     }
   }
@@ -199,32 +219,198 @@ $transition-fast: 150ms ease-out;
 }
 
 // ============================================================================
-// Quick Actions
+// Saldo Personal Section
 // ============================================================================
 
-.quick-actions {
+.saldo-personal-section {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: tokens.$stone-50;
+  border: 1px solid tokens.$stone-200;
+  border-radius: $radius-md;
+  transition: all $transition-fast;
 
-  button {
-    flex: 1;
-    min-width: fit-content;
-    display: inline-flex;
+  &--available {
+    background: linear-gradient(135deg, rgba($success-500, 0.04) 0%, rgba($success-500, 0.08) 100%);
+    border-color: rgba($success-500, 0.2);
+  }
+
+  :host ::ng-deep .scout-field {
+    margin-bottom: 0;
+  }
+}
+
+.saldo-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 4px;
+
+  .saldo-disponible {
+    display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 16px;
+    gap: 6px;
     font-size: 0.8125rem;
     font-weight: 500;
-    border-radius: $radius-md;
-    cursor: pointer;
-    transition: all $transition-fast;
+    color: $success-600;
 
     mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &--empty {
+    justify-content: flex-start;
+    color: tokens.$stone-400;
+    font-size: 0.8125rem;
+
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+
+    span {
+      font-style: italic;
+    }
+  }
+}
+
+.btn-use-saldo {
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: $success-600;
+  background: white;
+  border: 1px solid $success-500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba($success-500, 0.08);
+    border-color: $success-600;
+  }
+
+  &:active {
+    background: rgba($success-500, 0.12);
+    transform: translateY(1px);
+  }
+}
+
+// ============================================================================
+// Payment Summary Strip
+// ============================================================================
+
+.payment-summary {
+  padding: 14px 16px;
+  background: tokens.$stone-50;
+  border: 1px solid tokens.$stone-200;
+  border-radius: $radius-md;
+  transition: all $transition-fast;
+
+  &--error {
+    background: rgba($danger-500, 0.04);
+    border-color: rgba($danger-500, 0.3);
+  }
+
+  &--complete {
+    background: rgba($success-500, 0.04);
+    border-color: rgba($success-500, 0.3);
+  }
+}
+
+.validation-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: $danger-600;
+  font-size: 0.8125rem;
+  font-weight: 500;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+}
+
+.summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.summary-calc {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.calc-item {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+
+  .calc-label {
+    font-size: 0.75rem;
+    color: tokens.$stone-500;
+  }
+
+  .calc-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: tokens.$stone-700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &--total {
+    .calc-value {
+      color: tokens.$stone-900;
+      font-size: 0.9375rem;
+    }
+  }
+}
+
+.calc-operator {
+  color: tokens.$stone-400;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.summary-result {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 6px 12px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid tokens.$stone-200;
+
+  .result-label {
+    font-size: 0.75rem;
+    color: tokens.$stone-500;
+  }
+
+  .result-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: tokens.$stone-800;
+    font-variant-numeric: tabular-nums;
+
+    &--zero {
+      color: $success-600;
     }
   }
 }
@@ -370,12 +556,37 @@ $transition-fast: 150ms ease-out;
     gap: 14px;
   }
 
-  .quick-actions {
-    flex-direction: column;
+  .saldo-personal-section {
+    padding: 10px;
+  }
 
-    button {
+  .saldo-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+
+    .btn-use-saldo {
       width: 100%;
+      text-align: center;
     }
+  }
+
+  .payment-summary {
+    padding: 12px;
+  }
+
+  .summary-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .summary-calc {
+    justify-content: center;
+  }
+
+  .summary-result {
+    width: 100%;
+    justify-content: center;
   }
 
   .dialog-actions {
