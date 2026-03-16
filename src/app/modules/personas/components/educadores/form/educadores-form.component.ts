@@ -72,14 +72,14 @@ export class EducadoresFormComponent implements OnInit {
     if (this.form.invalid) return;
     if (this.isEditing && this.editId) {
       const dto: UpdatePersonaDto = this.formBuilder.extractUpdateEducadorDto(this.form);
-      this.state.update(this.editId, dto).subscribe({ next: () => this.router.navigate(['/personas/educadores']) });
+      this.state.update(this.editId, dto).subscribe({ next: () => this.router.navigate(['/personas']) });
     } else {
       const dto: CreateEducadorDto = this.formBuilder.extractCreateEducadorDto(this.form);
-      this.state.create(dto).subscribe({ next: () => this.router.navigate(['/personas/educadores']) });
+      this.state.create(dto).subscribe({ next: () => this.router.navigate(['/personas']) });
     }
   }
 
   onCancel(): void {
-    this.router.navigate(['/personas/educadores']);
+    this.router.navigate(['/personas']);
   }
 }

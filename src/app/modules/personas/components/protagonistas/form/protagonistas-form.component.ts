@@ -81,17 +81,17 @@ export class ProtagonistasFormComponent implements OnInit {
     if (this.isEditing && this.editId) {
       const dto: UpdatePersonaDto = this.formBuilder.extractUpdateProtagonistaDto(this.form);
       this.state.update(this.editId, dto).subscribe({
-        next: () => this.router.navigate(['/personas/protagonistas'])
+        next: () => this.router.navigate(['/personas'])
       });
     } else {
       const dto: CreateProtagonistaDto = this.formBuilder.extractCreateProtagonistaDto(this.form);
       this.state.createProtagonista(dto).subscribe({
-        next: () => this.router.navigate(['/personas/protagonistas'])
+        next: () => this.router.navigate(['/personas'])
       });
     }
   }
 
   onCancel(): void {
-    this.router.navigate(['/personas/protagonistas']);
+    this.router.navigate(['/personas']);
   }
 }

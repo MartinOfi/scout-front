@@ -67,14 +67,14 @@ export class PersonasExternasFormComponent implements OnInit {
     if (this.form.invalid) return;
     if (this.isEditing && this.editId) {
       const dto: UpdatePersonaDto = this.formBuilder.extractUpdatePersonaExternaDto(this.form);
-      this.state.update(this.editId, dto).subscribe({ next: () => this.router.navigate(['/personas/personas-externas']) });
+      this.state.update(this.editId, dto).subscribe({ next: () => this.router.navigate(['/personas']) });
     } else {
       const dto: CreatePersonaExternaDto = this.formBuilder.extractCreatePersonaExternaDto(this.form);
-      this.state.create(dto).subscribe({ next: () => this.router.navigate(['/personas/personas-externas']) });
+      this.state.create(dto).subscribe({ next: () => this.router.navigate(['/personas']) });
     }
   }
 
   onCancel(): void {
-    this.router.navigate(['/personas/personas-externas']);
+    this.router.navigate(['/personas']);
   }
 }
