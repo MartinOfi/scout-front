@@ -17,11 +17,12 @@ import { GenericFiltersComponent } from '../../../../shared/components/filters/g
 import { FilterConfig } from '../../../../shared/components/filters/generic-filters/filter-config.interface';
 import { FilterType } from '../../../../shared/components/filters/generic-filters/filter-type.enum';
 import { TableColumn, ActionEvent, TableAction } from '../../../../shared/models/table.model';
-import { PersonaType, Rama, EstadoPersona } from '../../../../shared/enums';
+import { PersonaType, Rama, EstadoPersona, RamaEnum } from '../../../../shared/enums';
 import { Protagonista, PersonaUnion } from '../../../../shared/models';
 import {
   generateRamaTabs,
   getRamaFromTabKey,
+  RAMA_TAB_KEYS,
   RamaTabKey,
 } from '../../../../shared/constants/rama.constants';
 import {
@@ -80,7 +81,7 @@ export class PersonasDashboardComponent implements OnInit {
   readonly error = this.state.error;
 
   /** Currently active tab */
-  readonly activeTab = signal<TabKey>('manada');
+  readonly activeTab = signal<TabKey>(RAMA_TAB_KEYS[RamaEnum.MANADA]);
 
   /** Current search filter */
   readonly searchFilter = signal<string>('');

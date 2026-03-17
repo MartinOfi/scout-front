@@ -4,7 +4,14 @@
  * SIN any - tipado estricto
  */
 
-import { Component, OnInit, ChangeDetectionStrategy, inject, Signal, computed } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  inject,
+  Signal,
+  computed,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -30,11 +37,11 @@ import { SelectFieldComponent } from '../../../../../shared/components/form/sele
     EmptyStateComponent,
     FormFieldComponent,
     TextFieldComponent,
-    SelectFieldComponent
+    SelectFieldComponent,
   ],
   templateUrl: './educadores-form.component.html',
   styleUrls: ['./educadores-form.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EducadoresFormComponent implements OnInit {
   private readonly state = inject(EducadoresStateService);
@@ -53,26 +60,46 @@ export class EducadoresFormComponent implements OnInit {
   readonly selected: Signal<Educador | null> = computed(() => this.state.selected());
 
   ngOnInit(): void {
-    this.route.params.pipe(take(1), filter(params => !!params['id'])).subscribe(params => {
-      this.isEditing = true;
-      this.editId = params['id'];
-      this.loadEducador(this.editId);
-    });
+    this.route.params
+      .pipe(
+        take(1),
+        filter((params) => !!params['id']),
+      )
+      .subscribe((params) => {
+        this.isEditing = true;
+        this.editId = params['id'];
+        this.loadEducador(this.editId);
+      });
   }
 
   private loadEducador(id: string | null): void {
     if (!id) return;
-    const educador = this.state.educadores().find(e => e.id === id);
+
+    // Primero buscar en el cache local
+    const educador = this.state.educadores().find((e) => e.id === id);
     if (educador) {
       this.form = this.formBuilder.buildEditEducadorForm(educador);
+      return;
     }
+
+    // Si no está en cache, cargar desde la API
+    this.state
+      .loadById(id)
+      .pipe(take(1))
+      .subscribe({
+        next: (loaded) => {
+          this.form = this.formBuilder.buildEditEducadorForm(loaded);
+        },
+      });
   }
 
   onSubmit(): void {
     if (this.form.invalid) return;
     if (this.isEditing && this.editId) {
       const dto: UpdatePersonaDto = this.formBuilder.extractUpdateEducadorDto(this.form);
-      this.state.update(this.editId, dto).subscribe({ next: () => this.router.navigate(['/personas']) });
+      this.state
+        .update(this.editId, dto)
+        .subscribe({ next: () => this.router.navigate(['/personas']) });
     } else {
       const dto: CreateEducadorDto = this.formBuilder.extractCreateEducadorDto(this.form);
       this.state.create(dto).subscribe({ next: () => this.router.navigate(['/personas']) });

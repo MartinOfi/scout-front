@@ -6,7 +6,7 @@
 
 import { Injectable, Signal, WritableSignal, computed, signal, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { tap, catchError, throwError } from 'rxjs';
+import { tap, catchError, throwError, map } from 'rxjs';
 
 import { Persona, Educador, CreateEducadorDto, UpdatePersonaDto } from '../../../shared/models';
 import { PersonasApiService } from './personas-api.service';
@@ -99,7 +99,7 @@ export class EducadoresStateService {
         this._loading.set(false);
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
-      })
+      }),
     );
   }
 
@@ -113,7 +113,7 @@ export class EducadoresStateService {
     return this.apiService.update(id, dto).pipe(
       tap((persona: Persona) => {
         this._educadores.update((prev) =>
-          prev.map((e) => (e.id === id ? (persona as Educador) : e))
+          prev.map((e) => (e.id === id ? (persona as Educador) : e)),
         );
         this._loading.set(false);
         this.notificationService.showSuccess('Educador actualizado exitosamente');
@@ -124,7 +124,7 @@ export class EducadoresStateService {
         this._loading.set(false);
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
-      })
+      }),
     );
   }
 
@@ -150,7 +150,36 @@ export class EducadoresStateService {
         this._loading.set(false);
         this.notificationService.showError(errorMsg);
         return throwError(() => err);
-      })
+      }),
+    );
+  }
+
+  /**
+   * Cargar un educador por ID desde la API
+   * Útil para edición cuando se navega directamente a la URL
+   */
+  loadById(id: string): Observable<Educador> {
+    this._loading.set(true);
+    this._error.set(null);
+
+    return this.apiService.getById(id).pipe(
+      map((persona) => persona as Educador),
+      tap((educador) => {
+        // Agregar al estado si no existe
+        const exists = this._educadores().some((e) => e.id === id);
+        if (!exists) {
+          this._educadores.update((prev) => [...prev, educador]);
+        }
+        this._selectedId.set(id);
+        this._loading.set(false);
+      }),
+      catchError((err: unknown) => {
+        const errorMsg = err instanceof Error ? err.message : 'Error al cargar educador';
+        this._error.set(errorMsg);
+        this._loading.set(false);
+        this.notificationService.showError(errorMsg);
+        return throwError(() => err);
+      }),
     );
   }
 
