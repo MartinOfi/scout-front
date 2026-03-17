@@ -8,10 +8,18 @@ import {
   UpdateInscripcionDto,
   PagoInscripcionDto,
   UpdatePagoDto,
+  TipoDeuda,
+  InscripcionesConsolidado,
 } from '../../../shared/models';
-import { TipoInscripcion } from '../../../shared/enums';
+import { PersonaType, RamaEnum, TipoInscripcion } from '../../../shared/enums';
 import { HttpService } from '../../../shared/services';
 import { API_CONFIG } from '../../../shared/constants';
+
+/**
+ * Rama filter type for inscripciones
+ * Includes scout branches (protagonistas) + educadores
+ */
+export type RamaFilter = RamaEnum | typeof PersonaType.EDUCADOR;
 
 /**
  * Query params for listing inscripciones
@@ -19,6 +27,8 @@ import { API_CONFIG } from '../../../shared/constants';
 export interface InscripcionesQueryParams {
   ano?: number;
   tipo?: TipoInscripcion;
+  tipoDeuda?: TipoDeuda;
+  rama?: RamaFilter;
 }
 
 /**
@@ -44,7 +54,34 @@ export class InscripcionesApiService {
     if (params?.tipo) {
       queryParams['tipo'] = params.tipo;
     }
+    if (params?.tipoDeuda) {
+      queryParams['tipoDeuda'] = params.tipoDeuda;
+    }
+    if (params?.rama) {
+      queryParams['rama'] = params.rama;
+    }
     return this.http.get<Inscripcion[]>(this.endpoint, queryParams);
+  }
+
+  /**
+   * Get consolidado data with aggregated stats and debtors breakdown
+   * GET /api/v1/inscripciones/consolidado
+   */
+  getConsolidado(params?: InscripcionesQueryParams): Observable<InscripcionesConsolidado> {
+    const queryParams: Record<string, string> = {};
+    if (params?.ano) {
+      queryParams['ano'] = params.ano.toString();
+    }
+    if (params?.tipo) {
+      queryParams['tipo'] = params.tipo;
+    }
+    if (params?.tipoDeuda) {
+      queryParams['tipoDeuda'] = params.tipoDeuda;
+    }
+    if (params?.rama) {
+      queryParams['rama'] = params.rama;
+    }
+    return this.http.get<InscripcionesConsolidado>(`${this.endpoint}/consolidado`, queryParams);
   }
 
   /**

@@ -132,19 +132,24 @@ export class InscripcionDetailComponent implements OnInit {
     const d = this.detail();
     if (!d) return false;
     return (
-      d.declaracionDeSalud && d.autorizacionDeImagen && d.salidasCercanas && d.autorizacionIngreso
+      d.declaracionDeSalud &&
+      d.autorizacionDeImagen &&
+      d.salidasCercanas &&
+      d.autorizacionIngreso &&
+      d.certificadoAptitudFisica
     );
   });
 
   /** Count of pending authorizations */
   readonly authPendingCount: Signal<number> = computed(() => {
     const d = this.detail();
-    if (!d) return 4;
+    if (!d) return 5;
     let count = 0;
     if (!d.declaracionDeSalud) count++;
     if (!d.autorizacionDeImagen) count++;
     if (!d.salidasCercanas) count++;
     if (!d.autorizacionIngreso) count++;
+    if (!d.certificadoAptitudFisica) count++;
     return count;
   });
 

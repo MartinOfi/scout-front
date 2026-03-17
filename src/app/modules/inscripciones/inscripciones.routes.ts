@@ -8,32 +8,51 @@ import { Routes } from '@angular/router';
 export const INSCRIPCIONES_ROUTES: Routes = [
   {
     path: '',
-    loadComponent: () => import('./components/inscripciones-list/inscripciones-list.component')
-      .then(m => m.InscripcionesListComponent)
+    loadComponent: () =>
+      import('./components/inscripciones-list/inscripciones-list.component').then(
+        (m) => m.InscripcionesListComponent,
+      ),
+  },
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./components/inscripciones-dashboard/inscripciones-dashboard.component').then(
+        (m) => m.InscripcionesDashboardComponent,
+      ),
   },
   {
     path: 'crear',
-    loadComponent: () => import('./components/inscripcion-form/smart/inscripcion-form.component')
-      .then(m => m.InscripcionFormComponent)
+    loadComponent: () =>
+      import('./components/inscripcion-form/smart/inscripcion-form.component').then(
+        (m) => m.InscripcionFormComponent,
+      ),
   },
   {
     path: 'cuotas',
-    loadComponent: () => import('./components/cuotas-list/smart/cuotas-list.component')
-      .then(m => m.CuotasListComponent)
+    loadComponent: () =>
+      import('./components/cuotas-list/smart/cuotas-list.component').then(
+        (m) => m.CuotasListComponent,
+      ),
   },
   {
     path: ':id',
-    loadComponent: () => import('./components/inscripcion-detail/smart/inscripcion-detail.component')
-      .then(m => m.InscripcionDetailComponent)
+    loadComponent: () =>
+      import('./components/inscripcion-detail/smart/inscripcion-detail.component').then(
+        (m) => m.InscripcionDetailComponent,
+      ),
   },
   {
     path: ':id/editar',
-    loadComponent: () => import('./components/inscripcion-form/smart/inscripcion-form.component')
-      .then(m => m.InscripcionFormComponent)
+    loadComponent: () =>
+      import('./components/inscripcion-form/smart/inscripcion-form.component').then(
+        (m) => m.InscripcionFormComponent,
+      ),
   },
   {
     path: ':id/pago',
-    loadComponent: () => import('./components/inscripcion-form/smart/inscripcion-form.component')
-      .then(m => m.InscripcionFormComponent)
-  }
+    loadComponent: () =>
+      import('./components/inscripcion-form/smart/inscripcion-form.component').then(
+        (m) => m.InscripcionFormComponent,
+      ),
+  },
 ];

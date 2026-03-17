@@ -8,8 +8,9 @@
   Grid responsivo configurable
 -->
 
-<div class="generic-filters">
-  <!-- Header de filtros -->
+<div class="generic-filters" [ngClass]="{ 'generic-filters--inline': inline() }">
+  <!-- Header de filtros (oculto en modo inline) -->
+  @if (!inline()) {
   <div class="filters-header">
     <div class="filters-header-title">
       <div class="filters-title-row" (click)="toggleExpanded()">
@@ -36,10 +37,11 @@
       </button>
     </div>
   </div>
+  }
 
-  <!-- Formulario de filtros (colapsable) -->
-  @if (isExpanded()) {
-  <form [formGroup]="filtersForm" class="filters-form">
+  <!-- Formulario de filtros (colapsable, siempre visible en modo inline) -->
+  @if (isExpanded() || inline()) {
+  <form [formGroup]="filtersForm" class="filters-form" [ngClass]="{ 'filters-form--inline': inline() }">
     <!-- Filtros tipo CHIPS en fila completa separada -->
     @for (config of filterConfigs; track config.key) {
     @if (config.type === FilterType.CHIPS) {
@@ -57,7 +59,7 @@
     }
 
     <!-- Resto de filtros en grid -->
-    <div class="filters-grid">
+    <div class="filters-grid" [ngClass]="{ 'filters-grid--inline': inline() }">
       @for (config of filterConfigs; track config.key) {
       @if (config.type !== FilterType.CHIPS) {
       <div class="filter-group">
@@ -143,13 +145,20 @@
     </div>
   </form>
 
-  <!-- Indicador de filtros activos -->
-  @if (hasActiveFilters()) {
+  <!-- Indicador de filtros activos (oculto en modo inline) -->
+  @if (hasActiveFilters() && !inline()) {
   <div class="active-filters">
     <p class="text-muted">
       <strong>{{ filterConfigs.length }}</strong> filtros configurados
     </p>
   </div>
+  }
+
+  <!-- Botón limpiar en modo inline -->
+  @if (inline() && showClearButton() && hasActiveFilters()) {
+  <button type="button" class="btn btn-ghost btn-sm inline-clear-btn" (click)="onClearFilters()">
+    Limpiar filtros
+  </button>
   }
   }
 </div>

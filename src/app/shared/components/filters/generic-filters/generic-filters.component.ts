@@ -74,7 +74,18 @@
  * ```
  */
 
-import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy, signal, computed, inject, output, input } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  OnDestroy,
+  ChangeDetectionStrategy,
+  signal,
+  computed,
+  inject,
+  output,
+  input,
+} from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { NgClass } from '@angular/common';
@@ -264,8 +275,8 @@ import { FilterType } from './filter-type.enum';
     TextFieldComponent,
     NumberFieldComponent,
     CheckboxFieldComponent,
-    ChipsFilterComponent
-  ]
+    ChipsFilterComponent,
+  ],
 })
 export class GenericFiltersComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
@@ -353,6 +364,13 @@ export class GenericFiltersComponent implements OnInit, OnDestroy {
   readonly showApplyButton = input<boolean>(false);
 
   /**
+   * Modo inline/compacto
+   * @description Muestra los filtros en una sola línea horizontal sin header expandible
+   * @default false
+   */
+  readonly inline = input<boolean>(false);
+
+  /**
    * Evento emitido cuando cambian los filtros
    * @description Se emite cada vez que cambian los valores de los filtros
    * @param filters Objeto con los valores actuales de todos los filtros
@@ -390,8 +408,7 @@ export class GenericFiltersComponent implements OnInit, OnDestroy {
   hasActiveFilters = computed(() => {
     const currentFilters = this.filters();
     return Object.values(currentFilters).some(
-      (value) =>
-        value !== null && value !== undefined && value !== '' && value !== false
+      (value) => value !== null && value !== undefined && value !== '' && value !== false,
     );
   });
 
@@ -501,30 +518,28 @@ export class GenericFiltersComponent implements OnInit, OnDestroy {
     // Evitar múltiples suscripciones
     if (this.isAutoFilteringSetup || !this.filtersForm) return;
 
-    this.filtersForm.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((formValue) => {
-        // Procesar valores para DATE_RANGE antes de establecer el signal
-        const processedFilters: Record<string, any> = {};
-        this.filterConfigs.forEach((config) => {
-          if (config.type === FilterType.DATE_RANGE) {
-            const startDate = formValue[config.key + 'Start'];
-            const endDate = formValue[config.key + 'End'];
-            if (startDate || endDate) {
-              processedFilters[config.key] = {
-                startDate: startDate || null,
-                endDate: endDate || null,
-              };
-            }
-          } else {
-            processedFilters[config.key] = formValue[config.key];
+    this.filtersForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((formValue) => {
+      // Procesar valores para DATE_RANGE antes de establecer el signal
+      const processedFilters: Record<string, any> = {};
+      this.filterConfigs.forEach((config) => {
+        if (config.type === FilterType.DATE_RANGE) {
+          const startDate = formValue[config.key + 'Start'];
+          const endDate = formValue[config.key + 'End'];
+          if (startDate || endDate) {
+            processedFilters[config.key] = {
+              startDate: startDate || null,
+              endDate: endDate || null,
+            };
           }
-        });
-        this.filters.set(processedFilters);
-        if (this.autoApply) {
-          this.applyFilters();
+        } else {
+          processedFilters[config.key] = formValue[config.key];
         }
       });
+      this.filters.set(processedFilters);
+      if (this.autoApply) {
+        this.applyFilters();
+      }
+    });
 
     this.isAutoFilteringSetup = true;
   }
@@ -648,9 +663,7 @@ export class GenericFiltersComponent implements OnInit, OnDestroy {
    */
   isFilterActive(key: string): boolean {
     const value = this.filters()[key];
-    return (
-      value !== null && value !== undefined && value !== '' && value !== false
-    );
+    return value !== null && value !== undefined && value !== '' && value !== false;
   }
 
   /**

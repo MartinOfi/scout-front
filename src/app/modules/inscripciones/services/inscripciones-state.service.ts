@@ -15,6 +15,7 @@ import {
   UpdateInscripcionDto,
   PagoInscripcionDto,
   UpdatePagoDto,
+  InscripcionesConsolidado,
 } from '../../../shared/models';
 import { TipoInscripcion } from '../../../shared/enums';
 
@@ -38,6 +39,11 @@ export class InscripcionesStateService {
   private readonly _selectedId: WritableSignal<string | null> = signal(null);
   private readonly _selectedDetail: WritableSignal<InscripcionConEstado | null> = signal(null);
 
+  // Consolidado state
+  private readonly _consolidado: WritableSignal<InscripcionesConsolidado | null> = signal(null);
+  private readonly _consolidadoLoading: WritableSignal<boolean> = signal(false);
+  private readonly _consolidadoError: WritableSignal<string | null> = signal(null);
+
   // ============================================================================
   // Public Readonly Signals
   // ============================================================================
@@ -46,6 +52,11 @@ export class InscripcionesStateService {
   readonly loading: Signal<boolean> = this._loading.asReadonly();
   readonly error: Signal<string | null> = this._error.asReadonly();
   readonly selectedDetail: Signal<InscripcionConEstado | null> = this._selectedDetail.asReadonly();
+
+  // Consolidado signals
+  readonly consolidado: Signal<InscripcionesConsolidado | null> = this._consolidado.asReadonly();
+  readonly consolidadoLoading: Signal<boolean> = this._consolidadoLoading.asReadonly();
+  readonly consolidadoError: Signal<string | null> = this._consolidadoError.asReadonly();
 
   // ============================================================================
   // Computed Signals (derived state)
@@ -109,6 +120,27 @@ export class InscripcionesStateService {
    */
   loadByTipo(tipo: TipoInscripcion): void {
     this.load({ tipo });
+  }
+
+  /**
+   * Cargar datos consolidados (KPIs y deudores)
+   */
+  loadConsolidado(params?: InscripcionesQueryParams): void {
+    this._consolidadoLoading.set(true);
+    this._consolidadoError.set(null);
+
+    this.apiService.getConsolidado(params).subscribe({
+      next: (consolidado: InscripcionesConsolidado) => {
+        this._consolidado.set(consolidado);
+        this._consolidadoLoading.set(false);
+      },
+      error: (err: unknown) => {
+        const errorMsg = err instanceof Error ? err.message : 'Error al cargar consolidado';
+        this._consolidadoError.set(errorMsg);
+        this._consolidadoLoading.set(false);
+        this.notificationService.showError(errorMsg);
+      },
+    });
   }
 
   /**
@@ -342,5 +374,8 @@ export class InscripcionesStateService {
     this._error.set(null);
     this._selectedId.set(null);
     this._selectedDetail.set(null);
+    this._consolidado.set(null);
+    this._consolidadoLoading.set(false);
+    this._consolidadoError.set(null);
   }
 }

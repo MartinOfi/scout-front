@@ -1,0 +1,158 @@
+@if (loading()) {
+<div class="kpi-dashboard kpi-dashboard--loading">
+  <div class="loading-skeleton">
+    <div class="skeleton-hero"></div>
+    <div class="skeleton-grid">
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+    </div>
+  </div>
+</div>
+} @else if (consolidado()) {
+<div class="kpi-dashboard">
+  <!-- Hero: Total + Distribution -->
+  <section class="kpi-hero">
+    <div class="kpi-hero__total">
+      <span class="kpi-hero__label">Total Inscripciones</span>
+      <span class="kpi-hero__value">{{ animatedTotal() | number }}</span>
+      <span class="kpi-hero__sublabel">{{ consolidado()?.filtros?.ano || 'Todos los años' }}</span>
+    </div>
+
+    <div class="kpi-hero__distribution">
+      <h4 class="kpi-hero__distribution-title">Distribución por Rama</h4>
+      <div class="rama-bars">
+        @for (rama of ramaDistribution(); track rama.key) {
+        <div class="rama-bar" [matTooltip]="rama.label + ': ' + rama.count + ' (' + rama.formattedPercentage + '%)'">
+          <div class="rama-bar__fill" [style.width.%]="rama.percentage" [style.background-color]="rama.color"></div>
+        </div>
+        }
+      </div>
+      <div class="rama-legend">
+        @for (rama of ramaDistribution(); track rama.key) {
+        <div class="rama-legend__item">
+          <span class="rama-legend__dot" [style.background-color]="rama.color"></span>
+          <span class="rama-legend__label">{{ rama.label }}</span>
+          <span class="rama-legend__count">{{ rama.count }}</span>
+        </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Financial Metrics -->
+  <section class="kpi-financial">
+    <h3 class="kpi-section-title">
+      <mat-icon>account_balance_wallet</mat-icon>
+      Resumen Financiero
+    </h3>
+
+    <div class="financial-grid">
+      @for (metric of financialData(); track metric.key) {
+      <article class="financial-card" [class]="'financial-card--' + metric.variant">
+        <div class="financial-card__header">
+          <span class="financial-card__icon">
+            <mat-icon>{{ metric.icon }}</mat-icon>
+          </span>
+          <span class="financial-card__label">{{ metric.label }}</span>
+        </div>
+        <div class="financial-card__value">
+          {{ animatedFinancial()[metric.key] | currency:'$':'symbol':'1.0-0':'es-AR' }}
+        </div>
+        @if (metric.key !== 'montoEsperado') {
+        <div class="financial-card__progress">
+          <div class="financial-card__progress-bar" [style.width.%]="metric.percentage"
+            [class]="'financial-card__progress-bar--' + metric.variant">
+          </div>
+        </div>
+        <span class="financial-card__percentage">{{ metric.percentage | number:'1.1-1' }}%</span>
+        }
+      </article>
+      }
+    </div>
+
+    <!-- Payment Progress Ring -->
+    <div class="payment-progress">
+      <div class="payment-progress__ring">
+        <svg viewBox="0 0 120 120" class="payment-progress__svg">
+          <circle class="payment-progress__track" cx="60" cy="60" r="52" />
+          <circle class="payment-progress__fill" cx="60" cy="60" r="52" [style.stroke-dashoffset]="327 - (327 * paymentProgress() / 100)" />
+        </svg>
+        <div class="payment-progress__center">
+          <span class="payment-progress__value">{{ paymentProgress() | number:'1.0-0' }}%</span>
+          <span class="payment-progress__label">Cobrado</span>
+        </div>
+      </div>
+      <div class="payment-progress__details">
+        <div class="payment-progress__detail">
+          <span class="payment-progress__detail-label">Esperado</span>
+          <span class="payment-progress__detail-value">{{ consolidado()?.financiero?.montoEsperado | currency:'$':'symbol':'1.0-0':'es-AR' }}</span>
+        </div>
+        <div class="payment-progress__detail">
+          <span class="payment-progress__detail-label">Cobrado</span>
+          <span class="payment-progress__detail-value payment-progress__detail-value--success">{{ consolidado()?.financiero?.montoPagado | currency:'$':'symbol':'1.0-0':'es-AR' }}</span>
+        </div>
+        <div class="payment-progress__detail">
+          <span class="payment-progress__detail-label">Pendiente</span>
+          <span class="payment-progress__detail-value payment-progress__detail-value--warning">{{ consolidado()?.financiero?.montoAdeudado | currency:'$':'symbol':'1.0-0':'es-AR' }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Debtors Breakdown -->
+  <section class="kpi-debtors">
+    <h3 class="kpi-section-title">
+      <mat-icon>group</mat-icon>
+      Deudores
+    </h3>
+
+    <div class="debtors-grid">
+      @for (category of debtorsData(); track category.key) {
+      <article class="debtor-card" [class]="'debtor-card--' + category.variant">
+        <div class="debtor-card__header">
+          <span class="debtor-card__icon">
+            <mat-icon>{{ category.icon }}</mat-icon>
+          </span>
+          <div class="debtor-card__info">
+            <span class="debtor-card__label">{{ category.label }}</span>
+            <span class="debtor-card__description">{{ category.description }}</span>
+          </div>
+        </div>
+
+        <div class="debtor-card__metrics">
+          <div class="debtor-card__count">
+            <span class="debtor-card__count-value">{{ category.count }}</span>
+            <span class="debtor-card__count-label">personas</span>
+          </div>
+          @if (category.monto) {
+          <div class="debtor-card__amount">
+            <span class="debtor-card__amount-label">Monto total</span>
+            <span class="debtor-card__amount-value">{{ category.monto | currency:'$':'symbol':'1.0-0':'es-AR' }}</span>
+          </div>
+          }
+        </div>
+
+        @if (getRamaBreakdown(category.porRama).length > 0) {
+        <div class="debtor-card__breakdown">
+          @for (rama of getRamaBreakdown(category.porRama); track rama.label) {
+          <span class="debtor-card__breakdown-item">
+            {{ rama.label }}: {{ rama.count }}
+          </span>
+          }
+        </div>
+        }
+      </article>
+      }
+    </div>
+  </section>
+
+  <!-- Last updated -->
+  <footer class="kpi-footer">
+    <span class="kpi-footer__text">
+      Actualizado: {{ consolidado()?.fecha | date:'dd/MM/yyyy HH:mm' }}
+    </span>
+  </footer>
+</div>
+}

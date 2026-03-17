@@ -1,0 +1,21 @@
+<div class="dashboard-container">
+  <!-- Compact Header: Title + Tabs + Back button (right) -->
+  <div class="dashboard-header">
+    <div class="dashboard-header-content">
+      <h1 class="dashboard-title">Dashboard</h1>
+      <app-button-tabs [tabs]="tabs" [activeTab]="activeTab()" (tabChange)="onTabChange($event)" />
+    </div>
+    <button type="button" class="btn btn-ghost btn-sm" (click)="goToList()">
+      <mat-icon>list</mat-icon>
+      Ver lista
+    </button>
+  </div>
+
+  <!-- Inline Filters -->
+  <div class="dashboard-filters">
+    <app-generic-filters [filterConfigs]="filterConfigs" [autoApply]="true" [showClearButton]="true"
+      [inline]="true" (filtersChanged)="onFilterChange($event)" />
+  </div>
+
+  <app-kpi-dashboard [consolidado]="state.consolidado()" [loading]="state.consolidadoLoading()" />
+</div>

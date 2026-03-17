@@ -28,6 +28,7 @@ export interface Inscripcion {
   autorizacionDeImagen: boolean;
   salidasCercanas: boolean;
   autorizacionIngreso: boolean;
+  certificadoAptitudFisica: boolean;
   createdAt: string;
   updatedAt: string;
   // Calculated fields (returned by backend)
@@ -76,6 +77,7 @@ export interface CreateInscripcionDto {
   autorizacionDeImagen?: boolean;
   salidasCercanas?: boolean;
   autorizacionIngreso?: boolean;
+  certificadoAptitudFisica?: boolean;
 }
 
 /**
@@ -87,4 +89,86 @@ export interface UpdateInscripcionDto {
   autorizacionDeImagen?: boolean;
   salidasCercanas?: boolean;
   autorizacionIngreso?: boolean;
+  certificadoAptitudFisica?: boolean;
+}
+
+// ============================================================================
+// Consolidado Types (GET /inscripciones/consolidado)
+// ============================================================================
+
+/**
+ * Tipo de deuda para filtrar inscripciones
+ * - dinero: solo con saldo pendiente > 0
+ * - documentacion: solo con documentos faltantes (Scout Argentina)
+ * - ambos: con dinero Y documentación pendiente
+ */
+export type TipoDeuda = 'dinero' | 'documentacion' | 'ambos';
+
+/**
+ * Distribución por rama (breakdown de conteo)
+ */
+export interface DistribucionPorRama {
+  readonly total: number;
+  readonly manada: number;
+  readonly unidad: number;
+  readonly caminantes: number;
+  readonly rovers: number;
+  readonly educadores: number;
+}
+
+/**
+ * Resumen financiero consolidado
+ */
+export interface ResumenFinanciero {
+  readonly montoEsperado: number;
+  readonly montoPagado: number;
+  readonly montoAdeudado: number;
+  readonly montoBonificado: number;
+}
+
+/**
+ * Deuda de dinero con monto total
+ */
+export interface DeudaDinero {
+  readonly total: number;
+  readonly monto: number;
+  readonly porRama: DistribucionPorRama;
+}
+
+/**
+ * Deuda de documentación (solo Scout Argentina)
+ */
+export interface DeudaDocumentacion {
+  readonly total: number;
+  readonly porRama: DistribucionPorRama;
+}
+
+/**
+ * Resumen de deudores agrupado
+ */
+export interface DeudoresResumen {
+  readonly dinero: DeudaDinero;
+  readonly documentacion: DeudaDocumentacion;
+  readonly ambos: DistribucionPorRama;
+}
+
+/**
+ * Filtros aplicados al consolidado (echo del backend)
+ */
+export interface FiltrosConsolidado {
+  readonly ano?: number;
+  readonly tipo?: TipoInscripcion;
+  readonly tipoDeuda?: TipoDeuda;
+}
+
+/**
+ * Respuesta del endpoint GET /inscripciones/consolidado
+ */
+export interface InscripcionesConsolidado {
+  readonly filtros: FiltrosConsolidado;
+  readonly total: number;
+  readonly porRama: DistribucionPorRama;
+  readonly financiero: ResumenFinanciero;
+  readonly deudores: DeudoresResumen;
+  readonly fecha: string;
 }

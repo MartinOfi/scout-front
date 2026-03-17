@@ -179,7 +179,7 @@
             <span>Todo completado</span>
             } @else {
             <strong>Pendientes</strong>
-            <span>{{ authPendingCount() }} de 4</span>
+            <span>{{ authPendingCount() }} de 5</span>
             }
           </div>
         </div>
@@ -216,6 +216,14 @@
               <mat-icon>{{ d.autorizacionIngreso ? 'check' : 'remove' }}</mat-icon>
             </div>
             <span class="auth-item__label">Ingreso</span>
+          </div>
+
+          <div class="auth-item">
+            <div class="auth-item__check"
+              [ngClass]="d.certificadoAptitudFisica ? 'auth-item__check--yes' : 'auth-item__check--no'">
+              <mat-icon>{{ d.certificadoAptitudFisica ? 'check' : 'remove' }}</mat-icon>
+            </div>
+            <span class="auth-item__label">Apto Físico</span>
           </div>
         </div>
       </section>

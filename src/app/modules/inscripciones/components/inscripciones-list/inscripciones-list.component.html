@@ -1,8 +1,41 @@
-<section class="inscripciones-stats">
-  @for (stat of stats(); track stat.title) {
-  <app-stat-card [icon]="stat.icon" [title]="stat.title" [value]="stat.value" [variant]="stat.variant" />
-  }
-</section>
+<!-- Simplified Stats Bar -->
+@if (consolidado(); as data) {
+<div class="stats-summary">
+  <div class="stats-summary-main">
+    <div class="stats-total">
+      <span class="stats-total-number">{{ data.total }}</span>
+      <span class="stats-total-label">Inscriptos</span>
+    </div>
+
+    <div class="stats-rama-bar">
+      @for (rama of ramaDistribution(); track rama.key) {
+      @if (rama.count > 0) {
+      <div class="rama-segment" [style.width.%]="rama.percentage" [style.backgroundColor]="rama.color"
+        [matTooltip]="rama.label + ': ' + rama.count">
+      </div>
+      }
+      }
+    </div>
+
+    <div class="stats-rama-legend">
+      @for (rama of ramaDistribution(); track rama.key) {
+      @if (rama.count > 0) {
+      <div class="legend-item">
+        <span class="legend-dot" [style.backgroundColor]="rama.color"></span>
+        <span class="legend-label">{{ rama.label }}</span>
+        <span class="legend-count">{{ rama.count }}</span>
+      </div>
+      }
+      }
+    </div>
+  </div>
+
+  <button type="button" class="btn btn-secondary dashboard-btn" (click)="goToDashboard()">
+    <mat-icon>dashboard</mat-icon>
+    Ver Dashboard
+  </button>
+</div>
+}
 
 <div class="inscripciones-tabs-container">
   <div class="inscripciones-tabs-container-header">

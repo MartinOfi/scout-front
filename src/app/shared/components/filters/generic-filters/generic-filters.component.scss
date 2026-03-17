@@ -13,6 +13,18 @@
   padding: 1.5rem;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   margin-bottom: 1.5rem;
+
+  // Inline mode: compact horizontal layout
+  &--inline {
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
 }
 
 .filters-header {
@@ -110,6 +122,29 @@
 }
 
 .filters-form {
+  // Inline mode: horizontal layout
+  &--inline {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    flex: 1;
+
+    .chips-filter-row {
+      display: none; // Hide chips in inline mode for simplicity
+    }
+
+    .filter-group {
+      flex-direction: row;
+      align-items: center;
+      gap: 0.5rem;
+
+      label {
+        margin-bottom: 0;
+        white-space: nowrap;
+      }
+    }
+  }
 
   // Fila completa para filtros tipo CHIPS
   .chips-filter-row {
@@ -133,6 +168,27 @@
 
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
+    }
+
+    // Inline mode: horizontal flexbox
+    &--inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+
+      .filter-group {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: auto;
+
+        label {
+          margin-bottom: 0;
+          white-space: nowrap;
+          font-size: 0.8125rem;
+        }
+      }
     }
   }
 
@@ -293,6 +349,17 @@
     &:hover:not(:disabled) {
       background-color: #4b5563;
     }
+  }
+}
+
+// Inline clear button
+.inline-clear-btn {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  padding: 0.25rem 0.5rem;
+
+  &:hover {
+    color: #374151;
   }
 }
 

@@ -140,6 +140,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
       autorizacionDeImagen: [false],
       salidasCercanas: [false],
       autorizacionIngreso: [false],
+      certificadoAptitudFisica: [false],
     },
     { validators: this.validateMontosNoExcedenTotal.bind(this) },
   );
@@ -175,6 +176,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
             autorizacionDeImagen: false,
             salidasCercanas: false,
             autorizacionIngreso: false,
+            certificadoAptitudFisica: false,
           });
         }
         // Auto-fill monto from config when not editing
@@ -295,6 +297,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
         autorizacionDeImagen: inscripcion.autorizacionDeImagen,
         salidasCercanas: inscripcion.salidasCercanas,
         autorizacionIngreso: inscripcion.autorizacionIngreso,
+        certificadoAptitudFisica: inscripcion.certificadoAptitudFisica,
       });
       // Disable fields that can't be edited
       this.inscripcionForm.get('personaId')?.disable();
@@ -318,6 +321,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
         autorizacionDeImagen: formValue.autorizacionDeImagen,
         salidasCercanas: formValue.salidasCercanas,
         autorizacionIngreso: formValue.autorizacionIngreso,
+        certificadoAptitudFisica: formValue.certificadoAptitudFisica,
       };
       this.state.update(this.inscripcionId, updateDto).subscribe(() => {
         this.router.navigate(['/inscripciones']);
@@ -337,6 +341,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
         autorizacionDeImagen: formValue.autorizacionDeImagen || undefined,
         salidasCercanas: formValue.salidasCercanas || undefined,
         autorizacionIngreso: formValue.autorizacionIngreso || undefined,
+        certificadoAptitudFisica: formValue.certificadoAptitudFisica || undefined,
       };
       this.state.create(dto).subscribe(() => {
         this.router.navigate(['/inscripciones']);

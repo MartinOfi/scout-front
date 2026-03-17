@@ -15,15 +15,12 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { InscripcionesStateService } from '../../services/inscripciones-state.service';
-import {
-  StatCardComponent,
-  StatCardVariant,
-} from '../../../../shared/components/stat-card/stat-card.component';
+import { RamaFilter } from '../../services/inscripciones-api.service';
 import {
   ButtonTabsComponent,
   TabConfig,
@@ -33,21 +30,15 @@ import { GenericFiltersComponent } from '../../../../shared/components/filters/g
 import { FilterConfig } from '../../../../shared/components/filters/generic-filters/filter-config.interface';
 import { FilterType } from '../../../../shared/components/filters/generic-filters/filter-type.enum';
 import { TableColumn, ActionEvent, TableAction } from '../../../../shared/models/table.model';
-import { TipoInscripcion } from '../../../../shared/enums';
-import { Inscripcion } from '../../../../shared/models';
+import { TipoInscripcion, RamaEnum, PersonaType, RAMA_LABELS } from '../../../../shared/enums';
+import { Inscripcion, TipoDeuda } from '../../../../shared/models';
 import { ConfirmDialogService } from '../../../../shared/services';
-
-interface StatConfig {
-  readonly icon: string;
-  readonly title: string;
-  readonly value: number;
-  readonly variant: StatCardVariant;
-}
 
 interface InscripcionFilters {
   search: string;
   ano: string;
-  soloDeudores: boolean;
+  tipoDeuda: TipoDeuda | '';
+  rama: RamaFilter | '';
 }
 
 interface InscripcionTableRow {
@@ -64,6 +55,7 @@ interface InscripcionTableRow {
   autorizacionDeImagen: boolean;
   salidasCercanas: boolean;
   autorizacionIngreso: boolean;
+  certificadoAptitudFisica: boolean;
 }
 
 @Component({
@@ -71,11 +63,10 @@ interface InscripcionTableRow {
   standalone: true,
   imports: [
     CommonModule,
-    MatCardModule,
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    StatCardComponent,
+    MatTooltipModule,
     ButtonTabsComponent,
     DataTableComponent,
     GenericFiltersComponent,
@@ -93,6 +84,33 @@ export class InscripcionesListComponent implements OnInit {
   readonly inscripciones = this.state.inscripciones;
   readonly loading = this.state.loading;
   readonly error = this.state.error;
+  readonly consolidado = this.state.consolidado;
+
+  /** Rama configurations for simplified stats */
+  readonly ramaConfigs = [
+    { key: 'manada' as const, label: 'Manada', color: '#f59e0b' },
+    { key: 'unidad' as const, label: 'Unidad', color: '#10b981' },
+    { key: 'caminantes' as const, label: 'Caminantes', color: '#3b82f6' },
+    { key: 'rovers' as const, label: 'Rovers', color: '#8b5cf6' },
+    { key: 'educadores' as const, label: 'Educadores', color: '#812128' },
+  ];
+
+  /** Simplified rama distribution for stats bar */
+  readonly ramaDistribution = computed(() => {
+    const data = this.consolidado();
+    if (!data) return [];
+
+    const total = data.total || 1;
+    return this.ramaConfigs.map((rama) => {
+      const count = data.porRama[rama.key];
+      const percentage = (count / total) * 100;
+      return {
+        ...rama,
+        count,
+        percentage,
+      };
+    });
+  });
 
   /** Currently active tab (tipo) */
   readonly activeTab = signal<TipoInscripcion>('scout_argentina');
@@ -104,73 +122,25 @@ export class InscripcionesListComponent implements OnInit {
   readonly currentFilters = signal<InscripcionFilters>({
     search: '',
     ano: String(this.currentYear),
-    soloDeudores: false,
+    tipoDeuda: '',
+    rama: '',
   });
 
-  /**
-   * Check if an inscripcion is considered a "debtor"
-   * A debtor has pending payment OR (for Scout Argentina only) is missing any of the 4 required documents
-   */
-  private isDeudor(inscripcion: Inscripcion): boolean {
-    const hasPendingPayment = (inscripcion.saldoPendiente ?? 0) > 0;
-
-    // Only check documents for Scout Argentina inscriptions
-    if (inscripcion.tipo === 'scout_argentina') {
-      const missingDocuments =
-        !inscripcion.declaracionDeSalud ||
-        !inscripcion.autorizacionDeImagen ||
-        !inscripcion.salidasCercanas ||
-        !inscripcion.autorizacionIngreso;
-      return hasPendingPayment || missingDocuments;
-    }
-
-    return hasPendingPayment;
-  }
-
-  /** Filtered inscripciones by active tab and filters */
+  /** Filtered inscripciones by search (other filters handled by backend) */
   readonly filteredInscripciones = computed((): Inscripcion[] => {
-    const tipo = this.activeTab();
     const filters = this.currentFilters();
 
+    // Backend handles tipo, ano, tipoDeuda filtering
+    // Local filtering only for search (name matching)
+    if (!filters.search) {
+      return this.inscripciones();
+    }
+
+    const searchLower = filters.search.toLowerCase();
     return this.inscripciones().filter((inscripcion) => {
-      // Filter by tipo (tab)
-      if (inscripcion.tipo !== tipo) return false;
-
-      // Filter by year (now handled by backend, but keep for local consistency)
-      if (filters.ano && inscripcion.ano !== parseInt(filters.ano, 10)) return false;
-
-      // Filter by search (persona name)
-      if (filters.search) {
-        const searchLower = filters.search.toLowerCase();
-        const personaName = inscripcion.persona?.nombre?.toLowerCase() || '';
-        if (!personaName.includes(searchLower)) return false;
-      }
-
-      // Filter by deudores (pending payment OR missing documents)
-      if (filters.soloDeudores && !this.isDeudor(inscripcion)) return false;
-
-      return true;
+      const personaName = inscripcion.persona?.nombre?.toLowerCase() || '';
+      return personaName.includes(searchLower);
     });
-  });
-
-  readonly stats = computed((): readonly StatConfig[] => {
-    const filtered = this.filteredInscripciones();
-    const total = filtered.length;
-    const totalEsperado = filtered.reduce((sum, i) => sum + (i.montoTotal - i.montoBonificado), 0);
-    const montoAdeudado = filtered.reduce((sum, i) => sum + (i.saldoPendiente ?? 0), 0);
-    const cantidadDeudores = filtered.filter((i) => this.isDeudor(i)).length;
-
-    return [
-      { icon: 'people', title: 'Total Inscripciones', value: total, variant: 'info' },
-      { icon: 'payments', title: 'Monto Esperado', value: totalEsperado, variant: 'success' },
-      { icon: 'warning', title: 'Monto Adeudado', value: montoAdeudado, variant: 'warning' },
-      {
-        icon: 'person_off',
-        title: 'Cantidad Deudores',
-        value: cantidadDeudores,
-        variant: 'danger',
-      },
-    ];
   });
 
   /** Table data mapped from inscripciones */
@@ -188,6 +158,7 @@ export class InscripcionesListComponent implements OnInit {
       autorizacionDeImagen: i.autorizacionDeImagen,
       salidasCercanas: i.salidasCercanas,
       autorizacionIngreso: i.autorizacionIngreso,
+      certificadoAptitudFisica: i.certificadoAptitudFisica,
     }));
   });
 
@@ -226,10 +197,32 @@ export class InscripcionesListComponent implements OnInit {
       defaultValue: String(this.currentYear),
     },
     {
-      key: 'soloDeudores',
-      type: FilterType.BOOLEAN,
-      label: 'Solo deudores',
-      defaultValue: false,
+      key: 'tipoDeuda',
+      type: FilterType.SELECT,
+      label: 'Tipo de Deuda',
+      placeholder: 'Todos',
+      options: [
+        { value: '', label: 'Todos' },
+        { value: 'dinero', label: 'Deuda de dinero' },
+        { value: 'documentacion', label: 'Documentación faltante' },
+        { value: 'ambos', label: 'Dinero y documentación' },
+      ],
+      defaultValue: '',
+    },
+    {
+      key: 'rama',
+      type: FilterType.SELECT,
+      label: 'Rama',
+      placeholder: 'Todas las ramas',
+      options: [
+        { value: '', label: 'Todas las ramas' },
+        { value: RamaEnum.MANADA, label: RAMA_LABELS[RamaEnum.MANADA] },
+        { value: RamaEnum.UNIDAD, label: RAMA_LABELS[RamaEnum.UNIDAD] },
+        { value: RamaEnum.CAMINANTES, label: RAMA_LABELS[RamaEnum.CAMINANTES] },
+        { value: RamaEnum.ROVERS, label: RAMA_LABELS[RamaEnum.ROVERS] },
+        { value: PersonaType.EDUCADOR, label: 'Educadores' },
+      ],
+      defaultValue: '',
     },
   ];
 
@@ -247,6 +240,7 @@ export class InscripcionesListComponent implements OnInit {
     { key: 'autorizacionDeImagen', header: 'Autorización de Imagen', type: 'boolean' },
     { key: 'salidasCercanas', header: 'Salidas Cercanas', type: 'boolean' },
     { key: 'autorizacionIngreso', header: 'Autorización de Ingreso', type: 'boolean' },
+    { key: 'certificadoAptitudFisica', header: 'Cert. Aptitud Física', type: 'boolean' },
   ];
 
   /** Action column */
@@ -266,12 +260,17 @@ export class InscripcionesListComponent implements OnInit {
   });
 
   constructor() {
-    // Reload when tab or year filter changes
+    // Reload inscripciones and consolidado when tab or filters change
     effect(() => {
       const tipo = this.activeTab();
       const filters = this.currentFilters();
       const ano = filters.ano ? parseInt(filters.ano, 10) : undefined;
-      this.state.load({ tipo, ano });
+      const tipoDeuda = filters.tipoDeuda || undefined;
+      const rama = filters.rama || undefined;
+
+      // Load both inscripciones list and consolidado stats
+      this.state.load({ tipo, ano, tipoDeuda, rama });
+      this.state.loadConsolidado({ tipo, ano, tipoDeuda, rama });
     });
   }
 
@@ -284,10 +283,16 @@ export class InscripcionesListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Read deudores query param to initialize filter
-    const deudoresParam = this.route.snapshot.queryParamMap.get('deudores');
-    if (deudoresParam === 'true') {
-      this.currentFilters.update((f) => ({ ...f, soloDeudores: true }));
+    // Read query params to initialize filters
+    const tipoDeudaParam = this.route.snapshot.queryParamMap.get('tipoDeuda');
+    if (tipoDeudaParam && ['dinero', 'documentacion', 'ambos'].includes(tipoDeudaParam)) {
+      this.currentFilters.update((f) => ({ ...f, tipoDeuda: tipoDeudaParam as TipoDeuda }));
+    }
+
+    const ramaParam = this.route.snapshot.queryParamMap.get('rama');
+    const validRamaValues = [...Object.values(RamaEnum), PersonaType.EDUCADOR];
+    if (ramaParam && validRamaValues.includes(ramaParam as RamaFilter)) {
+      this.currentFilters.update((f) => ({ ...f, rama: ramaParam as RamaFilter }));
     }
   }
 
@@ -296,22 +301,37 @@ export class InscripcionesListComponent implements OnInit {
   }
 
   onFilterChange(filters: Record<string, unknown>): void {
-    const soloDeudores = (filters['soloDeudores'] as boolean) ?? false;
+    const tipoDeuda = (filters['tipoDeuda'] as TipoDeuda | '') ?? '';
+    const rama = (filters['rama'] as RamaFilter | '') ?? '';
     this.currentFilters.set({
       search: (filters['search'] as string) ?? '',
       ano: (filters['ano'] as string) ?? '',
-      soloDeudores,
+      tipoDeuda,
+      rama,
     });
-    // Update URL with deudores query param
+    // Update URL with filter query params
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { deudores: soloDeudores || null },
+      queryParams: {
+        tipoDeuda: tipoDeuda || null,
+        rama: rama || null,
+      },
       queryParamsHandling: 'merge',
     });
   }
 
   onCreate(): void {
     this.router.navigate(['/inscripciones/crear']);
+  }
+
+  goToDashboard(): void {
+    const filters = this.currentFilters();
+    this.router.navigate(['/inscripciones/dashboard'], {
+      queryParams: {
+        tipoDeuda: filters.tipoDeuda || null,
+        rama: filters.rama || null,
+      },
+    });
   }
 
   onEdit(id: string): void {
@@ -327,11 +347,14 @@ export class InscripcionesListComponent implements OnInit {
       .delete('inscripción', () => this.state.deleteAsync(id))
       .subscribe((result) => {
         if (result.deleted) {
-          // Reload the list after successful deletion
+          // Reload the list and consolidado after successful deletion
           const tipo = this.activeTab();
           const filters = this.currentFilters();
           const ano = filters.ano ? parseInt(filters.ano, 10) : undefined;
-          this.state.load({ tipo, ano });
+          const tipoDeuda = filters.tipoDeuda || undefined;
+          const rama = filters.rama || undefined;
+          this.state.load({ tipo, ano, tipoDeuda, rama });
+          this.state.loadConsolidado({ tipo, ano, tipoDeuda, rama });
         }
       });
   }

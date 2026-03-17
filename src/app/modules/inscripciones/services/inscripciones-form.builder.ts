@@ -7,15 +7,14 @@
 import { Injectable, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import {
-  CreateInscripcionDto,
-  UpdateInscripcionDto,
-  Inscripcion,
-} from '../../../shared/models';
+import { CreateInscripcionDto, UpdateInscripcionDto, Inscripcion } from '../../../shared/models';
 
 import { TipoInscripcion } from '../../../shared/enums';
 
-import { positiveNumberValidator, decimalValidator } from '../../../shared/validators/custom-validators';
+import {
+  positiveNumberValidator,
+  decimalValidator,
+} from '../../../shared/validators/custom-validators';
 
 @Injectable({
   providedIn: 'root',
@@ -35,19 +34,13 @@ export class InscripcionesFormBuilder {
       personaId: ['', [Validators.required]],
       tipo: ['scout_argentina' as TipoInscripcion, [Validators.required]],
       ano: [new Date().getFullYear(), [Validators.required]],
-      montoTotal: [
-        '',
-        [
-          Validators.required,
-          positiveNumberValidator(),
-          decimalValidator(2),
-        ],
-      ],
+      montoTotal: ['', [Validators.required, positiveNumberValidator(), decimalValidator(2)]],
       montoBonificado: [0, [Validators.min(0), decimalValidator(2)]],
       declaracionDeSalud: [false],
       autorizacionDeImagen: [false],
       salidasCercanas: [false],
       autorizacionIngreso: [false],
+      certificadoAptitudFisica: [false],
     });
   }
 
@@ -57,14 +50,12 @@ export class InscripcionesFormBuilder {
    */
   buildEditForm(inscripcion: Inscripcion): FormGroup {
     return this.fb.group({
-      montoBonificado: [
-        inscripcion.montoBonificado,
-        [Validators.min(0), decimalValidator(2)],
-      ],
+      montoBonificado: [inscripcion.montoBonificado, [Validators.min(0), decimalValidator(2)]],
       declaracionDeSalud: [inscripcion.declaracionDeSalud],
       autorizacionDeImagen: [inscripcion.autorizacionDeImagen],
       salidasCercanas: [inscripcion.salidasCercanas],
       autorizacionIngreso: [inscripcion.autorizacionIngreso],
+      certificadoAptitudFisica: [inscripcion.certificadoAptitudFisica],
     });
   }
 
@@ -96,6 +87,9 @@ export class InscripcionesFormBuilder {
     if (value.autorizacionIngreso) {
       dto.autorizacionIngreso = true;
     }
+    if (value.certificadoAptitudFisica) {
+      dto.certificadoAptitudFisica = true;
+    }
 
     return dto;
   }
@@ -111,6 +105,7 @@ export class InscripcionesFormBuilder {
       autorizacionDeImagen: value.autorizacionDeImagen as boolean,
       salidasCercanas: value.salidasCercanas as boolean,
       autorizacionIngreso: value.autorizacionIngreso as boolean,
+      certificadoAptitudFisica: value.certificadoAptitudFisica as boolean,
     };
   }
 }
