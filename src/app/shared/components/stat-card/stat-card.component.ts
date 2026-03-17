@@ -7,7 +7,7 @@ import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 
-export type StatCardVariant = 'success' | 'info' | 'warning' | 'danger';
+export type StatCardVariant = 'success' | 'info' | 'warning' | 'danger' | 'primary';
 export type StatCardFormat = 'currency' | 'number' | 'percent';
 
 @Component({

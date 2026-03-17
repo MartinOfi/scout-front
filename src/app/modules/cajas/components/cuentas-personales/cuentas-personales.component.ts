@@ -5,7 +5,14 @@
  * SIN any - tipado estricto
  */
 
-import { Component, OnInit, ChangeDetectionStrategy, inject, computed } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  inject,
+  computed,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,6 +23,10 @@ import { CajasStateService } from '../../services/cajas-state.service';
 import { CajaConSaldo } from '../../../../shared/models';
 import { DataTableComponent } from '../../../../shared/components/tables/data-table.component';
 import { TableColumn, TableData, ActionEvent } from '../../../../shared/models/table.model';
+import { GenericFiltersComponent } from '../../../../shared/components/filters/generic-filters/generic-filters.component';
+import { FilterConfig } from '../../../../shared/components/filters/generic-filters/filter-config.interface';
+import { FilterType } from '../../../../shared/components/filters/generic-filters/filter-type.enum';
+import { RAMA_LABELS, RamaEnum } from '../../../../shared/enums/persona.enum';
 
 @Component({
   selector: 'app-cuentas-personales',
@@ -26,6 +37,7 @@ import { TableColumn, TableData, ActionEvent } from '../../../../shared/models/t
     MatIconModule,
     MatProgressSpinnerModule,
     DataTableComponent,
+    GenericFiltersComponent,
   ],
   templateUrl: './cuentas-personales.component.html',
   styleUrls: ['./cuentas-personales.component.scss'],
@@ -37,15 +49,60 @@ export class CuentasPersonalesComponent implements OnInit {
 
   readonly loading = this.cajasState.loading;
 
+  // Filter state
+  private readonly activeFilters = signal<Record<string, unknown>>({});
+
   readonly tableData = computed((): TableData[] => {
-    return this.cajasState.cajasPersonales().map((caja) => ({
+    const allData = this.cajasState.cajasPersonales().map((caja) => ({
       id: caja.id,
       nombre: this.getNombrePropietario(caja),
       rama: this.getRamaPropietario(caja),
       saldo: caja.saldoActual,
       propietarioId: caja.propietarioId,
     }));
+
+    const filters = this.activeFilters();
+    return allData.filter((row) => {
+      // Text search filter
+      if (filters['search'] && typeof filters['search'] === 'string') {
+        const searchTerm = filters['search'].toLowerCase();
+        if (!row.nombre.toLowerCase().includes(searchTerm)) {
+          return false;
+        }
+      }
+      // Rama filter
+      if (filters['rama'] && typeof filters['rama'] === 'string') {
+        if (row.rama !== filters['rama']) {
+          return false;
+        }
+      }
+      return true;
+    });
   });
+
+  // Filter configuration
+  readonly filterConfigs: FilterConfig[] = [
+    {
+      key: 'search',
+      type: FilterType.TEXT,
+      label: 'Buscar',
+      placeholder: 'Buscar por nombre...',
+    },
+    {
+      key: 'rama',
+      type: FilterType.SELECT,
+      label: 'Rama',
+      placeholder: 'Todas',
+      options: [
+        { value: '', label: 'Todas las ramas' },
+        { value: RamaEnum.MANADA, label: RAMA_LABELS[RamaEnum.MANADA] },
+        { value: RamaEnum.UNIDAD, label: RAMA_LABELS[RamaEnum.UNIDAD] },
+        { value: RamaEnum.CAMINANTES, label: RAMA_LABELS[RamaEnum.CAMINANTES] },
+        { value: RamaEnum.ROVERS, label: RAMA_LABELS[RamaEnum.ROVERS] },
+        { value: 'educadores', label: 'Educadores' },
+      ],
+    },
+  ];
 
   readonly tableColumns: TableColumn[] = [
     { key: 'nombre', header: 'Nombre', type: 'text', sortable: true },
@@ -114,5 +171,9 @@ export class CuentasPersonalesComponent implements OnInit {
     if (propietarioId) {
       this.router.navigate(['/personas/protagonistas', propietarioId]);
     }
+  }
+
+  onFiltersChanged(filters: Record<string, unknown>): void {
+    this.activeFilters.set(filters);
   }
 }

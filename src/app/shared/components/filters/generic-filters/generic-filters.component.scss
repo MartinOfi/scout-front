@@ -149,8 +149,9 @@
   // Fila completa para filtros tipo CHIPS
   .chips-filter-row {
     display: flex;
-    align-items: baseline;
+    flex-direction: column;
     width: 100%;
+    margin-top: 0.5rem; // Space for chip hover/active transforms
 
     .chips-filter-label {
       display: block;

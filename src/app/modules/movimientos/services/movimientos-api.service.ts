@@ -54,6 +54,7 @@ export class MovimientosApiService {
 
     if (filters) {
       if (filters.cajaId) params['cajaId'] = filters.cajaId;
+      if (filters.tipoCaja) params['tipoCaja'] = filters.tipoCaja;
       if (filters.tipo) params['tipo'] = filters.tipo;
       if (filters.concepto) params['concepto'] = filters.concepto;
       if (filters.responsableId) params['responsableId'] = filters.responsableId;

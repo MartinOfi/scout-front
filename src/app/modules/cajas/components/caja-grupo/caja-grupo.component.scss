@@ -16,18 +16,34 @@
 }
 
 // =============================================================================
-// STATS SECTION - Uses shared stat-card like inscripciones/personas
+// HEADER SECTION - Stat card + Action buttons aligned horizontally
 // =============================================================================
 
+.caja-header {
+  display: flex;
+  align-items: stretch;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+
+  // Stat card takes its natural width
+  app-stat-card {
+    flex-shrink: 0;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+// Legacy aliases for backward compatibility
 .caja-stats {
   display: grid;
   grid-template-columns: minmax(200px, 300px);
   gap: var(--spacing-md);
 }
-
-// =============================================================================
-// ACTIONS
-// =============================================================================
 
 .action-grid {
   display: flex;
@@ -89,13 +105,17 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
+  background: white;
+  border-radius: 8px;
+  padding: var(--spacing-lg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .section-title {
   font-size: var(--font-size-lg);
   font-weight: 600;
-  color: var(--text-primary);
   margin: 0;
+  color: #1f2937;
 }
 
 .section-header {

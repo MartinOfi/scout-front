@@ -14,45 +14,49 @@
   }
 
   @if (cajaGrupo(); as caja) {
-    <!-- KPI Section - Consistent with inscripciones/personas -->
-    <section class="caja-stats">
+    <!-- Header Section - Stat Card + Action Buttons aligned horizontally -->
+    <section class="caja-header">
       <app-stat-card
         icon="account_balance"
         title="Saldo Caja de Grupo"
         [value]="saldoGrupo()"
         [variant]="saldoGrupo() >= 0 ? 'success' : 'danger'"
       />
+      <div class="action-buttons">
+        <app-action-button
+          icon="add"
+          label="Registrar Movimiento"
+          variant="success"
+          (clicked)="onRegistrarMovimiento()"
+        />
+        <app-action-button
+          icon="info"
+          label="Ver Detalles"
+          variant="info"
+          (clicked)="onOpenDrawer()"
+        />
+        <app-action-button
+          icon="list_alt"
+          label="Ver Todos los Movimientos"
+          variant="warning"
+          (clicked)="onVerTodosMovimientos()"
+        />
+      </div>
     </section>
 
-    <!-- Action Buttons Grid -->
-    <div class="action-grid">
-      <app-action-button
-        icon="add"
-        label="Registrar Movimiento"
-        variant="success"
-        (clicked)="onRegistrarMovimiento()"
-      />
-      <app-action-button
-        icon="info"
-        label="Ver Detalles"
-        variant="info"
-        (clicked)="onOpenDrawer()"
-      />
-      <app-action-button
-        icon="list_alt"
-        label="Ver Todos los Movimientos"
-        variant="warning"
-        (clicked)="onVerTodosMovimientos()"
-      />
-    </div>
-
-    <!-- Movimientos Section with DataTable -->
+    <!-- Movimientos Section with Filters and DataTable -->
     <section class="movimientos-section">
       <h3 class="section-title">Últimos Movimientos</h3>
+      <app-generic-filters
+        [filterConfigs]="filterConfigs"
+        [autoApply]="true"
+        [showClearButton]="true"
+        (filtersChanged)="onFiltersChanged($event)"
+      />
       <app-data-table
         [data]="$any(movimientosGrupo() | slice:0:10)"
         [columns]="movimientosColumns"
-        [config]="{ hidePagination: true }"
+        [config]="{ showHeader: true, hoverable: true, hidePagination: true }"
         (actionClick)="onTableAction($event)"
       />
     </section>

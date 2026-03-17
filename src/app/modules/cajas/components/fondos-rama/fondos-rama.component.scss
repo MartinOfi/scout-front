@@ -1,5 +1,5 @@
 // =============================================================================
-// FONDOS RAMA - Grid view for branch funds
+// FONDOS RAMA - Unified view for branch funds with KPI cards and movements table
 // =============================================================================
 
 .fondos-rama-container {
@@ -9,34 +9,84 @@
 }
 
 // =============================================================================
-// STATS SECTION - Uses shared stat-card like inscripciones
+// FONDOS HEADER - 5 KPI Cards in a row
 // =============================================================================
 
-.fondos-stats {
-  display: grid;
-  grid-template-columns: minmax(200px, 300px);
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-sm);
+.fondos-header {
+  display: flex;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.rama-card-wrapper {
+  flex: 1;
+  min-width: 180px;
+}
+
+.card-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &--add {
+    background-color: var(--color-success-light, #dcfce7);
+    color: var(--color-success, #16a34a);
+
+    &:hover {
+      background-color: var(--color-success, #16a34a);
+      color: white;
+    }
+  }
+
+  &--info {
+    background-color: var(--color-info-light, #dbeafe);
+    color: var(--color-info, #2563eb);
+
+    &:hover {
+      background-color: var(--color-info, #2563eb);
+      color: white;
+    }
+  }
 }
 
 // =============================================================================
-// HEADER
+// MOVIMIENTOS SECTION
 // =============================================================================
 
-.header {
+.movimientos-section {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: var(--spacing-md);
+  background: white;
+  border-radius: 8px;
+  padding: var(--spacing-lg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
 
-  h2 {
-    margin: 0;
-    font-size: var(--text-xl);
-    font-weight: 600;
-    color: var(--text-primary);
-    font-family: var(--font-family-headings);
-  }
+.section-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin: 0;
+  color: #1f2937;
 }
 
 // =============================================================================
@@ -58,15 +108,25 @@
 }
 
 // =============================================================================
-// FONDOS GRID
+// RESPONSIVE
 // =============================================================================
 
-.fondos-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--spacing-md);
+@media (max-width: 1200px) {
+  .fondos-header {
+    gap: var(--spacing-md);
+  }
 
-  @media (max-width: 640px) {
-    grid-template-columns: 1fr;
+  .rama-card-wrapper {
+    min-width: 160px;
+  }
+}
+
+@media (max-width: 768px) {
+  .fondos-header {
+    flex-direction: column;
+  }
+
+  .rama-card-wrapper {
+    min-width: 100%;
   }
 }

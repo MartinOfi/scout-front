@@ -1,4 +1,8 @@
 .chips-filter {
+  // Extra padding and overflow visible to prevent clipping of chip shadows and transforms
+  padding-top: 0.5rem;
+  overflow: visible;
+
   ::ng-deep {
     mat-chip-set {
       display: flex;
@@ -6,6 +10,8 @@
       gap: 0.75rem;
       background: white;
       padding: 1rem;
+      padding-top: 0.75rem; // Extra top padding for chip transforms
+      overflow: visible;
     }
 
     mat-chip {
@@ -42,10 +48,15 @@
         margin-right: 0.5rem;
       }
 
+      .mdc-evolution-chip__cell--primary {
+        height: 45px
+      }
+
       .mdc-evolution-chip__text-label {
         font-weight: inherit;
         letter-spacing: 0.01em;
         color: inherit;
+        display: flex;
       }
     }
   }

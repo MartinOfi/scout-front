@@ -5,17 +5,21 @@
     </span>
     <span class="stat-card__title">{{ title() }}</span>
   </header>
-  <p class="stat-card__value">
-    @switch (format()) {
+  <div class="stat-card__content">
+
+    <p class="stat-card__value">
+      @switch (format()) {
       @case ('currency') {
-        {{ value() | currency:'$':'symbol':'1.0-0':'es-AR' }}
+      {{ value() | currency:'$':'symbol':'1.0-0':'es-AR' }}
       }
       @case ('percent') {
-        {{ value() | percent:'1.0-1' }}
+      {{ value() | percent:'1.0-1' }}
       }
       @default {
-        {{ value() | number:'1.0-0' }}
+      {{ value() | number:'1.0-0' }}
       }
-    }
-  </p>
+      }
+    </p>
+    <ng-content select="[slot=actions]"></ng-content>
+  </div>
 </article>

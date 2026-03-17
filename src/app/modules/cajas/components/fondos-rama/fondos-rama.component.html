@@ -1,35 +1,54 @@
 <div class="fondos-rama-container">
-  <section class="fondos-stats">
-    <app-stat-card
-      icon="savings"
-      title="Total Fondos de Rama"
-      [value]="totalSaldosRamas()"
-      [variant]="totalSaldosRamas() >= 0 ? 'success' : 'danger'"
-    />
-  </section>
-
-  <div class="header">
-    <h2>Fondos por Rama</h2>
-  </div>
-
   @if (loading()) {
-    <div class="loading-state">
-      <mat-spinner diameter="40"></mat-spinner>
-      <span>Cargando fondos...</span>
-    </div>
+  <div class="loading-state">
+    <mat-spinner diameter="40"></mat-spinner>
+    <span>Cargando fondos...</span>
+  </div>
   }
 
-  <div class="fondos-grid">
-    @for (rama of ramas; track rama) {
-      <app-fondo-card
-        [rama]="rama"
-        [saldo]="getSaldoRama(rama)"
-        [icon]="getRamaIcon(rama)"
-        [label]="getRamaLabel(rama)"
-        (cardClick)="onOpenDrawer(rama)"
-        (verMovimientos)="onVerMovimientosRama(rama)"
-        (registrarMovimiento)="onRegistrarMovimiento(rama)">
-      </app-fondo-card>
+  <!-- KPI Cards Row: Total + 4 Rama Cards -->
+  <section class="fondos-header">
+    <!-- Total Fondos Rama Card -->
+    <div class="rama-card-wrapper">
+      <app-stat-card icon="account_balance_wallet" title="Total Fondos Rama" [value]="totalSaldosRamas()"
+        variant="primary" />
+    </div>
+
+    <!-- Individual Rama Cards with Action Buttons -->
+    @for (cajaType of RAMA_CAJA_TYPES; track cajaType) {
+    <div class="rama-card-wrapper">
+      <app-stat-card [icon]="CAJA_ICONS[cajaType]" [title]="CAJA_TYPE_LABELS[cajaType]"
+        [value]="getSaldoByType(cajaType)" [variant]="getVariantByType(cajaType)">
+        <div slot="actions" class="card-actions">
+          <button mat-icon-button matTooltip="Registrar Movimiento" class="action-btn action-btn--add"
+            (click)="onRegistrarMovimiento(cajaType)">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+      </app-stat-card>
+    </div>
     }
-  </div>
+  </section>
+
+  <!-- Movimientos Section with Filters and Table -->
+  <section class="movimientos-section">
+    <h3 class="section-title">Movimientos de Ramas</h3>
+
+    <!-- Rama Chips Filter -->
+    <app-chips-filter [chips]="ramaChips" [selectedValues]="selectedRamas()" [allowMultiple]="true"
+      (chipsSelected)="onRamaChipsChanged($event)" />
+
+    <app-generic-filters [filterConfigs]="filterConfigs" [autoApply]="true" [showClearButton]="true"
+      (filtersChanged)="onFiltersChanged($event)" />
+
+    @if (movimientosLoading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="32"></mat-spinner>
+      <span>Cargando movimientos...</span>
+    </div>
+    } @else {
+    <app-data-table [data]="movimientosTableData()" [columns]="movimientosColumns"
+      [config]="{ showHeader: true, hoverable: true, hidePagination: false }" (actionClick)="onTableAction($event)" />
+    }
+  </section>
 </div>

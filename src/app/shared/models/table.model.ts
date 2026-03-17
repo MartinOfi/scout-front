@@ -28,7 +28,9 @@ export interface TableColumn {
     | 'onTime'
     | 'late'
     | 'rating'
-    | 'boolean';
+    | 'boolean'
+    | 'concepto'
+    | 'cajaType';
   /** Whether the column is sortable */
   sortable?: boolean;
   /** Fixed width for the column */

@@ -1,4 +1,13 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges, inject, output, input } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+  inject,
+  output,
+  input,
+} from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { NgClass } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
@@ -13,6 +22,8 @@ import {
 import { StatusConfigService } from '../../services/status-config.service';
 import { ServiceStatusFormatPipe } from '../../pipes/service-status-format.pipe';
 import { DateFormatPipe } from '../../pipes/date-format.pipe';
+import { CONCEPTO_MOVIMIENTO_LABELS, ConceptoMovimiento } from '../../enums/movimiento.enum';
+import { CajaType, CAJA_TYPE_LABELS } from '../../enums/caja.enum';
 
 /**
  * Componente de tabla reutilizable y responsivo
@@ -77,7 +88,7 @@ import { DateFormatPipe } from '../../pipes/date-format.pipe';
   standalone: true,
   templateUrl: './data-table.component.html',
   styleUrls: ['./data-table.component.scss'],
-  imports: [NgClass, MatIcon, ServiceStatusFormatPipe, DateFormatPipe]
+  imports: [NgClass, MatIcon, ServiceStatusFormatPipe, DateFormatPipe],
 })
 export class DataTableComponent implements OnInit, OnChanges {
   private statusConfig = inject(StatusConfigService);
@@ -204,7 +215,7 @@ export class DataTableComponent implements OnInit, OnChanges {
    *
    * Configura los datos iniciales y aplica el primer procesamiento.
    */
-  constructor() { }
+  constructor() {}
 
   ngOnInit(): void {
     this.updateData();
@@ -276,10 +287,7 @@ export class DataTableComponent implements OnInit, OnChanges {
    */
   getAppointmentTimeClass(column: TableColumn, row: TableData): string {
     // Solo aplicar estilos si está habilitado y es la columna de hora de cita
-    if (
-      !this.enableAppointmentTimeColoring() ||
-      column.key !== 'appointmentTime'
-    ) {
+    if (!this.enableAppointmentTimeColoring() || column.key !== 'appointmentTime') {
       return '';
     }
 
@@ -305,7 +313,7 @@ export class DataTableComponent implements OnInit, OnChanges {
           // Crear fecha en formato ISO
           const isoString = `${year}-${month.padStart(2, '0')}-${day.padStart(
             2,
-            '0'
+            '0',
           )}T${hours}:${minutes}:00.000Z`;
           appointment = new Date(isoString);
         } else {
@@ -352,8 +360,7 @@ export class DataTableComponent implements OnInit, OnChanges {
     if (!column.sortable) return;
 
     const direction =
-      this.currentSort?.column === column.key &&
-        this.currentSort.direction === 'asc'
+      this.currentSort?.column === column.key && this.currentSort.direction === 'asc'
         ? 'desc'
         : 'asc';
     this.currentSort = { column: column.key, direction };
@@ -413,10 +420,8 @@ export class DataTableComponent implements OnInit, OnChanges {
       const aValue = a[this.currentSort!.column] ?? '';
       const bValue = b[this.currentSort!.column] ?? '';
 
-      if (aValue < bValue)
-        return this.currentSort!.direction === 'asc' ? -1 : 1;
-      if (aValue > bValue)
-        return this.currentSort!.direction === 'asc' ? 1 : -1;
+      if (aValue < bValue) return this.currentSort!.direction === 'asc' ? -1 : 1;
+      if (aValue > bValue) return this.currentSort!.direction === 'asc' ? 1 : -1;
       return 0;
     });
   }
@@ -436,10 +441,7 @@ export class DataTableComponent implements OnInit, OnChanges {
       return this.columns().some((column) => {
         const value = row[column.key];
         if (value === null || value === undefined) return false;
-        return value
-          .toString()
-          .toLowerCase()
-          .includes(this.searchTerm.toLowerCase());
+        return value.toString().toLowerCase().includes(this.searchTerm.toLowerCase());
       });
     });
   }
@@ -586,6 +588,54 @@ export class DataTableComponent implements OnInit, OnChanges {
   }
 
   /**
+   * Obtiene el label legible para un concepto de movimiento
+   *
+   * Traduce valores como 'inscripcion_grupo' a 'Inscripción de Grupo'
+   *
+   * @param value - Valor del concepto (puede ser string o null)
+   * @returns Label formateado o el valor original si no se encuentra
+   */
+  getConceptoLabel(value: unknown): string {
+    if (!value || typeof value !== 'string') {
+      return '-';
+    }
+    return CONCEPTO_MOVIMIENTO_LABELS[value as ConceptoMovimiento] ?? value;
+  }
+
+  /**
+   * Obtiene el label legible para un tipo de caja
+   *
+   * Traduce valores como 'rama_manada' a 'Fondo Manada'
+   *
+   * @param value - Valor del tipo de caja (puede ser string o null)
+   * @returns Label formateado o el valor original si no se encuentra
+   */
+  getCajaTypeLabel(value: unknown): string {
+    if (!value || typeof value !== 'string') {
+      return '-';
+    }
+    return CAJA_TYPE_LABELS[value as CajaType] ?? value;
+  }
+
+  /**
+   * Obtiene un valor anidado de un objeto usando notación de puntos
+   *
+   * Permite acceder a propiedades como 'caja.tipoCaja' o 'responsable.nombreCompleto'
+   *
+   * @param obj - Objeto del cual extraer el valor
+   * @param path - Ruta al valor usando notación de puntos (e.g., 'caja.tipoCaja')
+   * @returns El valor encontrado o undefined si la ruta no existe
+   */
+  getNestedValue(obj: TableData, path: string): unknown {
+    return path.split('.').reduce<unknown>((current, key) => {
+      if (current && typeof current === 'object' && !Array.isArray(current)) {
+        return (current as Record<string, unknown>)[key];
+      }
+      return undefined;
+    }, obj);
+  }
+
+  /**
    * Maneja el click en una celda de teléfono
    *
    * Abre WhatsApp en una nueva pestaña con el número formateado.
@@ -594,10 +644,7 @@ export class DataTableComponent implements OnInit, OnChanges {
    * @param phone - Número telefónico a abrir en WhatsApp (puede ser cualquier tipo de TableData)
    * @param event - Evento del click
    */
-  onPhoneClick(
-    phone: unknown,
-    event: Event
-  ): void {
+  onPhoneClick(phone: unknown, event: Event): void {
     // Prevenir la propagación del evento para evitar que se active el rowClick
     event.stopPropagation();
 

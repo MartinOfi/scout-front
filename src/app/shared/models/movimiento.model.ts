@@ -3,12 +3,7 @@
  * Typed interfaces - NO any
  */
 
-import {
-  TipoMovimientoEnum,
-  ConceptoMovimiento,
-  MedioPago,
-  EstadoPago,
-} from '../enums';
+import { TipoMovimientoEnum, ConceptoMovimiento, MedioPago, EstadoPago } from '../enums';
 import { Persona } from './persona.model';
 import { Caja } from './caja.model';
 
@@ -81,6 +76,8 @@ export interface UpdateMovimientoDto {
  */
 export interface MovimientosFilters {
   cajaId?: string;
+  /** Comma-separated CajaType values for filtering by multiple caja types */
+  tipoCaja?: string;
   tipo?: TipoMovimientoEnum;
   concepto?: ConceptoMovimiento;
   responsableId?: string;

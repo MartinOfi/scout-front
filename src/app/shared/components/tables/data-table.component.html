@@ -171,6 +171,18 @@ Este template implementa una tabla responsiva con las siguientes característica
                   {{ row[column.key] }}
                 </a>
                 }
+                <!-- Tipo concepto (movimiento) con label formateado -->
+                @if (column.type === 'concepto') {
+                <p class="text-gray-900 whitespace-no-wrap">
+                  {{ getConceptoLabel(row[column.key]) }}
+                </p>
+                }
+                <!-- Tipo cajaType con label formateado (soporta nested keys como 'caja.tipoCaja') -->
+                @if (column.type === 'cajaType') {
+                <p class="text-gray-900 whitespace-no-wrap">
+                  {{ getCajaTypeLabel(getNestedValue(row, column.key)) }}
+                </p>
+                }
                 <!-- Tipo texto, número (renderizado por defecto) -->
                 @if (
                 column.type !== 'image' &&
@@ -186,10 +198,12 @@ Este template implementa una tabla responsiva con las siguientes característica
                 column.type !== 'onTime' &&
                 column.type !== 'late' &&
                 column.type !== 'rating' &&
-                column.type !== 'boolean'
+                column.type !== 'boolean' &&
+                column.type !== 'concepto' &&
+                column.type !== 'cajaType'
                 ) {
                 <p class="text-gray-900 whitespace-no-wrap" [ngClass]="getAppointmentTimeClass(column, row)">
-                  {{ row[column.key] }}
+                  {{ column.key.includes('.') ? getNestedValue(row, column.key) : row[column.key] }}
                 </p>
                 }
               </td>
