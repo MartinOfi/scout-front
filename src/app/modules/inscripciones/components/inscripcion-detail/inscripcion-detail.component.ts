@@ -7,6 +7,7 @@ import {
   Component,
   OnInit,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   inject,
   Signal,
   computed,
@@ -71,6 +72,7 @@ export class InscripcionDetailComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly dialog = inject(MatDialog);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   readonly loading: Signal<boolean> = this.state.loading;
   readonly error: Signal<string | null> = this.state.error;
@@ -271,7 +273,9 @@ export class InscripcionDetailComponent implements OnInit {
           medioPago: result.data.medioPago,
           descripcion: result.data.descripcion,
         };
-        this.state.pagarInscripcion(inscripcionId, dto).subscribe();
+        this.state.pagarInscripcion(inscripcionId, dto).subscribe({
+          next: () => this.reloadDetail(inscripcionId),
+        });
         break;
       }
       case 'edit': {
@@ -280,13 +284,23 @@ export class InscripcionDetailComponent implements OnInit {
           medioPago: result.data.medioPago,
           descripcion: result.data.descripcion,
         };
-        this.state.updatePago(inscripcionId, result.movimientoId, updateDto).subscribe();
+        this.state.updatePago(inscripcionId, result.movimientoId, updateDto).subscribe({
+          next: () => this.reloadDetail(inscripcionId),
+        });
         break;
       }
       case 'delete': {
-        this.state.deletePago(inscripcionId, result.movimientoId).subscribe();
+        this.state.deletePago(inscripcionId, result.movimientoId).subscribe({
+          next: () => this.reloadDetail(inscripcionId),
+        });
         break;
       }
     }
+  }
+
+  /** Reload inscription detail after payment operations */
+  private reloadDetail(inscripcionId: string): void {
+    this.state.loadDetail(inscripcionId);
+    this.cdr.markForCheck();
   }
 }
