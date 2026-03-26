@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import {
   Caja,
   CajaConSaldo,
@@ -15,9 +15,11 @@ import { CajaType } from '../../../shared/enums';
 
 /**
  * API service for Cajas module
- * Uses correct endpoints from API_REFERENCE.md:
+ * Endpoints:
  * - GET /cajas - List all cajas (with optional tipo query param)
  * - GET /cajas/grupo - Get caja de grupo
+ * - GET /cajas/consolidado - Get consolidated balances
+ * - GET /cajas/personal/:personaId/saldo - Get saldo de cuenta personal
  * - GET /cajas/:id - Get caja by ID
  * - GET /movimientos/saldo/:cajaId - Get saldo of a caja
  * - GET /movimientos/caja/:cajaId - Get movimientos of a caja
@@ -91,18 +93,12 @@ export class CajasApiService {
 
   /**
    * Get saldo de cuenta personal by personaId
-   * Fetches personal cajas and finds the one matching the propietarioId
+   * Single request to backend endpoint
    * Returns 0 if no personal account found
    */
   getSaldoCuentaPersonal(personaId: string): Observable<number> {
-    return this.getByType(CajaType.PERSONAL).pipe(
-      map((cajas: Caja[]) => cajas.find((c) => c.propietarioId === personaId)),
-      switchMap((caja: Caja | undefined) => {
-        if (!caja) {
-          return of(0);
-        }
-        return this.getSaldo(caja.id).pipe(map((res) => res.saldo));
-      }),
-    );
+    return this.http
+      .get<{ saldo: number }>(`${API_CONFIG.ENDPOINTS.CAJAS_PERSONAL_SALDO}/${personaId}/saldo`)
+      .pipe(map((res) => res.saldo));
   }
 }

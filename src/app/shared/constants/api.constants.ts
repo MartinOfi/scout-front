@@ -28,6 +28,7 @@ export const API_CONFIG = {
     CAJAS: 'cajas',
     CAJAS_GRUPO: 'cajas/grupo',
     CAJAS_CONSOLIDADO: 'cajas/consolidado',
+    CAJAS_PERSONAL_SALDO: 'cajas/personal', // + /:personaId/saldo
 
     // Movimientos
     MOVIMIENTOS: 'movimientos',
