@@ -4,14 +4,19 @@
  * SIN any - tipado estricto
  */
 
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  inject,
+  signal,
+  effect,
+  computed,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatIconModule } from '@angular/material/icon';
 
 import { CampamentosStateService, CampamentosFormBuilder } from '../../../services';
 
@@ -20,6 +25,7 @@ import { FormFieldComponent } from '../../../../../shared/components/form/form-f
 import { TextFieldComponent } from '../../../../../shared/components/form/text-field/text-field.component';
 import { NumberFieldComponent } from '../../../../../shared/components/form/number-field/number-field.component';
 import { TextareaFieldComponent } from '../../../../../shared/components/form/textarea-field/textarea-field.component';
+import { DateFieldComponent } from '../../../../../shared/components/form/date-field/date-field.component';
 
 @Component({
   selector: 'app-campamento-form',
@@ -27,17 +33,16 @@ import { TextareaFieldComponent } from '../../../../../shared/components/form/te
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
+    MatIconModule,
     FormFieldComponent,
     TextFieldComponent,
     NumberFieldComponent,
-    TextareaFieldComponent
+    TextareaFieldComponent,
+    DateFieldComponent,
   ],
   templateUrl: './campamento-form.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrl: './campamento-form.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CampamentoFormComponent implements OnInit {
   readonly state: CampamentosStateService = inject(CampamentosStateService);
@@ -48,18 +53,34 @@ export class CampamentoFormComponent implements OnInit {
   readonly form: FormGroup = this.formBuilder.buildCreateForm();
   readonly isEditing = signal(false);
   readonly loading = signal(false);
+  readonly loadingData = computed(() => this.state.loading() && this.isEditing());
+
+  private formPopulated = false;
+
+  constructor() {
+    // React to selected campamento changes and populate form
+    effect(() => {
+      const campamento = this.state.selected();
+      if (campamento && this.isEditing() && !this.formPopulated) {
+        this.form.patchValue({
+          nombre: campamento.nombre,
+          fechaInicio: campamento.fechaInicio,
+          fechaFin: campamento.fechaFin,
+          costoPorPersona: campamento.costoPorPersona,
+          cuotasBase: campamento.cuotasBase ?? 1,
+          descripcion: campamento.descripcion ?? '',
+        });
+        this.formPopulated = true;
+      }
+    });
+  }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEditing.set(true);
-      this.loadCampamento(id);
+      this.state.loadById(id);
     }
-  }
-
-  loadCampamento(id: string): void {
-    this.loading.set(true);
-    this.loading.set(false);
   }
 
   onSubmit(): void {
@@ -77,12 +98,12 @@ export class CampamentoFormComponent implements OnInit {
 
       this.state.update(id, dto).subscribe({
         next: () => this.router.navigate(['/campamentos', id]),
-        error: () => this.loading.set(false)
+        error: () => this.loading.set(false),
       });
     } else {
       this.state.create(dto).subscribe({
         next: (campamento) => this.router.navigate(['/campamentos', campamento.id]),
-        error: () => this.loading.set(false)
+        error: () => this.loading.set(false),
       });
     }
   }

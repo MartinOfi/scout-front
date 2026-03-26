@@ -1,10 +1,257 @@
-<div class="campamento-detail-container">
-  <h1>Detalle del Campamento</h1>
-  
-  <!-- TODO: Mostrar detalles del campamento -->
-  
-  <div class="actions">
-    <button (click)="onBack()">Volver</button>
-    <button (click)="onEdit()">Editar</button>
+<div class="detail-page">
+  @if (loading()) {
+  <div class="detail-loading">
+    <app-loading-spinner message="Cargando campamento..." />
   </div>
+  } @else if (error()) {
+  <div class="detail-error">
+    <app-empty-state icon="error_outline" [message]="error() ?? 'Error al cargar'" actionLabel="Volver"
+      (onAction)="onBack()" />
+  </div>
+  } @else if (campamento(); as campamentoInfo) {
+  <div class="detail-content">
+    <!-- Header: Camp Name + Actions -->
+    <header class="detail-header">
+      <div class="detail-header__left">
+        <div class="detail-header__badge">
+          <mat-icon>hiking</mat-icon>
+        </div>
+        <div class="detail-header__info">
+          <h1 class="detail-header__name">{{ campamentoInfo.nombre }}</h1>
+          <div class="detail-header__meta">
+            <span class="detail-header__dates">
+              <mat-icon>calendar_today</mat-icon>
+              {{ campamentoInfo.fechaInicio | date:'d MMM' }} — {{ campamentoInfo.fechaFin | date:'d MMM yyyy' }}
+            </span>
+            @if (diasRestantes(); as diasHastaCampamento) {
+            <span class="detail-header__countdown">
+              <mat-icon>schedule</mat-icon>
+              {{ diasHastaCampamento }} días
+            </span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-header__right">
+        <button class="detail-header__back" (click)="onBack()" aria-label="Volver al listado">
+          <mat-icon>arrow_back</mat-icon>
+          Volver
+        </button>
+        <button class="btn-icon" (click)="onEdit()" aria-label="Editar campamento">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </div>
+    </header>
+
+    <!-- Info Card: Description + Cost -->
+    @if (campamentoInfo.descripcion || campamentoInfo.costoPorPersona) {
+    <section class="info-card">
+      @if (campamentoInfo.descripcion) {
+      <p class="info-card__description">{{ campamentoInfo.descripcion }}</p>
+      }
+      <div class="info-card__details">
+        <div class="info-card__item">
+          <span class="info-card__label">Costo por persona</span>
+          <span class="info-card__value">{{ campamentoInfo.costoPorPersona | currency:'ARS':'symbol':'1.0-0' }}</span>
+        </div>
+        @if (campamentoInfo.cuotasBase) {
+        <div class="info-card__item">
+          <span class="info-card__label">Cuotas sugeridas</span>
+          <span class="info-card__value">{{ campamentoInfo.cuotasBase }}</span>
+        </div>
+        }
+        @if (kpis(); as kpisData) {
+        <div class="info-card__item">
+          <span class="info-card__label">Participantes</span>
+          <span class="info-card__value">{{ kpisData.cantidadParticipantes }}</span>
+        </div>
+        }
+      </div>
+    </section>
+    }
+
+    <!-- KPI Cards: Financial Summary -->
+    @if (kpis(); as kpisData) {
+    <section class="kpi-section" aria-labelledby="kpi-heading">
+      <h2 id="kpi-heading" class="sr-only">Resumen Financiero</h2>
+      <div class="kpi-grid">
+        @for (kpiConfig of kpiConfigs; track kpiConfig.key) {
+        <app-stat-card [icon]="kpiConfig.icon" [title]="kpiConfig.title" [value]="kpisData[kpiConfig.key]" [variant]="kpiConfig.variant"
+          format="currency" />
+        }
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="progress-section">
+        <div class="progress-header">
+          <span class="progress-label">Recaudación</span>
+          <span class="progress-percent">{{ progressPercent() | number:'1.0-0' }}%</span>
+        </div>
+        <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="progressPercent()" aria-valuemin="0"
+          aria-valuemax="100">
+          <div class="progress-fill" [style.width.%]="progressPercent()"
+            [class.progress-fill--complete]="progressPercent() >= 100"
+            [class.progress-fill--partial]="progressPercent() > 0 && progressPercent() < 100">
+          </div>
+        </div>
+      </div>
+    </section>
+    }
+
+    <!-- Tabs Navigation -->
+    <section class="tabs-section">
+      <div class="tabs-header">
+        <app-button-tabs [tabs]="tabs" [activeTab]="activeTab()" (tabChange)="onTabChange($event)" />
+        @if (activeTab() === 'participantes') {
+        <button class="btn-add" (click)="onAddParticipante()">
+          <mat-icon>person_add</mat-icon>
+          Agregar
+        </button>
+        } @else {
+        <button class="btn-add" (click)="onRegistrarGasto()">
+          <mat-icon>add</mat-icon>
+          Gasto
+        </button>
+        }
+      </div>
+
+      <!-- Tab Content: Participantes -->
+      @if (activeTab() === 'participantes') {
+      <div class="tab-content">
+        @if (participantes().length > 0) {
+        <div class="participantes-list">
+          @for (participante of participantes(); track participante.id) {
+          <article class="participante-card">
+            <div class="participante-card__header">
+              <div class="participante-card__avatar">
+                <mat-icon>person</mat-icon>
+              </div>
+              <div class="participante-card__info">
+                <h3 class="participante-card__name">{{ participante.nombre }}</h3>
+                <div class="participante-card__progress">
+                  <span class="participante-card__paid">{{ participante.totalPagado | currency:'ARS':'symbol':'1.0-0' }}</span>
+                  <span class="participante-card__separator">/</span>
+                  <span class="participante-card__total">{{ participante.costoPorPersona | currency:'ARS':'symbol':'1.0-0' }}</span>
+                </div>
+              </div>
+              <div class="participante-card__status" [class.participante-card__status--complete]="participante.saldoPendiente === 0"
+                [class.participante-card__status--pending]="participante.saldoPendiente > 0">
+                @if (participante.saldoPendiente === 0) {
+                <mat-icon>check_circle</mat-icon>
+                <span>Al día</span>
+                } @else {
+                <span class="participante-card__pending">{{ participante.saldoPendiente | currency:'ARS':'symbol':'1.0-0' }}</span>
+                <span>pendiente</span>
+                }
+              </div>
+            </div>
+
+            <!-- Payment History -->
+            @if (participante.pagos.length > 0) {
+            <div class="participante-card__payments">
+              @for (pago of participante.pagos; track pago.movimientoId) {
+              <div class="payment-row">
+                <span class="payment-row__date">{{ pago.fecha | date:'d/M' }}</span>
+                <span class="payment-row__amount">{{ pago.monto | currency:'ARS':'symbol':'1.0-0' }}</span>
+                <span class="payment-row__method">{{ pago.medioPago }}</span>
+                <button class="payment-row__edit" (click)="onEditPago(participante, pago)" aria-label="Editar pago">
+                  <mat-icon>edit</mat-icon>
+                </button>
+              </div>
+              }
+            </div>
+            }
+
+            <!-- Add Payment Action -->
+            @if (participante.saldoPendiente > 0) {
+            <button class="participante-card__action" (click)="onRegistrarPago(participante)">
+              <mat-icon>add</mat-icon>
+              Registrar pago
+            </button>
+            }
+          </article>
+          }
+        </div>
+        } @else {
+        <div class="tab-empty">
+          <div class="tab-empty__icon">
+            <mat-icon>group_add</mat-icon>
+          </div>
+          <p class="tab-empty__text">Sin participantes</p>
+          <p class="tab-empty__hint">Agregá participantes al campamento</p>
+        </div>
+        }
+      </div>
+      }
+
+      <!-- Tab Content: Movimientos -->
+      @if (activeTab() === 'movimientos') {
+      <div class="tab-content">
+        @if (movimientos().length > 0) {
+        <div class="movimientos-list">
+          @for (movimiento of movimientos(); track movimiento.id) {
+          <article class="movimiento-card" [class.movimiento-card--ingreso]="movimiento.tipo === 'ingreso'"
+            [class.movimiento-card--egreso]="movimiento.tipo === 'egreso'">
+            <div class="movimiento-card__icon">
+              @if (movimiento.tipo === 'ingreso') {
+              <mat-icon>arrow_downward</mat-icon>
+              } @else {
+              <mat-icon>arrow_upward</mat-icon>
+              }
+            </div>
+            <div class="movimiento-card__info">
+              <span class="movimiento-card__date">{{ movimiento.fecha | date:'d MMM yyyy' }}</span>
+              <span class="movimiento-card__description">{{ movimiento.descripcion ?? 'Sin descripción' }}</span>
+              <span class="movimiento-card__responsable">{{ movimiento.responsableNombre }}</span>
+            </div>
+            <div class="movimiento-card__amount" [class.movimiento-card__amount--positive]="movimiento.tipo === 'ingreso'"
+              [class.movimiento-card__amount--negative]="movimiento.tipo === 'egreso'">
+              @if (movimiento.tipo === 'ingreso') {
+              +{{ movimiento.monto | currency:'ARS':'symbol':'1.0-0' }}
+              } @else {
+              -{{ movimiento.monto | currency:'ARS':'symbol':'1.0-0' }}
+              }
+            </div>
+            <div class="movimiento-card__meta">
+              <span class="movimiento-card__medio">{{ movimiento.medioPago }}</span>
+              <span class="movimiento-card__estado" [class.movimiento-card__estado--pagado]="movimiento.estadoPago === 'pagado'"
+                [class.movimiento-card__estado--pendiente]="movimiento.estadoPago === 'pendiente_reembolso'">
+                {{ movimiento.estadoPago }}
+              </span>
+            </div>
+          </article>
+          }
+        </div>
+        } @else {
+        <div class="tab-empty">
+          <div class="tab-empty__icon">
+            <mat-icon>receipt_long</mat-icon>
+          </div>
+          <p class="tab-empty__text">Sin movimientos</p>
+          <p class="tab-empty__hint">Registrá pagos o gastos para ver el historial</p>
+        </div>
+        }
+      </div>
+      }
+    </section>
+
+    <!-- Footer Actions -->
+    <footer class="detail-actions">
+      <button class="action-btn action-btn--danger" (click)="onDelete()">
+        <mat-icon>delete_outline</mat-icon>
+        Eliminar
+      </button>
+      <button class="action-btn action-btn--primary" (click)="onEdit()">
+        <mat-icon>edit</mat-icon>
+        Editar campamento
+      </button>
+    </footer>
+  </div>
+  } @else {
+  <div class="detail-empty">
+    <app-empty-state icon="hiking" message="Campamento no encontrado" actionLabel="Volver al listado"
+      (onAction)="onBack()" />
+  </div>
+  }
 </div>

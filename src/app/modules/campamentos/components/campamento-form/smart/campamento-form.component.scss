@@ -1,73 +1,105 @@
 // =============================================================================
-// CAMPAMENTO FORM STYLES
+// CAMPAMENTO FORM - CAMP REGISTRATION FLOW
 // =============================================================================
+// Clean, focused form following movimiento form aesthetic
 
 @use 'sass:color';
-@use '../../../../../shared/components/form/form-tokens' as *;
+@use '../../../../../shared/components/form/form-tokens' as tokens;
 
-// Page layout
-.scout-form-page {
-  min-height: 100vh;
-  background-color: $stone-100;
-  padding: 32px 16px;
+// -----------------------------------------------------------------------------
+// PAGE LAYOUT
+// -----------------------------------------------------------------------------
+
+.payment-page {
+  min-height: 100%;
+  padding: 24px 16px;
+  padding-bottom: 48px;
 
   @media (min-width: 640px) {
-    padding: 40px 24px;
+    padding: 32px 24px;
   }
 }
 
-.scout-form-wrapper {
+.payment-container {
+  max-width: 560px;
   margin: 0 auto;
-  width: 100%;
-
-  &--single {
-    max-width: 600px;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.scout-form-card {
-  background-color: white;
+// Loading state
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  background: white;
   border-radius: 16px;
-  box-shadow: $shadow-card;
-  overflow: hidden;
-  border: 1px solid $stone-200;
-}
+  box-shadow: tokens.$shadow-card;
 
-.scout-form-header {
-  padding: 24px 28px;
+  .loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid tokens.$stone-200;
+    border-top-color: tokens.$brand-burgundy;
+  }
 
-  &--with-divider {
-    border-bottom: 1px solid $stone-200;
+  p {
+    margin: 16px 0 0;
+    font-size: 14px;
+    color: tokens.$stone-500;
   }
 }
 
-.scout-form-title {
-  font-family: var(--font-family-headings);
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: $stone-900;
+// -----------------------------------------------------------------------------
+// FORM CARD
+// -----------------------------------------------------------------------------
+
+.form-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: tokens.$shadow-card;
+  overflow: hidden;
+}
+
+.form-header {
+  padding: 24px 24px 0;
+}
+
+.form-title {
   margin: 0;
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: tokens.$stone-900;
+  letter-spacing: -0.01em;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+
+  mat-icon {
+    color: tokens.$brand-burgundy;
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
 }
 
-.scout-form-icon {
-  color: $brand-burgundy;
-  font-size: 1.25rem;
-}
-
-.scout-form-subtitle {
-  margin: 6px 0 0;
+.form-subtitle {
+  margin: 4px 0 0;
   font-size: 14px;
-  color: $stone-500;
+  color: tokens.$stone-500;
 }
 
-.scout-form-body {
-  padding: 28px;
+.form-body {
+  padding: 24px;
 }
 
-// Form rows
+// -----------------------------------------------------------------------------
+// FORM LAYOUT
+// -----------------------------------------------------------------------------
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr;
@@ -76,15 +108,15 @@
   @media (min-width: 480px) {
     grid-template-columns: 1fr 1fr;
   }
+}
 
-  // Material form field styling within rows
-  mat-form-field {
-    width: 100%;
-    margin-bottom: 20px;
+.form-field--full {
+  @media (min-width: 480px) {
+    grid-column: 1 / -1;
   }
 }
 
-// Input with prefix
+// Input with currency prefix
 .input-with-prefix {
   position: relative;
   display: flex;
@@ -94,7 +126,7 @@
 .input-prefix {
   position: absolute;
   left: 14px;
-  color: $stone-500;
+  color: tokens.$stone-500;
   font-weight: 500;
   font-size: 15px;
   pointer-events: none;
@@ -102,30 +134,26 @@
 }
 
 .input-with-prefix ::ng-deep {
+
   .scout-input,
   input {
     padding-left: 32px;
   }
 }
 
-// Actions
-.scout-form-actions {
-  padding: 20px 28px 28px;
-  background-color: $stone-50;
-  border-top: 1px solid $stone-200;
-}
+// -----------------------------------------------------------------------------
+// FORM ACTIONS
+// -----------------------------------------------------------------------------
 
-.scout-form-actions__row {
+.form-actions {
   display: flex;
+  justify-content: space-between;
   gap: 12px;
-  flex-wrap: wrap;
-
-  &--between {
-    justify-content: space-between;
-  }
+  padding: 20px 24px 24px;
+  background: tokens.$stone-50;
+  border-top: 1px solid tokens.$stone-200;
 }
 
-// Buttons
 .btn-primary,
 .btn-secondary {
   font-family: var(--font-family-base);
@@ -134,11 +162,20 @@
   padding: 12px 24px;
   border-radius: 10px;
   cursor: pointer;
-  transition: all $transition-fast;
+  transition: all tokens.$transition-fast;
   border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
 
   &:focus-visible {
-    outline: 2px solid $brand-burgundy;
+    outline: 2px solid tokens.$brand-burgundy;
     outline-offset: 2px;
   }
 
@@ -149,44 +186,35 @@
 }
 
 .btn-primary {
-  background-color: $brand-burgundy;
+  background-color: tokens.$brand-burgundy;
   color: white;
 
   &:hover:not(:disabled) {
-    background-color: $brand-burgundy-light;
+    background-color: tokens.$brand-burgundy-light;
   }
 
   &:active:not(:disabled) {
-    background-color: color.adjust($brand-burgundy, $lightness: -5%);
+    background-color: color.adjust(tokens.$brand-burgundy, $lightness: -5%);
   }
 }
 
 .btn-secondary {
   background-color: white;
-  color: $stone-700;
-  border: 1.5px solid $stone-300;
+  color: tokens.$stone-700;
+  border: 1.5px solid tokens.$stone-300;
 
   &:hover:not(:disabled) {
-    background-color: $stone-50;
-    border-color: $stone-400;
+    background-color: tokens.$stone-50;
+    border-color: tokens.$stone-400;
   }
 }
 
-// Loading state
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 48px 24px;
-  gap: 16px;
-}
-
+// Loading spinner
 .loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid $stone-200;
-  border-top-color: $brand-burgundy;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -197,26 +225,16 @@
   }
 }
 
-.loading-text {
-  font-size: 14px;
-  color: $stone-500;
-  margin: 0;
-}
+// -----------------------------------------------------------------------------
+// REDUCED MOTION
+// -----------------------------------------------------------------------------
 
-// Override Material datepicker to match scout style
-::ng-deep {
-  mat-form-field {
-    .mdc-text-field--outlined {
-      --mdc-outlined-text-field-container-shape: 10px;
-      --mdc-outlined-text-field-outline-color: #{$stone-300};
-      --mdc-outlined-text-field-hover-outline-color: #{$stone-400};
-      --mdc-outlined-text-field-focus-outline-color: #{$brand-burgundy};
-      --mdc-outlined-text-field-label-text-color: #{$stone-700};
-      --mdc-outlined-text-field-input-text-color: #{$stone-800};
-    }
+@media (prefers-reduced-motion: reduce) {
 
-    .mat-mdc-form-field-subscript-wrapper {
-      display: none;
-    }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }

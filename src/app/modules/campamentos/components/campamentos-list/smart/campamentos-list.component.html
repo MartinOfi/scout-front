@@ -1,38 +1,95 @@
-<div class="container">
-  <header class="header">
-    <h1>Campamentos</h1>
-    <button mat-raised-button color="primary" (click)="onCreate()">
-      <mat-icon>add</mat-icon>
-      Crear Campamento
-    </button>
-  </header>
+<main class="camps-page">
+  <div class="camps-content">
+    <!-- Page Header -->
+    <header class="camps-header">
+      <div class="camps-header__left">
+        <div class="camps-header__icon">
+          <mat-icon>hiking</mat-icon>
+        </div>
+        <div class="camps-header__info">
+          <h1 class="camps-header__title">Campamentos</h1>
+          <p class="camps-header__subtitle">Gestión de campamentos y actividades al aire libre</p>
+        </div>
+      </div>
+      <div class="camps-header__right">
+        <button type="button" class="btn-create" (click)="onCreate()">
+          <mat-icon>add</mat-icon>
+          Crear Campamento
+        </button>
+      </div>
+    </header>
 
-  <!-- Loading State -->
-  <app-loading-spinner *ngIf="loading()"></app-loading-spinner>
+    <!-- Loading State -->
+    @if (loading()) {
+      <div class="camps-loading">
+        <app-loading-spinner></app-loading-spinner>
+      </div>
+    }
 
-  <!-- Error State -->
-  <div *ngIf="error()" class="error-container">
-    <mat-icon color="warn">error</mat-icon>
-    <span>{{ error() }}</span>
+    <!-- Error State -->
+    @if (error()) {
+      <div class="camps-error">
+        <mat-icon color="warn">error_outline</mat-icon>
+        <span>{{ error() }}</span>
+      </div>
+    }
+
+    <!-- Content (Stats + Grid) -->
+    @if (!loading() && !error()) {
+      @if (campamentos().length === 0) {
+        <!-- Empty State -->
+        <div class="camps-empty">
+          <div class="camps-empty__icon">
+            <mat-icon>terrain</mat-icon>
+          </div>
+          <h2 class="camps-empty__title">No hay campamentos registrados</h2>
+          <p class="camps-empty__text">
+            Comienza creando tu primer campamento para gestionar participantes y pagos.
+          </p>
+          <button type="button" class="camps-empty__action" (click)="onCreate()">
+            <mat-icon>add</mat-icon>
+            Crear Campamento
+          </button>
+        </div>
+      } @else {
+        <!-- Stats Summary Bar -->
+        <section class="camps-stats" aria-label="Resumen de campamentos">
+          <div class="camps-stats__total">
+            <span class="camps-stats__number">{{ stats().total }}</span>
+            <span class="camps-stats__label">Campamentos</span>
+          </div>
+          <div class="camps-stats__divider" aria-hidden="true"></div>
+          <div class="camps-stats__breakdown">
+            <div class="camps-stats__item">
+              <span class="camps-stats__dot camps-stats__dot--upcoming" aria-hidden="true"></span>
+              <span class="camps-stats__item-label">Próximos</span>
+              <span class="camps-stats__item-count">{{ stats().upcoming }}</span>
+            </div>
+            <div class="camps-stats__item">
+              <span class="camps-stats__dot camps-stats__dot--active" aria-hidden="true"></span>
+              <span class="camps-stats__item-label">En curso</span>
+              <span class="camps-stats__item-count">{{ stats().active }}</span>
+            </div>
+            <div class="camps-stats__item">
+              <span class="camps-stats__dot camps-stats__dot--past" aria-hidden="true"></span>
+              <span class="camps-stats__item-label">Finalizados</span>
+              <span class="camps-stats__item-count">{{ stats().past }}</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Camps Grid -->
+        <section class="camps-grid" aria-label="Lista de campamentos">
+          @for (campamento of campamentos(); track campamento.id) {
+            <app-campamento-card
+              [campamento]="campamento"
+              (select)="onSelect($event)"
+              (edit)="onEdit($event)"
+              (delete)="onDelete($event)">
+            </app-campamento-card>
+          }
+        </section>
+      }
+    }
   </div>
-
-  <!-- Empty State -->
-  <app-empty-state
-    *ngIf="!loading() && !error() && campamentos().length === 0"
-    title="No hay campamentos registrados"
-    message="Comienza creando tu primer campamento"
-    actionLabel="Crear Campamento"
-    (action)="onCreate()">
-  </app-empty-state>
-
-  <!-- Data State -->
-  <div *ngIf="!loading() && campamentos().length > 0" class="campamentos-grid">
-    <app-campamento-card
-      *ngFor="let campamento of campamentos()"
-      [campamento]="campamento"
-      (select)="onSelect($event)"
-      (edit)="onEdit($event)"
-      (delete)="onDelete($event)">
-    </app-campamento-card>
-  </div>
-</div>
+</main>

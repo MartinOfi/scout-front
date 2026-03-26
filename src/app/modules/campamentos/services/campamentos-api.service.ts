@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import {
   Campamento,
   CampamentoConResumen,
+  CampamentoDetalleDto,
   PagoParticipante,
   CreateCampamentoDto,
   UpdateCampamentoDto,
@@ -38,6 +39,14 @@ export class CampamentosApiService {
    */
   getById(id: string): Observable<Campamento> {
     return this.http.get<Campamento>(`${this.endpoint}/${id}`);
+  }
+
+  /**
+   * Get consolidated campamento detail
+   * Includes: campamento info, participantes with payment status, all movements, and KPIs
+   */
+  getDetalle(id: string): Observable<CampamentoDetalleDto> {
+    return this.http.get<CampamentoDetalleDto>(`${this.endpoint}/${id}/detalle`);
   }
 
   /**

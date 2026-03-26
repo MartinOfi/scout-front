@@ -39,34 +39,28 @@ export class CampamentosFormBuilder {
    * Construir formulario para crear un nuevo campamento
    */
   buildCreateForm(): FormGroup {
-    const form = this.fb.group({
-      nombre: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(100),
-          safeTextValidator(),
+    const form = this.fb.group(
+      {
+        nombre: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(3),
+            Validators.maxLength(100),
+            safeTextValidator(),
+          ],
         ],
-      ],
-      fechaInicio: ['', [Validators.required]],
-      fechaFin: ['', [Validators.required]],
-      costoPorPersona: [
-        '',
-        [
-          Validators.required,
-          positiveNumberValidator(),
-          decimalValidator(2),
+        fechaInicio: ['', [Validators.required]],
+        fechaFin: ['', [Validators.required]],
+        costoPorPersona: [
+          '',
+          [Validators.required, positiveNumberValidator(), decimalValidator(2)],
         ],
-      ],
-      descripcion: [
-        '',
-        [
-          Validators.maxLength(500),
-          safeTextValidator(),
-        ],
-      ],
-    }, { validators: dateRangeValidator('fechaInicio', 'fechaFin') });
+        cuotasBase: [1, [Validators.required, Validators.min(1), Validators.max(12)]],
+        descripcion: ['', [Validators.maxLength(500), safeTextValidator()]],
+      },
+      { validators: dateRangeValidator('fechaInicio', 'fechaFin') },
+    );
 
     return form;
   }
@@ -75,34 +69,34 @@ export class CampamentosFormBuilder {
    * Construir formulario para editar un campamento
    */
   buildEditForm(campamento: Campamento): FormGroup {
-    return this.fb.group({
-      nombre: [
-        campamento.nombre,
-        [
-          Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(100),
-          safeTextValidator(),
+    return this.fb.group(
+      {
+        nombre: [
+          campamento.nombre,
+          [
+            Validators.required,
+            Validators.minLength(3),
+            Validators.maxLength(100),
+            safeTextValidator(),
+          ],
         ],
-      ],
-      fechaInicio: [campamento.fechaInicio],
-      fechaFin: [campamento.fechaFin],
-      costoPorPersona: [
-        campamento.costoPorPersona,
-        [
-          Validators.required,
-          positiveNumberValidator(),
-          decimalValidator(2),
+        fechaInicio: [campamento.fechaInicio],
+        fechaFin: [campamento.fechaFin],
+        costoPorPersona: [
+          campamento.costoPorPersona,
+          [Validators.required, positiveNumberValidator(), decimalValidator(2)],
         ],
-      ],
-      descripcion: [
-        campamento.descripcion ?? '',
-        [
-          Validators.maxLength(500),
-          safeTextValidator(),
+        cuotasBase: [
+          campamento.cuotasBase ?? 1,
+          [Validators.required, Validators.min(1), Validators.max(12)],
         ],
-      ],
-    }, { validators: dateRangeValidator('fechaInicio', 'fechaFin') });
+        descripcion: [
+          campamento.descripcion ?? '',
+          [Validators.maxLength(500), safeTextValidator()],
+        ],
+      },
+      { validators: dateRangeValidator('fechaInicio', 'fechaFin') },
+    );
   }
 
   /**
@@ -121,14 +115,7 @@ export class CampamentosFormBuilder {
   buildPagoForm(): FormGroup {
     return this.fb.group({
       personaId: ['', [Validators.required]],
-      monto: [
-        '',
-        [
-          Validators.required,
-          positiveNumberValidator(),
-          decimalValidator(2),
-        ],
-      ],
+      monto: ['', [Validators.required, positiveNumberValidator(), decimalValidator(2)]],
       medioPago: ['', [Validators.required]],
     });
   }
@@ -138,22 +125,8 @@ export class CampamentosFormBuilder {
    */
   buildGastoForm(): FormGroup {
     return this.fb.group({
-      monto: [
-        '',
-        [
-          Validators.required,
-          positiveNumberValidator(),
-          decimalValidator(2),
-        ],
-      ],
-      descripcion: [
-        '',
-        [
-          Validators.required,
-          Validators.maxLength(500),
-          safeTextValidator(),
-        ],
-      ],
+      monto: ['', [Validators.required, positiveNumberValidator(), decimalValidator(2)]],
+      descripcion: ['', [Validators.required, Validators.maxLength(500), safeTextValidator()]],
       responsableId: ['', [Validators.required]],
       medioPago: ['', [Validators.required]],
       estadoPago: ['', [Validators.required]],
@@ -169,6 +142,7 @@ export class CampamentosFormBuilder {
       fechaInicio: form.value.fechaInicio as string,
       fechaFin: form.value.fechaFin as string,
       costoPorPersona: Number(form.value.costoPorPersona) as number,
+      cuotasBase: Number(form.value.cuotasBase) as number,
       descripcion: form.value.descripcion || undefined,
     };
   }
@@ -182,6 +156,7 @@ export class CampamentosFormBuilder {
       fechaInicio: form.value.fechaInicio as string,
       fechaFin: form.value.fechaFin as string,
       costoPorPersona: Number(form.value.costoPorPersona) as number,
+      cuotasBase: Number(form.value.cuotasBase) as number,
       descripcion: form.value.descripcion || undefined,
     };
   }

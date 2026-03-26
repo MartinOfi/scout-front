@@ -11,6 +11,11 @@ import { tap, catchError, finalize } from 'rxjs/operators';
 import {
   Campamento,
   CampamentoConResumen,
+  CampamentoDetalleDto,
+  CampamentoInfoDto,
+  CampamentoKpisDto,
+  ParticipantePagoDto,
+  MovimientoCampamentoDto,
   PagoParticipante,
   CreateCampamentoDto,
   UpdateCampamentoDto,
@@ -35,6 +40,7 @@ export class CampamentosStateService {
   // ============================================================================
 
   private readonly _campamentos: WritableSignal<Campamento[]> = signal([]);
+  private readonly _detalle: WritableSignal<CampamentoDetalleDto | null> = signal(null);
   private readonly _pagosPorParticipante: WritableSignal<Record<string, PagoParticipante[]>> =
     signal({});
   private readonly _loading: WritableSignal<boolean> = signal(false);
@@ -46,6 +52,7 @@ export class CampamentosStateService {
   // ============================================================================
 
   readonly campamentos: Signal<Campamento[]> = this._campamentos.asReadonly();
+  readonly detalle: Signal<CampamentoDetalleDto | null> = this._detalle.asReadonly();
   readonly pagosPorParticipante: Signal<Record<string, PagoParticipante[]>> =
     this._pagosPorParticipante.asReadonly();
   readonly loading: Signal<boolean> = this._loading.asReadonly();
@@ -62,6 +69,23 @@ export class CampamentosStateService {
 
   readonly totalCampamentos = computed((): number => {
     return this._campamentos().length;
+  });
+
+  // Computed signals for easy access to detail parts
+  readonly detalleInfo = computed((): CampamentoInfoDto | null => {
+    return this._detalle()?.campamento ?? null;
+  });
+
+  readonly detalleParticipantes = computed((): ParticipantePagoDto[] => {
+    return this._detalle()?.participantes ?? [];
+  });
+
+  readonly detalleMovimientos = computed((): MovimientoCampamentoDto[] => {
+    return this._detalle()?.movimientos ?? [];
+  });
+
+  readonly detalleKpis = computed((): CampamentoKpisDto | null => {
+    return this._detalle()?.kpis ?? null;
   });
 
   // ============================================================================
@@ -82,6 +106,30 @@ export class CampamentosStateService {
       },
       error: (err: unknown) => {
         const errorMsg = err instanceof Error ? err.message : 'Error al cargar campamentos';
+        this._error.set(errorMsg);
+        this._loading.set(false);
+        this.notificationService.showError(errorMsg);
+      },
+    });
+  }
+
+  /**
+   * Cargar detalle consolidado de un campamento
+   * Incluye: info, participantes con estado de pagos, movimientos y KPIs
+   */
+  loadDetalle(id: string): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this._selectedId.set(id);
+
+    this.apiService.getDetalle(id).subscribe({
+      next: (detalle: CampamentoDetalleDto) => {
+        this._detalle.set(detalle);
+        this._loading.set(false);
+      },
+      error: (err: unknown) => {
+        const errorMsg =
+          err instanceof Error ? err.message : 'Error al cargar detalle del campamento';
         this._error.set(errorMsg);
         this._loading.set(false);
         this.notificationService.showError(errorMsg);
@@ -190,6 +238,7 @@ export class CampamentosStateService {
 
     return this.apiService.registrarPago(campamentoId, dto).pipe(
       tap(() => {
+        this.loadDetalle(campamentoId);
         this.notificationService.showSuccess('Pago registrado exitosamente');
       }),
       catchError((err: unknown) => {
@@ -211,6 +260,7 @@ export class CampamentosStateService {
 
     return this.apiService.registrarGasto(campamentoId, dto).pipe(
       tap(() => {
+        this.loadDetalle(campamentoId);
         this.notificationService.showSuccess('Gasto registrado exitosamente');
       }),
       catchError((err: unknown) => {
@@ -233,7 +283,7 @@ export class CampamentosStateService {
 
     return this.apiService.updatePago(campamentoId, movimientoId, dto).pipe(
       tap(() => {
-        this.loadPagosPorParticipante(campamentoId);
+        this.loadDetalle(campamentoId);
         this.notificationService.showSuccess('Pago actualizado exitosamente');
       }),
       catchError((err: unknown) => {
@@ -256,7 +306,7 @@ export class CampamentosStateService {
 
     return this.apiService.deletePago(campamentoId, movimientoId).pipe(
       tap(() => {
-        this.loadPagosPorParticipante(campamentoId);
+        this.loadDetalle(campamentoId);
         this.notificationService.showSuccess('Pago eliminado exitosamente');
       }),
       catchError((err: unknown) => {
@@ -294,6 +344,36 @@ export class CampamentosStateService {
   }
 
   /**
+   * Cargar un campamento por ID
+   * Carga el campamento y su resumen financiero
+   */
+  loadById(id: string): void {
+    this._loading.set(true);
+    this._error.set(null);
+    this._selectedId.set(id);
+
+    this.apiService.getById(id).subscribe({
+      next: (campamento: Campamento) => {
+        // Update or add to campamentos array
+        this._campamentos.update((prev) => {
+          const exists = prev.some((c) => c.id === id);
+          if (exists) {
+            return prev.map((c) => (c.id === id ? campamento : c));
+          }
+          return [...prev, campamento];
+        });
+        this._loading.set(false);
+      },
+      error: (err: unknown) => {
+        const errorMsg = err instanceof Error ? err.message : 'Error al cargar campamento';
+        this._error.set(errorMsg);
+        this._loading.set(false);
+        this.notificationService.showError(errorMsg);
+      },
+    });
+  }
+
+  /**
    * Seleccionar un campamento
    */
   select(id: string | null): void {
@@ -305,6 +385,7 @@ export class CampamentosStateService {
    */
   clear(): void {
     this._campamentos.set([]);
+    this._detalle.set(null);
     this._pagosPorParticipante.set({});
     this._loading.set(false);
     this._error.set(null);

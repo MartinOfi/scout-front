@@ -1,43 +1,71 @@
-<mat-card class="campamento-card">
-  <mat-card-header>
-    <mat-card-title>{{ campamento.nombre }}</mat-card-title>
-    <mat-card-subtitle>
-      {{ campamento.fechaInicio | date:'dd/MM/yyyy' }} - {{ campamento.fechaFin | date:'dd/MM/yyyy' }}
-    </mat-card-subtitle>
-  </mat-card-header>
+<article class="camp-card" (click)="onSelect()">
+  <!-- Status Badge -->
+  <div class="camp-card__status" [class.camp-card__status--upcoming]="status === 'upcoming'"
+    [class.camp-card__status--active]="status === 'active'" [class.camp-card__status--past]="status === 'past'">
+    @if (status === 'upcoming' && daysUntil !== null) {
+    <mat-icon>schedule</mat-icon>
+    <span>{{ daysUntil }}d</span>
+    } @else if (status === 'active') {
+    <mat-icon>directions_walk</mat-icon>
+    <span>En curso</span>
+    } @else {
+    <mat-icon>check_circle</mat-icon>
+    <span>Finalizado</span>
+    }
+  </div>
 
-  <mat-card-content>
-    <div class="info-grid">
-      <div class="info-item">
-        <mat-icon class="icon">attach_money</mat-icon>
-        <span class="label">Costo:</span>
-        <span class="value">${{ campamento.costoPorPersona }}</span>
-      </div>
-
-      <div class="info-item">
-        <mat-icon class="icon">group</mat-icon>
-        <span class="label">Participantes:</span>
-        <span class="value">{{ campamento.participantes?.length ?? 0 }}</span>
+  <!-- Header -->
+  <header class="camp-card__header">
+    <div class="camp-card__badge">
+      <mat-icon>hiking</mat-icon>
+    </div>
+    <div class="camp-card__info">
+      <h3 class="camp-card__name">{{ campamento.nombre }}</h3>
+      <div class="camp-card__dates">
+        <mat-icon>calendar_today</mat-icon>
+        <span>{{ campamento.fechaInicio | date:'d MMM' }} — {{ campamento.fechaFin | date:'d MMM' }}</span>
       </div>
     </div>
+  </header>
 
-    <p *ngIf="campamento.descripcion" class="description">
-      {{ campamento.descripcion }}
-    </p>
-  </mat-card-content>
+  <!-- Stats -->
+  <div class="camp-card__body">
+    <div class="camp-card__stats">
+      <div class="camp-card__stat">
+        <span class="camp-card__stat-value">{{ campamento.participantes?.length ?? 0 }}</span>
+        <span class="camp-card__stat-label">Participantes</span>
+      </div>
+      <div class="camp-card__stat">
+        <span class="camp-card__stat-value">{{ campamento.costoPorPersona | currency:'ARS':'symbol':'1.0-0' }}</span>
+        <span class="camp-card__stat-label">Costo</span>
+      </div>
+      <div class="camp-card__stat">
+        <span class="camp-card__stat-value">{{ campamento.cuotasBase ?? 1 }}</span>
+        <span class="camp-card__stat-label">Cuotas</span>
+      </div>
+    </div>
+  </div>
 
-  <mat-card-actions align="end">
-    <button mat-button (click)="onSelect()">
+  <!-- Description (if exists) -->
+  @if (campamento.descripcion) {
+  <p class="camp-card__description">{{ campamento.descripcion }}</p>
+  }
+
+  <!-- Footer Actions -->
+  <footer class="camp-card__footer">
+    <button type="button" class="camp-card__action-primary" (click)="onSelect(); $event.stopPropagation()">
       <mat-icon>visibility</mat-icon>
-      Ver
+      Ver detalle
     </button>
-    <button mat-button (click)="onEdit()">
-      <mat-icon>edit</mat-icon>
-      Editar
-    </button>
-    <button mat-button color="warn" (click)="onDelete()">
-      <mat-icon>delete</mat-icon>
-      Eliminar
-    </button>
-  </mat-card-actions>
-</mat-card>
+    <div class="camp-card__actions-secondary">
+      <button type="button" class="camp-card__action-icon unstyled" (click)="onEdit(); $event.stopPropagation()"
+        aria-label="Editar campamento">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button type="button" class="camp-card__action-icon camp-card__action-icon--danger unstyled"
+        (click)="onDelete(); $event.stopPropagation()" aria-label="Eliminar campamento">
+        <mat-icon>delete_outline</mat-icon>
+      </button>
+    </div>
+  </footer>
+</article>

@@ -1,59 +1,77 @@
-<div class="scout-form-page">
-  <div class="scout-form-wrapper scout-form-wrapper--single">
-    <div class="scout-form-card">
+<div class="payment-page">
+  <div class="payment-container">
+
+    <!-- Loading State -->
+    @if (loadingData()) {
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Cargando datos...</p>
+    </div>
+    } @else {
+
+    <!-- Form Card -->
+    <div class="form-card">
       <!-- Header -->
-      <header class="scout-form-header scout-form-header--with-divider">
-        <h1 class="scout-form-title">
-          <i class="fas fa-campground scout-form-icon"></i>
-          {{ isEditing() ? 'Editar Campamento' : 'Nuevo Campamento' }}
+      <header class="form-header">
+        <h1 class="form-title">
+          <mat-icon aria-hidden="true">hiking</mat-icon>
+          {{ isEditing() ? 'Editar' : 'Nuevo' }} Campamento
         </h1>
-        <p class="scout-form-subtitle">
+        <p class="form-subtitle">
           {{ isEditing() ? 'Modifica los datos del campamento' : 'Registra un nuevo campamento' }}
         </p>
       </header>
 
-      <!-- Content -->
-      <div class="scout-form-body">
-        @if (loading()) {
-          <div class="loading-state">
-            <div class="loading-spinner"></div>
-            <p class="loading-text">Cargando...</p>
-          </div>
-        } @else {
-          <form [formGroup]="form" (ngSubmit)="onSubmit()">
-            <!-- Nombre -->
+      <!-- Form Content -->
+      <div class="form-body">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+          <!-- Nombre -->
+          <app-form-field
+            label="Nombre del Campamento"
+            [forId]="'nombre-input'"
+            [required]="true"
+            [invalid]="!!(form.get('nombre')?.invalid && form.get('nombre')?.touched)"
+          >
+            <app-text-field
+              id="nombre-input"
+              formControlName="nombre"
+              placeholder="Ej: Campamento de Verano 2024"
+            />
+            <span error>El nombre es requerido</span>
+          </app-form-field>
+
+          <div class="form-row">
+            <!-- Fecha de Inicio -->
             <app-form-field
-              label="Nombre del Campamento"
-              [forId]="'nombre-input'"
+              label="Fecha de Inicio"
+              [forId]="'fecha-inicio-input'"
               [required]="true"
-              [invalid]="!!(form.get('nombre')?.invalid && form.get('nombre')?.touched)"
+              [invalid]="!!(form.get('fechaInicio')?.invalid && form.get('fechaInicio')?.touched)"
             >
-              <app-text-field
-                id="nombre-input"
-                formControlName="nombre"
-                placeholder="Ej: Campamento de Verano 2024"
+              <app-date-field
+                id="fecha-inicio-input"
+                formControlName="fechaInicio"
               />
-              <span error>El nombre es requerido</span>
+              <span error>La fecha de inicio es requerida</span>
             </app-form-field>
 
-            <div class="form-row">
-              <!-- Fecha de Inicio - mantiene mat-datepicker -->
-              <mat-form-field>
-                <mat-label>Fecha de Inicio</mat-label>
-                <input matInput [matDatepicker]="pickerInicio" formControlName="fechaInicio">
-                <mat-datepicker-toggle matIconSuffix [for]="pickerInicio"></mat-datepicker-toggle>
-                <mat-datepicker #pickerInicio></mat-datepicker>
-              </mat-form-field>
+            <!-- Fecha de Fin -->
+            <app-form-field
+              label="Fecha de Fin"
+              [forId]="'fecha-fin-input'"
+              [required]="true"
+              [invalid]="!!(form.get('fechaFin')?.invalid && form.get('fechaFin')?.touched)"
+            >
+              <app-date-field
+                id="fecha-fin-input"
+                formControlName="fechaFin"
+              />
+              <span error>La fecha de fin es requerida</span>
+            </app-form-field>
+          </div>
 
-              <!-- Fecha de Fin - mantiene mat-datepicker -->
-              <mat-form-field>
-                <mat-label>Fecha de Fin</mat-label>
-                <input matInput [matDatepicker]="pickerFin" formControlName="fechaFin">
-                <mat-datepicker-toggle matIconSuffix [for]="pickerFin"></mat-datepicker-toggle>
-                <mat-datepicker #pickerFin></mat-datepicker>
-              </mat-form-field>
-            </div>
-
+          <div class="form-row">
             <!-- Costo por Persona -->
             <app-form-field
               label="Costo por Persona"
@@ -74,40 +92,61 @@
               <span error>El costo es requerido</span>
             </app-form-field>
 
-            <!-- Descripción -->
+            <!-- Cuotas Base -->
             <app-form-field
-              label="Descripción"
-              [forId]="'descripcion-input'"
+              label="Cantidad de Cuotas"
+              [forId]="'cuotas-input'"
+              [required]="true"
+              [invalid]="!!(form.get('cuotasBase')?.invalid && form.get('cuotasBase')?.touched)"
             >
-              <app-textarea-field
-                id="descripcion-input"
-                formControlName="descripcion"
-                [rows]="4"
-                placeholder="Descripción del campamento"
+              <app-number-field
+                id="cuotas-input"
+                formControlName="cuotasBase"
+                [min]="1"
+                [max]="12"
+                [step]="1"
+                placeholder="1"
               />
+              <span error>Las cuotas deben ser entre 1 y 12</span>
             </app-form-field>
-          </form>
-        }
+          </div>
+
+          <!-- Descripción -->
+          <app-form-field
+            label="Descripción"
+            [forId]="'descripcion-input'"
+          >
+            <app-textarea-field
+              id="descripcion-input"
+              formControlName="descripcion"
+              [rows]="3"
+              placeholder="Descripción del campamento (opcional)"
+            />
+          </app-form-field>
+
+        </form>
       </div>
 
       <!-- Actions -->
-      @if (!loading()) {
-        <div class="scout-form-actions">
-          <div class="scout-form-actions__row scout-form-actions__row--between">
-            <button type="button" class="btn-secondary" (click)="onCancel()">
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              class="btn-primary"
-              [disabled]="form.invalid"
-              (click)="onSubmit()"
-            >
-              {{ isEditing() ? 'Actualizar' : 'Crear' }}
-            </button>
-          </div>
-        </div>
-      }
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="onCancel()">
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="form.invalid || loading()"
+          (click)="onSubmit()"
+        >
+          @if (loading()) {
+          <span class="loading-spinner"></span>
+          } @else {
+          {{ isEditing() ? 'Actualizar' : 'Crear Campamento' }}
+          }
+        </button>
+      </div>
     </div>
+
+    }
   </div>
 </div>
