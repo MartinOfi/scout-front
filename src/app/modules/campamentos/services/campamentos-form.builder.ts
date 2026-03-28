@@ -172,12 +172,17 @@ export class CampamentosFormBuilder {
 
   /**
    * Extraer DTO del formulario de pago
+   * Note: personaId is now passed separately to the API, not in the DTO
    */
   extractPagoDto(form: FormGroup): RegistrarPagoCampamentoDto {
+    const montoPagado = Number(form.value.montoPagado ?? form.value.monto) || 0;
+    const montoConSaldoPersonal = Number(form.value.montoConSaldoPersonal) || 0;
+
     return {
-      personaId: form.value.personaId as string,
-      monto: Number(form.value.monto) as number,
-      medioPago: form.value.medioPago as MedioPago,
+      montoPagado,
+      montoConSaldoPersonal: montoConSaldoPersonal > 0 ? montoConSaldoPersonal : undefined,
+      medioPago: montoPagado > 0 ? (form.value.medioPago as MedioPago) : undefined,
+      descripcion: form.value.descripcion || undefined,
     };
   }
 

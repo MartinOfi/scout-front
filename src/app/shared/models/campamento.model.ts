@@ -97,12 +97,39 @@ export interface AddParticipanteDto {
 
 /**
  * DTO for registering a payment
+ * POST /api/v1/campamentos/:id/pagos/:personaId
+ * Supports mixed payments (cash/transfer + personal account balance)
  */
 export interface RegistrarPagoCampamentoDto {
-  personaId: string;
-  monto: number;
-  medioPago: MedioPago;
+  /** Amount paid in cash/transfer (required, >= 0) */
+  montoPagado: number;
+  /** Amount to deduct from personal account (optional, default: 0) */
+  montoConSaldoPersonal?: number;
+  /** Payment method - required if montoPagado > 0 */
+  medioPago?: MedioPago;
+  /** Optional payment description */
   descripcion?: string;
+}
+
+/**
+ * Response from payment registration
+ */
+export interface ResultadoPagoDto {
+  movimientoIngreso: {
+    id: string;
+    monto: number;
+    concepto: 'CAMPAMENTO_PAGO';
+    medioPago: MedioPago;
+  };
+  movimientoEgresoPersonal?: {
+    id: string;
+    monto: number;
+  };
+  desglose: {
+    montoSaldoPersonal: number;
+    montoFisico: number;
+    total: number;
+  };
 }
 
 /**
@@ -156,6 +183,8 @@ export interface ParticipantePagoDto {
   totalPagado: number;
   saldoPendiente: number;
   estadoPago: EstadoPagoCampamento;
+  /** Personal account balance available for mixed payments */
+  saldoCuentaPersonal: number;
   pagos: PagoParticipanteDto[];
 }
 

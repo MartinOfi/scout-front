@@ -214,7 +214,7 @@ a {
 
 // Base button styles (solo para botones que NO son Material ni icon buttons custom)
 // Usa class="unstyled" en cualquier botón para excluirlo de estos estilos
-button:not([mat-button]):not([mat-raised-button]):not([mat-flat-button]):not([mat-stroked-button]):not([mat-icon-button]):not([mat-fab]):not([mat-mini-fab]):not(.btn-icon):not(.action-button):not(.button-tab):not(.unstyled) {
+button:not([mat-button]):not([mat-raised-button]):not([mat-flat-button]):not([mat-stroked-button]):not([mat-icon-button]):not([mat-fab]):not([mat-mini-fab]):not(.btn-icon):not(.action-button):not(.button-tab):not(.btn-primary):not(.btn-secondary):not(.btn-outline):not(.btn-danger):not(.unstyled) {
   font-family: var(--font-family-base);
   font-size: 14px;
   font-weight: 500;

@@ -36,15 +36,22 @@ export interface PagoCampamentoDialogData {
 
 /**
  * Form data returned by the dialog (create mode)
+ * Supports mixed payments (cash/transfer + personal account balance)
  */
 export interface PagoCampamentoCreateData {
-  monto: number;
-  medioPago: MedioPago;
+  /** Amount paid in cash/transfer */
+  montoPagado: number;
+  /** Amount to deduct from personal account */
+  montoConSaldoPersonal: number;
+  /** Payment method (required if montoPagado > 0) */
+  medioPago?: MedioPago;
+  /** Optional description */
   descripcion?: string;
 }
 
 /**
  * Form data returned by the dialog (edit mode)
+ * Note: Edit mode only supports single payment type (no mixed)
  */
 export interface PagoCampamentoEditData {
   monto: number;
@@ -101,7 +108,7 @@ export class PagoCampamentoDialogComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.isEditMode) {
-      // Edit mode: populate with existing values
+      // Edit mode: populate with existing values (single payment type)
       const existing = this.data.existingPago!;
       this.form = this.fb.group({
         monto: [existing.monto, [Validators.required, Validators.min(1)]],
@@ -109,10 +116,11 @@ export class PagoCampamentoDialogComponent implements OnInit {
         descripcion: [existing.descripcion ?? ''],
       });
     } else {
-      // Create mode
+      // Create mode: supports mixed payments
       this.form = this.fb.group({
-        monto: [0, [Validators.required, Validators.min(1), Validators.max(this.data.montoPendiente)]],
-        medioPago: [MedioPagoEnum.EFECTIVO, [Validators.required]],
+        montoPagado: [0, [Validators.min(0)]],
+        montoConSaldoPersonal: [0, [Validators.min(0)]],
+        medioPago: [MedioPagoEnum.EFECTIVO],
         descripcion: [''],
       });
     }
@@ -142,8 +150,28 @@ export class PagoCampamentoDialogComponent implements OnInit {
     return this.saldoCuentaPersonal > 0 && !this.isEditMode;
   }
 
+  /** Amount from cash/transfer (create mode) or single amount (edit mode) */
+  get montoPagado(): number {
+    if (this.isEditMode) {
+      return this.form.get('monto')?.value || 0;
+    }
+    return this.form.get('montoPagado')?.value || 0;
+  }
+
+  /** Amount from personal account (create mode only) */
+  get montoConSaldoPersonal(): number {
+    if (this.isEditMode) return 0;
+    return this.form.get('montoConSaldoPersonal')?.value || 0;
+  }
+
+  /** Total payment = cash + personal account */
   get montoTotalPago(): number {
-    return this.form.get('monto')?.value || 0;
+    return this.montoPagado + this.montoConSaldoPersonal;
+  }
+
+  /** Maximum that can be used from personal account */
+  get maxSaldoPersonalUsable(): number {
+    return Math.min(this.saldoCuentaPersonal, this.montoPendiente);
   }
 
   get montoRestante(): number {
@@ -166,9 +194,21 @@ export class PagoCampamentoDialogComponent implements OnInit {
   get formInvalid(): boolean {
     if (this.form.invalid) return true;
 
-    const monto = this.form.get('monto')?.value || 0;
-    if (monto <= 0) return true;
-    if (monto > this.maxAllowedMonto) return true;
+    if (this.isEditMode) {
+      // Edit mode: validate single amount
+      const monto = this.form.get('monto')?.value || 0;
+      if (monto <= 0) return true;
+      if (monto > this.maxAllowedMonto) return true;
+    } else {
+      // Create mode: validate mixed payment
+      const total = this.montoTotalPago;
+      if (total <= 0) return true;
+      if (total > this.montoPendiente) return true;
+      // If cash payment > 0, medio pago is required
+      if (this.montoPagado > 0 && !this.form.get('medioPago')?.value) return true;
+      // Cannot use more personal balance than available
+      if (this.montoConSaldoPersonal > this.saldoCuentaPersonal) return true;
+    }
 
     return false;
   }
@@ -177,13 +217,36 @@ export class PagoCampamentoDialogComponent implements OnInit {
   getMedioPagoValue = (option: MedioPagoOption): MedioPago => option.value;
   getMedioPagoLabel = (option: MedioPagoOption): string => option.label;
 
+  /** Use all available personal account balance (up to pending amount) */
   usarSaldoDisponible(): void {
     const montoAUsar = Math.min(this.saldoCuentaPersonal, this.montoPendiente);
-    this.form.patchValue({ monto: montoAUsar });
+    this.form.patchValue({ montoConSaldoPersonal: montoAUsar });
   }
 
+  /** Pay full pending amount with cash/transfer */
   pagarTodo(): void {
-    this.form.patchValue({ monto: this.montoPendiente });
+    if (this.isEditMode) {
+      // In edit mode, use maxAllowedMonto (pending + existing payment being edited)
+      this.form.patchValue({ monto: this.maxAllowedMonto });
+    } else {
+      this.form.patchValue({
+        montoPagado: this.montoPendiente,
+        montoConSaldoPersonal: 0,
+      });
+    }
+  }
+
+  /** Pay full pending using personal account first, then cash for remainder */
+  pagarTodoConSaldo(): void {
+    if (this.isEditMode) return;
+
+    const saldoUsable = Math.min(this.saldoCuentaPersonal, this.montoPendiente);
+    const remainder = this.montoPendiente - saldoUsable;
+
+    this.form.patchValue({
+      montoConSaldoPersonal: saldoUsable,
+      montoPagado: remainder,
+    });
   }
 
   onSubmit(): void {
@@ -206,11 +269,16 @@ export class PagoCampamentoDialogComponent implements OnInit {
       };
       this.dialogRef.close(result);
     } else {
+      // Create mode: mixed payment support
+      const montoPagado = Number(formValue.montoPagado) || 0;
+      const montoConSaldoPersonal = Number(formValue.montoConSaldoPersonal) || 0;
+
       const result: PagoCampamentoDialogResult = {
         mode: 'create',
         data: {
-          monto: Number(formValue.monto),
-          medioPago: formValue.medioPago as MedioPago,
+          montoPagado,
+          montoConSaldoPersonal,
+          medioPago: montoPagado > 0 ? (formValue.medioPago as MedioPago) : undefined,
           descripcion: formValue.descripcion || undefined,
         },
       };

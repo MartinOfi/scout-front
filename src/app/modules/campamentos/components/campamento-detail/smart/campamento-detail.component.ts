@@ -20,6 +20,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { from, switchMap } from 'rxjs';
 
 import { CampamentosStateService } from '../../../services';
+import { CajasApiService } from '../../../../cajas/services/cajas-api.service';
 import {
   LoadingSpinnerComponent,
   ConfirmDialogService,
@@ -46,6 +47,12 @@ import {
   PagoCampamentoDialogData,
   PagoCampamentoDialogResult,
 } from '../../shared/pago-campamento-dialog/pago-campamento-dialog.component';
+import {
+  PersonaSelectorDialogData,
+  PersonaSelectorDialogResult,
+} from '../../../../../shared/components/persona-selector-dialog/persona-selector-dialog.component';
+import { AddParticipanteDto } from '../../../../../shared/models';
+import { PersonaType } from '../../../../../shared/enums';
 
 interface KpiConfig {
   readonly icon: string;
@@ -80,6 +87,7 @@ export class CampamentoDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly dialog = inject(MatDialog);
+  private readonly cajasApi = inject(CajasApiService);
   readonly state = inject(CampamentosStateService);
 
   // Consolidated detail data from state
@@ -160,8 +168,33 @@ export class CampamentoDetailComponent implements OnInit {
   }
 
   onAddParticipante(): void {
-    // TODO: Abrir dialog para agregar participante
-    console.log('Add participante');
+    const camp = this.campamento();
+    if (!camp) return;
+
+    // Get existing participant IDs to exclude
+    const existingIds = this.participantes().map((p) => p.id);
+
+    const dialogData: PersonaSelectorDialogData = {
+      title: 'Agregar Participante',
+      subtitle: 'Seleccioná una persona para inscribir al campamento',
+      filterByTypes: [PersonaType.PROTAGONISTA, PersonaType.EDUCADOR],
+      excludeIds: existingIds,
+      showRamaFilter: true,
+      confirmLabel: 'Agregar',
+    };
+
+    this.openPersonaSelectorDialog(dialogData)
+      .pipe(switchMap((dialogRef) => dialogRef.afterClosed()))
+      .subscribe((result: PersonaSelectorDialogResult | undefined) => {
+        if (!result) return;
+        const dto: AddParticipanteDto = { personaId: result.persona.id };
+        this.state.addParticipante(camp.id, dto).subscribe({
+          next: () => {
+            // Reload detail to refresh all data (KPIs, participants list)
+            this.loadCampamento(camp.id);
+          },
+        });
+      });
   }
 
   /** Open payment dialog for creating a new payment */
@@ -169,19 +202,25 @@ export class CampamentoDetailComponent implements OnInit {
     const camp = this.campamento();
     if (!camp) return;
 
-    const dialogData: PagoCampamentoDialogData = {
-      campamentoId: camp.id,
-      participanteId: participante.id,
-      participanteNombre: participante.nombre,
-      costoPorPersona: participante.costoPorPersona,
-      totalPagado: participante.totalPagado,
-      montoPendiente: participante.saldoPendiente,
-      saldoCuentaPersonal: 0,
-      mode: 'create',
-    };
-
-    this.openPaymentDialog(dialogData)
-      .pipe(switchMap((dialogRef) => dialogRef.afterClosed()))
+    // Fetch personal account balance before opening the dialog
+    this.cajasApi
+      .getSaldoCuentaPersonal(participante.id)
+      .pipe(
+        switchMap((saldoCuentaPersonal: number) => {
+          const dialogData: PagoCampamentoDialogData = {
+            campamentoId: camp.id,
+            participanteId: participante.id,
+            participanteNombre: participante.nombre,
+            costoPorPersona: participante.costoPorPersona,
+            totalPagado: participante.totalPagado,
+            montoPendiente: participante.saldoPendiente,
+            saldoCuentaPersonal,
+            mode: 'create',
+          };
+          return this.openPaymentDialog(dialogData);
+        }),
+        switchMap((dialogRef) => dialogRef.afterClosed()),
+      )
       .subscribe((result: PagoCampamentoDialogResult | undefined) => {
         if (!result) return;
         this.handleDialogResult(camp.id, participante.id, result);
@@ -193,24 +232,31 @@ export class CampamentoDetailComponent implements OnInit {
     const camp = this.campamento();
     if (!camp) return;
 
-    const dialogData: PagoCampamentoDialogData = {
-      campamentoId: camp.id,
-      participanteId: participante.id,
-      participanteNombre: participante.nombre,
-      costoPorPersona: participante.costoPorPersona,
-      totalPagado: participante.totalPagado,
-      montoPendiente: participante.saldoPendiente,
-      mode: 'edit',
-      existingPago: {
-        movimientoId: pago.movimientoId,
-        fecha: pago.fecha,
-        monto: pago.monto,
-        medioPago: pago.medioPago,
-      },
-    };
-
-    this.openPaymentDialog(dialogData)
-      .pipe(switchMap((dialogRef) => dialogRef.afterClosed()))
+    // Fetch saldo cuenta personal before opening dialog (same as create mode)
+    this.cajasApi
+      .getSaldoCuentaPersonal(participante.id)
+      .pipe(
+        switchMap((saldoCuentaPersonal: number) => {
+          const dialogData: PagoCampamentoDialogData = {
+            campamentoId: camp.id,
+            participanteId: participante.id,
+            participanteNombre: participante.nombre,
+            costoPorPersona: participante.costoPorPersona,
+            totalPagado: participante.totalPagado,
+            montoPendiente: participante.saldoPendiente,
+            saldoCuentaPersonal,
+            mode: 'edit',
+            existingPago: {
+              movimientoId: pago.movimientoId,
+              fecha: pago.fecha,
+              monto: pago.monto,
+              medioPago: pago.medioPago,
+            },
+          };
+          return this.openPaymentDialog(dialogData);
+        }),
+        switchMap((dialogRef) => dialogRef.afterClosed()),
+      )
       .subscribe((result: PagoCampamentoDialogResult | undefined) => {
         if (!result) return;
         this.handleDialogResult(camp.id, participante.id, result);
@@ -237,6 +283,21 @@ export class CampamentoDetailComponent implements OnInit {
     );
   }
 
+  private openPersonaSelectorDialog(dialogData: PersonaSelectorDialogData) {
+    return from(
+      import('../../../../../shared/components/persona-selector-dialog/persona-selector-dialog.component').then(
+        ({ PersonaSelectorDialogComponent }) => {
+          return this.dialog.open(PersonaSelectorDialogComponent, {
+            width: '480px',
+            maxWidth: '90vw',
+            data: dialogData,
+            disableClose: false,
+          });
+        },
+      ),
+    );
+  }
+
   private handleDialogResult(
     campamentoId: string,
     participanteId: string,
@@ -246,13 +307,14 @@ export class CampamentoDetailComponent implements OnInit {
     // reload the detalle after success, so no additional callback needed
     switch (result.mode) {
       case 'create': {
+        // Mixed payment: montoPagado (cash/transfer) + montoConSaldoPersonal (personal account)
         const dto: RegistrarPagoCampamentoDto = {
-          personaId: participanteId,
-          monto: result.data.monto,
+          montoPagado: result.data.montoPagado,
+          montoConSaldoPersonal: result.data.montoConSaldoPersonal || undefined,
           medioPago: result.data.medioPago,
           descripcion: result.data.descripcion,
         };
-        this.state.registrarPago(campamentoId, dto).subscribe();
+        this.state.registrarPago(campamentoId, participanteId, dto).subscribe();
         break;
       }
       case 'edit': {

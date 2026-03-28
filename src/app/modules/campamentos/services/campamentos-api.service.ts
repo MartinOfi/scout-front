@@ -2,15 +2,15 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
   Campamento,
-  CampamentoConResumen,
   CampamentoDetalleDto,
-  PagoParticipante,
   CreateCampamentoDto,
   UpdateCampamentoDto,
   AddParticipanteDto,
   RegistrarPagoCampamentoDto,
   RegistrarGastoCampamentoDto,
   UpdatePagoDto,
+  ResultadoPagoDto,
+  PagoParticipante,
 } from '../../../shared/models';
 import { HttpService } from '../../../shared/services';
 import { API_CONFIG } from '../../../shared/constants';
@@ -105,10 +105,16 @@ export class CampamentosApiService {
 
   /**
    * Register a payment for campamento
+   * POST /api/v1/campamentos/:id/pagos/:personaId
+   * Supports mixed payments (cash/transfer + personal account balance)
    */
-  registrarPago(campamentoId: string, dto: RegistrarPagoCampamentoDto): Observable<void> {
-    return this.http.post<void, RegistrarPagoCampamentoDto>(
-      `${this.endpoint}/${campamentoId}/pagos`,
+  registrarPago(
+    campamentoId: string,
+    personaId: string,
+    dto: RegistrarPagoCampamentoDto,
+  ): Observable<ResultadoPagoDto> {
+    return this.http.post<ResultadoPagoDto, RegistrarPagoCampamentoDto>(
+      `${this.endpoint}/${campamentoId}/pagos/${personaId}`,
       dto,
     );
   }

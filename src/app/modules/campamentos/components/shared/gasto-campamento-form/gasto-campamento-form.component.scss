@@ -1,23 +1,28 @@
+// =============================================================================
+// GASTO CAMPAMENTO FORM STYLES
+// =============================================================================
+// Consistent form spacing using design tokens
+
+@use '../../../../../shared/components/form/form-tokens' as tokens;
+
 .gasto-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
   padding: 16px;
 }
 
 .form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  @include tokens.form-grid(2);
 
   .full-width {
-    grid-column: 1 / -1;
+    @include tokens.form-field-full;
   }
 }
 
 .actions {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 12px;
   margin-top: 8px;
 }

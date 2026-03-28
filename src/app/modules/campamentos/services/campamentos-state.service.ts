@@ -10,7 +10,6 @@ import { tap, catchError, finalize } from 'rxjs/operators';
 
 import {
   Campamento,
-  CampamentoConResumen,
   CampamentoDetalleDto,
   CampamentoInfoDto,
   CampamentoKpisDto,
@@ -23,6 +22,7 @@ import {
   RegistrarPagoCampamentoDto,
   RegistrarGastoCampamentoDto,
   UpdatePagoDto,
+  ResultadoPagoDto,
 } from '../../../shared/models';
 
 import { CampamentosApiService } from './campamentos-api.service';
@@ -231,12 +231,18 @@ export class CampamentosStateService {
 
   /**
    * Registrar un pago para campamento
+   * POST /api/v1/campamentos/:id/pagos/:personaId
+   * Supports mixed payments (cash/transfer + personal account balance)
    */
-  registrarPago(campamentoId: string, dto: RegistrarPagoCampamentoDto): Observable<void> {
+  registrarPago(
+    campamentoId: string,
+    personaId: string,
+    dto: RegistrarPagoCampamentoDto,
+  ): Observable<ResultadoPagoDto> {
     this._loading.set(true);
     this._error.set(null);
 
-    return this.apiService.registrarPago(campamentoId, dto).pipe(
+    return this.apiService.registrarPago(campamentoId, personaId, dto).pipe(
       tap(() => {
         this.loadDetalle(campamentoId);
         this.notificationService.showSuccess('Pago registrado exitosamente');

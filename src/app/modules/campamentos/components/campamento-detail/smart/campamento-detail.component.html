@@ -77,8 +77,8 @@
       <h2 id="kpi-heading" class="sr-only">Resumen Financiero</h2>
       <div class="kpi-grid">
         @for (kpiConfig of kpiConfigs; track kpiConfig.key) {
-        <app-stat-card [icon]="kpiConfig.icon" [title]="kpiConfig.title" [value]="kpisData[kpiConfig.key]" [variant]="kpiConfig.variant"
-          format="currency" />
+        <app-stat-card [icon]="kpiConfig.icon" [title]="kpiConfig.title" [value]="kpisData[kpiConfig.key]"
+          [variant]="kpiConfig.variant" format="currency" />
         }
       </div>
 
@@ -130,18 +130,22 @@
               <div class="participante-card__info">
                 <h3 class="participante-card__name">{{ participante.nombre }}</h3>
                 <div class="participante-card__progress">
-                  <span class="participante-card__paid">{{ participante.totalPagado | currency:'ARS':'symbol':'1.0-0' }}</span>
+                  <span class="participante-card__paid">{{ participante.totalPagado | currency:'ARS':'symbol':'1.0-0'
+                    }}</span>
                   <span class="participante-card__separator">/</span>
-                  <span class="participante-card__total">{{ participante.costoPorPersona | currency:'ARS':'symbol':'1.0-0' }}</span>
+                  <span class="participante-card__total">{{ participante.costoPorPersona |
+                    currency:'ARS':'symbol':'1.0-0' }}</span>
                 </div>
               </div>
-              <div class="participante-card__status" [class.participante-card__status--complete]="participante.saldoPendiente === 0"
+              <div class="participante-card__status"
+                [class.participante-card__status--complete]="participante.saldoPendiente === 0"
                 [class.participante-card__status--pending]="participante.saldoPendiente > 0">
                 @if (participante.saldoPendiente === 0) {
                 <mat-icon>check_circle</mat-icon>
                 <span>Al día</span>
                 } @else {
-                <span class="participante-card__pending">{{ participante.saldoPendiente | currency:'ARS':'symbol':'1.0-0' }}</span>
+                <span class="participante-card__pending">{{ participante.saldoPendiente |
+                  currency:'ARS':'symbol':'1.0-0' }}</span>
                 <span>pendiente</span>
                 }
               </div>
@@ -155,7 +159,8 @@
                 <span class="payment-row__date">{{ pago.fecha | date:'d/M' }}</span>
                 <span class="payment-row__amount">{{ pago.monto | currency:'ARS':'symbol':'1.0-0' }}</span>
                 <span class="payment-row__method">{{ pago.medioPago }}</span>
-                <button class="payment-row__edit" (click)="onEditPago(participante, pago)" aria-label="Editar pago">
+                <button class="payment-row__edit unstyled" (click)="onEditPago(participante, pago)"
+                  aria-label="Editar pago">
                   <mat-icon>edit</mat-icon>
                 </button>
               </div>
@@ -205,7 +210,8 @@
               <span class="movimiento-card__description">{{ movimiento.descripcion ?? 'Sin descripción' }}</span>
               <span class="movimiento-card__responsable">{{ movimiento.responsableNombre }}</span>
             </div>
-            <div class="movimiento-card__amount" [class.movimiento-card__amount--positive]="movimiento.tipo === 'ingreso'"
+            <div class="movimiento-card__amount"
+              [class.movimiento-card__amount--positive]="movimiento.tipo === 'ingreso'"
               [class.movimiento-card__amount--negative]="movimiento.tipo === 'egreso'">
               @if (movimiento.tipo === 'ingreso') {
               +{{ movimiento.monto | currency:'ARS':'symbol':'1.0-0' }}
@@ -215,7 +221,8 @@
             </div>
             <div class="movimiento-card__meta">
               <span class="movimiento-card__medio">{{ movimiento.medioPago }}</span>
-              <span class="movimiento-card__estado" [class.movimiento-card__estado--pagado]="movimiento.estadoPago === 'pagado'"
+              <span class="movimiento-card__estado"
+                [class.movimiento-card__estado--pagado]="movimiento.estadoPago === 'pagado'"
                 [class.movimiento-card__estado--pendiente]="movimiento.estadoPago === 'pendiente_reembolso'">
                 {{ movimiento.estadoPago }}
               </span>

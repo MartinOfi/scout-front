@@ -101,19 +101,15 @@
 // -----------------------------------------------------------------------------
 
 .form-row {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0 20px;
+  @include tokens.form-grid(1);
 
   @media (min-width: 480px) {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 .form-field--full {
-  @media (min-width: 480px) {
-    grid-column: 1 / -1;
-  }
+  @include tokens.form-field-full;
 }
 
 // Input with currency prefix

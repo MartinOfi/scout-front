@@ -219,8 +219,7 @@
 }
 
 .field-row {
-  display: grid;
-  gap: 16px;
+  @include form-grid(1);
 
   &--2col {
     grid-template-columns: 1fr 1fr;

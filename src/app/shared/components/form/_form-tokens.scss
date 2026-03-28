@@ -52,6 +52,10 @@ $field-margin-bottom: 20px;
 $hint-margin-top: 6px;
 $error-margin-top: 6px;
 
+// Grid spacing (for form grids using gap instead of margins)
+$field-row-gap: 20px;
+$field-column-gap: 16px;
+
 // -----------------------------------------------------------------------------
 // TRANSITIONS
 // -----------------------------------------------------------------------------
@@ -143,6 +147,26 @@ $shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.1);
   line-height: 1.4;
   color: $color-error;
   font-weight: 500;
+}
+
+// Form grid layout - use for multi-column form layouts
+// Automatically removes field margins and uses gap instead
+@mixin form-grid($columns: 2) {
+  display: grid;
+  grid-template-columns: repeat($columns, 1fr);
+  gap: $field-row-gap $field-column-gap;
+
+  // Remove bottom margin from form fields inside grid (use gap instead)
+  app-form-field {
+    ::ng-deep .scout-field {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// Full-width field helper for grid layouts
+@mixin form-field-full {
+  grid-column: 1 / -1;
 }
 
 @mixin checkbox-base {

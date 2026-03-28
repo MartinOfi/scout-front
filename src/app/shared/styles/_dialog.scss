@@ -1,0 +1,301 @@
+// ============================================================================
+// Shared Dialog Styles
+// Reusable styles for all Material dialogs in the application
+// ============================================================================
+
+@use 'sass:color';
+@use '../components/form/form-tokens' as tokens;
+
+// ============================================================================
+// Design Tokens
+// ============================================================================
+
+$dialog-radius-md: 8px;
+$dialog-radius-lg: 12px;
+$dialog-radius-xl: 16px;
+
+$dialog-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+$dialog-transition: 150ms ease-out;
+
+// Color tokens
+$success-500: #22c55e;
+$success-600: #16a34a;
+$danger-500: #ef4444;
+$danger-600: #dc2626;
+
+// ============================================================================
+// Material Dialog Container Override Mixin
+// ============================================================================
+
+@mixin dialog-container-override {
+  .mat-mdc-dialog-container {
+    --mdc-dialog-container-shape: #{$dialog-radius-xl};
+
+    .mdc-dialog__surface {
+      border-radius: $dialog-radius-xl !important;
+      box-shadow: $dialog-shadow !important;
+      overflow: hidden;
+    }
+  }
+
+  .mat-mdc-dialog-content {
+    padding: 0 !important;
+    max-height: 70vh;
+  }
+
+  .mat-mdc-dialog-actions {
+    min-height: auto;
+  }
+
+  .mat-mdc-dialog-title {
+    padding: 0 !important;
+    margin: 0 !important;
+
+    &::before {
+      display: none;
+    }
+  }
+}
+
+// ============================================================================
+// Dialog Structure Mixins
+// ============================================================================
+
+@mixin dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 20px 24px 16px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: tokens.$stone-900;
+  letter-spacing: -0.01em;
+  border-bottom: 1px solid tokens.$stone-200;
+  background-color: white;
+
+  mat-icon {
+    color: tokens.$brand-burgundy;
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+}
+
+@mixin dialog-content($min-width: 380px, $max-width: 480px) {
+  padding: 24px 28px;
+  min-width: $min-width;
+  max-width: $max-width;
+  background-color: white;
+}
+
+@mixin dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid tokens.$stone-200;
+}
+
+// ============================================================================
+// Button Mixins
+// ============================================================================
+
+@mixin btn-base {
+  padding: 12px 24px;
+  border-radius: $dialog-radius-md;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $dialog-transition;
+}
+
+@mixin btn-secondary {
+  @include btn-base;
+  background-color: white;
+  border: 1px solid tokens.$stone-300;
+  color: tokens.$stone-700;
+
+  &:hover {
+    background-color: tokens.$stone-50;
+    border-color: tokens.$stone-400;
+  }
+
+  &:active {
+    background-color: tokens.$stone-100;
+  }
+}
+
+@mixin btn-primary {
+  @include btn-base;
+  background: linear-gradient(135deg, tokens.$brand-burgundy 0%, tokens.$brand-burgundy-light 100%);
+  border: none;
+  color: white;
+  box-shadow: 0 1px 2px 0 rgba(tokens.$brand-burgundy, 0.2);
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, color.adjust(tokens.$brand-burgundy, $lightness: -5%) 0%, tokens.$brand-burgundy 100%);
+    box-shadow: 0 2px 4px 0 rgba(tokens.$brand-burgundy, 0.25);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    background: tokens.$stone-200;
+    color: tokens.$stone-400;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+@mixin btn-outline {
+  @include btn-base;
+  padding: 10px 16px;
+  background-color: white;
+  border: 1px solid tokens.$stone-300;
+  color: tokens.$stone-700;
+
+  mat-icon {
+    color: tokens.$brand-burgundy;
+  }
+
+  &:hover {
+    border-color: tokens.$brand-burgundy;
+    color: tokens.$brand-burgundy;
+
+    mat-icon {
+      color: tokens.$brand-burgundy;
+    }
+  }
+
+  &:active {
+    background-color: tokens.$stone-100;
+  }
+}
+
+@mixin btn-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: auto;
+  background-color: white;
+  border: 1px solid $danger-500;
+  color: $danger-600;
+  padding: 10px 16px;
+  border-radius: $dialog-radius-md;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $dialog-transition;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background-color: rgba($danger-500, 0.06);
+    border-color: $danger-600;
+  }
+
+  &:active {
+    background-color: rgba($danger-500, 0.1);
+  }
+}
+
+// ============================================================================
+// Utility Classes (for direct use)
+// ============================================================================
+
+.dialog-title {
+  @include dialog-title;
+}
+
+.dialog-content {
+  @include dialog-content;
+}
+
+.dialog-actions {
+  @include dialog-actions;
+}
+
+.btn-secondary {
+  @include btn-secondary;
+}
+
+.btn-primary {
+  @include btn-primary;
+}
+
+.btn-outline {
+  @include btn-outline;
+}
+
+.btn-danger {
+  @include btn-danger;
+}
+
+// ============================================================================
+// Loading & Empty States
+// ============================================================================
+
+@mixin dialog-state-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+  background: linear-gradient(135deg, tokens.$stone-50 0%, tokens.$stone-100 100%);
+  border: 1px solid tokens.$stone-200;
+  border-radius: $dialog-radius-md;
+  color: tokens.$stone-500;
+  font-size: 0.875rem;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: tokens.$stone-400;
+  }
+}
+
+.loading-state,
+.empty-state {
+  @include dialog-state-box;
+}
+
+.loading-icon {
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ============================================================================
+// Responsive
+// ============================================================================
+
+@mixin dialog-responsive {
+  @media (max-width: 600px) {
+    .dialog-content {
+      min-width: auto;
+      padding: 16px;
+    }
+
+    .dialog-title {
+      padding: 16px 16px 12px;
+    }
+
+    .dialog-actions {
+      padding: 12px 16px 16px;
+    }
+  }
+}

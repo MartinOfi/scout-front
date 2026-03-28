@@ -1,0 +1,63 @@
+<div class="persona-selector-dialog">
+
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon>person_add</mat-icon>
+    {{ data.title }}
+  </h2>
+
+  <mat-dialog-content class="dialog-content">
+    @if (data.subtitle) {
+    <p class="dialog-subtitle">{{ data.subtitle }}</p>
+    }
+
+    <form [formGroup]="form" class="selector-form">
+      <!-- Rama Filter (optional) -->
+      @if (data.showRamaFilter) {
+      <app-form-field label="Filtrar por Rama" [forId]="'rama-filter'"
+        hint="Opcional - filtra las personas disponibles">
+        <app-select-field id="rama-filter" placeholder="Todas las ramas" [options]="ramaOptions"
+          [optionLabelFn]="getRamaLabel" [optionValueFn]="getRamaValue"
+          (change)="onRamaChange($any($event.target).value || null)" />
+      </app-form-field>
+      }
+
+      <!-- Persona Select -->
+      <app-form-field label="Seleccionar Persona" [forId]="'persona-select'" [required]="true"
+        [invalid]="!!(form.get('personaId')?.invalid && form.get('personaId')?.touched)">
+        @if (loading()) {
+        <div class="loading-state">
+          <mat-icon class="loading-icon">hourglass_empty</mat-icon>
+          <span>Cargando personas...</span>
+        </div>
+        } @else if (filteredPersonas().length === 0) {
+        <div class="empty-state">
+          <mat-icon>person_off</mat-icon>
+          <span>No hay personas disponibles</span>
+        </div>
+        } @else {
+        <app-select-field id="persona-select" formControlName="personaId" placeholder="Seleccionar persona"
+          [options]="filteredPersonas()" [optionLabelFn]="getPersonaLabel" [optionValueFn]="getPersonaValue"
+          [searchable]="true" [minSearchLength]="1" />
+        }
+        <span error>Seleccione una persona</span>
+      </app-form-field>
+
+      <!-- Available count info -->
+      @if (!loading() && filteredPersonas().length > 0) {
+      <p class="available-count">
+        <mat-icon>info_outline</mat-icon>
+        {{ filteredPersonas().length }} persona(s) disponible(s)
+      </p>
+      }
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions" align="end">
+    <button type="button" class="btn-secondary" (click)="onCancel()">
+      Cancelar
+    </button>
+    <button type="button" class="btn-primary" [disabled]="form.invalid || loading()" (click)="onConfirm()">
+      {{ data.confirmLabel ?? 'Confirmar' }}
+    </button>
+  </mat-dialog-actions>
+</div>

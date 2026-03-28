@@ -1,0 +1,124 @@
+// ============================================================================
+// Persona Selector Dialog
+// Uses shared dialog styles + component-specific styles
+// ============================================================================
+
+@use '../../styles/dialog' as dialog;
+@use '../form/form-tokens' as tokens;
+
+// ============================================================================
+// Host & Material Dialog Container Override
+// ============================================================================
+
+:host {
+  display: block;
+}
+
+:host ::ng-deep {
+  @include dialog.dialog-container-override;
+}
+
+.persona-selector-dialog {
+  padding: 1rem;
+}
+
+// ============================================================================
+// Dialog Structure (using shared)
+// ============================================================================
+
+.dialog-title {
+  @include dialog.dialog-title;
+}
+
+.dialog-content {
+  @include dialog.dialog-content(380px, 480px);
+}
+
+.dialog-actions {
+  @include dialog.dialog-actions;
+}
+
+// ============================================================================
+// Button Styles (using shared)
+// ============================================================================
+
+.btn-secondary {
+  @include dialog.btn-secondary;
+}
+
+.btn-primary {
+  @include dialog.btn-primary;
+}
+
+// ============================================================================
+// Dialog Subtitle
+// ============================================================================
+
+.dialog-subtitle {
+  margin: 0 0 16px;
+  font-size: 0.875rem;
+  color: tokens.$stone-500;
+  line-height: 1.5;
+}
+
+// ============================================================================
+// Form Layout
+// ============================================================================
+
+.selector-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  ::ng-deep app-form-field .scout-field {
+    margin-bottom: 0;
+  }
+}
+
+// ============================================================================
+// Loading & Empty States (using shared)
+// ============================================================================
+
+.loading-state,
+.empty-state {
+  @include dialog.dialog-state-box;
+}
+
+.loading-icon {
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ============================================================================
+// Available Count Info
+// ============================================================================
+
+.available-count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.8125rem;
+  color: tokens.$stone-500;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: tokens.$stone-400;
+  }
+}
+
+// ============================================================================
+// Responsive (using shared)
+// ============================================================================
+
+@include dialog.dialog-responsive;
