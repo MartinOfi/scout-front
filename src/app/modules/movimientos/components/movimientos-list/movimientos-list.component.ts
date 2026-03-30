@@ -348,7 +348,7 @@ export class MovimientosListComponent implements OnInit {
       .delete('movimiento', () => this.state.delete(id))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((result) => {
-        if (result.deleted) {
+        if (result.confirmed) {
           // Reload current page after deletion
           this.state.loadPage(this.currentPage());
         }

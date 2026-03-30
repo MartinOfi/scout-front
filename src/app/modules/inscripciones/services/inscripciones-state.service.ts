@@ -255,7 +255,7 @@ export class InscripcionesStateService {
 
   /**
    * Eliminar una inscripción (Promise)
-   * Used by DeleteDialogComponent for async/await pattern
+   * Used by ConfirmDialogService.delete() for async/await pattern
    */
   async deleteAsync(id: string): Promise<void> {
     return firstValueFrom(this.apiService.delete(id)).then(() => {

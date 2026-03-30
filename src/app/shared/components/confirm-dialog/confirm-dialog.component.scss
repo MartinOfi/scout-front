@@ -1,0 +1,247 @@
+/**
+ * Confirm Dialog Component Styles
+ * Supports both simple confirmations and async operations with state machine.
+ * Uses design system tokens and GPU-accelerated animations.
+ */
+
+@use '../../../shared/styles/tokens' as t;
+
+// ============================================================================
+// Design Tokens
+// ============================================================================
+
+$danger-100: #fee2e2;
+$danger-500: #ef4444;
+$danger-600: #dc2626;
+$success-100: #dcfce7;
+$success-500: #22c55e;
+$success-600: #16a34a;
+$amber-50: #fffbeb;
+$amber-200: #fde68a;
+$amber-500: #f59e0b;
+$amber-700: #b45309;
+
+$radius-lg: 12px;
+$radius-xl: 16px;
+$shadow-dialog: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+// ============================================================================
+// Host & Animation
+// ============================================================================
+
+:host {
+  display: block;
+  animation: dialog-enter 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dialog-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host {
+    animation: none;
+  }
+}
+
+// ============================================================================
+// Material Dialog Container Override
+// ============================================================================
+
+:host ::ng-deep {
+  .mat-mdc-dialog-container {
+    --mdc-dialog-container-shape: #{$radius-xl};
+
+    .mdc-dialog__surface {
+      border-radius: $radius-xl !important;
+      box-shadow: $shadow-dialog !important;
+      overflow: hidden;
+    }
+  }
+
+  .mat-mdc-dialog-content {
+    padding: 0 !important;
+  }
+
+  .mat-mdc-dialog-actions {
+    padding: 0 !important;
+    min-height: auto;
+  }
+
+  .mat-mdc-dialog-title {
+    padding: 0 !important;
+    margin: 0 !important;
+
+    &::before {
+      display: none;
+    }
+  }
+}
+
+// ============================================================================
+// Dialog Container
+// ============================================================================
+
+.confirm-dialog {
+  padding: 24px;
+  min-width: 320px;
+  text-align: center;
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // Icon
+  // ──────────────────────────────────────────────────────────────────────────
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    margin-bottom: 16px;
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+
+    &--destructive {
+      background: rgba(220, 38, 38, 0.1);
+      color: t.$color-error;
+    }
+
+    &--default {
+      background: rgba(129, 33, 40, 0.1);
+      color: t.$brand-burgundy;
+    }
+
+    &--success {
+      background: $success-100;
+      color: $success-600;
+
+      mat-icon {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+      }
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // Title
+  // ──────────────────────────────────────────────────────────────────────────
+
+  &__title {
+    margin: 0 0 8px;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: t.$stone-800;
+
+    &--danger {
+      color: $danger-600;
+    }
+
+    &--success {
+      color: $success-600;
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // Message
+  // ──────────────────────────────────────────────────────────────────────────
+
+  &__message {
+    margin: 0 0 24px;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: t.$stone-600;
+
+    &--muted {
+      color: t.$stone-500;
+      font-style: italic;
+    }
+
+    &--success {
+      color: $success-600;
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // Warning Box
+  // ──────────────────────────────────────────────────────────────────────────
+
+  &__warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 0 0 24px;
+    padding: 12px;
+    background-color: $amber-50;
+    border: 1px solid $amber-200;
+    border-radius: $radius-lg;
+    color: $amber-700;
+    font-size: 0.875rem;
+    text-align: left;
+
+    mat-icon {
+      color: $amber-500;
+      flex-shrink: 0;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    span {
+      line-height: 1.4;
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // Error Box
+  // ──────────────────────────────────────────────────────────────────────────
+
+  &__error {
+    padding: 16px;
+    margin-bottom: 24px;
+    background-color: rgba($danger-500, 0.05);
+    border: 1px solid rgba($danger-500, 0.2);
+    border-radius: $radius-lg;
+    text-align: left;
+  }
+
+  &__error-message {
+    color: $danger-600;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  &__error-hint {
+    color: $danger-500;
+    font-size: 0.75rem;
+    margin: 8px 0 0;
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // Actions
+  // ──────────────────────────────────────────────────────────────────────────
+
+  &__actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+
+    &--center {
+      justify-content: center;
+    }
+  }
+}

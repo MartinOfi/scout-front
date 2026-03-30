@@ -348,7 +348,7 @@ export class InscripcionesListComponent implements OnInit {
     this.confirmDialog
       .delete('inscripción', () => this.state.deleteAsync(id))
       .subscribe((result) => {
-        if (result.deleted) {
+        if (result.confirmed) {
           // Reload the list and consolidado after successful deletion
           const tipo = this.activeTab();
           const filters = this.currentFilters();
