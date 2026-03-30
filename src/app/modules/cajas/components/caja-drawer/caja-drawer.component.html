@@ -81,13 +81,11 @@
 
   <!-- Footer actions -->
   <footer class="drawer-footer">
-    <button mat-stroked-button class="btn-secondary" (click)="onVerTodos()">
-      <mat-icon>list_alt</mat-icon>
+    <app-button variant="secondary" icon="list_alt" (clicked)="onVerTodos()">
       Ver todos
-    </button>
-    <button mat-flat-button color="primary" class="btn-primary" (click)="onRegistrarMovimiento()">
-      <mat-icon>add</mat-icon>
+    </app-button>
+    <app-button variant="primary" icon="add" (clicked)="onRegistrarMovimiento()">
       Registrar
-    </button>
+    </app-button>
   </footer>
 </div>

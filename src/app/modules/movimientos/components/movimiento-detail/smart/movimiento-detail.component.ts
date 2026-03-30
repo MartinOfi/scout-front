@@ -15,6 +15,7 @@ import { MovimientosStateService } from '../../../services/movimientos-state.ser
 import { Movimiento } from '../../../../../shared/models';
 import { MovimientoInfoCardComponent } from '../../shared/movimiento-info-card/movimiento-info-card.component';
 import { ConfirmDialogService } from '../../../../../shared/services';
+import { ButtonComponent } from '../../../../../shared/components/button/button.component';
 
 @Component({
   selector: 'app-movimiento-detail',
@@ -25,10 +26,11 @@ import { ConfirmDialogService } from '../../../../../shared/services';
     MatIconModule,
     MatCardModule,
     MatProgressSpinnerModule,
-    MovimientoInfoCardComponent
+    MovimientoInfoCardComponent,
+    ButtonComponent,
   ],
   templateUrl: './movimiento-detail.component.html',
-  styleUrl: './movimiento-detail.component.scss'
+  styleUrl: './movimiento-detail.component.scss',
 })
 export class MovimientoDetailComponent implements OnInit {
   private readonly state = inject(MovimientosStateService);
@@ -89,7 +91,7 @@ export class MovimientoDetailComponent implements OnInit {
           },
           error: () => {
             // Error ya manejado por el state service
-          }
+          },
         });
       }
     });

@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ButtonComponent } from '../button/button.component';
 
 export type DeleteDialogState = 'confirm' | 'loading' | 'error' | 'success';
 
@@ -34,7 +35,13 @@ export interface DeleteDialogResult {
 @Component({
   selector: 'app-delete-dialog',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatDialogModule, MatProgressSpinnerModule],
+  imports: [
+    CommonModule,
+    MatIconModule,
+    MatDialogModule,
+    MatProgressSpinnerModule,
+    ButtonComponent,
+  ],
   templateUrl: './delete-dialog.component.html',
   styleUrl: './delete-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

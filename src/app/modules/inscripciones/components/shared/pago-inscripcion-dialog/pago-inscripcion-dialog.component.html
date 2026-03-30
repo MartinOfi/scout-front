@@ -154,17 +154,16 @@
 
   <mat-dialog-actions class="dialog-actions" align="end">
     @if (isEditMode) {
-    <button type="button" class="btn-danger" (click)="onDelete()">
-      <mat-icon>delete</mat-icon>
+    <app-button variant="danger" icon="delete" (clicked)="onDelete()">
       Eliminar
-    </button>
+    </app-button>
     }
-    <button type="button" class="btn-secondary" (click)="onCancel()">
+    <app-button variant="secondary" (clicked)="onCancel()">
       Cancelar
-    </button>
-    <button type="button" class="btn-primary" [disabled]="formInvalid" (click)="onSubmit()">
+    </app-button>
+    <app-button variant="primary" [disabled]="formInvalid" (clicked)="onSubmit()">
       {{ isEditMode ? 'Guardar Cambios' : 'Registrar Pago' }}
-    </button>
+    </app-button>
   </mat-dialog-actions>
 
 </div>

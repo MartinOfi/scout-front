@@ -129,21 +129,18 @@
 
       <!-- Actions -->
       <div class="form-actions">
-        <button type="button" class="btn-secondary" (click)="onCancel()">
+        <app-button variant="secondary" (clicked)="onCancel()">
           Cancelar
-        </button>
-        <button
+        </app-button>
+        <app-button
           type="submit"
-          class="btn-primary"
-          [disabled]="form.invalid || loading()"
-          (click)="onSubmit()"
+          variant="primary"
+          [disabled]="form.invalid"
+          [loading]="loading()"
+          (clicked)="onSubmit()"
         >
-          @if (loading()) {
-          <span class="loading-spinner"></span>
-          } @else {
           {{ isEditing() ? 'Actualizar' : 'Crear Campamento' }}
-          }
-        </button>
+        </app-button>
       </div>
     </div>
 

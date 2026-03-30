@@ -99,6 +99,7 @@ import { CheckboxFieldComponent } from '../../form/checkbox-field/checkbox-field
 import { ChipsFilterComponent } from '../chips-filter/chips-filter.component';
 import { FilterConfig } from './filter-config.interface';
 import { FilterType } from './filter-type.enum';
+import { ButtonComponent } from '../../button/button.component';
 
 /**
  * Componente de filtros genérico y configurable
@@ -276,6 +277,7 @@ import { FilterType } from './filter-type.enum';
     NumberFieldComponent,
     CheckboxFieldComponent,
     ChipsFilterComponent,
+    ButtonComponent,
   ],
 })
 export class GenericFiltersComponent implements OnInit, OnDestroy {

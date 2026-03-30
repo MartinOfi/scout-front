@@ -26,6 +26,7 @@ import { TextFieldComponent } from '../../../../../shared/components/form/text-f
 import { NumberFieldComponent } from '../../../../../shared/components/form/number-field/number-field.component';
 import { TextareaFieldComponent } from '../../../../../shared/components/form/textarea-field/textarea-field.component';
 import { DateFieldComponent } from '../../../../../shared/components/form/date-field/date-field.component';
+import { ButtonComponent } from '../../../../../shared/components/button/button.component';
 
 @Component({
   selector: 'app-campamento-form',
@@ -39,6 +40,7 @@ import { DateFieldComponent } from '../../../../../shared/components/form/date-f
     NumberFieldComponent,
     TextareaFieldComponent,
     DateFieldComponent,
+    ButtonComponent,
   ],
   templateUrl: './campamento-form.component.html',
   styleUrl: './campamento-form.component.scss',

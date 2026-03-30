@@ -5,10 +5,9 @@
       <h1 class="dashboard-title">Dashboard</h1>
       <app-button-tabs [tabs]="tabs" [activeTab]="activeTab()" (tabChange)="onTabChange($event)" />
     </div>
-    <button type="button" class="btn btn-ghost btn-sm" (click)="goToList()">
-      <mat-icon>list</mat-icon>
+    <app-button variant="ghost" size="sm" icon="list" (clicked)="goToList()">
       Ver lista
-    </button>
+    </app-button>
   </div>
 
   <!-- Inline Filters -->

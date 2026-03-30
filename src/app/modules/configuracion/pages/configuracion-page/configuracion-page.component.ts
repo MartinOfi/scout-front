@@ -14,6 +14,7 @@ import { NumberFieldComponent } from '../../../../shared/components/form/number-
 import { FormActionsComponent } from '../../../../shared/components/form/form-actions/form-actions.component';
 import { ConfiguracionService } from '../../../../shared/services';
 import { NotificationService } from '../../../../shared/services';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
 @Component({
   selector: 'app-configuracion-page',
@@ -26,6 +27,7 @@ import { NotificationService } from '../../../../shared/services';
     FormFieldComponent,
     NumberFieldComponent,
     FormActionsComponent,
+    ButtonComponent,
   ],
   templateUrl: './configuracion-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -4,14 +4,27 @@
  * SIN any - tipado estricto
  */
 
-import { Component, OnInit, ChangeDetectionStrategy, inject, computed, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  inject,
+  computed,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PersonasStateService } from '../../services/personas-state.service';
-import { StatCardComponent, StatCardVariant } from '../../../../shared/components/stat-card/stat-card.component';
-import { ButtonTabsComponent, TabConfig } from '../../../../shared/components/button-tabs/button-tabs.component';
+import {
+  StatCardComponent,
+  StatCardVariant,
+} from '../../../../shared/components/stat-card/stat-card.component';
+import {
+  ButtonTabsComponent,
+  TabConfig,
+} from '../../../../shared/components/button-tabs/button-tabs.component';
 import { DataTableComponent } from '../../../../shared/components/tables/data-table.component';
 import { GenericFiltersComponent } from '../../../../shared/components/filters/generic-filters/generic-filters.component';
 import { FilterConfig } from '../../../../shared/components/filters/generic-filters/filter-config.interface';
@@ -29,6 +42,7 @@ import {
   PERSONA_TYPE_ICONS,
   PERSONA_TYPE_ROUTES,
 } from '../../../../shared/constants/persona.constants';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
 interface StatConfig {
   readonly icon: string;
@@ -68,6 +82,7 @@ type TabKey = RamaTabKey | PersonaTabKey | SpecialTabKey;
     ButtonTabsComponent,
     DataTableComponent,
     GenericFiltersComponent,
+    ButtonComponent,
   ],
   templateUrl: './personas-dashboard.component.html',
   styleUrl: './personas-dashboard.component.scss',
@@ -88,15 +103,30 @@ export class PersonasDashboardComponent implements OnInit {
 
   /** Stats computed from state */
   readonly stats = computed((): readonly StatConfig[] => [
-    { icon: PERSONA_TYPE_ICONS[PersonaType.PROTAGONISTA], title: 'Protagonistas', value: this.state.protagonistaCount(), variant: 'info' },
-    { icon: PERSONA_TYPE_ICONS[PersonaType.EDUCADOR], title: 'Educadores', value: this.state.educadorCount(), variant: 'success' },
-    { icon: 'people', title: 'Personas Extras', value: this.state.personasExternasCount(), variant: 'warning' },
+    {
+      icon: PERSONA_TYPE_ICONS[PersonaType.PROTAGONISTA],
+      title: 'Protagonistas',
+      value: this.state.protagonistaCount(),
+      variant: 'info',
+    },
+    {
+      icon: PERSONA_TYPE_ICONS[PersonaType.EDUCADOR],
+      title: 'Educadores',
+      value: this.state.educadorCount(),
+      variant: 'success',
+    },
+    {
+      icon: 'people',
+      title: 'Personas Extras',
+      value: this.state.personasExternasCount(),
+      variant: 'warning',
+    },
     { icon: 'groups', title: 'Total Activos', value: this.totalActivos(), variant: 'danger' },
   ]);
 
   /** Total active personas */
   readonly totalActivos = computed((): number => {
-    return this.state.allPersonas().filter(p => p.estado === EstadoPersona.ACTIVO).length;
+    return this.state.allPersonas().filter((p) => p.estado === EstadoPersona.ACTIVO).length;
   });
 
   /** Tab configurations - generated from constants */
@@ -153,12 +183,10 @@ export class PersonasDashboardComponent implements OnInit {
 
     // Apply search filter
     if (search) {
-      personas = personas.filter(p =>
-        p.nombre.toLowerCase().includes(search)
-      );
+      personas = personas.filter((p) => p.nombre.toLowerCase().includes(search));
     }
 
-    return personas.map(p => this.mapToTableRow(p));
+    return personas.map((p) => this.mapToTableRow(p));
   });
 
   ngOnInit(): void {
@@ -170,7 +198,7 @@ export class PersonasDashboardComponent implements OnInit {
   }
 
   onFilterChange(filters: Record<string, unknown>): void {
-    const search = filters['search'] as string ?? '';
+    const search = (filters['search'] as string) ?? '';
     this.searchFilter.set(search);
   }
 
@@ -209,7 +237,7 @@ export class PersonasDashboardComponent implements OnInit {
   }
 
   private getProtagonistasbyRama(rama: Rama): Protagonista[] {
-    return this.state.protagonistas().filter(p => p.rama === rama);
+    return this.state.protagonistas().filter((p) => p.rama === rama);
   }
 
   private getDeudores(): PersonaUnion[] {
@@ -218,7 +246,8 @@ export class PersonasDashboardComponent implements OnInit {
   }
 
   private mapToTableRow(persona: PersonaUnion): PersonaTableRow {
-    const protagonista = persona.tipo === PersonaType.PROTAGONISTA ? persona as Protagonista : null;
+    const protagonista =
+      persona.tipo === PersonaType.PROTAGONISTA ? (persona as Protagonista) : null;
     return {
       id: persona.id,
       nombreCompleto: persona.nombre,

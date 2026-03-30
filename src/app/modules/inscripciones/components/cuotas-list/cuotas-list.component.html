@@ -1,10 +1,9 @@
 <div class="cuotas-list-container">
   <header class="page-header">
     <h1>Cuotas del Grupo</h1>
-    <button mat-button (click)="onBack()">
-      <mat-icon>arrow_back</mat-icon>
+    <app-button variant="secondary" icon="arrow_back" (clicked)="onBack()">
       Volver
-    </button>
+    </app-button>
   </header>
 
   @if (loading()) {

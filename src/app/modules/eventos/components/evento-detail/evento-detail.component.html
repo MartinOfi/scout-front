@@ -22,14 +22,12 @@
         }
       </mat-card-content>
       <mat-card-actions>
-        <button mat-button (click)="onBack()">
-          <mat-icon>arrow_back</mat-icon>
+        <app-button variant="secondary" icon="arrow_back" (clicked)="onBack()">
           Volver
-        </button>
-        <button mat-raised-button color="primary" (click)="onEdit()">
-          <mat-icon>edit</mat-icon>
+        </app-button>
+        <app-button variant="primary" icon="edit" (clicked)="onEdit()">
           Editar
-        </button>
+        </app-button>
       </mat-card-actions>
     </mat-card>
   } @else {

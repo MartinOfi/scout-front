@@ -12,7 +12,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 
 import { CampamentosStateService } from '../../../services';
-import { ConfirmDialogService, LoadingSpinnerComponent } from '../../../../../shared';
+import {
+  ConfirmDialogService,
+  LoadingSpinnerComponent,
+  ButtonComponent,
+} from '../../../../../shared';
 
 // Dumb Components
 import { CampamentoCardComponent } from '../components/campamento-card/campamento-card.component';
@@ -36,6 +40,7 @@ interface CampStats {
     MatCardModule,
     CampamentoCardComponent,
     LoadingSpinnerComponent,
+    ButtonComponent,
   ],
   templateUrl: './campamentos-list.component.html',
   styleUrl: './campamentos-list.component.scss',
@@ -102,8 +107,7 @@ export class CampamentosListComponent implements OnInit {
   onDelete(id: string): void {
     this.confirmDialog.confirmDelete('campamento').subscribe((confirmed: boolean) => {
       if (confirmed) {
-        // TODO: Implementar delete en CampamentosStateService
-        console.log('Delete campamento:', id);
+        this.state.delete(id).subscribe();
       }
     });
   }

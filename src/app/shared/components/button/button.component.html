@@ -1,0 +1,41 @@
+<button
+  [type]="type()"
+  [class]="buttonClasses()"
+  [disabled]="isDisabled()"
+  (click)="onClick($event)"
+>
+  <!-- Shimmer effect layer (primary only) -->
+  @if (variant() === 'primary' && !isDisabled()) {
+    <span class="scout-btn__shimmer" aria-hidden="true"></span>
+  }
+
+  <!-- Loading spinner -->
+  @if (loading()) {
+    <span class="scout-btn__spinner" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="32" stroke-dashoffset="32">
+          <animate attributeName="stroke-dashoffset" values="32;0;32" dur="1.2s" repeatCount="indefinite" />
+          <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite" />
+        </circle>
+      </svg>
+    </span>
+  }
+
+  <!-- Icon left -->
+  @if (icon() && iconPosition() === 'left' && !loading()) {
+    <mat-icon class="scout-btn__icon scout-btn__icon--left">{{ icon() }}</mat-icon>
+  }
+
+  <!-- Content -->
+  <span class="scout-btn__content" [class.scout-btn__content--hidden]="loading()">
+    <ng-content></ng-content>
+  </span>
+
+  <!-- Icon right -->
+  @if (icon() && iconPosition() === 'right' && !loading()) {
+    <mat-icon class="scout-btn__icon scout-btn__icon--right">{{ icon() }}</mat-icon>
+  }
+
+  <!-- Highlight layer for depth -->
+  <span class="scout-btn__highlight" aria-hidden="true"></span>
+</button>

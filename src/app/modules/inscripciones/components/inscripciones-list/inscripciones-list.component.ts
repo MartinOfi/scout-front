@@ -33,6 +33,7 @@ import { TableColumn, ActionEvent, TableAction } from '../../../../shared/models
 import { TipoInscripcion, RamaEnum, PersonaType, RAMA_LABELS } from '../../../../shared/enums';
 import { Inscripcion, TipoDeuda } from '../../../../shared/models';
 import { ConfirmDialogService } from '../../../../shared/services';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
 interface InscripcionFilters {
   search: string;
@@ -70,6 +71,7 @@ interface InscripcionTableRow {
     ButtonTabsComponent,
     DataTableComponent,
     GenericFiltersComponent,
+    ButtonComponent,
   ],
   templateUrl: './inscripciones-list.component.html',
   styleUrl: './inscripciones-list.component.scss',

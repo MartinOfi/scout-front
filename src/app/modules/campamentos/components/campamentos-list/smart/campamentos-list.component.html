@@ -57,10 +57,13 @@
               <span class="camps-stats__item-count">{{ stats().past }}</span>
             </div>
           </div>
-          <button type="button" class="btn btn-primary camps-stats__action" (click)="onCreate()">
-            <mat-icon>add</mat-icon>
+          <app-button
+            class="camps-stats__action"
+            icon="add"
+            variant="primary"
+            (clicked)="onCreate()">
             Crear Campamento
-          </button>
+          </app-button>
         </section>
 
         <!-- Camps Grid -->

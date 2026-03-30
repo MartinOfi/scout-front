@@ -14,6 +14,7 @@ import { CuotasStateService } from '../../../cuotas/services/cuotas-state.servic
 import { ESTADO_CUOTA_LABELS } from '../../../../shared/enums';
 import { DataTableComponent } from '../../../../shared/components/tables/data-table.component';
 import { TableColumn, TableData, ActionEvent } from '../../../../shared/models/table.model';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
 @Component({
   selector: 'app-cuotas-list',
@@ -23,10 +24,11 @@ import { TableColumn, TableData, ActionEvent } from '../../../../shared/models/t
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    DataTableComponent
+    DataTableComponent,
+    ButtonComponent,
   ],
   templateUrl: './cuotas-list.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CuotasListComponent implements OnInit {
   readonly state: CuotasStateService = inject(CuotasStateService);
@@ -37,13 +39,13 @@ export class CuotasListComponent implements OnInit {
   readonly error = this.state.error;
 
   readonly tableData = computed((): TableData[] => {
-    return this.cuotas().map(c => ({
+    return this.cuotas().map((c) => ({
       id: c.id,
       persona: c.persona?.nombre || '',
       nombre: c.nombre,
       ano: c.ano,
       monto: c.montoTotal,
-      estado: ESTADO_CUOTA_LABELS[c.estado] || c.estado
+      estado: ESTADO_CUOTA_LABELS[c.estado] || c.estado,
     }));
   });
 
@@ -51,17 +53,20 @@ export class CuotasListComponent implements OnInit {
     { key: 'persona', header: 'Persona', type: 'text', sortable: true },
     { key: 'nombre', header: 'Cuota', type: 'text', sortable: true },
     { key: 'ano', header: 'Año', type: 'number', sortable: true },
-    { key: 'monto', header: 'Monto', type: 'number', sortable: true,
-      formatter: (value: unknown) => `$${(value as number).toLocaleString('es-AR')}` },
+    {
+      key: 'monto',
+      header: 'Monto',
+      type: 'number',
+      sortable: true,
+      formatter: (value: unknown) => `$${(value as number).toLocaleString('es-AR')}`,
+    },
     { key: 'estado', header: 'Estado', type: 'status', sortable: true },
     {
       key: 'actions',
       header: 'Acciones',
       type: 'action',
-      actions: [
-        { key: 'payment', label: 'Pagar', icon: 'payment', tooltip: 'Registrar pago' }
-      ]
-    }
+      actions: [{ key: 'payment', label: 'Pagar', icon: 'payment', tooltip: 'Registrar pago' }],
+    },
   ];
 
   ngOnInit(): void {

@@ -14,11 +14,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { ButtonComponent } from '../../../../../../shared/components/button/button.component';
 
-import { 
-  TipoMovimientoEnum, 
+import {
+  TipoMovimientoEnum,
   ConceptoMovimiento,
-  CONCEPTO_MOVIMIENTO_LABELS 
+  CONCEPTO_MOVIMIENTO_LABELS,
 } from '../../../../../../shared/enums';
 import { MovimientosFilters } from '../../../../../../shared/models';
 
@@ -33,10 +34,11 @@ import { MovimientosFilters } from '../../../../../../shared/models';
     MatInputModule,
     MatDatepickerModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    ButtonComponent,
   ],
   templateUrl: './movimiento-filters.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MovimientoFiltersComponent {
   readonly filterChange = output<MovimientosFilters>();
@@ -53,19 +55,19 @@ export class MovimientoFiltersComponent {
       tipo: [null],
       concepto: [null],
       fechaInicio: [null],
-      fechaFin: [null]
+      fechaFin: [null],
     });
   }
 
   onFilterChange(): void {
     const rawValue = this.filterForm.value;
     const filters: MovimientosFilters = {};
-    
+
     if (rawValue.tipo) filters.tipo = rawValue.tipo;
     if (rawValue.concepto) filters.concepto = rawValue.concepto;
     if (rawValue.fechaInicio) filters.fechaInicio = rawValue.fechaInicio.toISOString();
     if (rawValue.fechaFin) filters.fechaFin = rawValue.fechaFin.toISOString();
-    
+
     this.filterChange.emit(filters);
   }
 

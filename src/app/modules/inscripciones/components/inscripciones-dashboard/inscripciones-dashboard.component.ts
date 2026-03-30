@@ -3,14 +3,7 @@
  * Dedicated page for comprehensive KPI dashboard
  */
 
-import {
-  Component,
-  OnInit,
-  ChangeDetectionStrategy,
-  inject,
-  signal,
-  effect,
-} from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,6 +20,7 @@ import { FilterConfig } from '../../../../shared/components/filters/generic-filt
 import { FilterType } from '../../../../shared/components/filters/generic-filters/filter-type.enum';
 import { PersonaType, RamaEnum, TipoInscripcion } from '../../../../shared/enums';
 import { TipoDeuda } from '../../../../shared/models';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
 interface DashboardFilters {
   ano: string;
@@ -44,6 +38,7 @@ interface DashboardFilters {
     KpiDashboardComponent,
     ButtonTabsComponent,
     GenericFiltersComponent,
+    ButtonComponent,
   ],
   templateUrl: './inscripciones-dashboard.component.html',
   styleUrl: './inscripciones-dashboard.component.scss',
@@ -147,7 +142,13 @@ export class InscripcionesDashboardComponent implements OnInit {
     const ramaParam = this.route.snapshot.queryParamMap.get('rama');
     if (
       ramaParam &&
-      [RamaEnum.MANADA, RamaEnum.UNIDAD, RamaEnum.CAMINANTES, RamaEnum.ROVERS, PersonaType.EDUCADOR].includes(ramaParam as RamaFilter)
+      [
+        RamaEnum.MANADA,
+        RamaEnum.UNIDAD,
+        RamaEnum.CAMINANTES,
+        RamaEnum.ROVERS,
+        PersonaType.EDUCADOR,
+      ].includes(ramaParam as RamaFilter)
     ) {
       this.currentFilters.update((f) => ({ ...f, rama: ramaParam as RamaFilter }));
     }

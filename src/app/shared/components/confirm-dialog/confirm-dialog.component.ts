@@ -1,14 +1,13 @@
 /**
  * Confirm Dialog Component
- * Dumb Component - Renders confirmation dialog content
- * ChangeDetectionStrategy.OnPush - max 45 lines
+ * Dumb Component - Renders confirmation dialog with consistent button styling.
+ * Uses GPU-accelerated animations for smooth 60fps entrance.
  */
 
-import { Component, ChangeDetectionStrategy, Inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MatButtonModule } from '@angular/material/button';
+import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { ButtonComponent, ButtonVariant } from '../button/button.component';
 
 export interface ConfirmDialogData {
   title: string;
@@ -22,61 +21,125 @@ export interface ConfirmDialogData {
 @Component({
   selector: 'app-confirm-dialog',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule],
+  imports: [MatIconModule, ButtonComponent],
   template: `
-    <div class="confirm-dialog-container">
-      <div class="confirm-icon-section">
-        <mat-icon [color]="data.isDestructive ? 'warn' : 'accent'">
-          {{ data.icon }}
-        </mat-icon>
+    <div class="confirm-dialog">
+      <!-- Icon -->
+      <div class="confirm-dialog__icon" [class]="iconContainerClass()">
+        <mat-icon>{{ data.icon }}</mat-icon>
       </div>
-      <h2 mat-dialog-title>{{ data.title }}</h2>
-      <mat-dialog-content>
-        {{ data.message }}
-      </mat-dialog-content>
-      <mat-dialog-actions align="end">
-        <button mat-button (click)="onCancel()">{{ data.cancelText }}</button>
-        <button
-          mat-raised-button
-          [color]="data.isDestructive ? 'warn' : 'primary'"
-          (click)="onConfirm()"
-        >
+
+      <!-- Title -->
+      <h2 class="confirm-dialog__title">{{ data.title }}</h2>
+
+      <!-- Message -->
+      <p class="confirm-dialog__message">{{ data.message }}</p>
+
+      <!-- Actions -->
+      <div class="confirm-dialog__actions">
+        <app-button variant="secondary" (clicked)="onCancel()">
+          {{ data.cancelText }}
+        </app-button>
+        <app-button [variant]="confirmVariant()" (clicked)="onConfirm()">
           {{ data.confirmText }}
-        </button>
-      </mat-dialog-actions>
+        </app-button>
+      </div>
     </div>
   `,
-  styles: [`
-    .confirm-dialog-container {
-      min-width: 300px;
-    }
+  styles: [
+    `
+      @use '../../../shared/styles/tokens' as t;
 
-    .confirm-icon-section {
-      text-align: center;
-      margin-bottom: 16px;
-    }
+      :host {
+        display: block;
+        animation: dialog-enter 200ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
 
-    mat-icon {
-      font-size: 48px;
-      width: 48px;
-      height: 48px;
-    }
+      @keyframes dialog-enter {
+        from {
+          opacity: 0;
+          transform: scale(0.95) translateY(-8px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
 
-    h2 {
-      margin: 0 0 8px 0;
-    }
+      @media (prefers-reduced-motion: reduce) {
+        :host {
+          animation: none;
+        }
+      }
 
-    mat-dialog-actions {
-      padding-top: 16px;
-    }
-  `],
-  changeDetection: ChangeDetectionStrategy.OnPush
+      .confirm-dialog {
+        padding: 24px;
+        min-width: 320px;
+        max-width: 400px;
+        text-align: center;
+
+        &__icon {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          margin-bottom: 16px;
+
+          mat-icon {
+            font-size: 28px;
+            width: 28px;
+            height: 28px;
+          }
+
+          &--destructive {
+            background: rgba(220, 38, 38, 0.1);
+            color: t.$color-error;
+          }
+
+          &--default {
+            background: rgba(129, 33, 40, 0.1);
+            color: t.$brand-burgundy;
+          }
+        }
+
+        &__title {
+          margin: 0 0 8px;
+          font-size: 1.125rem;
+          font-weight: 600;
+          color: t.$stone-800;
+        }
+
+        &__message {
+          margin: 0 0 24px;
+          font-size: 0.9375rem;
+          line-height: 1.5;
+          color: t.$stone-600;
+        }
+
+        &__actions {
+          display: flex;
+          gap: 12px;
+          justify-content: center;
+        }
+      }
+    `,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfirmDialogComponent {
-  constructor(
-    public dialogRef: MatDialogRef<ConfirmDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: ConfirmDialogData
-  ) {}
+  readonly dialogRef = inject(MatDialogRef<ConfirmDialogComponent>);
+  readonly data: ConfirmDialogData = inject(MAT_DIALOG_DATA);
+
+  readonly confirmVariant = computed<ButtonVariant>(() =>
+    this.data.isDestructive ? 'danger' : 'primary',
+  );
+
+  readonly iconContainerClass = computed(
+    () =>
+      `confirm-dialog__icon confirm-dialog__icon--${this.data.isDestructive ? 'destructive' : 'default'}`,
+  );
 
   onCancel(): void {
     this.dialogRef.close(false);

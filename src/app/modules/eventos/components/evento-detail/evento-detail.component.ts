@@ -14,6 +14,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { EventosStateService } from '../../services/eventos-state.service';
 import { Evento } from '../../../../shared/models';
 import { TIPO_EVENTO_LABELS, TipoEvento } from '../../../../shared/enums';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
 @Component({
   selector: 'app-evento-detail',
@@ -23,10 +24,11 @@ import { TIPO_EVENTO_LABELS, TipoEvento } from '../../../../shared/enums';
     MatCardModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    ButtonComponent,
   ],
   templateUrl: './evento-detail.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EventoDetailComponent implements OnInit {
   private readonly state: EventosStateService = inject(EventosStateService);

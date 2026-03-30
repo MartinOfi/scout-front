@@ -7,7 +7,7 @@
 <div class="personas-tabs-container">
   <div class="personas-tabs-container-header">
     <app-button-tabs [tabs]="tabs" [activeTab]="activeTab()" (tabChange)="onTabChange($event)" />
-    <button type="button" class="btn btn-primary" (click)="onNuevoMiembro()">Nuevo Miembro</button>
+    <app-button variant="primary" (clicked)="onNuevoMiembro()">Nuevo Miembro</app-button>
   </div>
 
   <div class="tab-content">

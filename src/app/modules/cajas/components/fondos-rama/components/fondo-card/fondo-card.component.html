@@ -23,13 +23,11 @@
   </mat-card-content>
   
   <mat-card-actions>
-    <button mat-button (click)="verMovimientos.emit()">
-      <mat-icon>receipt_long</mat-icon>
+    <app-button variant="secondary" icon="receipt_long" (clicked)="verMovimientos.emit()">
       Movimientos
-    </button>
-    <button mat-raised-button color="primary" (click)="registrarMovimiento.emit()">
-      <mat-icon>add</mat-icon>
+    </app-button>
+    <app-button variant="primary" icon="add" (clicked)="registrarMovimiento.emit()">
       Registrar
-    </button>
+    </app-button>
   </mat-card-actions>
 </mat-card>

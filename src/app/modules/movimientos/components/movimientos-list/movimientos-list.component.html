@@ -10,9 +10,9 @@
         aria-label="Filtrar movimientos por tipo" />
       <div class="movimientos-content__actions">
         <span class="record-count">{{ totalItems() }} registros</span>
-        <button type="button" class="btn btn-primary" (click)="onNuevoMovimiento()">
+        <app-button variant="primary" (clicked)="onNuevoMovimiento()">
           Nuevo Movimiento
-        </button>
+        </app-button>
       </div>
     </div>
 
@@ -35,13 +35,9 @@
         <div class="error-state">
           <mat-icon color="warn">error</mat-icon>
           <span>{{ error() }}</span>
-          <button
-            mat-stroked-button
-            color="primary"
-            (click)="state.loadPage(1)"
-            class="mt-4">
+          <app-button variant="secondary" (clicked)="state.loadPage(1)">
             Reintentar
-          </button>
+          </app-button>
         </div>
       } @else if (tableData().length === 0) {
         <div class="empty-state">

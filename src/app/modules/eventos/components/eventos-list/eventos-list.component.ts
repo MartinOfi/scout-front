@@ -4,7 +4,14 @@
  * SIN any - tipado estricto
  */
 
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  inject,
+  signal,
+  computed,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,6 +23,7 @@ import { TipoEvento, TIPO_EVENTO_LABELS } from '../../../../shared/enums';
 import { DataTableComponent } from '../../../../shared/components/tables/data-table.component';
 import { TableColumn, TableData, ActionEvent } from '../../../../shared/models/table.model';
 import { EventoFiltersComponent } from './components/evento-filters.component';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
 @Component({
   selector: 'app-eventos-list',
@@ -26,10 +34,11 @@ import { EventoFiltersComponent } from './components/evento-filters.component';
     MatIconModule,
     MatProgressSpinnerModule,
     DataTableComponent,
-    EventoFiltersComponent
+    EventoFiltersComponent,
+    ButtonComponent,
   ],
   templateUrl: './eventos-list.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EventosListComponent implements OnInit {
   readonly state: EventosStateService = inject(EventosStateService);
@@ -57,12 +66,12 @@ export class EventosListComponent implements OnInit {
   });
 
   readonly tableData = computed((): TableData[] => {
-    return this.eventosFiltrados().map(e => ({
+    return this.eventosFiltrados().map((e) => ({
       id: e.id,
       nombre: e.nombre,
       fecha: e.fecha,
       tipo: TIPO_EVENTO_LABELS[e.tipo] || e.tipo,
-      descripcion: e.descripcion || ''
+      descripcion: e.descripcion || '',
     }));
   });
 
@@ -77,9 +86,9 @@ export class EventosListComponent implements OnInit {
       type: 'action',
       actions: [
         { key: 'view', label: 'Ver', icon: 'visibility', tooltip: 'Ver detalle' },
-        { key: 'edit', label: 'Editar', icon: 'edit', tooltip: 'Editar' }
-      ]
-    }
+        { key: 'edit', label: 'Editar', icon: 'edit', tooltip: 'Editar' },
+      ],
+    },
   ];
 
   ngOnInit(): void {

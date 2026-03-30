@@ -1,10 +1,9 @@
 <div class="eventos-list-container">
   <header class="page-header">
     <h1>Eventos</h1>
-    <button mat-raised-button color="primary" (click)="onCreate()">
-      <mat-icon>add</mat-icon>
+    <app-button variant="primary" icon="add" (clicked)="onCreate()">
       Nuevo Evento
-    </button>
+    </app-button>
   </header>
 
   <app-evento-filters (filterChange)="onFiltroChange($event)" />
@@ -18,7 +17,7 @@
     <div class="error-state">
       <mat-icon color="warn">error</mat-icon>
       <p>{{ error() }}</p>
-      <button mat-button (click)="state.load()">Reintentar</button>
+      <app-button variant="secondary" (clicked)="state.load()">Reintentar</app-button>
     </div>
   } @else if (tableData().length === 0) {
     <div class="empty-state">

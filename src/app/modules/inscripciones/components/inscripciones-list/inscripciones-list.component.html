@@ -30,17 +30,16 @@
     </div>
   </div>
 
-  <button type="button" class="btn btn-secondary dashboard-btn" (click)="goToDashboard()">
-    <mat-icon>dashboard</mat-icon>
+  <app-button variant="secondary" icon="dashboard" (clicked)="goToDashboard()">
     Ver Dashboard
-  </button>
+  </app-button>
 </div>
 }
 
 <div class="inscripciones-tabs-container">
   <div class="inscripciones-tabs-container-header">
     <app-button-tabs [tabs]="tabs" [activeTab]="activeTab()" (tabChange)="onTabChange($event)" />
-    <button type="button" class="btn btn-primary" (click)="onCreate()">Nueva Inscripción</button>
+    <app-button variant="primary" (clicked)="onCreate()">Nueva Inscripción</app-button>
   </div>
 
   <div class="tab-content">

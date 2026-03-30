@@ -20,13 +20,13 @@
     <!-- Botones de acción -->
     <div class="filters-actions">
       @if (showClearButton()) {
-      <button type="button" class="btn btn-secondary" (click)="onClearFilters()" [disabled]="!hasActiveFilters()">
+      <app-button variant="secondary" (clicked)="onClearFilters()" [disabled]="!hasActiveFilters()">
         Limpiar
-      </button>
+      </app-button>
       } @if (showApplyButton()) {
-      <button type="button" class="btn btn-primary" (click)="onApplyFilters()">
+      <app-button variant="primary" (clicked)="onApplyFilters()">
         Aplicar Filtros
-      </button>
+      </app-button>
       }
       <button type="button" class="btn-toggle unstyled" (click)="toggleExpanded()"
         [attr.aria-label]="isExpanded() ? 'Ocultar filtros' : 'Mostrar filtros'" [attr.aria-expanded]="isExpanded()"
@@ -156,9 +156,9 @@
 
   <!-- Botón limpiar en modo inline -->
   @if (inline() && showClearButton() && hasActiveFilters()) {
-  <button type="button" class="btn btn-ghost btn-sm inline-clear-btn" (click)="onClearFilters()">
+  <app-button variant="ghost" size="sm" (clicked)="onClearFilters()">
     Limpiar filtros
-  </button>
+  </app-button>
   }
   }
 </div>

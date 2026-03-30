@@ -5,10 +5,12 @@
  */
 
 import { Injectable, Signal, WritableSignal, computed, signal, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { tap, catchError, finalize } from 'rxjs/operators';
 
 import {
+  ApiErrorResponse,
   Campamento,
   CampamentoDetalleDto,
   CampamentoInfoDto,
@@ -323,6 +325,38 @@ export class CampamentosStateService {
       }),
       finalize(() => this._loading.set(false)),
     );
+  }
+
+  /**
+   * Eliminar un campamento (soft delete)
+   * No setea loading/error global para no bloquear la UI
+   */
+  delete(id: string): Observable<void> {
+    return this.apiService.delete(id).pipe(
+      tap(() => {
+        this._campamentos.update((prev) => prev.filter((c) => c.id !== id));
+        this.notificationService.showSuccess('Campamento eliminado exitosamente');
+      }),
+      catchError((err: unknown) => {
+        const errorMsg = this.extractErrorMessage(err, 'Error al eliminar campamento');
+        this.notificationService.showError(errorMsg);
+        return throwError(() => err);
+      }),
+    );
+  }
+
+  /**
+   * Extract error message from HttpErrorResponse or Error
+   */
+  private extractErrorMessage(err: unknown, fallback: string): string {
+    if (err instanceof HttpErrorResponse) {
+      const apiError = err.error as ApiErrorResponse;
+      return apiError?.message || fallback;
+    }
+    if (err instanceof Error) {
+      return err.message;
+    }
+    return fallback;
   }
 
   /**

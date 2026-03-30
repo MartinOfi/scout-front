@@ -5,14 +5,12 @@
     </button>
     <h1>Detalle del Movimiento</h1>
     <div class="actions">
-      <button mat-button (click)="onEdit()" [disabled]="!movimiento()">
-        <mat-icon>edit</mat-icon>
+      <app-button variant="secondary" icon="edit" (clicked)="onEdit()" [disabled]="!movimiento()">
         Editar
-      </button>
-      <button mat-button color="warn" (click)="onDelete()" [disabled]="!movimiento()">
-        <mat-icon>delete</mat-icon>
+      </app-button>
+      <app-button variant="danger" icon="delete" (clicked)="onDelete()" [disabled]="!movimiento()">
         Eliminar
-      </button>
+      </app-button>
     </div>
   </header>
 
@@ -26,7 +24,7 @@
   <div *ngIf="error() && !loading()" class="error-container">
     <mat-icon color="warn">error</mat-icon>
     <p>{{ error() }}</p>
-    <button mat-raised-button (click)="onBack()">Volver</button>
+    <app-button variant="secondary" (clicked)="onBack()">Volver</app-button>
   </div>
 
   <!-- Data State -->

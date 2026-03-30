@@ -16,6 +16,7 @@ import { FormFieldComponent } from '../../../../../shared/components/form/form-f
 import { NumberFieldComponent } from '../../../../../shared/components/form/number-field/number-field.component';
 import { SelectFieldComponent } from '../../../../../shared/components/form/select-field/select-field.component';
 import { TextareaFieldComponent } from '../../../../../shared/components/form/textarea-field/textarea-field.component';
+import { ButtonComponent } from '../../../../../shared/components/button/button.component';
 
 /**
  * Data passed to the dialog
@@ -67,6 +68,7 @@ interface MedioPagoOption {
     NumberFieldComponent,
     SelectFieldComponent,
     TextareaFieldComponent,
+    ButtonComponent,
   ],
   templateUrl: './pago-cuota-dialog.component.html',
   styleUrl: './pago-cuota-dialog.component.scss',
@@ -88,7 +90,10 @@ export class PagoCuotaDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      monto: [0, [Validators.required, Validators.min(1), Validators.max(this.data.montoPendiente)]],
+      monto: [
+        0,
+        [Validators.required, Validators.min(1), Validators.max(this.data.montoPendiente)],
+      ],
       medioPago: [MedioPagoEnum.EFECTIVO, [Validators.required]],
       descripcion: [''],
     });

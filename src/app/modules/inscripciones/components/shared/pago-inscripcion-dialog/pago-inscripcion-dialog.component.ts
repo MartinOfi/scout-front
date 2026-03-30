@@ -24,6 +24,7 @@ import { FormFieldComponent } from '../../../../../shared/components/form/form-f
 import { NumberFieldComponent } from '../../../../../shared/components/form/number-field/number-field.component';
 import { SelectFieldComponent } from '../../../../../shared/components/form/select-field/select-field.component';
 import { TextareaFieldComponent } from '../../../../../shared/components/form/textarea-field/textarea-field.component';
+import { ButtonComponent } from '../../../../../shared/components/button/button.component';
 
 /**
  * Data passed to the dialog
@@ -81,6 +82,7 @@ interface MedioPagoOption {
     NumberFieldComponent,
     SelectFieldComponent,
     TextareaFieldComponent,
+    ButtonComponent,
   ],
   templateUrl: './pago-inscripcion-dialog.component.html',
   styleUrl: './pago-inscripcion-dialog.component.scss',

@@ -44,6 +44,7 @@ import { GenericFiltersComponent } from '../../../../shared/components/filters/g
 import { FilterConfig } from '../../../../shared/components/filters/generic-filters/filter-config.interface';
 import { FilterType } from '../../../../shared/components/filters/generic-filters/filter-type.enum';
 import { ConfirmDialogService } from '../../../../shared/services/confirm-dialog.service';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
 type TabKey = 'todos' | 'ingreso' | 'egreso';
 
@@ -60,6 +61,7 @@ type TabKey = 'todos' | 'ingreso' | 'egreso';
     DataTableComponent,
     ButtonTabsComponent,
     GenericFiltersComponent,
+    ButtonComponent,
   ],
   templateUrl: './movimientos-list.component.html',
   styleUrl: './movimientos-list.component.scss',

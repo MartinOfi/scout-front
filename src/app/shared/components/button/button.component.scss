@@ -1,0 +1,353 @@
+// =============================================================================
+// SCOUT BUTTON COMPONENT
+// =============================================================================
+// Distinctive, production-grade buttons with subtle shimmer effect.
+// Avoids generic "AI slop" aesthetics - refined and intentional.
+
+@use '../../../shared/styles/tokens' as t;
+
+// -----------------------------------------------------------------------------
+// CSS CUSTOM PROPERTIES
+// -----------------------------------------------------------------------------
+
+:host {
+  display: inline-block;
+
+  --btn-bg: #{t.$brand-burgundy};
+  --btn-bg-hover: #{t.$brand-burgundy-dark};
+  --btn-color: #{t.$text-inverse};
+  --btn-border: transparent;
+  --btn-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+  --btn-shadow-hover: 0 4px 12px rgba(129, 33, 40, 0.25), 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  // Shimmer effect
+  --shimmer-color: rgba(255, 255, 255, 0.4);
+  --shimmer-duration: 2.5s;
+
+  // Easing - exponential for natural deceleration (NOT bounce)
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+// -----------------------------------------------------------------------------
+// BASE BUTTON
+// -----------------------------------------------------------------------------
+
+.scout-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: 1px solid var(--btn-border);
+  border-radius: 10px;
+  background: var(--btn-bg);
+  color: var(--btn-color);
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow: var(--btn-shadow);
+  transition:
+    background-color 200ms var(--ease-out-quart),
+    border-color 200ms var(--ease-out-quart),
+    box-shadow 200ms var(--ease-out-quart),
+    transform 150ms var(--ease-out-expo);
+
+  &:focus-visible {
+    outline: 2px solid t.$brand-burgundy;
+    outline-offset: 2px;
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--btn-bg-hover);
+    box-shadow: var(--btn-shadow-hover);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: var(--btn-shadow);
+  }
+
+  // Reduced motion
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    .scout-btn__shimmer {
+      display: none;
+    }
+  }
+
+  // Icon styling
+  mat-icon,
+  .scout-btn__icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// SHIMMER EFFECT (Primary buttons only)
+// -----------------------------------------------------------------------------
+
+.scout-btn__shimmer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--shimmer-color) 50%,
+      transparent 100%
+    );
+    transform: skewX(-20deg);
+    opacity: 0;
+    transition: opacity 300ms var(--ease-out-quart);
+  }
+
+  .scout-btn:hover:not(:disabled) &::before {
+    opacity: 1;
+    animation: shimmer-slide var(--shimmer-duration) ease-in-out infinite;
+  }
+}
+
+@keyframes shimmer-slide {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 200%;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// HIGHLIGHT LAYER (Subtle inset glow for depth)
+// -----------------------------------------------------------------------------
+
+.scout-btn__highlight {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: box-shadow 200ms var(--ease-out-quart);
+
+  .scout-btn:hover:not(:disabled) & {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  .scout-btn:active:not(:disabled) & {
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// CONTENT
+// -----------------------------------------------------------------------------
+
+.scout-btn__content {
+  position: relative;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: inherit;
+  transition: opacity 150ms var(--ease-out-quart);
+
+  &--hidden {
+    opacity: 0;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// LOADING SPINNER
+// -----------------------------------------------------------------------------
+
+.scout-btn__spinner {
+  position: absolute;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// SIZE VARIANTS
+// -----------------------------------------------------------------------------
+
+.scout-btn--sm {
+  padding: 8px 16px;
+  font-size: 0.8125rem;
+  border-radius: 8px;
+  gap: 6px;
+
+  mat-icon,
+  .scout-btn__icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  .scout-btn__spinner svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.scout-btn--lg {
+  padding: 14px 32px;
+  font-size: 1rem;
+  border-radius: 12px;
+  gap: 10px;
+
+  mat-icon,
+  .scout-btn__icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .scout-btn__spinner svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// VARIANT: PRIMARY (Default - Burgundy with shimmer)
+// -----------------------------------------------------------------------------
+
+.scout-btn--primary {
+  --btn-bg: #{t.$brand-burgundy};
+  --btn-bg-hover: #{t.$brand-burgundy-dark};
+  --btn-color: #{t.$text-inverse};
+  --btn-shadow-hover: 0 4px 14px rgba(129, 33, 40, 0.3), 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+// -----------------------------------------------------------------------------
+// VARIANT: SECONDARY (Warm stone, subtle)
+// -----------------------------------------------------------------------------
+
+.scout-btn--secondary {
+  --btn-bg: #{t.$stone-100};
+  --btn-bg-hover: #{t.$stone-200};
+  --btn-color: #{t.$stone-700};
+  --btn-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --btn-shadow-hover: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+  .scout-btn__highlight {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// VARIANT: OUTLINE (Border only)
+// -----------------------------------------------------------------------------
+
+.scout-btn--outline {
+  --btn-bg: transparent;
+  --btn-bg-hover: rgba(129, 33, 40, 0.06);
+  --btn-color: #{t.$brand-burgundy};
+  --btn-border: #{t.$brand-burgundy};
+  --btn-shadow: none;
+  --btn-shadow-hover: none;
+
+  .scout-btn__highlight {
+    display: none;
+  }
+
+  &:hover:not(:disabled) {
+    --btn-border: #{t.$brand-burgundy-dark};
+  }
+}
+
+// -----------------------------------------------------------------------------
+// VARIANT: GHOST (No background)
+// -----------------------------------------------------------------------------
+
+.scout-btn--ghost {
+  --btn-bg: transparent;
+  --btn-bg-hover: #{t.$stone-100};
+  --btn-color: #{t.$stone-600};
+  --btn-shadow: none;
+  --btn-shadow-hover: none;
+
+  .scout-btn__highlight {
+    display: none;
+  }
+
+  &:hover:not(:disabled) {
+    --btn-color: #{t.$stone-800};
+  }
+}
+
+// -----------------------------------------------------------------------------
+// VARIANT: DANGER
+// -----------------------------------------------------------------------------
+
+.scout-btn--danger {
+  --btn-bg: #{t.$color-error};
+  --btn-bg-hover: #{t.$color-error-dark};
+  --btn-color: #{t.$text-inverse};
+  --btn-shadow-hover: 0 4px 14px rgba(220, 38, 38, 0.3), 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shimmer-color: rgba(255, 255, 255, 0.3);
+}
+
+// -----------------------------------------------------------------------------
+// VARIANT: SUCCESS
+// -----------------------------------------------------------------------------
+
+.scout-btn--success {
+  --btn-bg: #{t.$color-success};
+  --btn-bg-hover: #{t.$color-success-dark};
+  --btn-color: #{t.$text-inverse};
+  --btn-shadow-hover: 0 4px 14px rgba(5, 150, 105, 0.3), 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shimmer-color: rgba(255, 255, 255, 0.3);
+}
+
+// -----------------------------------------------------------------------------
+// STATES
+// -----------------------------------------------------------------------------
+
+.scout-btn--full-width {
+  width: 100%;
+}
+
+.scout-btn--disabled,
+.scout-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+
+  .scout-btn__shimmer {
+    display: none;
+  }
+}
+
+.scout-btn--loading {
+  cursor: wait;
+}

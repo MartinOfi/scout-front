@@ -11,6 +11,7 @@ export * from './link-button/link-button.component';
 export * from './data-list-item/data-list-item.component';
 export * from './data-list-card/data-list-card.component';
 export * from './action-button/action-button.component';
+export * from './button/button.component';
 export { EventListItemComponent } from './event-list-item/event-list-item.component';
 export type { EventCategoryConfig } from './event-list-item/event-list-item.component';
 export * from './tables/data-table.component';

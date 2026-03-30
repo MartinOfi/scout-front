@@ -32,6 +32,7 @@ import { PersonaType, Rama, RAMAS, PERSONA_TYPE_LABELS, RAMA_LABELS } from '../.
 import { PersonasApiService } from '../../../modules/personas/services/personas-api.service';
 import { FormFieldComponent } from '../form/form-field/form-field.component';
 import { SelectFieldComponent } from '../form/select-field/select-field.component';
+import { ButtonComponent } from '../button/button.component';
 
 // ============================================================================
 // Public Interfaces
@@ -79,6 +80,7 @@ export interface PersonaSelectorDialogResult {
     MatIconModule,
     FormFieldComponent,
     SelectFieldComponent,
+    ButtonComponent,
   ],
   templateUrl: './persona-selector-dialog.component.html',
   styleUrl: './persona-selector-dialog.component.scss',

@@ -19,6 +19,7 @@ import {
   ConceptoMovimiento,
 } from '../../../../shared/enums';
 import { humanize } from '../../../../shared/pipes';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
 @Component({
   selector: 'app-caja-drawer',
@@ -32,6 +33,7 @@ import { humanize } from '../../../../shared/pipes';
     MatButtonToggleModule,
     MatProgressSpinnerModule,
     MatChipsModule,
+    ButtonComponent,
   ],
   templateUrl: './caja-drawer.component.html',
   styleUrls: ['./caja-drawer.component.scss'],

@@ -96,10 +96,9 @@
       <!-- Quick Actions for Edit Mode -->
       @if (montoPendiente > 0) {
       <div class="quick-actions">
-        <button type="button" class="btn-outline" (click)="pagarTodo()">
-          <mat-icon>payments</mat-icon>
+        <app-button variant="outline" icon="payments" (clicked)="pagarTodo()">
           Pagar Todo (${{ maxAllowedMonto | number:'1.0-0' }})
-        </button>
+        </app-button>
       </div>
       }
       }
@@ -182,19 +181,16 @@
       @if (!isEditMode && montoPendiente > 0) {
       <div class="quick-actions">
         @if (saldoCuentaPersonal > 0) {
-        <button type="button" class="btn-outline" (click)="pagarTodoConSaldo()">
-          <mat-icon>flash_on</mat-icon>
+        <app-button variant="outline" icon="flash_on" (clicked)="pagarTodoConSaldo()">
           Pagar Todo (mixto)
-        </button>
-        <button type="button" class="btn-outline" (click)="usarSaldoDisponible()">
-          <mat-icon>account_balance_wallet</mat-icon>
+        </app-button>
+        <app-button variant="outline" icon="account_balance_wallet" (clicked)="usarSaldoDisponible()">
           Solo Saldo (${{ maxSaldoPersonalUsable | number:'1.0-0' }})
-        </button>
+        </app-button>
         }
-        <button type="button" class="btn-outline" (click)="pagarTodo()">
-          <mat-icon>payments</mat-icon>
+        <app-button variant="outline" icon="payments" (clicked)="pagarTodo()">
           Solo Efectivo (${{ montoPendiente | number:'1.0-0' }})
-        </button>
+        </app-button>
       </div>
       }
     </form>
@@ -202,16 +198,15 @@
 
   <mat-dialog-actions class="dialog-actions" align="end">
     @if (isEditMode) {
-    <button type="button" class="btn-danger" (click)="onDelete()">
-      <mat-icon>delete</mat-icon>
+    <app-button variant="danger" icon="delete" (clicked)="onDelete()">
       Eliminar
-    </button>
+    </app-button>
     }
-    <button type="button" class="btn-secondary" (click)="onCancel()">
+    <app-button variant="secondary" (clicked)="onCancel()">
       Cancelar
-    </button>
-    <button type="button" class="btn-primary" [disabled]="formInvalid" (click)="onSubmit()">
+    </app-button>
+    <app-button variant="primary" [disabled]="formInvalid" (clicked)="onSubmit()">
       {{ isEditMode ? 'Guardar Cambios' : 'Registrar Pago' }}
-    </button>
+    </app-button>
   </mat-dialog-actions>
 </div>

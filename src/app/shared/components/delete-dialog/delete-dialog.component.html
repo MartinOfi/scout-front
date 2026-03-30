@@ -20,13 +20,12 @@
   </mat-dialog-content>
 
   <mat-dialog-actions class="dialog-actions">
-    <button type="button" class="btn-secondary" (click)="onCancel()">
+    <app-button variant="secondary" (clicked)="onCancel()">
       Cancelar
-    </button>
-    <button type="button" class="btn-danger-filled" (click)="onConfirm()">
-      <mat-icon>delete</mat-icon>
+    </app-button>
+    <app-button variant="danger" icon="delete" (clicked)="onConfirm()">
       Eliminar
-    </button>
+    </app-button>
   </mat-dialog-actions>
   }
 
@@ -67,9 +66,9 @@
   </mat-dialog-content>
 
   <mat-dialog-actions class="dialog-actions dialog-actions--center">
-    <button type="button" class="btn-primary" (click)="onClose()">
+    <app-button variant="primary" (clicked)="onClose()">
       Entendido
-    </button>
+    </app-button>
   </mat-dialog-actions>
   }
 
