@@ -4,24 +4,24 @@
 // ============================================================================
 
 @use 'sass:color';
-@use '../components/form/form-tokens' as tokens;
+@use 'tokens' as t;
 
 // ============================================================================
-// Design Tokens
+// Design Tokens (using centralized values)
 // ============================================================================
 
-$dialog-radius-md: 8px;
-$dialog-radius-lg: 12px;
-$dialog-radius-xl: 16px;
+$dialog-radius-md: t.$radius-default;
 
-$dialog-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-$dialog-transition: 150ms ease-out;
+// Backwards-compatible color aliases for components using legacy naming
+$success-500: t.$color-success;
+$success-600: t.$color-success-dark;
+$danger-500: t.$color-error;
+$danger-600: t.$color-error-dark;
+$dialog-radius-lg: t.$radius-xl;
+$dialog-radius-xl: t.$radius-2xl;
 
-// Color tokens
-$success-500: #22c55e;
-$success-600: #16a34a;
-$danger-500: #ef4444;
-$danger-600: #dc2626;
+$dialog-shadow: t.$shadow-dialog;
+$dialog-transition: t.$transition-fast;
 
 // ============================================================================
 // Material Dialog Container Override Mixin
@@ -69,13 +69,13 @@ $danger-600: #dc2626;
   padding: 20px 24px 16px;
   font-size: 1.125rem;
   font-weight: 600;
-  color: tokens.$stone-900;
+  color: t.$stone-900;
   letter-spacing: -0.01em;
-  border-bottom: 1px solid tokens.$stone-200;
+  border-bottom: 1px solid t.$stone-200;
   background-color: white;
 
   mat-icon {
-    color: tokens.$brand-burgundy;
+    color: t.$brand-burgundy;
     font-size: 22px;
     width: 22px;
     height: 22px;
@@ -93,11 +93,11 @@ $danger-600: #dc2626;
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  border-top: 1px solid tokens.$stone-200;
+  border-top: 1px solid t.$stone-200;
 }
 
 // ============================================================================
-// Button Mixins
+// Button Mixins (using centralized patterns where possible)
 // ============================================================================
 
 @mixin btn-base {
@@ -112,29 +112,29 @@ $danger-600: #dc2626;
 @mixin btn-secondary {
   @include btn-base;
   background-color: white;
-  border: 1px solid tokens.$stone-300;
-  color: tokens.$stone-700;
+  border: 1px solid t.$stone-300;
+  color: t.$stone-700;
 
   &:hover {
-    background-color: tokens.$stone-50;
-    border-color: tokens.$stone-400;
+    background-color: t.$stone-50;
+    border-color: t.$stone-400;
   }
 
   &:active {
-    background-color: tokens.$stone-100;
+    background-color: t.$stone-100;
   }
 }
 
 @mixin btn-primary {
   @include btn-base;
-  background: linear-gradient(135deg, tokens.$brand-burgundy 0%, tokens.$brand-burgundy-light 100%);
+  background: linear-gradient(135deg, t.$brand-burgundy 0%, t.$brand-burgundy-light 100%);
   border: none;
   color: white;
-  box-shadow: 0 1px 2px 0 rgba(tokens.$brand-burgundy, 0.2);
+  box-shadow: 0 1px 2px 0 rgba(t.$brand-burgundy, 0.2);
 
   &:hover:not(:disabled) {
-    background: linear-gradient(135deg, color.adjust(tokens.$brand-burgundy, $lightness: -5%) 0%, tokens.$brand-burgundy 100%);
-    box-shadow: 0 2px 4px 0 rgba(tokens.$brand-burgundy, 0.25);
+    background: linear-gradient(135deg, color.adjust(t.$brand-burgundy, $lightness: -5%) 0%, t.$brand-burgundy 100%);
+    box-shadow: 0 2px 4px 0 rgba(t.$brand-burgundy, 0.25);
   }
 
   &:active:not(:disabled) {
@@ -142,8 +142,8 @@ $danger-600: #dc2626;
   }
 
   &:disabled {
-    background: tokens.$stone-200;
-    color: tokens.$stone-400;
+    background: t.$stone-200;
+    color: t.$stone-400;
     cursor: not-allowed;
     box-shadow: none;
   }
@@ -153,24 +153,24 @@ $danger-600: #dc2626;
   @include btn-base;
   padding: 10px 16px;
   background-color: white;
-  border: 1px solid tokens.$stone-300;
-  color: tokens.$stone-700;
+  border: 1px solid t.$stone-300;
+  color: t.$stone-700;
 
   mat-icon {
-    color: tokens.$brand-burgundy;
+    color: t.$brand-burgundy;
   }
 
   &:hover {
-    border-color: tokens.$brand-burgundy;
-    color: tokens.$brand-burgundy;
+    border-color: t.$brand-burgundy;
+    color: t.$brand-burgundy;
 
     mat-icon {
-      color: tokens.$brand-burgundy;
+      color: t.$brand-burgundy;
     }
   }
 
   &:active {
-    background-color: tokens.$stone-100;
+    background-color: t.$stone-100;
   }
 }
 
@@ -180,8 +180,8 @@ $danger-600: #dc2626;
   gap: 6px;
   margin-right: auto;
   background-color: white;
-  border: 1px solid $danger-500;
-  color: $danger-600;
+  border: 1px solid t.$color-error;
+  color: t.$color-error-dark;
   padding: 10px 16px;
   border-radius: $dialog-radius-md;
   font-size: 0.875rem;
@@ -196,12 +196,12 @@ $danger-600: #dc2626;
   }
 
   &:hover {
-    background-color: rgba($danger-500, 0.06);
-    border-color: $danger-600;
+    background-color: rgba(t.$color-error, 0.06);
+    border-color: t.$color-error-dark;
   }
 
   &:active {
-    background-color: rgba($danger-500, 0.1);
+    background-color: rgba(t.$color-error, 0.1);
   }
 }
 
@@ -238,7 +238,7 @@ $danger-600: #dc2626;
 }
 
 // ============================================================================
-// Loading & Empty States
+// Loading & Empty States (using centralized patterns)
 // ============================================================================
 
 @mixin dialog-state-box {
@@ -246,17 +246,17 @@ $danger-600: #dc2626;
   align-items: center;
   gap: 10px;
   padding: 16px;
-  background: linear-gradient(135deg, tokens.$stone-50 0%, tokens.$stone-100 100%);
-  border: 1px solid tokens.$stone-200;
+  background: linear-gradient(135deg, t.$stone-50 0%, t.$stone-100 100%);
+  border: 1px solid t.$stone-200;
   border-radius: $dialog-radius-md;
-  color: tokens.$stone-500;
+  color: t.$stone-500;
   font-size: 0.875rem;
 
   mat-icon {
     font-size: 20px;
     width: 20px;
     height: 20px;
-    color: tokens.$stone-400;
+    color: t.$stone-400;
   }
 }
 

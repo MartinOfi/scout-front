@@ -1,11 +1,11 @@
-@use '../../../../../../shared/components/form/form-tokens' as tokens;
+@use '../../../../../../shared/styles/tokens' as t;
 
 $card-radius: 16px;
 
 .movimientos-card {
   background: white;
   border-radius: $card-radius;
-  box-shadow: tokens.$shadow-card;
+  box-shadow: t.$shadow-card;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -15,14 +15,14 @@ $card-radius: 16px;
     align-items: center;
     gap: 10px;
     padding: 14px 16px;
-    border-bottom: 1px solid tokens.$stone-100;
-    background: tokens.$stone-50;
+    border-bottom: 1px solid t.$stone-100;
+    background: t.$stone-50;
 
     mat-icon {
       font-size: 20px;
       width: 20px;
       height: 20px;
-      color: tokens.$brand-burgundy;
+      color: t.$brand-burgundy;
     }
   }
 
@@ -30,7 +30,7 @@ $card-radius: 16px;
     margin: 0;
     font-size: 15px;
     font-weight: 600;
-    color: tokens.$stone-800;
+    color: t.$stone-800;
     flex: 1;
   }
 
@@ -41,11 +41,11 @@ $card-radius: 16px;
     padding: 0;
     background: transparent;
     border: none;
-    color: tokens.$brand-burgundy;
+    color: t.$brand-burgundy;
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    transition: opacity tokens.$transition-fast;
+    transition: opacity t.$transition-fast;
 
     mat-icon {
       font-size: 16px;
@@ -59,7 +59,7 @@ $card-radius: 16px;
 
     &:focus-visible {
       outline: none;
-      box-shadow: tokens.$shadow-focus;
+      box-shadow: t.$shadow-focus;
       border-radius: 4px;
     }
   }
@@ -76,7 +76,7 @@ $card-radius: 16px;
     height: 100%;
     min-height: 120px;
     padding: 24px 16px;
-    color: tokens.$stone-400;
+    color: t.$stone-400;
     font-size: 14px;
     font-weight: 500;
   }
@@ -92,15 +92,15 @@ $card-radius: 16px;
     align-items: flex-start;
     gap: 12px;
     padding: 12px 16px;
-    border-bottom: 1px solid tokens.$stone-100;
-    transition: background-color tokens.$transition-fast;
+    border-bottom: 1px solid t.$stone-100;
+    transition: background-color t.$transition-fast;
 
     &:last-child {
       border-bottom: none;
     }
 
     &:hover {
-      background-color: tokens.$stone-50;
+      background-color: t.$stone-50;
     }
   }
 
@@ -112,9 +112,9 @@ $card-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: color-mix(in srgb, tokens.$color-success 12%, transparent);
+    background-color: color-mix(in srgb, t.$color-success 12%, transparent);
     border-radius: 50%;
-    color: tokens.$color-success;
+    color: t.$color-success;
 
     mat-icon {
       font-size: 16px;
@@ -141,13 +141,13 @@ $card-radius: 16px;
   &__amount {
     font-size: 15px;
     font-weight: 600;
-    color: tokens.$stone-900;
+    color: t.$stone-900;
     font-variant-numeric: tabular-nums;
   }
 
   &__date {
     font-size: 12px;
-    color: tokens.$stone-500;
+    color: t.$stone-500;
     white-space: nowrap;
   }
 
@@ -156,7 +156,7 @@ $card-radius: 16px;
     align-items: center;
     gap: 6px;
     font-size: 12px;
-    color: tokens.$stone-500;
+    color: t.$stone-500;
     flex-wrap: wrap;
   }
 
@@ -164,10 +164,10 @@ $card-radius: 16px;
     display: inline-flex;
     align-items: center;
     padding: 2px 6px;
-    background-color: tokens.$stone-100;
+    background-color: t.$stone-100;
     border-radius: 4px;
     font-size: 11px;
     font-weight: 500;
-    color: tokens.$stone-600;
+    color: t.$stone-600;
   }
 }

@@ -1,0 +1,144 @@
+// =============================================================================
+// BADGE PATTERNS
+// =============================================================================
+// Reusable badge mixins for status indicators, labels, and tags.
+// Badges communicate status, categories, or counts.
+
+@use '../tokens' as t;
+
+// -----------------------------------------------------------------------------
+// BASE BADGE
+// -----------------------------------------------------------------------------
+@mixin badge-base {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: t.$radius-badge;
+  font-size: 0.6875rem;  // 11px
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+// Badge with icon
+@mixin badge-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+// Larger badge variant
+@mixin badge-lg {
+  padding: 6px 12px;
+  font-size: 0.75rem;  // 12px
+  border-radius: t.$radius-default;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// STATUS BADGES
+// -----------------------------------------------------------------------------
+
+@mixin badge-success {
+  @include badge-base;
+  background: t.$color-success-light;
+  color: t.$color-success-dark;
+}
+
+@mixin badge-error {
+  @include badge-base;
+  background: t.$color-error-light;
+  color: t.$color-error-dark;
+}
+
+@mixin badge-warning {
+  @include badge-base;
+  background: t.$color-warning-light;
+  color: t.$color-warning-dark;
+}
+
+@mixin badge-info {
+  @include badge-base;
+  background: t.$color-info-light;
+  color: t.$color-info-dark;
+}
+
+@mixin badge-pending {
+  @include badge-base;
+  background: t.$color-pending-light;
+  color: t.$color-warning-dark;
+}
+
+@mixin badge-neutral {
+  @include badge-base;
+  background: t.$stone-100;
+  color: t.$stone-600;
+}
+
+// -----------------------------------------------------------------------------
+// RAMA BADGES
+// -----------------------------------------------------------------------------
+// Dynamic badge for scout branches
+
+@mixin badge-rama($rama) {
+  @include badge-base;
+  background: t.rama-color($rama, 'light');
+  color: t.rama-color($rama, 'dark');
+}
+
+// Generic rama badge (use with CSS custom properties)
+@mixin badge-rama-dynamic {
+  @include badge-base;
+  background: var(--rama-color-light, #{t.$stone-100});
+  color: var(--rama-color-dark, #{t.$stone-600});
+}
+
+// -----------------------------------------------------------------------------
+// COUNT BADGE
+// -----------------------------------------------------------------------------
+// Small circular badge for counts/notifications
+
+@mixin badge-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: t.$radius-full;
+  background: t.$brand-burgundy;
+  color: t.$text-inverse;
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+@mixin badge-count-neutral {
+  @include badge-count;
+  background: t.$stone-200;
+  color: t.$stone-700;
+}
+
+// -----------------------------------------------------------------------------
+// OUTLINE BADGES
+// -----------------------------------------------------------------------------
+
+@mixin badge-outline {
+  @include badge-base;
+  background: transparent;
+  border: 1px solid t.$border-default;
+  color: t.$text-secondary;
+}
+
+@mixin badge-outline-primary {
+  @include badge-base;
+  background: transparent;
+  border: 1px solid t.$brand-burgundy;
+  color: t.$brand-burgundy;
+}

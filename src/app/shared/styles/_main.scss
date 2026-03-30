@@ -1,0 +1,28 @@
+// =============================================================================
+// SCOUT DESIGN SYSTEM - MAIN ENTRY POINT
+// =============================================================================
+// Single import for the complete design system including tokens and patterns.
+//
+// Usage in components:
+//   @use 'app/shared/styles/main' as ds;
+//
+//   .my-card {
+//     background: ds.$brand-burgundy;
+//     border-radius: ds.$radius-card;
+//     @include ds.card-base;
+//   }
+//
+// Or import separately for namespacing:
+//   @use 'app/shared/styles/tokens' as t;
+//   @use 'app/shared/styles/patterns' as p;
+//
+//   .my-card {
+//     background: t.$brand-burgundy;
+//     @include p.card-base;
+//   }
+
+// Forward all tokens (colors, radius, shadows, transitions, spacing)
+@forward 'tokens';
+
+// Forward all patterns (cards, badges, states, buttons, headers)
+@forward 'patterns';

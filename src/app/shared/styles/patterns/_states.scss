@@ -1,0 +1,233 @@
+// =============================================================================
+// STATE PATTERNS
+// =============================================================================
+// Reusable patterns for empty, loading, and error states.
+// Provides consistent user feedback across the application.
+
+@use '../tokens' as t;
+
+// -----------------------------------------------------------------------------
+// EMPTY STATE
+// -----------------------------------------------------------------------------
+// Used when a list/section has no content
+
+@mixin empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: t.$spacing-2xl t.$spacing-xl;
+  text-align: center;
+  gap: t.$spacing-md;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: t.$stone-400;
+  }
+
+  p, .empty-message {
+    color: t.$text-secondary;
+    margin: 0;
+    font-size: 0.875rem;
+    max-width: 280px;
+  }
+
+  .empty-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: t.$text-primary;
+    margin-bottom: t.$spacing-xs;
+  }
+}
+
+// Compact empty state for inline usage
+@mixin empty-state-compact {
+  display: flex;
+  align-items: center;
+  gap: t.$spacing-sm;
+  padding: t.$spacing-lg;
+  background: linear-gradient(135deg, t.$stone-50 0%, t.$stone-100 100%);
+  border: 1px solid t.$stone-200;
+  border-radius: t.$radius-default;
+  color: t.$text-muted;
+  font-size: 0.875rem;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: t.$stone-400;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// LOADING STATE
+// -----------------------------------------------------------------------------
+// Displayed while content is being fetched
+
+@mixin loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: t.$spacing-2xl t.$spacing-xl;
+  text-align: center;
+  gap: t.$spacing-md;
+
+  mat-spinner {
+    margin-bottom: t.$spacing-sm;
+  }
+
+  p, .loading-message {
+    color: t.$text-secondary;
+    margin: 0;
+    font-size: 0.875rem;
+  }
+}
+
+// Inline loading state
+@mixin loading-state-inline {
+  display: flex;
+  align-items: center;
+  gap: t.$spacing-sm;
+  padding: t.$spacing-lg;
+  background: linear-gradient(135deg, t.$stone-50 0%, t.$stone-100 100%);
+  border: 1px solid t.$stone-200;
+  border-radius: t.$radius-default;
+  color: t.$text-muted;
+  font-size: 0.875rem;
+
+  .loading-icon {
+    animation: spin 1.5s linear infinite;
+  }
+}
+
+// Skeleton loading placeholder
+@mixin skeleton-box($width: 100%, $height: 1rem) {
+  width: $width;
+  height: $height;
+  background: linear-gradient(
+    90deg,
+    t.$stone-100 25%,
+    t.$stone-200 50%,
+    t.$stone-100 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: t.$radius-sm;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// ERROR STATE
+// -----------------------------------------------------------------------------
+// Displayed when content fails to load
+
+@mixin error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: t.$spacing-2xl t.$spacing-xl;
+  text-align: center;
+  gap: t.$spacing-md;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: t.$color-error;
+  }
+
+  .error-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: t.$text-primary;
+  }
+
+  p, .error-message {
+    color: t.$text-secondary;
+    margin: 0;
+    font-size: 0.875rem;
+    max-width: 320px;
+  }
+}
+
+// Compact error for inline usage
+@mixin error-state-compact {
+  display: flex;
+  align-items: center;
+  gap: t.$spacing-sm;
+  padding: t.$spacing-md;
+  background: t.$color-error-light;
+  border: 1px solid rgba(t.$color-error, 0.2);
+  border-radius: t.$radius-default;
+  color: t.$color-error;
+  font-size: 0.875rem;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// NO SELECTION STATE
+// -----------------------------------------------------------------------------
+// Used in master-detail views when nothing is selected
+
+@mixin no-selection-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: t.$spacing-2xl;
+  text-align: center;
+  background: t.$stone-50;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: t.$stone-300;
+    margin-bottom: t.$spacing-lg;
+  }
+
+  h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: t.$text-secondary;
+    margin: 0 0 t.$spacing-xs;
+  }
+
+  p {
+    color: t.$text-muted;
+    margin: 0;
+    font-size: 0.875rem;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// SPIN ANIMATION
+// -----------------------------------------------------------------------------
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

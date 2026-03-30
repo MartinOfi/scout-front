@@ -1,0 +1,232 @@
+// =============================================================================
+// HEADER PATTERNS
+// =============================================================================
+// Reusable header mixins for section titles, dialog headers, and page headers.
+
+@use '../tokens' as t;
+
+// -----------------------------------------------------------------------------
+// SECTION HEADER
+// -----------------------------------------------------------------------------
+// Used for card/section titles with optional actions
+
+@mixin section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: t.$spacing-md;
+  margin-bottom: t.$spacing-lg;
+}
+
+@mixin section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: t.$text-primary;
+  margin: 0;
+  line-height: 1.4;
+}
+
+@mixin section-subtitle {
+  font-size: 0.875rem;
+  color: t.$text-secondary;
+  margin: t.$spacing-xs 0 0;
+}
+
+// Section header with icon
+@mixin section-header-with-icon {
+  @include section-header;
+
+  .header-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: t.$radius-default;
+    background: linear-gradient(135deg, t.$brand-burgundy 0%, t.$brand-burgundy-light 100%);
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: t.$text-inverse;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// DIALOG HEADER
+// -----------------------------------------------------------------------------
+// Standard header for Material dialogs
+
+@mixin dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 20px 24px 16px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: t.$stone-900;
+  letter-spacing: -0.01em;
+  border-bottom: 1px solid t.$stone-200;
+  background-color: t.$surface-white;
+
+  mat-icon {
+    color: t.$brand-burgundy;
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+}
+
+// Dialog header close button
+@mixin dialog-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: t.$radius-default;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: t.$stone-500;
+  transition: all t.$transition-fast;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: t.$stone-100;
+    color: t.$stone-700;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// PAGE HEADER
+// -----------------------------------------------------------------------------
+// Main page title area
+
+@mixin page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: t.$spacing-lg;
+  margin-bottom: t.$spacing-xl;
+}
+
+@mixin page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: t.$text-primary;
+  margin: 0;
+  line-height: 1.3;
+}
+
+@mixin page-subtitle {
+  font-size: 0.9375rem;
+  color: t.$text-secondary;
+  margin: t.$spacing-xs 0 0;
+}
+
+// Page header with breadcrumb
+@mixin page-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: t.$spacing-xs;
+  font-size: 0.8125rem;
+  color: t.$text-muted;
+  margin-bottom: t.$spacing-sm;
+
+  a {
+    color: t.$text-secondary;
+    text-decoration: none;
+    transition: color t.$transition-fast;
+
+    &:hover {
+      color: t.$brand-burgundy;
+    }
+  }
+
+  .separator {
+    color: t.$stone-400;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// LIST HEADER
+// -----------------------------------------------------------------------------
+// Header for list/table views with filters and actions
+
+@mixin list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: t.$spacing-md;
+  padding: t.$spacing-md t.$spacing-lg;
+  background: t.$stone-50;
+  border-bottom: 1px solid t.$border-light;
+  border-radius: t.$radius-card t.$radius-card 0 0;
+}
+
+@mixin list-header-actions {
+  display: flex;
+  align-items: center;
+  gap: t.$spacing-sm;
+}
+
+// -----------------------------------------------------------------------------
+// DETAIL HEADER
+// -----------------------------------------------------------------------------
+// Header for detail/view pages
+
+@mixin detail-header {
+  display: flex;
+  align-items: flex-start;
+  gap: t.$spacing-lg;
+  padding: t.$spacing-xl;
+  background: linear-gradient(135deg, t.$brand-burgundy 0%, t.$brand-indigo 100%);
+  color: t.$text-inverse;
+  border-radius: t.$radius-card t.$radius-card 0 0;
+}
+
+@mixin detail-header-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: t.$radius-full;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+
+  mat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@mixin detail-header-content {
+  flex: 1;
+
+  h1, .title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 t.$spacing-xs;
+    color: t.$text-inverse;
+  }
+
+  .subtitle {
+    font-size: 0.9375rem;
+    opacity: 0.9;
+    margin: 0;
+  }
+}

@@ -1,0 +1,65 @@
+// =============================================================================
+// TRANSITION TOKENS
+// =============================================================================
+// Timing functions and durations for smooth animations.
+// Uses the standard Material Design easing curve as default.
+
+// -----------------------------------------------------------------------------
+// DURATIONS
+// -----------------------------------------------------------------------------
+$duration-instant: 0ms;
+$duration-fast: 150ms;
+$duration-normal: 250ms;
+$duration-slow: 350ms;
+$duration-slower: 500ms;
+
+// -----------------------------------------------------------------------------
+// EASING FUNCTIONS
+// -----------------------------------------------------------------------------
+// Standard Material Design easing - natural acceleration/deceleration
+$ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+// Deceleration - entering elements
+$ease-out: cubic-bezier(0, 0, 0.2, 1);
+// Acceleration - exiting elements
+$ease-in: cubic-bezier(0.4, 0, 1, 1);
+// Linear - progress indicators
+$ease-linear: linear;
+// Bounce - playful interactions
+$ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+// -----------------------------------------------------------------------------
+// COMPOSED TRANSITIONS
+// -----------------------------------------------------------------------------
+$transition-fast: $duration-fast $ease-default;
+$transition-normal: $duration-normal $ease-default;
+$transition-slow: $duration-slow $ease-default;
+
+// -----------------------------------------------------------------------------
+// PROPERTY-SPECIFIC TRANSITIONS
+// -----------------------------------------------------------------------------
+$transition-colors: color $duration-fast $ease-default,
+                    background-color $duration-fast $ease-default,
+                    border-color $duration-fast $ease-default;
+
+$transition-transform: transform $duration-fast $ease-default;
+
+$transition-opacity: opacity $duration-fast $ease-default;
+
+$transition-shadow: box-shadow $duration-fast $ease-default;
+
+$transition-all: all $duration-fast $ease-default;
+
+// -----------------------------------------------------------------------------
+// HOVER TRANSITIONS MIXIN
+// -----------------------------------------------------------------------------
+@mixin transition-hover($properties: all) {
+  transition: #{$properties} $duration-fast $ease-default;
+}
+
+// Common multi-property hover transition
+@mixin transition-interactive {
+  transition: background-color $duration-fast $ease-default,
+              border-color $duration-fast $ease-default,
+              box-shadow $duration-fast $ease-default,
+              transform $duration-fast $ease-default;
+}

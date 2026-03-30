@@ -1,5 +1,6 @@
 // =============================================================================
 // MOVIMIENTOS LIST COMPONENT STYLES
+// Unified pattern matching personas-dashboard
 // =============================================================================
 
 .movimientos-list-container {
@@ -9,32 +10,37 @@
 }
 
 // =============================================================================
-// HEADER
+// MAIN CONTENT CONTAINER (matches personas-tabs-container)
 // =============================================================================
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--spacing-md);
+.movimientos-content {
+  background: white;
+  border-radius: 8px;
+  padding: var(--spacing-lg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
-  &-left {
+  &__header {
     display: flex;
-    align-items: baseline;
-    gap: var(--spacing-sm);
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
   }
 }
 
-// =============================================================================
-// FILTERS SECTION
-// =============================================================================
+.record-count {
+  font-size: 14px;
+  color: var(--gray-500);
+}
 
-.filters-section {
-  background: white;
-  border-radius: 8px;
-  padding: var(--spacing-md);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+.tab-content {
+  margin-top: var(--spacing-md);
 }
 
 // =============================================================================
@@ -48,12 +54,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-2xl);
+  padding: var(--spacing-xl);
   text-align: center;
   gap: var(--spacing-md);
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   min-height: 300px;
 
   mat-icon {
@@ -85,11 +88,9 @@
   align-items: center;
   flex-wrap: wrap;
   gap: var(--spacing-md);
-  padding: var(--spacing-md);
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding-top: var(--spacing-md);
   margin-top: var(--spacing-md);
+  border-top: 1px solid var(--gray-200);
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -132,7 +133,6 @@
   .page-size-select {
     width: 80px;
 
-    // Reduce Material form field density for compact pagination
     ::ng-deep {
       .mat-mdc-form-field-subscript-wrapper {
         display: none;

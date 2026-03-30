@@ -1,0 +1,46 @@
+// =============================================================================
+// SHADOW TOKENS
+// =============================================================================
+// Elevation system using consistent box-shadow values.
+// Shadows use subtle transparency for natural depth perception.
+
+// -----------------------------------------------------------------------------
+// SHADOW SCALE
+// -----------------------------------------------------------------------------
+$shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
+$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.04);
+$shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 8px 10px rgba(0, 0, 0, 0.04);
+$shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+// -----------------------------------------------------------------------------
+// SEMANTIC ALIASES
+// -----------------------------------------------------------------------------
+$shadow-card: $shadow-sm;
+$shadow-card-hover: $shadow-lg;
+$shadow-dialog: $shadow-2xl;
+$shadow-dropdown: $shadow-lg;
+$shadow-tooltip: $shadow-md;
+$shadow-button-hover: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+// -----------------------------------------------------------------------------
+// SPECIALIZED SHADOWS
+// -----------------------------------------------------------------------------
+$shadow-input-inset: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-focus: 0 0 0 3px rgba(129, 33, 40, 0.15);  // Brand burgundy focus ring
+$shadow-focus-error: 0 0 0 3px rgba(220, 38, 38, 0.15);
+$shadow-focus-success: 0 0 0 3px rgba(5, 150, 105, 0.15);
+
+// -----------------------------------------------------------------------------
+// INTERACTIVE SHADOW MIXIN
+// -----------------------------------------------------------------------------
+// Use this for cards/buttons that lift on hover
+@mixin shadow-interactive($base: $shadow-sm, $hover: $shadow-lg) {
+  box-shadow: $base;
+  transition: box-shadow 150ms ease;
+
+  &:hover {
+    box-shadow: $hover;
+  }
+}

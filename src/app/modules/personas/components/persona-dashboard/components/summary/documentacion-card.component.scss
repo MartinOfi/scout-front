@@ -1,11 +1,11 @@
-@use '../../../../../../shared/components/form/form-tokens' as tokens;
+@use '../../../../../../shared/styles/tokens' as t;
 
 $card-radius: 16px;
 
 .doc-card {
   background: white;
   border-radius: $card-radius;
-  box-shadow: tokens.$shadow-card;
+  box-shadow: t.$shadow-card;
   padding: 16px;
 
   &__header {
@@ -18,7 +18,7 @@ $card-radius: 16px;
       font-size: 20px;
       width: 20px;
       height: 20px;
-      color: tokens.$brand-burgundy;
+      color: t.$brand-burgundy;
     }
   }
 
@@ -26,7 +26,7 @@ $card-radius: 16px;
     margin: 0;
     font-size: 14px;
     font-weight: 600;
-    color: tokens.$stone-800;
+    color: t.$stone-800;
     letter-spacing: -0.01em;
   }
 }
@@ -46,7 +46,7 @@ $card-radius: 16px;
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  background-color: tokens.$stone-50;
+  background-color: t.$stone-50;
   border-radius: 8px;
 
   &__check {
@@ -65,19 +65,19 @@ $card-radius: 16px;
     }
 
     &--yes {
-      background-color: tokens.$color-success;
+      background-color: t.$color-success;
       color: white;
     }
 
     &--no {
-      background-color: tokens.$stone-200;
-      color: tokens.$stone-400;
+      background-color: t.$stone-200;
+      color: t.$stone-400;
     }
   }
 
   &__label {
     font-size: 13px;
     font-weight: 500;
-    color: tokens.$stone-700;
+    color: t.$stone-700;
   }
 }

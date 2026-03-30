@@ -1,0 +1,246 @@
+// =============================================================================
+// BUTTON PATTERNS
+// =============================================================================
+// Reusable button mixins for consistent button styling.
+// Extends Angular Material buttons with scout-themed variants.
+
+@use 'sass:color';
+@use '../tokens' as t;
+
+// -----------------------------------------------------------------------------
+// BASE BUTTON
+// -----------------------------------------------------------------------------
+@mixin btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 24px;
+  border-radius: t.$radius-button;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: all t.$transition-fast;
+  text-decoration: none;
+  border: none;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// Small button variant
+@mixin btn-sm {
+  padding: 8px 16px;
+  font-size: 0.8125rem;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// Large button variant
+@mixin btn-lg {
+  padding: 14px 28px;
+  font-size: 1rem;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// PRIMARY BUTTON
+// -----------------------------------------------------------------------------
+@mixin btn-primary {
+  @include btn-base;
+  background: linear-gradient(135deg, t.$brand-burgundy 0%, t.$brand-burgundy-light 100%);
+  color: t.$text-inverse;
+  box-shadow: 0 1px 2px 0 rgba(t.$brand-burgundy, 0.2);
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, color.adjust(t.$brand-burgundy, $lightness: -5%) 0%, t.$brand-burgundy 100%);
+    box-shadow: 0 2px 4px 0 rgba(t.$brand-burgundy, 0.25);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    background: t.$stone-200;
+    color: t.$stone-400;
+    box-shadow: none;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// SECONDARY BUTTON
+// -----------------------------------------------------------------------------
+@mixin btn-secondary {
+  @include btn-base;
+  background-color: t.$surface-white;
+  border: 1px solid t.$border-default;
+  color: t.$text-secondary;
+
+  &:hover:not(:disabled) {
+    background-color: t.$stone-50;
+    border-color: t.$border-strong;
+  }
+
+  &:active:not(:disabled) {
+    background-color: t.$stone-100;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// OUTLINE BUTTON
+// -----------------------------------------------------------------------------
+@mixin btn-outline {
+  @include btn-base;
+  padding: 10px 16px;
+  background-color: t.$surface-white;
+  border: 1px solid t.$border-default;
+  color: t.$text-secondary;
+
+  mat-icon {
+    color: t.$brand-burgundy;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: t.$brand-burgundy;
+    color: t.$brand-burgundy;
+  }
+
+  &:active:not(:disabled) {
+    background-color: t.$stone-100;
+  }
+}
+
+// Outline primary variant
+@mixin btn-outline-primary {
+  @include btn-outline;
+  border-color: t.$brand-burgundy;
+  color: t.$brand-burgundy;
+
+  &:hover:not(:disabled) {
+    background-color: rgba(t.$brand-burgundy, 0.05);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// DANGER BUTTON
+// -----------------------------------------------------------------------------
+@mixin btn-danger {
+  @include btn-base;
+  margin-right: auto;  // Push to left in action bars
+  background-color: t.$surface-white;
+  border: 1px solid t.$color-error;
+  color: t.$color-error-dark;
+
+  &:hover:not(:disabled) {
+    background-color: rgba(t.$color-error, 0.06);
+    border-color: t.$color-error-dark;
+  }
+
+  &:active:not(:disabled) {
+    background-color: rgba(t.$color-error, 0.1);
+  }
+}
+
+// Filled danger button
+@mixin btn-danger-filled {
+  @include btn-base;
+  background-color: t.$color-error;
+  color: t.$text-inverse;
+
+  &:hover:not(:disabled) {
+    background-color: t.$color-error-dark;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// SUCCESS BUTTON
+// -----------------------------------------------------------------------------
+@mixin btn-success {
+  @include btn-base;
+  background-color: t.$color-success;
+  color: t.$text-inverse;
+
+  &:hover:not(:disabled) {
+    background-color: t.$color-success-dark;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// GHOST BUTTON
+// -----------------------------------------------------------------------------
+// No background, just text
+@mixin btn-ghost {
+  @include btn-base;
+  background-color: transparent;
+  color: t.$text-secondary;
+  padding: 8px 12px;
+
+  &:hover:not(:disabled) {
+    background-color: t.$stone-100;
+    color: t.$text-primary;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// ICON BUTTON
+// -----------------------------------------------------------------------------
+@mixin btn-icon($size: 40px) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: $size;
+  height: $size;
+  padding: 0;
+  border-radius: t.$radius-default;
+  background-color: transparent;
+  color: t.$text-secondary;
+  border: none;
+  cursor: pointer;
+  transition: all t.$transition-fast;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: t.$stone-100;
+    color: t.$text-primary;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Small icon button
+@mixin btn-icon-sm {
+  @include btn-icon(32px);
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}

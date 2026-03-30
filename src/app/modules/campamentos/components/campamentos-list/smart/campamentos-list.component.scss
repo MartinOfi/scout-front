@@ -1,8 +1,8 @@
 // =============================================================================
-// CAMPAMENTOS LIST - EXPEDITION-INSPIRED DESIGN
+// CAMPAMENTOS LIST - UNIFIED PATTERN
 // =============================================================================
 
-@use '../../../../../shared/components/form/form-tokens' as tokens;
+@use '../../../../../shared/styles/tokens' as t;
 
 // -----------------------------------------------------------------------------
 // REDUCED MOTION
@@ -23,11 +23,6 @@
 
 .camps-page {
   min-height: 100%;
-  padding: 24px;
-
-  @media (max-width: 640px) {
-    padding: 16px;
-  }
 }
 
 .camps-content {
@@ -36,117 +31,13 @@
 }
 
 // -----------------------------------------------------------------------------
-// PAGE HEADER
+// ACTIONS
 // -----------------------------------------------------------------------------
 
-.camps-header {
+.camps-actions {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 24px;
-
-  @media (max-width: 640px) {
-    flex-direction: column;
-  }
-}
-
-.camps-header__left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.camps-header__icon {
-  flex-shrink: 0;
-  width: 56px;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, tokens.$brand-burgundy 0%, #a32d36 100%);
-  border-radius: 14px;
-  color: white;
-  box-shadow: 0 4px 12px rgba(tokens.$brand-burgundy, 0.3);
-
-  mat-icon {
-    font-size: 28px;
-    width: 28px;
-    height: 28px;
-  }
-}
-
-.camps-header__info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.camps-header__title {
-  margin: 0;
-  font-size: clamp(1.5rem, 4vw, 2rem);
-  font-weight: 700;
-  color: tokens.$stone-900;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-}
-
-.camps-header__subtitle {
-  font-size: 14px;
-  color: tokens.$stone-500;
-}
-
-.camps-header__right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  @media (max-width: 640px) {
-    width: 100%;
-  }
-}
-
-// -----------------------------------------------------------------------------
-// CREATE BUTTON
-// -----------------------------------------------------------------------------
-
-.btn-create {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  background-color: tokens.$brand-burgundy;
-  border: none;
-  border-radius: 10px;
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background-color 150ms ease,
-    transform 150ms ease,
-    box-shadow 150ms ease;
-  box-shadow: 0 2px 8px rgba(tokens.$brand-burgundy, 0.25);
-
-  mat-icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-  }
-
-  &:hover {
-    background-color: tokens.$brand-burgundy-light;
-    box-shadow: 0 4px 12px rgba(tokens.$brand-burgundy, 0.35);
-  }
-
-  &:active {
-    transform: scale(0.98);
-  }
-
-  @media (max-width: 640px) {
-    width: 100%;
-    justify-content: center;
-  }
+  justify-content: flex-end;
+  margin-bottom: var(--spacing-lg);
 }
 
 // -----------------------------------------------------------------------------
@@ -159,9 +50,9 @@
   gap: 24px;
   padding: 16px 24px;
   background: white;
-  border-radius: 12px;
-  box-shadow: tokens.$shadow-card;
-  margin-bottom: 24px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: var(--spacing-lg);
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -181,7 +72,7 @@
 .camps-stats__number {
   font-size: 2.5rem;
   font-weight: 800;
-  color: tokens.$brand-burgundy;
+  color: t.$brand-burgundy;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
@@ -189,7 +80,7 @@
 .camps-stats__label {
   font-size: 14px;
   font-weight: 500;
-  color: tokens.$stone-500;
+  color: t.$stone-500;
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
@@ -197,7 +88,7 @@
 .camps-stats__divider {
   width: 1px;
   height: 40px;
-  background-color: tokens.$stone-200;
+  background-color: t.$stone-200;
 
   @media (max-width: 768px) {
     width: 100%;
@@ -224,77 +115,27 @@
   border-radius: 50%;
 
   &--upcoming {
-    background-color: tokens.$brand-burgundy;
+    background-color: t.$brand-burgundy;
   }
 
   &--active {
-    background-color: tokens.$color-success;
+    background-color: t.$color-success;
   }
 
   &--past {
-    background-color: tokens.$stone-300;
+    background-color: t.$stone-300;
   }
 }
 
 .camps-stats__item-label {
   font-size: 13px;
-  color: tokens.$stone-600;
+  color: t.$stone-600;
 }
 
 .camps-stats__item-count {
   font-size: 14px;
   font-weight: 700;
-  color: tokens.$stone-800;
-}
-
-// -----------------------------------------------------------------------------
-// FILTER BAR
-// -----------------------------------------------------------------------------
-
-.camps-filters {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-
-  @media (max-width: 640px) {
-    flex-wrap: wrap;
-  }
-}
-
-.filter-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  background-color: white;
-  border: 1px solid tokens.$stone-200;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 500;
-  color: tokens.$stone-600;
-  cursor: pointer;
-  transition:
-    background-color 150ms ease,
-    border-color 150ms ease,
-    color 150ms ease;
-
-  mat-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-  }
-
-  &:hover {
-    background-color: tokens.$stone-50;
-    border-color: tokens.$stone-300;
-  }
-
-  &--active {
-    background-color: color-mix(in srgb, tokens.$brand-burgundy 10%, transparent);
-    border-color: tokens.$brand-burgundy;
-    color: tokens.$brand-burgundy;
-  }
+  color: t.$stone-800;
 }
 
 // -----------------------------------------------------------------------------
@@ -325,8 +166,8 @@
   min-height: 400px;
   padding: 48px 24px;
   background: white;
-  border-radius: 12px;
-  box-shadow: tokens.$shadow-card;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 
@@ -336,7 +177,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, tokens.$stone-100 0%, tokens.$stone-200 100%);
+  background: linear-gradient(135deg, t.$stone-100 0%, t.$stone-200 100%);
   border-radius: 50%;
   margin-bottom: 16px;
 
@@ -344,7 +185,7 @@
     font-size: 40px;
     width: 40px;
     height: 40px;
-    color: tokens.$stone-400;
+    color: t.$stone-400;
   }
 }
 
@@ -352,13 +193,13 @@
   margin: 0 0 8px;
   font-size: 18px;
   font-weight: 600;
-  color: tokens.$stone-800;
+  color: t.$stone-800;
 }
 
 .camps-empty__text {
   margin: 0 0 20px;
   font-size: 14px;
-  color: tokens.$stone-500;
+  color: t.$stone-500;
   max-width: 280px;
 }
 
@@ -367,7 +208,7 @@
   align-items: center;
   gap: 6px;
   padding: 10px 18px;
-  background-color: tokens.$brand-burgundy;
+  background-color: t.$brand-burgundy;
   border: none;
   border-radius: 8px;
   color: white;
@@ -383,7 +224,7 @@
   }
 
   &:hover {
-    background-color: tokens.$brand-burgundy-light;
+    background-color: t.$brand-burgundy-light;
   }
 }
 

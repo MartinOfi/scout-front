@@ -1,0 +1,21 @@
+// =============================================================================
+// PATTERNS INDEX
+// =============================================================================
+// Single entry point for all UI pattern mixins.
+// Import this file to access reusable component patterns.
+//
+// Usage:
+//   @use 'app/shared/styles/patterns' as p;
+//   .my-card {
+//     @include p.card-base;
+//     @include p.card-padding;
+//   }
+//   .status {
+//     @include p.badge-success;
+//   }
+
+@forward 'cards';
+@forward 'badges';
+@forward 'states';
+@forward 'buttons';
+@forward 'headers';

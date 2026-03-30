@@ -4,8 +4,8 @@
 // ============================================================================
 
 @use 'sass:color';
+@use '../../../../../shared/styles/tokens' as t;
 @use '../../../../../shared/styles/dialog' as dialog;
-@use '../../../../../shared/components/form/form-tokens' as tokens;
 
 // ============================================================================
 // Host & Material Dialog Container Override
@@ -87,16 +87,16 @@
   gap: 14px;
   padding: 14px 16px;
   margin-bottom: 1rem;
-  background: linear-gradient(135deg, tokens.$stone-50 0%, tokens.$stone-100 100%);
-  border: 1px solid tokens.$stone-200;
-  border-radius: dialog.$dialog-radius-lg;
+  background: linear-gradient(135deg, t.$stone-50 0%, t.$stone-100 100%);
+  border: 1px solid t.$stone-200;
+  border-radius: t.$radius-xl;
 
   .avatar {
     flex-shrink: 0;
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: linear-gradient(135deg, tokens.$brand-burgundy 0%, tokens.$brand-burgundy-light 100%);
+    background: linear-gradient(135deg, t.$brand-burgundy 0%, t.$brand-burgundy-light 100%);
     color: white;
     display: flex;
     align-items: center;
@@ -104,7 +104,7 @@
     font-size: 1.125rem;
     font-weight: 600;
     text-transform: uppercase;
-    box-shadow: tokens.$shadow-card;
+    box-shadow: t.$shadow-card;
   }
 
   .info {
@@ -116,7 +116,7 @@
     .name {
       font-size: 0.9375rem;
       font-weight: 600;
-      color: tokens.$stone-800;
+      color: t.$stone-800;
       letter-spacing: -0.01em;
       white-space: nowrap;
       overflow: hidden;
@@ -125,7 +125,7 @@
 
     .label {
       font-size: 0.8125rem;
-      color: tokens.$stone-500;
+      color: t.$stone-500;
       font-weight: 400;
     }
   }
@@ -140,9 +140,9 @@
   flex-direction: column;
   gap: 10px;
   padding: 16px;
-  background: linear-gradient(135deg, tokens.$stone-50 0%, tokens.$stone-100 100%);
-  border: 1px solid tokens.$stone-200;
-  border-radius: dialog.$dialog-radius-lg;
+  background: linear-gradient(135deg, t.$stone-50 0%, t.$stone-100 100%);
+  border: 1px solid t.$stone-200;
+  border-radius: t.$radius-xl;
 
   .summary-item {
     display: flex;
@@ -154,43 +154,43 @@
       align-items: center;
       gap: 6px;
       font-size: 0.8125rem;
-      color: tokens.$stone-500;
+      color: t.$stone-500;
       font-weight: 400;
 
       .inline-icon {
         font-size: 16px;
         width: 16px;
         height: 16px;
-        color: dialog.$success-600;
+        color: t.$color-success-dark;
       }
     }
 
     .value {
       font-size: 0.9375rem;
       font-weight: 600;
-      color: tokens.$stone-800;
+      color: t.$stone-800;
       font-variant-numeric: tabular-nums;
 
       &.success {
-        color: dialog.$success-600;
+        color: t.$color-success-dark;
       }
 
       &.danger {
-        color: dialog.$danger-500;
+        color: t.$color-error;
       }
     }
 
     &.highlight {
       margin-top: 4px;
       padding: 8px 12px;
-      background: linear-gradient(135deg, rgba(dialog.$success-500, 0.08) 0%, rgba(dialog.$success-500, 0.12) 100%);
-      border: 1px solid rgba(dialog.$success-500, 0.2);
-      border-radius: dialog.$dialog-radius-md;
+      background: linear-gradient(135deg, rgba(t.$color-success, 0.08) 0%, rgba(t.$color-success, 0.12) 100%);
+      border: 1px solid rgba(t.$color-success, 0.2);
+      border-radius: t.$radius-default;
       margin-left: -12px;
       margin-right: -12px;
 
       .label {
-        color: tokens.$stone-600;
+        color: t.$stone-600;
         font-weight: 500;
       }
     }
@@ -198,14 +198,14 @@
 
   .progress-bar {
     height: 6px;
-    background-color: tokens.$stone-200;
+    background-color: t.$stone-200;
     border-radius: 3px;
     overflow: hidden;
     margin-top: 6px;
 
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, dialog.$success-500 0%, dialog.$success-600 100%);
+      background: linear-gradient(90deg, t.$color-success 0%, t.$color-success-dark 100%);
       border-radius: 3px;
       transition: width 300ms ease-out;
     }
@@ -213,7 +213,7 @@
 
   .progress-label {
     font-size: 0.75rem;
-    color: tokens.$stone-400;
+    color: t.$stone-400;
     text-align: center;
     margin-top: 4px;
     font-weight: 500;
@@ -226,7 +226,7 @@
 
 .divider {
   border: none;
-  border-top: 1px solid tokens.$stone-200;
+  border-top: 1px solid t.$stone-200;
   margin: 4px 0;
 }
 
@@ -259,7 +259,7 @@
   gap: 6px;
 
   .input-prefix {
-    color: tokens.$stone-500;
+    color: t.$stone-500;
     font-weight: 500;
     font-size: 0.9375rem;
   }
@@ -274,14 +274,14 @@
   flex-direction: column;
   gap: 8px;
   padding: 14px 16px;
-  background: linear-gradient(135deg, tokens.$stone-50 0%, tokens.$stone-100 100%);
-  border: 1px solid tokens.$stone-200;
-  border-radius: dialog.$dialog-radius-lg;
+  background: linear-gradient(135deg, t.$stone-50 0%, t.$stone-100 100%);
+  border: 1px solid t.$stone-200;
+  border-radius: t.$radius-xl;
 
   .breakdown-title {
     font-size: 0.8125rem;
     font-weight: 600;
-    color: tokens.$stone-600;
+    color: t.$stone-600;
     margin-bottom: 4px;
   }
 
@@ -290,19 +290,19 @@
     align-items: center;
     gap: 8px;
     font-size: 0.875rem;
-    color: tokens.$stone-600;
+    color: t.$stone-600;
 
     mat-icon {
       font-size: 18px;
       width: 18px;
       height: 18px;
-      color: tokens.$stone-400;
+      color: t.$stone-400;
     }
 
     .amount {
       margin-left: auto;
       font-weight: 600;
-      color: tokens.$stone-800;
+      color: t.$stone-800;
       font-variant-numeric: tabular-nums;
     }
   }
@@ -313,13 +313,13 @@
     justify-content: space-between;
     padding-top: 8px;
     margin-top: 4px;
-    border-top: 1px dashed tokens.$stone-300;
+    border-top: 1px dashed t.$stone-300;
     font-size: 0.9375rem;
     font-weight: 600;
-    color: tokens.$stone-700;
+    color: t.$stone-700;
 
     .amount {
-      color: tokens.$brand-burgundy;
+      color: t.$brand-burgundy;
       font-variant-numeric: tabular-nums;
     }
   }
@@ -334,25 +334,25 @@
   justify-content: space-between;
   align-items: center;
   padding: 14px 16px;
-  background: linear-gradient(135deg, rgba(tokens.$brand-burgundy, 0.04) 0%, rgba(tokens.$brand-burgundy, 0.08) 100%);
-  border: 1px solid rgba(tokens.$brand-burgundy, 0.15);
-  border-left: 3px solid tokens.$brand-burgundy;
-  border-radius: dialog.$dialog-radius-md;
+  background: linear-gradient(135deg, rgba(t.$brand-burgundy, 0.04) 0%, rgba(t.$brand-burgundy, 0.08) 100%);
+  border: 1px solid rgba(t.$brand-burgundy, 0.15);
+  border-left: 3px solid t.$brand-burgundy;
+  border-radius: t.$radius-default;
 
   .label {
     font-size: 0.875rem;
-    color: tokens.$stone-600;
+    color: t.$stone-600;
     font-weight: 500;
   }
 
   .value {
     font-size: 1.125rem;
     font-weight: 700;
-    color: tokens.$stone-800;
+    color: t.$stone-800;
     font-variant-numeric: tabular-nums;
 
     &.success {
-      color: dialog.$success-600;
+      color: t.$color-success-dark;
     }
   }
 }

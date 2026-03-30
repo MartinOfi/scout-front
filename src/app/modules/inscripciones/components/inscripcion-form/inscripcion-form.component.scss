@@ -5,7 +5,8 @@
 // Avoids generic card-wrapper patterns for a more editorial feel.
 
 @use 'sass:color';
-@use '../../../../shared/components/form/form-tokens' as *;
+@use '../../../../shared/styles/tokens' as *;
+@use '../../../../shared/components/form/form-tokens' as form;
 
 // -----------------------------------------------------------------------------
 // PAGE CONTAINER
@@ -219,7 +220,7 @@
 }
 
 .field-row {
-  @include form-grid(1);
+  @include form.form-grid(1);
 
   &--2col {
     grid-template-columns: 1fr 1fr;

@@ -1,0 +1,28 @@
+// =============================================================================
+// BORDER RADIUS TOKENS
+// =============================================================================
+// Consistent border-radius scale for UI elements.
+// Uses a progressive scale from subtle rounding to fully rounded.
+
+// -----------------------------------------------------------------------------
+// RADIUS SCALE
+// -----------------------------------------------------------------------------
+$radius-none: 0;
+$radius-sm: 4px;       // Small buttons, badges
+$radius-md: 6px;       // Default for most elements
+$radius-default: 8px;  // Buttons, inputs
+$radius-lg: 10px;      // Cards
+$radius-xl: 12px;      // Elevated cards
+$radius-2xl: 16px;     // Dialogs, modals
+$radius-full: 9999px;  // Pills, avatars, circular elements
+
+// -----------------------------------------------------------------------------
+// SEMANTIC ALIASES
+// -----------------------------------------------------------------------------
+$radius-button: $radius-default;
+$radius-input: $radius-lg;
+$radius-card: $radius-xl;
+$radius-dialog: $radius-2xl;
+$radius-badge: $radius-md;
+$radius-chip: $radius-full;
+$radius-avatar: $radius-full;

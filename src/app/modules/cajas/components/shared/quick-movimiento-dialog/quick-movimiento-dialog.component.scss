@@ -1,16 +1,10 @@
 // ============================================================================
-// Quick Movimiento Dialog - Clean dialog for registering movements
+// Quick Movimiento Dialog - Refactored with Centralized Design System
 // ============================================================================
 
-@use '../../../../../shared/components/form/form-tokens' as tokens;
-
-// Local design tokens (dialog-specific)
-$radius-md: 8px;
-$radius-lg: 12px;
-$radius-xl: 16px;
-
-$shadow-dialog: var(--shadow-xl);
-$transition-fast: 150ms ease-out;
+@use 'sass:color';
+@use '../../../../../shared/styles/tokens' as t;
+@use '../../../../../shared/styles/dialog' as dialog;
 
 // ============================================================================
 // Host & Material Dialog Container Override
@@ -21,34 +15,7 @@ $transition-fast: 150ms ease-out;
 }
 
 :host ::ng-deep {
-  .mat-mdc-dialog-container {
-    --mdc-dialog-container-shape: #{$radius-xl};
-
-    .mdc-dialog__surface {
-      border-radius: $radius-xl !important;
-      box-shadow: $shadow-dialog !important;
-      overflow: hidden;
-    }
-  }
-
-  .mat-mdc-dialog-content {
-    padding: 0 !important;
-    max-height: 70vh;
-  }
-
-  .mat-mdc-dialog-actions {
-    padding: 0 !important;
-    min-height: auto;
-  }
-
-  .mat-mdc-dialog-title {
-    padding: 0 !important;
-    margin: 0 !important;
-
-    &::before {
-      display: none;
-    }
-  }
+  @include dialog.dialog-container-override;
 }
 
 // ============================================================================
@@ -56,20 +23,10 @@ $transition-fast: 150ms ease-out;
 // ============================================================================
 
 .dialog-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 0;
-  padding: 20px 24px 16px;
-  font-size: var(--text-xl);
-  font-weight: 600;
-  color: var(--text-primary);
-  letter-spacing: -0.01em;
-  border-bottom: 1px solid var(--border-default);
-  background-color: var(--surface-primary);
+  @include dialog.dialog-title;
 
   .title-icon {
-    color: tokens.$brand-burgundy;
+    color: t.$brand-burgundy;
     font-size: 22px;
     width: 22px;
     height: 22px;
@@ -81,10 +38,7 @@ $transition-fast: 150ms ease-out;
 // ============================================================================
 
 .dialog-content {
-  padding: 20px 24px;
-  min-width: 440px;
-  max-width: 540px;
-  background-color: var(--surface-primary);
+  @include dialog.dialog-content(440px, 540px);
 }
 
 // ============================================================================
@@ -98,8 +52,8 @@ $transition-fast: 150ms ease-out;
   justify-content: center;
   gap: 12px;
   padding: 40px 20px;
-  color: var(--text-muted);
-  font-size: var(--text-sm);
+  color: t.$stone-500;
+  font-size: 0.875rem;
 }
 
 // ============================================================================
@@ -111,16 +65,16 @@ $transition-fast: 150ms ease-out;
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  background: var(--surface-secondary);
-  border: 1px solid var(--border-default);
-  border-radius: $radius-lg;
+  background: linear-gradient(135deg, t.$stone-50 0%, t.$stone-100 100%);
+  border: 1px solid t.$stone-200;
+  border-radius: t.$radius-xl;
   margin-bottom: 20px;
-  font-size: var(--text-base);
+  font-size: 0.9375rem;
   font-weight: 500;
-  color: var(--text-secondary);
+  color: t.$stone-600;
 
   mat-icon {
-    color: tokens.$brand-burgundy;
+    color: t.$brand-burgundy;
     font-size: 20px;
     width: 20px;
     height: 20px;
@@ -134,7 +88,7 @@ $transition-fast: 150ms ease-out;
 .form-grid {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: t.$spacing-md;
 }
 
 .form-row {
@@ -149,61 +103,22 @@ $transition-fast: 150ms ease-out;
 }
 
 // ============================================================================
-// Button Styles
+// Button Styles (using centralized mixins)
 // ============================================================================
 
 .btn-secondary {
-  background-color: var(--surface-primary);
-  border: 1px solid var(--border-default);
-  color: var(--text-secondary);
+  @include dialog.btn-secondary;
   padding: 10px 20px;
-  border-radius: $radius-md;
-  font-size: var(--text-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all $transition-fast;
-
-  &:hover {
-    background-color: var(--surface-secondary);
-    border-color: var(--border-strong);
-  }
-
-  &:active {
-    background-color: var(--surface-tertiary);
-  }
 }
 
 .btn-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--color-primary-burgundy);
-  border: none;
-  color: var(--text-on-primary);
+  @include dialog.btn-primary;
   padding: 10px 20px;
-  border-radius: $radius-md;
-  font-size: var(--text-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color $transition-fast;
-  box-shadow: var(--shadow-sm);
 
   mat-icon {
     font-size: 18px;
     width: 18px;
     height: 18px;
-  }
-
-  &:hover:not(:disabled) {
-    background: var(--color-burgundy-light);
-    box-shadow: var(--shadow-md);
-  }
-
-  &:disabled {
-    background: var(--border-default);
-    color: var(--text-muted);
-    cursor: not-allowed;
-    box-shadow: none;
   }
 }
 
@@ -212,12 +127,9 @@ $transition-fast: 150ms ease-out;
 // ============================================================================
 
 .dialog-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  @include dialog.dialog-actions;
   padding: 16px 24px 20px;
-  background-color: var(--surface-secondary);
-  border-top: 1px solid var(--border-default);
+  background-color: t.$stone-50;
 }
 
 // ============================================================================
@@ -227,7 +139,7 @@ $transition-fast: 150ms ease-out;
 @media (max-width: 600px) {
   .dialog-content {
     min-width: auto;
-    padding: 16px;
+    padding: t.$spacing-md;
   }
 
   .dialog-title {

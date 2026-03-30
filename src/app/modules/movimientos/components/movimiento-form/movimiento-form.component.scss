@@ -5,7 +5,8 @@
 // Designed to feel transactional and confident.
 
 @use 'sass:color';
-@use '../../../../shared/components/form/form-tokens' as tokens;
+@use '../../../../shared/styles/tokens' as t;
+@use '../../../../shared/components/form/form-tokens' as form;
 
 // -----------------------------------------------------------------------------
 // PAGE LAYOUT
@@ -13,7 +14,7 @@
 
 .payment-page {
   min-height: 100%;
-  background-color: tokens.$stone-100;
+  background-color: t.$stone-100;
   padding: 24px 16px;
   padding-bottom: 48px;
 
@@ -39,19 +40,19 @@
   padding: 64px 24px;
   background: white;
   border-radius: 16px;
-  box-shadow: tokens.$shadow-card;
+  box-shadow: t.$shadow-card;
 
   .loading-spinner {
     width: 32px;
     height: 32px;
-    border: 3px solid tokens.$stone-200;
-    border-top-color: tokens.$brand-burgundy;
+    border: 3px solid t.$stone-200;
+    border-top-color: t.$brand-burgundy;
   }
 
   p {
     margin: 16px 0 0;
     font-size: 14px;
-    color: tokens.$stone-500;
+    color: t.$stone-500;
   }
 }
 
@@ -62,10 +63,10 @@
   gap: 12px;
   padding: 14px 16px;
   margin-bottom: 20px;
-  background: color-mix(in srgb, tokens.$color-info 8%, white);
-  border: 1px solid color-mix(in srgb, tokens.$color-info 25%, white);
+  background: color-mix(in srgb, t.$color-info 8%, white);
+  border: 1px solid color-mix(in srgb, t.$color-info 25%, white);
   border-radius: 10px;
-  color: tokens.$stone-700;
+  color: t.$stone-700;
   font-size: 13px;
   line-height: 1.5;
 
@@ -74,15 +75,15 @@
     font-size: 18px;
     width: 18px;
     height: 18px;
-    color: tokens.$color-info;
+    color: t.$color-info;
     margin-top: 1px;
   }
 }
 
 // Read-only summary for edit mode
 .readonly-summary {
-  background: tokens.$stone-50;
-  border: 1px solid tokens.$stone-200;
+  background: t.$stone-50;
+  border: 1px solid t.$stone-200;
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 24px;
@@ -91,7 +92,7 @@
     margin: 0 0 12px;
     font-size: 13px;
     font-weight: 600;
-    color: tokens.$stone-500;
+    color: t.$stone-500;
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }
@@ -115,7 +116,7 @@
   &__label {
     font-size: 11px;
     font-weight: 500;
-    color: tokens.$stone-400;
+    color: t.$stone-400;
     text-transform: uppercase;
     letter-spacing: 0.03em;
   }
@@ -123,14 +124,14 @@
   &__value {
     font-size: 14px;
     font-weight: 500;
-    color: tokens.$stone-800;
+    color: t.$stone-800;
 
     &--ingreso {
-      color: tokens.$color-success;
+      color: t.$color-success;
     }
 
     &--egreso {
-      color: tokens.$color-error;
+      color: t.$color-error;
     }
 
     &--amount {
@@ -151,13 +152,13 @@
     content: '';
     flex: 1;
     height: 1px;
-    background: tokens.$stone-200;
+    background: t.$stone-200;
   }
 
   span {
     font-size: 12px;
     font-weight: 500;
-    color: tokens.$stone-400;
+    color: t.$stone-400;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     white-space: nowrap;
@@ -171,8 +172,8 @@
 
 .context-card {
   background: linear-gradient(135deg,
-      tokens.$brand-burgundy 0%,
-      color.adjust(tokens.$brand-burgundy, $lightness: -8%) 100%);
+      t.$brand-burgundy 0%,
+      color.adjust(t.$brand-burgundy, $lightness: -8%) 100%);
   border-radius: 16px;
   padding: 20px;
   color: white;
@@ -192,7 +193,7 @@
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: color tokens.$transition-fast;
+  transition: color t.$transition-fast;
   align-self: flex-start;
 
   mat-icon {
@@ -322,7 +323,7 @@
     }
 
     &.progress--partial {
-      background: tokens.$brand-amber;
+      background: t.$brand-amber;
     }
 
     &.progress--pending {
@@ -343,7 +344,7 @@
 .form-card {
   background: white;
   border-radius: 16px;
-  box-shadow: tokens.$shadow-card;
+  box-shadow: t.$shadow-card;
   overflow: hidden;
 }
 
@@ -355,14 +356,14 @@
   margin: 0;
   font-size: 1.375rem;
   font-weight: 600;
-  color: tokens.$stone-900;
+  color: t.$stone-900;
   letter-spacing: -0.01em;
   display: flex;
   align-items: center;
   gap: 10px;
 
   mat-icon {
-    color: tokens.$brand-burgundy;
+    color: t.$brand-burgundy;
     font-size: 22px;
     width: 22px;
     height: 22px;
@@ -372,7 +373,7 @@
 .form-subtitle {
   margin: 4px 0 0;
   font-size: 14px;
-  color: tokens.$stone-500;
+  color: t.$stone-500;
 }
 
 .form-body {
@@ -392,45 +393,45 @@
     align-items: center;
     gap: 8px;
     padding: 14px 16px;
-    background: tokens.$stone-50;
-    border: 2px dashed tokens.$stone-300;
+    background: t.$stone-50;
+    border: 2px dashed t.$stone-300;
     border-radius: 12px;
-    color: tokens.$stone-700;
+    color: t.$stone-700;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
     transition:
-      background-color tokens.$transition-fast,
-      border-color tokens.$transition-fast,
-      color tokens.$transition-fast;
+      background-color t.$transition-fast,
+      border-color t.$transition-fast,
+      color t.$transition-fast;
 
     mat-icon {
       font-size: 18px;
       width: 18px;
       height: 18px;
-      color: tokens.$brand-amber;
+      color: t.$brand-amber;
     }
 
     &:hover {
-      background: tokens.$stone-100;
-      border-color: tokens.$stone-400;
-      color: tokens.$stone-800;
+      background: t.$stone-100;
+      border-color: t.$stone-400;
+      color: t.$stone-800;
     }
 
     &:focus-visible {
       outline: none;
-      border-color: tokens.$brand-burgundy;
-      box-shadow: tokens.$shadow-focus;
+      border-color: t.$brand-burgundy;
+      box-shadow: t.$shadow-focus;
     }
 
     &--active {
-      background: color-mix(in srgb, tokens.$color-success 8%, white);
-      border-color: tokens.$color-success;
+      background: color-mix(in srgb, t.$color-success 8%, white);
+      border-color: t.$color-success;
       border-style: solid;
-      color: tokens.$color-success;
+      color: t.$color-success;
 
       mat-icon {
-        color: tokens.$color-success;
+        color: t.$color-success;
       }
     }
   }
@@ -447,7 +448,7 @@
 // -----------------------------------------------------------------------------
 
 .form-row {
-  @include tokens.form-grid(1);
+  @include form.form-grid(1);
 
   @media (min-width: 480px) {
     grid-template-columns: repeat(2, 1fr);
@@ -455,7 +456,7 @@
 }
 
 .form-field--full {
-  @include tokens.form-field-full;
+  @include form.form-field-full;
 }
 
 // Input with currency prefix
@@ -468,7 +469,7 @@
 .input-prefix {
   position: absolute;
   left: 14px;
-  color: tokens.$stone-500;
+  color: t.$stone-500;
   font-weight: 500;
   font-size: 15px;
   pointer-events: none;
@@ -500,8 +501,8 @@
   justify-content: space-between;
   gap: 12px;
   padding: 20px 24px 24px;
-  background: tokens.$stone-50;
-  border-top: 1px solid tokens.$stone-200;
+  background: t.$stone-50;
+  border-top: 1px solid t.$stone-200;
 }
 
 .btn-primary,
@@ -512,7 +513,7 @@
   padding: 12px 24px;
   border-radius: 10px;
   cursor: pointer;
-  transition: all tokens.$transition-fast;
+  transition: all t.$transition-fast;
   border: none;
   display: inline-flex;
   align-items: center;
@@ -525,7 +526,7 @@
   }
 
   &:focus-visible {
-    outline: 2px solid tokens.$brand-burgundy;
+    outline: 2px solid t.$brand-burgundy;
     outline-offset: 2px;
   }
 
@@ -536,26 +537,26 @@
 }
 
 .btn-primary {
-  background-color: tokens.$brand-burgundy;
+  background-color: t.$brand-burgundy;
   color: white;
 
   &:hover:not(:disabled) {
-    background-color: tokens.$brand-burgundy-light;
+    background-color: t.$brand-burgundy-light;
   }
 
   &:active:not(:disabled) {
-    background-color: color.adjust(tokens.$brand-burgundy, $lightness: -5%);
+    background-color: color.adjust(t.$brand-burgundy, $lightness: -5%);
   }
 }
 
 .btn-secondary {
   background-color: white;
-  color: tokens.$stone-700;
-  border: 1.5px solid tokens.$stone-300;
+  color: t.$stone-700;
+  border: 1.5px solid t.$stone-300;
 
   &:hover:not(:disabled) {
-    background-color: tokens.$stone-50;
-    border-color: tokens.$stone-400;
+    background-color: t.$stone-50;
+    border-color: t.$stone-400;
   }
 }
 
@@ -581,19 +582,19 @@
 
 ::ng-deep {
   mat-slide-toggle {
-    --mdc-switch-selected-track-color: #{tokens.$brand-burgundy};
-    --mdc-switch-selected-handle-color: #{tokens.$brand-burgundy};
-    --mdc-switch-selected-hover-track-color: #{tokens.$brand-burgundy-light};
-    --mdc-switch-selected-hover-handle-color: #{tokens.$brand-burgundy-light};
-    --mdc-switch-selected-focus-track-color: #{tokens.$brand-burgundy};
-    --mdc-switch-selected-focus-handle-color: #{tokens.$brand-burgundy};
-    --mdc-switch-selected-pressed-track-color: #{tokens.$brand-burgundy};
-    --mdc-switch-selected-pressed-handle-color: #{tokens.$brand-burgundy};
+    --mdc-switch-selected-track-color: #{t.$brand-burgundy};
+    --mdc-switch-selected-handle-color: #{t.$brand-burgundy};
+    --mdc-switch-selected-hover-track-color: #{t.$brand-burgundy-light};
+    --mdc-switch-selected-hover-handle-color: #{t.$brand-burgundy-light};
+    --mdc-switch-selected-focus-track-color: #{t.$brand-burgundy};
+    --mdc-switch-selected-focus-handle-color: #{t.$brand-burgundy};
+    --mdc-switch-selected-pressed-track-color: #{t.$brand-burgundy};
+    --mdc-switch-selected-pressed-handle-color: #{t.$brand-burgundy};
 
     .mdc-label {
       font-family: var(--font-family-base);
       font-size: 14px;
-      color: tokens.$stone-700;
+      color: t.$stone-700;
     }
   }
 }

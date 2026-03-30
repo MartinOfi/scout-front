@@ -1,23 +1,12 @@
 <main class="camps-page">
   <div class="camps-content">
-    <!-- Page Header -->
-    <header class="camps-header">
-      <div class="camps-header__left">
-        <div class="camps-header__icon">
-          <mat-icon>hiking</mat-icon>
-        </div>
-        <div class="camps-header__info">
-          <h1 class="camps-header__title">Campamentos</h1>
-          <p class="camps-header__subtitle">Gestión de campamentos y actividades al aire libre</p>
-        </div>
-      </div>
-      <div class="camps-header__right">
-        <button type="button" class="btn-create" (click)="onCreate()">
-          <mat-icon>add</mat-icon>
-          Crear Campamento
-        </button>
-      </div>
-    </header>
+    <!-- Action Button -->
+    <div class="camps-actions">
+      <button type="button" class="btn btn-primary" (click)="onCreate()">
+        <mat-icon>add</mat-icon>
+        Crear Campamento
+      </button>
+    </div>
 
     <!-- Loading State -->
     @if (loading()) {

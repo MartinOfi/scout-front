@@ -3,7 +3,8 @@
 // =============================================================================
 // Consistent form spacing using design tokens
 
-@use '../../../../../shared/components/form/form-tokens' as tokens;
+@use '../../../../../shared/styles/tokens' as t;
+@use '../../../../../shared/components/form/form-tokens' as form;
 
 .gasto-form {
   display: flex;
@@ -13,10 +14,10 @@
 }
 
 .form-grid {
-  @include tokens.form-grid(2);
+  @include form.form-grid(2);
 
   .full-width {
-    @include tokens.form-field-full;
+    @include form.form-field-full;
   }
 }
 

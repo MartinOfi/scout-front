@@ -3,7 +3,8 @@
 // =============================================================================
 // Consistent form spacing using design tokens
 
-@use '../../../../../shared/components/form/form-tokens' as tokens;
+@use '../../../../../shared/styles/tokens' as t;
+@use '../../../../../shared/components/form/form-tokens' as form;
 
 .pago-form {
   display: flex;
@@ -17,9 +18,9 @@
   flex-direction: column;
   gap: 8px;
   padding: 16px;
-  background-color: tokens.$stone-100;
+  background-color: t.$stone-100;
   border-radius: 8px;
-  border: 1px solid tokens.$stone-200;
+  border: 1px solid t.$stone-200;
 
   .summary-item {
     display: flex;
@@ -28,24 +29,24 @@
 
     .label {
       font-size: 14px;
-      color: tokens.$stone-500;
+      color: t.$stone-500;
     }
 
     .value {
       font-size: 16px;
       font-weight: 600;
-      color: tokens.$stone-800;
+      color: t.$stone-800;
       font-variant-numeric: tabular-nums;
 
       &.success {
-        color: tokens.$color-success;
+        color: t.$color-success;
       }
     }
   }
 }
 
 .form-fields {
-  @include tokens.form-grid(2);
+  @include form.form-grid(2);
 }
 
 .quick-actions {

@@ -1,0 +1,47 @@
+// =============================================================================
+// SPACING TOKENS
+// =============================================================================
+// Documents the CSS custom properties used throughout the app.
+// SCSS variables provided for use in mixins and calculations.
+//
+// The primary spacing system uses CSS custom properties (--spacing-*) defined
+// in styles.scss. These SCSS variables mirror those values for use in SCSS
+// contexts where CSS custom properties can't be used (like Sass math).
+
+// -----------------------------------------------------------------------------
+// SPACING SCALE (mirrors CSS custom properties)
+// -----------------------------------------------------------------------------
+$spacing-xs: 4px;     // var(--spacing-xs)
+$spacing-sm: 8px;     // var(--spacing-sm)
+$spacing-md: 12px;    // var(--spacing-md)
+$spacing-lg: 16px;    // var(--spacing-lg)
+$spacing-xl: 24px;    // var(--spacing-xl)
+$spacing-2xl: 32px;   // var(--spacing-2xl)
+$spacing-3xl: 48px;   // var(--spacing-3xl)
+$spacing-4xl: 64px;   // var(--spacing-4xl)
+
+// -----------------------------------------------------------------------------
+// SEMANTIC SPACING
+// -----------------------------------------------------------------------------
+$spacing-page-x: $spacing-xl;          // Horizontal page padding
+$spacing-page-y: $spacing-lg;          // Vertical page padding
+$spacing-section: $spacing-2xl;        // Between major sections
+$spacing-card-padding: $spacing-lg;    // Inside cards
+$spacing-card-gap: $spacing-md;        // Between card elements
+$spacing-form-gap: $spacing-lg;        // Between form fields
+$spacing-button-gap: $spacing-sm;      // Between inline buttons
+
+// -----------------------------------------------------------------------------
+// GRID GAPS
+// -----------------------------------------------------------------------------
+$grid-gap-sm: $spacing-md;
+$grid-gap-md: $spacing-lg;
+$grid-gap-lg: $spacing-xl;
+
+// -----------------------------------------------------------------------------
+// RESPONSIVE ADJUSTMENTS
+// -----------------------------------------------------------------------------
+// Use these for reduced spacing on mobile
+$spacing-page-x-mobile: $spacing-lg;
+$spacing-page-y-mobile: $spacing-md;
+$spacing-card-padding-mobile: $spacing-md;

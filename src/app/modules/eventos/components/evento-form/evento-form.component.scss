@@ -3,7 +3,8 @@
 // =============================================================================
 
 @use 'sass:color';
-@use '../../../../shared/components/form/form-tokens' as *;
+@use '../../../../shared/styles/tokens' as *;
+@use '../../../../shared/components/form/form-tokens' as form;
 
 // Page layout
 .scout-form-page {
@@ -164,7 +165,7 @@
 
 // Material form field full width
 .full-width {
-  @include form-field-full;
+  @include form.form-field-full;
 }
 
 // Override Material datepicker to match scout style

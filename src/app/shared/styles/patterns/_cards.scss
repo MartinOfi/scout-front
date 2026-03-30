@@ -1,0 +1,136 @@
+// =============================================================================
+// CARD PATTERNS
+// =============================================================================
+// Reusable card mixins for consistent card styling throughout the app.
+// Cards are the primary container for content groupings.
+
+@use '../tokens' as t;
+
+// -----------------------------------------------------------------------------
+// BASE CARD
+// -----------------------------------------------------------------------------
+// Foundation for all card variants
+@mixin card-base {
+  background: t.$surface-card;
+  border-radius: t.$radius-card;
+  box-shadow: t.$shadow-card;
+}
+
+// -----------------------------------------------------------------------------
+// CARD VARIANTS
+// -----------------------------------------------------------------------------
+
+// Interactive card - lifts on hover
+@mixin card-interactive {
+  @include card-base;
+  cursor: pointer;
+  @include t.transition-interactive;
+
+  &:hover {
+    box-shadow: t.$shadow-card-hover;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Elevated card - higher visual prominence
+@mixin card-elevated {
+  @include card-base;
+  box-shadow: t.$shadow-md;
+}
+
+// Flat card - minimal shadow, subtle border
+@mixin card-flat {
+  background: t.$surface-card;
+  border-radius: t.$radius-card;
+  border: 1px solid t.$border-light;
+}
+
+// Outlined card - border only, no shadow
+@mixin card-outlined {
+  background: t.$surface-card;
+  border-radius: t.$radius-card;
+  border: 1px solid t.$border-default;
+}
+
+// -----------------------------------------------------------------------------
+// CARD PADDING
+// -----------------------------------------------------------------------------
+@mixin card-padding($size: 'default') {
+  @if $size == 'sm' {
+    padding: t.$spacing-md;
+  } @else if $size == 'lg' {
+    padding: t.$spacing-xl;
+  } @else {
+    padding: t.$spacing-lg t.$spacing-xl;
+  }
+}
+
+// Responsive card padding
+@mixin card-padding-responsive {
+  padding: t.$spacing-lg t.$spacing-xl;
+
+  @media (max-width: 768px) {
+    padding: t.$spacing-md t.$spacing-lg;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// CARD SECTIONS
+// -----------------------------------------------------------------------------
+
+// Card header with bottom border
+@mixin card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: t.$spacing-lg t.$spacing-xl;
+  border-bottom: 1px solid t.$border-light;
+}
+
+// Card body content area
+@mixin card-body {
+  padding: t.$spacing-lg t.$spacing-xl;
+}
+
+// Card footer with top border
+@mixin card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: t.$spacing-sm;
+  padding: t.$spacing-md t.$spacing-xl;
+  border-top: 1px solid t.$border-light;
+  background: t.$stone-50;
+  border-radius: 0 0 t.$radius-card t.$radius-card;
+}
+
+// -----------------------------------------------------------------------------
+// STATS CARD
+// -----------------------------------------------------------------------------
+// Card variant for displaying numeric statistics
+@mixin stats-card {
+  @include card-base;
+  @include card-padding;
+  display: flex;
+  flex-direction: column;
+  gap: t.$spacing-xs;
+}
+
+@mixin stats-card-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  color: t.$text-primary;
+}
+
+@mixin stats-card-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: t.$text-muted;
+}
