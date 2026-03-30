@@ -1,29 +1,13 @@
 /**
  * KPI Dashboard Component
  * Comprehensive dashboard for displaying inscripciones consolidado data
- * Features animated number counters, progress bars, and distribution charts
  */
 
-import {
-  Component,
-  ChangeDetectionStrategy,
-  input,
-  computed,
-  OnInit,
-  signal,
-  effect,
-  DestroyRef,
-  inject,
-} from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, computed } from '@angular/core';
 import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import {
-  InscripcionesConsolidado,
-  DistribucionPorRama,
-  ResumenFinanciero,
-  DeudoresResumen,
-} from '../../models';
+import { InscripcionesConsolidado, DistribucionPorRama, ResumenFinanciero } from '../../models';
 
 /** Rama configuration for display */
 interface RamaConfig {
@@ -58,24 +42,12 @@ interface DebtorCategory {
   styleUrl: './kpi-dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class KpiDashboardComponent implements OnInit {
+export class KpiDashboardComponent {
   /** Consolidado data from backend */
   readonly consolidado = input.required<InscripcionesConsolidado | null>();
 
   /** Loading state */
   readonly loading = input<boolean>(false);
-
-  /** Animated values for number ticker effect */
-  readonly animatedTotal = signal(0);
-  readonly animatedFinancial = signal<Record<string, number>>({
-    montoEsperado: 0,
-    montoPagado: 0,
-    montoAdeudado: 0,
-    montoBonificado: 0,
-  });
-
-  private readonly destroyRef = inject(DestroyRef);
-  private animationFrameId: number | null = null;
 
   /** Rama configurations */
   readonly ramaConfigs: readonly RamaConfig[] = [
@@ -194,81 +166,6 @@ export class KpiDashboardComponent implements OnInit {
       };
     });
   });
-
-  constructor() {
-    // Animate numbers when consolidado changes
-    effect(() => {
-      const data = this.consolidado();
-      if (data) {
-        this.animateToValue(this.animatedTotal, data.total, 800);
-        this.animateFinancialValues(data.financiero, 1000);
-      }
-    });
-
-    this.destroyRef.onDestroy(() => {
-      if (this.animationFrameId !== null) {
-        cancelAnimationFrame(this.animationFrameId);
-      }
-    });
-  }
-
-  ngOnInit(): void {
-    // Initial animation handled by effect
-  }
-
-  /** Animate a signal value from current to target */
-  private animateToValue(
-    signalRef: ReturnType<typeof signal<number>>,
-    target: number,
-    duration: number,
-  ): void {
-    const start = signalRef();
-    const startTime = performance.now();
-
-    const animate = (currentTime: number): void => {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-
-      // Ease-out cubic for smooth deceleration
-      const easeOut = 1 - Math.pow(1 - progress, 3);
-      const current = Math.round(start + (target - start) * easeOut);
-
-      signalRef.set(current);
-
-      if (progress < 1) {
-        this.animationFrameId = requestAnimationFrame(animate);
-      }
-    };
-
-    this.animationFrameId = requestAnimationFrame(animate);
-  }
-
-  /** Animate financial values */
-  private animateFinancialValues(financiero: ResumenFinanciero, duration: number): void {
-    const startValues = this.animatedFinancial();
-    const startTime = performance.now();
-
-    const animate = (currentTime: number): void => {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const easeOut = 1 - Math.pow(1 - progress, 3);
-
-      const newValues: Record<string, number> = {};
-      for (const key of Object.keys(financiero) as (keyof ResumenFinanciero)[]) {
-        const start = startValues[key] || 0;
-        const target = financiero[key];
-        newValues[key] = Math.round(start + (target - start) * easeOut);
-      }
-
-      this.animatedFinancial.set(newValues);
-
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      }
-    };
-
-    requestAnimationFrame(animate);
-  }
 
   /** Get rama breakdown for a debtor category */
   getRamaBreakdown(porRama: DistribucionPorRama | undefined): { label: string; count: number }[] {

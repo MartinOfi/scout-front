@@ -16,7 +16,7 @@
   <section class="kpi-hero">
     <div class="kpi-hero__total">
       <span class="kpi-hero__label">Total Inscripciones</span>
-      <span class="kpi-hero__value">{{ animatedTotal() | number }}</span>
+      <span class="kpi-hero__value">{{ consolidado()?.total | number }}</span>
       <span class="kpi-hero__sublabel">{{ consolidado()?.filtros?.ano || 'Todos los años' }}</span>
     </div>
 
@@ -58,7 +58,7 @@
           <span class="financial-card__label">{{ metric.label }}</span>
         </div>
         <div class="financial-card__value">
-          {{ animatedFinancial()[metric.key] | currency:'$':'symbol':'1.0-0':'es-AR' }}
+          {{ metric.value | currency:'$':'symbol':'1.0-0':'es-AR' }}
         </div>
         @if (metric.key !== 'montoEsperado') {
         <div class="financial-card__progress">

@@ -21,13 +21,14 @@ $duration-slow: 500ms;
   gap: var(--spacing-lg);
 
   // Staggered entrance animation
-  animation: fadeInUp 400ms $ease-out-expo;
+  animation: fadeInUp 400ms;
 
   @keyframes fadeInUp {
     from {
       opacity: 0;
       transform: translateY(12px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -130,7 +131,7 @@ $duration-slow: 500ms;
   &__fill {
     height: 100%;
     border-radius: 4px;
-    transition: width 800ms $ease-out-expo;
+    transition: width $duration-slow $ease-out-expo;
     transform-origin: left;
   }
 
@@ -280,12 +281,23 @@ $duration-slow: 500ms;
   &__progress-bar {
     height: 100%;
     border-radius: 2px;
-    transition: width 800ms $ease-out-expo;
+    transition: width $duration-slow $ease-out-expo;
 
-    &--success { background: $color-success; }
-    &--warning { background: $color-warning; }
-    &--danger { background: $color-danger; }
-    &--info { background: $color-info; }
+    &--success {
+      background: $color-success;
+    }
+
+    &--warning {
+      background: $color-warning;
+    }
+
+    &--danger {
+      background: $color-danger;
+    }
+
+    &--info {
+      background: $color-info;
+    }
   }
 
   &__percentage {
@@ -359,7 +371,7 @@ $duration-slow: 500ms;
     stroke-width: 8;
     stroke-linecap: round;
     stroke-dasharray: 327;
-    transition: stroke-dashoffset 800ms $ease-out-expo;
+    transition: stroke-dashoffset $duration-slow $ease-out-expo;
   }
 
   &__center {
@@ -418,8 +430,13 @@ $duration-slow: 500ms;
     color: var(--gray-900);
     font-feature-settings: 'tnum' 1;
 
-    &--success { color: $color-success; }
-    &--warning { color: $color-warning; }
+    &--success {
+      color: $color-success;
+    }
+
+    &--warning {
+      color: $color-warning;
+    }
   }
 }
 
@@ -639,8 +656,13 @@ $duration-slow: 500ms;
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 // =============================================================================
