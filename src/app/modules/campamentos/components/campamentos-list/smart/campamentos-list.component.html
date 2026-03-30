@@ -1,13 +1,5 @@
 <main class="camps-page">
   <div class="camps-content">
-    <!-- Action Button -->
-    <div class="camps-actions">
-      <button type="button" class="btn btn-primary" (click)="onCreate()">
-        <mat-icon>add</mat-icon>
-        Crear Campamento
-      </button>
-    </div>
-
     <!-- Loading State -->
     @if (loading()) {
       <div class="camps-loading">
@@ -41,7 +33,7 @@
           </button>
         </div>
       } @else {
-        <!-- Stats Summary Bar -->
+        <!-- Stats Summary Bar with Action -->
         <section class="camps-stats" aria-label="Resumen de campamentos">
           <div class="camps-stats__total">
             <span class="camps-stats__number">{{ stats().total }}</span>
@@ -65,6 +57,10 @@
               <span class="camps-stats__item-count">{{ stats().past }}</span>
             </div>
           </div>
+          <button type="button" class="btn btn-primary camps-stats__action" (click)="onCreate()">
+            <mat-icon>add</mat-icon>
+            Crear Campamento
+          </button>
         </section>
 
         <!-- Camps Grid -->
