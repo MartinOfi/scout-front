@@ -5,7 +5,6 @@
 
 .action-button {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -18,24 +17,24 @@
     background-color 250ms cubic-bezier(0.4, 0, 0.2, 1);
 
   // ---------------------------------------------------------------------------
-  // Mobile-first: FAB-style circular button (icon only)
+  // Mobile-first: Pill button with icon + text
   // ---------------------------------------------------------------------------
-  gap: 0;
-  padding: 0;
+  flex-direction: row;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
   border: none;
-  // Circular shape - 56px is standard FAB size
-  width: 56px;
-  height: 56px;
-  min-height: 56px;
-  border-radius: 50%;
-  // Apply background directly (no border, no card background)
+  width: 100%;
+  height: auto;
+  min-height: 44px; // WCAG touch target
+  border-radius: 12px;
   background: linear-gradient(135deg, #8b2131 0%, #a33a42 100%);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 
   // ---------------------------------------------------------------------------
-  // Desktop: restore full card appearance
+  // Desktop: restore full card appearance (vertical layout)
   // ---------------------------------------------------------------------------
   @include respond-to('md') {
+    flex-direction: column;
     gap: var(--spacing-sm);
     padding: var(--spacing-lg);
     border: 1px solid transparent;
@@ -74,9 +73,9 @@
   }
 
   &:hover {
-    // Mobile: simple scale for FAB
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    // Mobile: subtle scale for pill button
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
 
     // Desktop: translate + enhanced shadow for card
     @include respond-to('md') {
@@ -95,9 +94,9 @@
   }
 
   &:active {
-    // Mobile: press feedback for FAB
-    transform: scale(0.95);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    // Mobile: press feedback for pill button
+    transform: scale(0.98);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
 
     // Desktop: subtle press for card
     @include respond-to('md') {
@@ -146,11 +145,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
     transition:
       transform 250ms cubic-bezier(0.4, 0, 0.2, 1),
       box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1);
 
-    // Mobile-first: no badge styling (icon sits directly in circular button)
+    // Mobile-first: no badge styling (icon inline with text)
     width: auto;
     height: auto;
     border-radius: 0;
@@ -167,12 +167,12 @@
 
     mat-icon {
       color: white;
-      // Mobile-first: larger icon for FAB
-      font-size: 24px;
-      width: 24px;
-      height: 24px;
+      // Mobile-first: smaller icon for pill button
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
 
-      // Desktop: same size
+      // Desktop: larger icon
       @include respond-to('md') {
         font-size: 24px;
         width: 24px;
@@ -186,18 +186,21 @@
   // ---------------------------------------------------------------------------
 
   &__label {
-    // Mobile-first: HIDE label (FAB shows icon only)
-    display: none;
+    // Mobile-first: show label in white (on colored background)
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: white;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
 
-    // Desktop: show label
+    // Desktop: dark text on light card background
     @include respond-to('md') {
-      display: block;
       font-size: 0.875rem;
-      font-weight: 600;
       text-align: center;
-      line-height: 1.3;
       color: var(--gray-700);
-      letter-spacing: 0.01em;
+      white-space: normal;
     }
   }
 

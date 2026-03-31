@@ -52,19 +52,20 @@
 
 // ---------------------------------------------------------------------------
 // Quick Actions Grid
-// Mobile-first: 2 columns (compact) with responsive padding
+// Mobile-first: 2 columns (pill buttons with text) → 2x2 on tablet+
 // ---------------------------------------------------------------------------
 
 .actions-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
   gap: var(--spacing-sm);
 
-  // Mobile-first: compact padding
+  // Mobile-first: 2 columns for pill buttons
+  grid-template-columns: repeat(2, 1fr);
   padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md);
 
-  // Tablet+: more spacious
+  // Tablet+: 2 columns with more spacious cards
   @include respond-to('md') {
+    grid-template-columns: repeat(2, 1fr);
     gap: var(--spacing-md);
     padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg);
   }
