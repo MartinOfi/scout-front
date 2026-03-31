@@ -1,6 +1,26 @@
+// =============================================================================
+// EMAIL FIELD - Mobile-first responsive email input
+// =============================================================================
 @use '../form-tokens' as *;
+
+/**
+ * Email field component
+ *
+ * Styling inherited from form-tokens input-base mixin:
+ * - Touch-friendly height (44px minimum on mobile)
+ * - 16px font-size on mobile to prevent iOS zoom
+ * - Responsive padding and border-radius
+ */
 
 :host {
   display: block;
   width: 100%;
+}
+
+.scout-input {
+  @include input-base;
+
+  &--error {
+    @include input-error;
+  }
 }

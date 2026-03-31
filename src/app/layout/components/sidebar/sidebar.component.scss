@@ -11,6 +11,13 @@
   overflow: visible;
   flex-shrink: 0;
 
+  // Mobile drawer mode: always expanded, no sticky
+  &.mobile-drawer {
+    position: relative;
+    width: 100%;
+    max-width: var(--sidebar-width-expanded);
+  }
+
   &.collapsed {
     width: var(--sidebar-width-collapsed);
 

@@ -1,8 +1,10 @@
 // =============================================================================
 // CAMPAMENTO CARD - EXPEDITION-INSPIRED DESIGN
+// Mobile-first responsive design
 // =============================================================================
 
 @use '../../../../../../shared/styles/tokens' as t;
+@use 'app/shared/styles/responsive' as *;
 
 // -----------------------------------------------------------------------------
 // CARD CONTAINER
@@ -140,7 +142,13 @@
 .camp-card__stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  // Mobile-first: compact gap
+  gap: 6px;
+
+  // Small screens+: more spacious
+  @include respond-to('xs') {
+    gap: 8px;
+  }
 }
 
 .camp-card__stat {
@@ -148,17 +156,29 @@
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  padding: 8px 4px;
+  // Mobile-first: compact padding
+  padding: 6px 2px;
   background-color: t.$stone-50;
   border-radius: 8px;
+
+  // Small screens+: more spacious
+  @include respond-to('xs') {
+    padding: 8px 4px;
+  }
 }
 
 .camp-card__stat-value {
-  font-size: 16px;
+  // Mobile-first: smaller text
+  font-size: 14px;
   font-weight: 700;
   color: t.$stone-800;
   font-variant-numeric: tabular-nums;
   line-height: 1;
+
+  // Small screens+: larger text
+  @include respond-to('xs') {
+    font-size: 16px;
+  }
 }
 
 .camp-card__stat-label {
@@ -261,21 +281,3 @@
   }
 }
 
-// -----------------------------------------------------------------------------
-// RESPONSIVE
-// -----------------------------------------------------------------------------
-
-@media (max-width: 480px) {
-  .camp-card__stats {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
-  }
-
-  .camp-card__stat {
-    padding: 6px 2px;
-  }
-
-  .camp-card__stat-value {
-    font-size: 14px;
-  }
-}

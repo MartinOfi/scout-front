@@ -1,6 +1,9 @@
 // =============================================================================
 // SALDO CARD - Clickable balance display
+// Mobile-first responsive design
 // =============================================================================
+
+@use 'app/shared/styles/responsive' as *;
 
 .saldo-card {
   cursor: pointer;
@@ -29,10 +32,18 @@
 }
 
 .saldo-icon {
-  font-size: 32px;
-  width: 32px;
-  height: 32px;
+  // Mobile-first: slightly smaller icon
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
   color: var(--color-primary-burgundy);
+
+  // Desktop: larger icon
+  @include respond-to('md') {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+  }
 }
 
 .saldo-details {
@@ -51,11 +62,17 @@
 }
 
 .saldo-amount {
-  font-size: var(--text-3xl);
+  // Mobile-first: smaller text
+  font-size: var(--text-2xl);
   font-weight: 600;
   color: var(--text-primary);
   font-family: var(--font-family-headings);
   font-variant-numeric: tabular-nums lining-nums;
+
+  // Desktop: larger text
+  @include respond-to('md') {
+    font-size: var(--text-3xl);
+  }
 
   &.negativo {
     color: var(--color-danger);

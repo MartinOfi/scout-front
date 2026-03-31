@@ -1,3 +1,9 @@
+// =============================================================================
+// CUENTA RESUMEN CARDS STYLES
+// Mobile-first responsive design
+// =============================================================================
+
+@use 'app/shared/styles/responsive' as *;
 @use '../../../../../../shared/styles/tokens' as t;
 
 .sr-only {
@@ -15,11 +21,13 @@
 .cuenta-resumen {
   &__grid {
     display: grid;
-    grid-template-columns: 1fr 2fr;
+    // Mobile-first: single column stack
+    grid-template-columns: 1fr;
     gap: 16px;
 
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
+    // Tablet+: 2-column layout (1fr + 2fr)
+    @include respond-to('md') {
+      grid-template-columns: 1fr 2fr;
     }
   }
 
@@ -33,11 +41,13 @@
 
   &__secondary {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    // Mobile-first: single column stack
+    grid-template-columns: 1fr;
     gap: 12px;
 
-    @media (max-width: 640px) {
-      grid-template-columns: 1fr;
+    // Tablet+: 3-column layout
+    @include respond-to('sm') {
+      grid-template-columns: repeat(3, 1fr);
     }
   }
 }

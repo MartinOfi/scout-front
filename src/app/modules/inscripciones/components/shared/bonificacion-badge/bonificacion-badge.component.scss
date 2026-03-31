@@ -1,3 +1,10 @@
+// =============================================================================
+// BONIFICACION BADGE - Status indicator badge
+// Mobile-first responsive design
+// =============================================================================
+
+@use 'app/shared/styles/responsive' as *;
+
 .estado-badge {
   display: inline-flex;
   align-items: center;

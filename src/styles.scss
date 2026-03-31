@@ -10,6 +10,13 @@
 @use 'app/shared/styles/color-tokens';
 @use 'app/shared/styles/typography-scale';
 
+// Responsive System (breakpoints, mixins, CSS custom properties)
+@use 'app/shared/styles/responsive';
+
+// Form Tokens - Global utility classes (.scout-input, .scout-label, etc.)
+// Required for form components that use these classes in templates
+@use 'app/shared/components/form/form-tokens';
+
 // -----------------------------------------------------------------------------
 // 2. EXTERNAL IMPORTS
 // -----------------------------------------------------------------------------

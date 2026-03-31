@@ -1,22 +1,45 @@
+// =============================================================================
+// FORM CONTAINER - Mobile-first responsive form layout
+// =============================================================================
 @use '../form-tokens' as *;
+@use 'app/shared/styles/responsive' as *;
+
+/**
+ * Form container component with responsive layout
+ *
+ * Mobile-first design with:
+ * - Compact padding on mobile
+ * - Single column layout by default
+ * - Touch-friendly spacing
+ * - WCAG compliant sizing
+ */
 
 :host {
   display: block;
 }
 
+// ---------------------------------------------------------------------------
+// Form Page - Full page form layout
+// ---------------------------------------------------------------------------
 .scout-form-page {
   min-height: 100vh;
-  padding: 32px 16px;
+  // Mobile-first: compact padding
+  padding: var(--spacing-md);
 
-  @media (min-width: 640px) {
-    padding: 40px 24px;
+  // Tablet: medium padding
+  @include respond-to('sm') {
+    padding: var(--spacing-lg) var(--spacing-md);
   }
 
-  @media (min-width: 1024px) {
-    padding: 48px 32px;
+  // Desktop: comfortable padding
+  @include respond-to('lg') {
+    padding: var(--spacing-xl) var(--spacing-lg);
   }
 }
 
+// ---------------------------------------------------------------------------
+// Form Wrapper - Max-width constraints
+// ---------------------------------------------------------------------------
 .scout-form-wrapper {
   margin: 0 auto;
   width: 100%;
@@ -26,20 +49,44 @@
   }
 
   &--double {
-    max-width: 960px;
+    // Mobile: full width
+    max-width: 100%;
+
+    // Desktop: constrained width
+    @include respond-to('md') {
+      max-width: 960px;
+    }
   }
 }
 
+// ---------------------------------------------------------------------------
+// Form Card - Container styling
+// ---------------------------------------------------------------------------
 .scout-form-card {
   background-color: white;
-  border-radius: 16px;
+  // Mobile-first: smaller radius
+  border-radius: 12px;
   box-shadow: $shadow-card;
   overflow: hidden;
   border: 1px solid $stone-200;
+
+  // Desktop: larger radius
+  @include respond-to('md') {
+    border-radius: 16px;
+  }
 }
 
+// ---------------------------------------------------------------------------
+// Form Header - Title and subtitle
+// ---------------------------------------------------------------------------
 .scout-form-header {
-  padding: 24px 28px;
+  // Mobile-first: compact padding
+  padding: var(--spacing-md);
+
+  // Desktop: comfortable padding
+  @include respond-to('md') {
+    padding: var(--spacing-lg) var(--spacing-xl);
+  }
 
   &--with-divider {
     border-bottom: 1px solid $stone-200;
@@ -48,38 +95,90 @@
 
 .scout-form-title {
   font-family: var(--font-family-headings);
-  font-size: 1.5rem;
+  // Mobile-first: smaller title
+  font-size: 1.25rem;
   font-weight: 600;
   color: $stone-900;
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--spacing-sm);
   letter-spacing: -0.01em;
+
+  // Desktop: larger title
+  @include respond-to('md') {
+    font-size: 1.5rem;
+    gap: 12px;
+  }
 }
 
 .scout-form-icon {
   color: $stone-500;
-  font-size: 1.25rem;
+  // Mobile-first: smaller icon
+  font-size: 1.125rem;
+
+  // Desktop: larger icon
+  @include respond-to('md') {
+    font-size: 1.25rem;
+  }
 }
 
 .scout-form-subtitle {
-  margin: 6px 0 0;
-  font-size: 14px;
+  margin: var(--spacing-xs) 0 0;
+  // Mobile-first: smaller text
+  font-size: 13px;
   color: $stone-500;
   line-height: 1.5;
+
+  // Desktop: standard text
+  @include respond-to('md') {
+    margin: 6px 0 0;
+    font-size: 14px;
+  }
 }
 
+// ---------------------------------------------------------------------------
+// Form Body - Content area
+// ---------------------------------------------------------------------------
 .scout-form-body {
-  padding: 0 28px;
+  // Mobile-first: compact padding
+  padding: 0 var(--spacing-md);
+
+  // Desktop: comfortable padding
+  @include respond-to('md') {
+    padding: 0 var(--spacing-xl);
+  }
 
   &--comfortable {
-    padding-top: 28px;
-    padding-bottom: 28px;
+    // Mobile-first
+    padding-top: var(--spacing-lg);
+    padding-bottom: var(--spacing-lg);
+
+    // Desktop
+    @include respond-to('md') {
+      padding-top: 28px;
+      padding-bottom: 28px;
+    }
   }
 
   &--compact {
-    padding-top: 20px;
-    padding-bottom: 20px;
+    // Mobile-first
+    padding-top: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+
+    // Desktop
+    @include respond-to('md') {
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Accessibility - Reduced Motion
+// ---------------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+  .scout-form-card {
+    transition: none;
   }
 }

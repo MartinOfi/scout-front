@@ -1,28 +1,81 @@
+// =============================================================================
+// CHIPS FILTER - Horizontal scrollable chip selection
+// =============================================================================
+@use 'app/shared/styles/responsive' as *;
+
+/**
+ * Chips filter component for multi-select filtering
+ *
+ * Mobile-first design with:
+ * - Horizontal scroll on mobile
+ * - Wrap layout on desktop
+ * - Touch-friendly chip sizes (44px height minimum)
+ * - WCAG compliant touch targets
+ */
+
 .chips-filter {
-  // Extra padding and overflow visible to prevent clipping of chip shadows and transforms
+  // Extra padding for chip shadows and transforms
   padding-top: 0.5rem;
   overflow: visible;
 
   ::ng-deep {
     mat-chip-set {
       display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
+      // Mobile-first: horizontal scroll
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+      gap: var(--spacing-xs);
       background: white;
-      padding: 1rem;
-      padding-top: 0.75rem; // Extra top padding for chip transforms
-      overflow: visible;
+      padding: var(--spacing-sm);
+      padding-top: var(--spacing-sm); // Extra for transforms
+
+      // Desktop: wrap layout
+      @include respond-to('md') {
+        flex-wrap: wrap;
+        overflow-x: visible;
+        gap: 0.75rem;
+        padding: 1rem;
+        padding-top: 0.75rem;
+      }
+
+      // Custom scrollbar for mobile
+      &::-webkit-scrollbar {
+        height: 4px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.1);
+        border-radius: 2px;
+      }
     }
 
     mat-chip {
       cursor: pointer;
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       font-weight: 500;
-      font-size: 0.875rem;
-      padding: 0.625rem 1.25rem;
+      user-select: none;
+      flex-shrink: 0;
+
+      // Mobile-first: touch-friendly size (44px height)
+      font-size: 13px;
+      padding: 10px 16px;
       border-radius: 20px;
       border: 1px solid transparent;
-      user-select: none;
+      min-height: 40px;
+
+      // Desktop: standard size
+      @include respond-to('md') {
+        font-size: 0.875rem;
+        padding: 0.625rem 1.25rem;
+        min-height: auto;
+      }
 
       &:hover:not(.chip-active):not([style*="cursor: not-allowed"]) {
         background-color: #e5e7eb !important;
@@ -42,14 +95,29 @@
       }
 
       .chip-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
-        margin-right: 0.5rem;
+        // Mobile-first: larger icon
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        margin-right: var(--spacing-xs);
+
+        // Desktop: standard icon
+        @include respond-to('md') {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+          margin-right: 0.5rem;
+        }
       }
 
       .mdc-evolution-chip__cell--primary {
-        height: 45px
+        // Mobile-first: touch target height
+        height: 40px;
+
+        // Desktop: standard
+        @include respond-to('md') {
+          height: 45px;
+        }
       }
 
       .mdc-evolution-chip__text-label {
@@ -57,34 +125,83 @@
         letter-spacing: 0.01em;
         color: inherit;
         display: flex;
+        white-space: nowrap;
       }
     }
   }
 }
 
-// Responsive design
-@media (max-width: 640px) {
+// ---------------------------------------------------------------------------
+// Scroll Indicator - Visual hint for horizontal scroll on mobile
+// ---------------------------------------------------------------------------
+.chips-filter-wrapper {
+  position: relative;
+
+  // Fade indicator on right edge (mobile only)
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 24px;
+    background: linear-gradient(90deg, transparent 0%, white 100%);
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+
+    @include respond-to('md') {
+      display: none;
+    }
+  }
+
+  // Hide indicator when scrolled to end
+  &.scrolled-to-end::after {
+    opacity: 0;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Accessibility - Reduced Motion
+// ---------------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
   .chips-filter {
     ::ng-deep {
+      mat-chip {
+        transition: none;
+
+        &:hover:not(.chip-active):not([style*="cursor: not-allowed"]) {
+          transform: none;
+        }
+
+        &.chip-active {
+          transform: none;
+        }
+      }
+
       mat-chip-set {
-        padding: 0.75rem;
-        gap: 0.5rem;
-      }
-
-      mat-chip {
-        padding: 0.5rem 1rem;
-        font-size: 0.8125rem;
+        scroll-behavior: auto;
       }
     }
   }
+
+  .chips-filter-wrapper::after {
+    transition: none;
+  }
 }
 
-@media (min-width: 641px) and (max-width: 1024px) {
+// ---------------------------------------------------------------------------
+// High Contrast Mode
+// ---------------------------------------------------------------------------
+@media (prefers-contrast: high) {
   .chips-filter {
     ::ng-deep {
       mat-chip {
-        padding: 0.625rem 1.125rem;
-        font-size: 0.8125rem;
+        border: 1px solid currentColor;
+
+        &.chip-active {
+          border-width: 2px;
+        }
       }
     }
   }

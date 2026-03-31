@@ -1,6 +1,9 @@
 // =============================================================================
 // CUENTAS PERSONALES - Personal accounts list
+// Mobile-first responsive design
 // =============================================================================
+
+@use 'app/shared/styles/responsive' as *;
 
 .cuentas-personales-container {
   display: flex;
@@ -28,8 +31,14 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-md);
-  padding: var(--spacing-2xl);
+  // Mobile-first: compact padding
+  padding: var(--spacing-lg);
   color: var(--text-muted);
+
+  // Tablet+: more spacious
+  @include respond-to('md') {
+    padding: var(--spacing-2xl);
+  }
 
   span {
     font-size: var(--text-sm);
@@ -41,16 +50,31 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-2xl);
+  gap: var(--spacing-sm);
+  // Mobile-first: compact padding
+  padding: var(--spacing-lg);
   color: var(--text-muted);
   text-align: center;
 
+  // Tablet+: more spacious
+  @include respond-to('md') {
+    gap: var(--spacing-md);
+    padding: var(--spacing-2xl);
+  }
+
   mat-icon {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
+    // Mobile-first: smaller icon
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
     opacity: 0.5;
+
+    // Tablet+: larger icon
+    @include respond-to('md') {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+    }
   }
 
   span {

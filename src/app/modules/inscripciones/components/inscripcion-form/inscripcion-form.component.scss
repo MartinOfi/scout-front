@@ -1,5 +1,6 @@
 // =============================================================================
 // INSCRIPCION FORM - EDITORIAL DESIGN
+// Mobile-first responsive design
 // =============================================================================
 // Distinctive form design with numbered sections and visual hierarchy.
 // Avoids generic card-wrapper patterns for a more editorial feel.
@@ -7,6 +8,7 @@
 @use 'sass:color';
 @use '../../../../shared/styles/tokens' as *;
 @use '../../../../shared/components/form/form-tokens' as form;
+@use 'app/shared/styles/responsive' as *;
 
 // -----------------------------------------------------------------------------
 // PAGE CONTAINER
@@ -15,9 +17,11 @@
 .inscription-page {
   max-width: 720px;
   margin: 0 auto;
-  padding: 32px 20px 64px;
+  // Mobile-first: NO padding (full bleed for maximum content area)
+  padding: 0;
 
-  @media (min-width: 640px) {
+  // Tablet+: restore spacious padding
+  @include respond-to('md') {
     padding: 48px 32px 80px;
   }
 }
@@ -126,25 +130,29 @@
 
 .form-section {
   display: grid;
-  grid-template-columns: 48px 1fr;
-  gap: 24px;
+  // Mobile-first: single column (marker above content)
+  grid-template-columns: 1fr;
+  gap: 12px;
 
-  @media (max-width: 479px) {
-    grid-template-columns: 1fr;
-    gap: 16px;
+  // Tablet+: two columns with marker on side
+  @include respond-to('sm') {
+    grid-template-columns: 48px 1fr;
+    gap: 24px;
   }
 }
 
 .section-marker {
   display: flex;
-  flex-direction: column;
+  // Mobile-first: horizontal row (marker + line beside heading)
+  flex-direction: row;
   align-items: center;
   gap: 12px;
-  padding-top: 4px;
+  padding-top: 0;
 
-  @media (max-width: 479px) {
-    flex-direction: row;
-    padding-top: 0;
+  // Tablet+: vertical column on side
+  @include respond-to('sm') {
+    flex-direction: column;
+    padding-top: 4px;
   }
 }
 
@@ -164,16 +172,18 @@
 
 .marker-line {
   flex: 1;
-  width: 2px;
-  background: linear-gradient(to bottom, $stone-200, transparent);
-  min-height: 40px;
+  // Mobile-first: horizontal line extending from number
+  height: 2px;
+  width: auto;
+  min-height: unset;
+  background: linear-gradient(to right, $stone-200, transparent);
 
-  @media (max-width: 479px) {
-    flex: 1;
-    height: 2px;
-    width: auto;
-    min-height: unset;
-    background: linear-gradient(to right, $stone-200, transparent);
+  // Tablet+: vertical line below number
+  @include respond-to('sm') {
+    width: 2px;
+    height: auto;
+    min-height: 40px;
+    background: linear-gradient(to bottom, $stone-200, transparent);
   }
 }
 
@@ -223,10 +233,12 @@
   @include form.form-grid(1);
 
   &--2col {
-    grid-template-columns: 1fr 1fr;
+    // Mobile-first: single column
+    grid-template-columns: 1fr;
 
-    @media (max-width: 479px) {
-      grid-template-columns: 1fr;
+    // Small screens+: two columns
+    @include respond-to('xs') {
+      grid-template-columns: 1fr 1fr;
     }
   }
 }
@@ -237,12 +249,14 @@
 
 .amount-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  // Mobile-first: single column
+  grid-template-columns: 1fr;
   gap: 12px;
   margin-bottom: 20px;
 
-  @media (max-width: 479px) {
-    grid-template-columns: 1fr;
+  // Small screens+: two columns
+  @include respond-to('xs') {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -430,15 +444,18 @@
 
 .personal-account-panel__body {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+  // Mobile-first: stack vertically
+  flex-direction: column;
+  align-items: stretch;
+  gap: 20px;
   padding: 20px 18px;
 
-  @media (max-width: 479px) {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 20px;
+  // Small screens+: horizontal layout
+  @include respond-to('xs') {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
   }
 }
 
@@ -544,16 +561,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  padding: 16px 20px;
+  // Mobile-first: compact
+  gap: 12px;
+  padding: 14px 16px;
   background-color: $stone-100;
   border-radius: 12px;
   flex-wrap: wrap;
   transition: all $transition-fast;
 
-  @media (max-width: 479px) {
-    gap: 12px;
-    padding: 14px 16px;
+  // Small screens+: more spacious
+  @include respond-to('xs') {
+    gap: 16px;
+    padding: 16px 20px;
   }
 
   &--error {
@@ -606,11 +625,13 @@
 
 .auth-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  // Mobile-first: single column
+  grid-template-columns: 1fr;
   gap: 12px;
 
-  @media (max-width: 599px) {
-    grid-template-columns: 1fr;
+  // Small screens+: two columns
+  @include respond-to('sm') {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 

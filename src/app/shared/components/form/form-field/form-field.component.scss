@@ -1,4 +1,17 @@
+// =============================================================================
+// FORM FIELD - Mobile-first responsive form field wrapper
+// =============================================================================
 @use '../form-tokens' as *;
+@use 'app/shared/styles/responsive' as *;
+
+/**
+ * Form field wrapper component
+ *
+ * Provides consistent field layout with:
+ * - Label, input, hint, and error message structure
+ * - Responsive spacing from form-tokens
+ * - Full width inputs on all breakpoints
+ */
 
 :host {
   display: block;

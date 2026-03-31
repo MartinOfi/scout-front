@@ -1,8 +1,8 @@
-<aside class="sidebar" [class.collapsed]="isCollapsed()">
+<aside class="sidebar" [class.collapsed]="isCollapsed() && !isMobileDrawer()" [class.mobile-drawer]="isMobileDrawer()">
   <div class="sidebar-header">
     <div class="header-content">
       <img src="assets/images/logo.png" alt="Grupo Scout Calasanz" class="logo-image" />
-      @if (!isCollapsed()) {
+      @if (!isCollapsed() || isMobileDrawer()) {
       <div class="header-text">
         <span class="group-name">Scout Finance</span>
         <span class="group-subtitle">Sistema de Gestión</span>
@@ -13,15 +13,21 @@
 
   <div class="divider-wrapper">
     <hr class="divider" />
-    <button class="toggle-btn btn-icon" type="button" (click)="toggle()"
-      [attr.aria-label]="isCollapsed() ? 'Expandir menú' : 'Colapsar menú'">
-      <mat-icon>{{ toggleIcon() }}</mat-icon>
-    </button>
+    @if (!isMobileDrawer()) {
+      <button class="toggle-btn btn-icon" type="button" (click)="toggle()"
+        [attr.aria-label]="isCollapsed() ? 'Expandir menú' : 'Colapsar menú'">
+        <mat-icon>{{ toggleIcon() }}</mat-icon>
+      </button>
+    }
   </div>
 
   <nav class="sidebar-nav">
     @for (item of menuItems; track item.route) {
-    <app-sidebar-item [item]="item" [isCollapsed]="isCollapsed()" />
+    <app-sidebar-item
+      [item]="item"
+      [isCollapsed]="isCollapsed() && !isMobileDrawer()"
+      (click)="itemClicked.emit()"
+    />
     }
   </nav>
 

@@ -1,6 +1,29 @@
+// =============================================================================
+// PHONE FIELD - Mobile-first responsive phone input
+// =============================================================================
 @use '../form-tokens' as *;
+
+/**
+ * Phone field component
+ *
+ * Styling inherited from form-tokens input-base mixin:
+ * - Touch-friendly height (44px minimum on mobile)
+ * - 16px font-size on mobile to prevent iOS zoom
+ * - Responsive padding and border-radius
+ */
 
 :host {
   display: block;
   width: 100%;
+}
+
+.scout-input {
+  @include input-base;
+
+  // Tabular numbers for phone alignment
+  font-variant-numeric: tabular-nums;
+
+  &--error {
+    @include input-error;
+  }
 }

@@ -5,6 +5,7 @@
 @use 'sass:color';
 @use '../../../../../shared/styles/tokens' as t;
 @use '../../../../../shared/styles/dialog' as dialog;
+@use '../../../../../shared/styles/responsive' as *;
 
 // ============================================================================
 // Host & Material Dialog Container Override
@@ -138,8 +139,16 @@
 
 .form-fields {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: t.$spacing-md;
+
+  // Mobile-first: single column
+  grid-template-columns: 1fr;
+  gap: 14px;
+
+  // Desktop: two columns
+  @include respond-to('md') {
+    grid-template-columns: 1fr 1fr;
+    gap: t.$spacing-md;
+  }
 
   .full-width {
     grid-column: 1 / -1;
@@ -390,71 +399,92 @@
 }
 
 // ============================================================================
-// Responsive
+// Mobile-First Responsive Overrides
+// (Note: dialog-title, dialog-content, dialog-actions already handle
+// responsive via shared mixins; these are component-specific adjustments)
 // ============================================================================
 
-@media (max-width: 600px) {
-  .dialog-content {
-    min-width: auto;
+.saldo-personal-section {
+  // Mobile-first: compact padding
+  padding: 10px;
+
+  // Desktop: more spacious
+  @include respond-to('md') {
     padding: t.$spacing-md;
   }
+}
 
-  .dialog-title {
-    padding: 16px 16px 12px;
+.saldo-info {
+  // Mobile-first: stacked layout
+  flex-direction: column;
+  align-items: flex-start;
+  gap: t.$spacing-sm;
+
+  .btn-use-saldo {
+    width: 100%;
+    text-align: center;
   }
 
-  .form-fields {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-
-  .saldo-personal-section {
-    padding: 10px;
-  }
-
-  .saldo-info {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: t.$spacing-sm;
+  // Desktop: horizontal layout
+  @include respond-to('md') {
+    flex-direction: row;
+    align-items: center;
+    gap: t.$spacing-md;
 
     .btn-use-saldo {
-      width: 100%;
-      text-align: center;
+      width: auto;
     }
   }
+}
 
-  .payment-summary {
-    padding: t.$spacing-md;
+.payment-summary {
+  // Mobile-first: standard padding
+  padding: t.$spacing-md;
+
+  // Desktop: slightly more
+  @include respond-to('md') {
+    padding: 14px 16px;
   }
+}
 
-  .summary-row {
-    flex-direction: column;
-    gap: t.$spacing-md;
+.summary-row {
+  // Mobile-first: stacked layout
+  flex-direction: column;
+  gap: t.$spacing-md;
+
+  // Desktop: horizontal
+  @include respond-to('md') {
+    flex-direction: row;
   }
+}
 
-  .summary-calc {
-    justify-content: center;
+.summary-calc {
+  // Mobile-first: centered
+  justify-content: center;
+
+  // Desktop: default (flex-start)
+  @include respond-to('md') {
+    justify-content: flex-start;
   }
+}
 
-  .summary-result {
-    width: 100%;
-    justify-content: center;
+.summary-result {
+  // Mobile-first: full width, centered
+  width: 100%;
+  justify-content: center;
+
+  // Desktop: auto width
+  @include respond-to('md') {
+    width: auto;
   }
+}
 
-  .dialog-actions {
-    padding: 12px 16px 16px;
-    flex-wrap: wrap;
+.summary {
+  // Mobile-first: compact padding
+  padding: 14px;
 
-    .btn-danger {
-      margin-right: 0;
-      width: 100%;
-      justify-content: center;
-      order: 3;
-      margin-top: t.$spacing-sm;
-    }
-  }
-
-  .summary {
-    padding: 14px;
+  // Desktop: more spacious
+  @include respond-to('md') {
+    padding: 14px 16px;
   }
 }

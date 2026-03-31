@@ -1,9 +1,11 @@
 // =============================================================================
 // PERSONA DASHBOARD - UNIFIED DETAIL VIEW
+// Mobile-first responsive design
 // =============================================================================
 // Warm, editorial layout for displaying persona financial and membership data.
 // Reuses patterns from inscripcion-detail with stone palette and burgundy accents.
 
+@use 'app/shared/styles/responsive' as *;
 @use '../../../../shared/styles/tokens' as t;
 
 // -----------------------------------------------------------------------------
@@ -33,12 +35,14 @@ $section-gap: 24px;
 
 .dashboard-page {
   min-height: 100%;
-  padding: 24px;
-  padding-bottom: 48px;
+  // Mobile-first: compact padding
+  padding: 16px;
+  padding-bottom: 32px;
 
-  @media (max-width: 640px) {
-    padding: 16px;
-    padding-bottom: 32px;
+  // Tablet+: more spacious
+  @include respond-to('sm') {
+    padding: 24px;
+    padding-bottom: 48px;
   }
 }
 
@@ -54,11 +58,13 @@ $section-gap: 24px;
 
 .dashboard-cards-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  // Mobile-first: single column stack
+  grid-template-columns: 1fr;
   gap: 20px;
 
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr;
+  // Desktop: full 3-column layout
+  @include respond-to('lg') {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 

@@ -1,12 +1,14 @@
 // =============================================================================
 // EVENT LIST ITEM - Upcoming event row with date badge
 // =============================================================================
+@use 'app/shared/styles/responsive' as *;
 
 .event-list-item {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md) var(--spacing-lg);
+  // Mobile-first: compact spacing
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
   margin: 0 var(--spacing-xs);
   border-radius: 10px;
   cursor: pointer;
@@ -16,13 +18,20 @@
     box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 
+  // Desktop: larger spacing
+  @include respond-to('md') {
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
+
   // Divider between items (not on last)
   &:not(:last-child)::after {
     content: '';
     position: absolute;
     bottom: 0;
-    left: calc(var(--spacing-lg) + 56px);
-    right: var(--spacing-lg);
+    // Mobile-first: smaller left offset
+    left: calc(var(--spacing-md) + 48px);
+    right: var(--spacing-md);
     height: 1px;
     background: linear-gradient(
       90deg,
@@ -30,6 +39,12 @@
       rgba(0, 0, 0, 0.06) 80%,
       transparent 100%
     );
+
+    // Desktop: larger offset
+    @include respond-to('md') {
+      left: calc(var(--spacing-lg) + 56px);
+      right: var(--spacing-lg);
+    }
   }
 
   &:hover {
@@ -75,10 +90,11 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-width: 52px;
-    height: 52px;
+    // Mobile-first: compact badge (44px min touch target)
+    min-width: 44px;
+    height: 44px;
     background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-    border-radius: 12px;
+    border-radius: 10px;
     padding: var(--spacing-xs);
     position: relative;
     overflow: hidden;
@@ -87,6 +103,13 @@
       transform 200ms cubic-bezier(0.4, 0, 0.2, 1),
       box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
 
+    // Desktop: larger badge
+    @include respond-to('md') {
+      min-width: 52px;
+      height: 52px;
+      border-radius: 12px;
+    }
+
     // Top accent stripe
     &::before {
       content: '';
@@ -94,28 +117,48 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 4px;
+      // Mobile-first: thinner stripe
+      height: 3px;
       background: linear-gradient(90deg, #1565c0 0%, #1976d2 100%);
-      border-radius: 12px 12px 0 0;
+      border-radius: 10px 10px 0 0;
+
+      // Desktop: thicker stripe
+      @include respond-to('md') {
+        height: 4px;
+        border-radius: 12px 12px 0 0;
+      }
     }
   }
 
   &__month {
-    font-size: 10px;
+    // Mobile-first: smaller month text
+    font-size: 9px;
     font-weight: 700;
     color: #1565c0;
     text-transform: uppercase;
-    letter-spacing: 0.8px;
+    letter-spacing: 0.6px;
     margin-top: 2px;
+
+    // Desktop: larger month text
+    @include respond-to('md') {
+      font-size: 10px;
+      letter-spacing: 0.8px;
+    }
   }
 
   &__day {
-    font-size: 20px;
+    // Mobile-first: smaller day number
+    font-size: 17px;
     font-weight: 700;
     color: #0d47a1;
     line-height: 1;
     font-family: var(--font-family-headings);
     font-feature-settings: 'tnum' 1;
+
+    // Desktop: larger day number
+    @include respond-to('md') {
+      font-size: 20px;
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -126,12 +169,19 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    // Mobile-first: tighter gap
+    gap: 4px;
     min-width: 0;
+
+    // Desktop: larger gap
+    @include respond-to('md') {
+      gap: 6px;
+    }
   }
 
   &__title {
-    font-size: 14px;
+    // Mobile-first: slightly smaller
+    font-size: 13px;
     font-weight: 500;
     margin: 0;
     color: var(--gray-900);
@@ -139,6 +189,11 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    // Desktop: standard size
+    @include respond-to('md') {
+      font-size: 14px;
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -148,15 +203,22 @@
   &__category {
     display: inline-flex;
     align-items: center;
-    font-size: 11px;
+    // Mobile-first: smaller chip
+    font-size: 10px;
     font-weight: 600;
-    padding: 3px 10px;
+    padding: 2px 8px;
     border-radius: 100px; // Pill shape
     width: fit-content;
     letter-spacing: 0.02em;
     text-transform: uppercase;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     transition: transform 200ms ease;
+
+    // Desktop: larger chip
+    @include respond-to('md') {
+      font-size: 11px;
+      padding: 3px 10px;
+    }
 
     &:hover {
       transform: scale(1.02);

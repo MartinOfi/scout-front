@@ -1,25 +1,56 @@
+// =============================================================================
+// MOVIMIENTO DETAIL - Transaction detail view
+// Mobile-first responsive design
+// =============================================================================
+
+@use 'app/shared/styles/responsive' as *;
+
 .detail-container {
-  padding: 24px;
+  // Mobile-first: compact padding
+  padding: var(--spacing-md);
   max-width: 1200px;
   margin: 0 auto;
+
+  // Tablet+: more spacious padding
+  @include respond-to('md') {
+    padding: var(--spacing-lg);
+  }
 }
 
 .header {
   display: flex;
+  // Mobile-first: allow wrap for small screens
+  flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+
+  // Tablet+: more spacious gap
+  @include respond-to('md') {
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
 
   h1 {
     flex: 1;
     margin: 0;
-    font-size: 24px;
+    // Mobile-first: smaller text
+    font-size: var(--text-lg);
     font-weight: 500;
+
+    // Tablet+: larger text
+    @include respond-to('md') {
+      font-size: var(--text-xl);
+    }
   }
 
   .actions {
     display: flex;
-    gap: 8px;
+    gap: var(--spacing-xs);
+
+    @include respond-to('md') {
+      gap: var(--spacing-sm);
+    }
   }
 }
 
@@ -29,18 +60,36 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 48px;
-  gap: 16px;
+  // Mobile-first: compact padding
+  padding: var(--spacing-xl);
+  gap: var(--spacing-md);
+
+  // Tablet+: more spacious padding
+  @include respond-to('md') {
+    padding: var(--spacing-2xl);
+  }
 
   mat-icon {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
+    // Mobile-first: smaller icon
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+
+    // Tablet+: larger icon
+    @include respond-to('md') {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+    }
   }
 
   p {
     margin: 0;
-    font-size: 16px;
-    color: rgba(0, 0, 0, 0.60);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+
+    @include respond-to('md') {
+      font-size: var(--text-base);
+    }
   }
 }

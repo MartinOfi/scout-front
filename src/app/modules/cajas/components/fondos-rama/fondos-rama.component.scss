@@ -1,6 +1,9 @@
 // =============================================================================
 // FONDOS RAMA - Unified view for branch funds with KPI cards and movements table
+// Mobile-first responsive design
 // =============================================================================
+
+@use 'app/shared/styles/responsive' as *;
 
 .fondos-rama-container {
   display: flex;
@@ -104,25 +107,40 @@
 }
 
 // =============================================================================
-// RESPONSIVE
+// RESPONSIVE - Mobile-first approach
 // =============================================================================
 
-@media (max-width: 1200px) {
+// Mobile-first: stacked layout
+.fondos-header {
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.rama-card-wrapper {
+  min-width: 100%;
+}
+
+// Tablet: 2 columns
+@include respond-to('md') {
   .fondos-header {
+    flex-direction: row;
     gap: var(--spacing-md);
   }
 
   .rama-card-wrapper {
     min-width: 160px;
+    flex: 1 1 calc(50% - var(--spacing-md));
   }
 }
 
-@media (max-width: 768px) {
+// Desktop: 4+ columns with larger gap
+@include respond-to('xl') {
   .fondos-header {
-    flex-direction: column;
+    gap: var(--spacing-lg);
   }
 
   .rama-card-wrapper {
-    min-width: 100%;
+    min-width: 180px;
+    flex: 1;
   }
 }

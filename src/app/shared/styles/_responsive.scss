@@ -1,0 +1,312 @@
+// =============================================================================
+// RESPONSIVE SYSTEM - SCOUT FRONTEND
+// =============================================================================
+// Mobile-first breakpoint system with SCSS mixins and CSS custom properties
+//
+// Usage:
+//   @use 'app/shared/styles/responsive' as *;
+//
+//   .my-component {
+
+//     padding: 16px;  // Mobile base
+//
+//     @include respond-to('md') {
+//       padding: 24px;  // Tablet+
+//     }
+//
+//     @include respond-to('lg') {
+//       padding: 32px;  // Desktop+
+//     }
+//   }
+// =============================================================================
+
+@use 'sass:map';
+
+// -----------------------------------------------------------------------------
+// BREAKPOINT DEFINITIONS
+// -----------------------------------------------------------------------------
+// Aligned with Tailwind CSS defaults for consistency
+
+$breakpoints: (
+  'xs':  375px,   // Mobile pequeño (iPhone SE)
+  'sm':  576px,   // Mobile grande / Landscape
+  'md':  768px,   // Tablet portrait
+  'lg':  1024px,  // Tablet landscape / Desktop pequeño
+  'xl':  1280px,  // Desktop
+  '2xl': 1440px   // Desktop grande
+) !default;
+
+// Export breakpoints as CSS custom properties for JS access
+:root {
+  --breakpoint-xs: #{map.get($breakpoints, 'xs')};
+  --breakpoint-sm: #{map.get($breakpoints, 'sm')};
+  --breakpoint-md: #{map.get($breakpoints, 'md')};
+  --breakpoint-lg: #{map.get($breakpoints, 'lg')};
+  --breakpoint-xl: #{map.get($breakpoints, 'xl')};
+  --breakpoint-2xl: #{map.get($breakpoints, '2xl')};
+}
+
+// -----------------------------------------------------------------------------
+// BREAKPOINT MIXINS
+// -----------------------------------------------------------------------------
+
+/// Mobile-first mixin (min-width)
+/// Use this as the primary approach - write mobile styles first, then enhance
+///
+/// @param {String} $breakpoint - Breakpoint name (xs, sm, md, lg, xl, 2xl)
+/// @example
+///   .card {
+///     padding: 16px;
+///     @include respond-to('md') { padding: 24px; }
+///     @include respond-to('lg') { padding: 32px; }
+///   }
+@mixin respond-to($breakpoint) {
+  @if map.has-key($breakpoints, $breakpoint) {
+    @media (min-width: map.get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  } @else {
+    @warn "Breakpoint '#{$breakpoint}' not found. Available: xs, sm, md, lg, xl, 2xl";
+  }
+}
+
+/// Desktop-first mixin (max-width)
+/// Use sparingly - only when you need to hide/change something specifically for mobile
+///
+/// @param {String} $breakpoint - Breakpoint name
+/// @example
+///   .sidebar {
+///     display: block;
+///     @include respond-below('md') { display: none; }
+///   }
+@mixin respond-below($breakpoint) {
+  @if map.has-key($breakpoints, $breakpoint) {
+    @media (max-width: #{map.get($breakpoints, $breakpoint) - 1px}) {
+      @content;
+    }
+  } @else {
+    @warn "Breakpoint '#{$breakpoint}' not found. Available: xs, sm, md, lg, xl, 2xl";
+  }
+}
+
+/// Range mixin (between two breakpoints)
+/// Use for tablet-only or specific range styles
+///
+/// @param {String} $min - Minimum breakpoint
+/// @param {String} $max - Maximum breakpoint
+/// @example
+///   .tablet-only {
+///     @include respond-between('md', 'lg') { display: block; }
+///   }
+@mixin respond-between($min, $max) {
+  @if map.has-key($breakpoints, $min) and map.has-key($breakpoints, $max) {
+    @media (min-width: map.get($breakpoints, $min)) and (max-width: #{map.get($breakpoints, $max) - 1px}) {
+      @content;
+    }
+  } @else {
+    @warn "One or both breakpoints not found. Available: xs, sm, md, lg, xl, 2xl";
+  }
+}
+
+// -----------------------------------------------------------------------------
+// RESPONSIVE CSS CUSTOM PROPERTIES
+// -----------------------------------------------------------------------------
+// These change based on viewport size for dynamic responsive values
+
+:root {
+  // -------------------------------------------------------------------------
+  // SIDEBAR RESPONSIVE DIMENSIONS
+  // -------------------------------------------------------------------------
+
+  // Mobile: sidebar hidden by default (drawer mode)
+  --sidebar-width: 0px;
+  --sidebar-visible: 0;
+
+  // Tablet+: sidebar visible
+  @media (min-width: map.get($breakpoints, 'md')) {
+    --sidebar-width: var(--sidebar-width-collapsed, 72px);
+    --sidebar-visible: 1;
+  }
+
+  // Desktop: sidebar expanded by default
+  @media (min-width: map.get($breakpoints, 'lg')) {
+    --sidebar-width: var(--sidebar-width-expanded, 260px);
+  }
+
+  // -------------------------------------------------------------------------
+  // SPACING RESPONSIVE SCALE
+  // -------------------------------------------------------------------------
+
+  // Base spacing (mobile) - Reduced for better content density
+  --spacing-page: 12px;
+  --spacing-section: var(--spacing-md, 16px);
+  --spacing-card: 12px;
+  --spacing-card-compact: 8px;  // For tight mobile layouts
+
+  // Small mobile+ (375px+)
+  @media (min-width: map.get($breakpoints, 'xs')) {
+    --spacing-page: var(--spacing-sm, 8px);
+    --spacing-section: var(--spacing-lg, 24px);
+    --spacing-card: 12px;
+  }
+
+  // Tablet+ (768px+)
+  @media (min-width: map.get($breakpoints, 'md')) {
+    --spacing-page: var(--spacing-lg, 24px);
+    --spacing-section: var(--spacing-xl, 32px);
+    --spacing-card: var(--spacing-md, 16px);
+  }
+
+  // Desktop+ (1024px+)
+  @media (min-width: map.get($breakpoints, 'lg')) {
+    --spacing-page: var(--spacing-xl, 32px);
+    --spacing-section: var(--spacing-2xl, 48px);
+    --spacing-card: var(--spacing-lg, 24px);
+  }
+
+  // -------------------------------------------------------------------------
+  // TYPOGRAPHY RESPONSIVE SCALE
+  // -------------------------------------------------------------------------
+
+  // Mobile base
+  --font-size-h1: 1.75rem;    // 28px
+  --font-size-h2: 1.5rem;     // 24px
+  --font-size-h3: 1.25rem;    // 20px
+  --font-size-h4: 1.125rem;   // 18px
+  --font-size-body: 1rem;     // 16px
+  --font-size-small: 0.875rem; // 14px
+
+  // Tablet+
+  @media (min-width: map.get($breakpoints, 'md')) {
+    --font-size-h1: 2rem;       // 32px
+    --font-size-h2: 1.75rem;    // 28px
+    --font-size-h3: 1.375rem;   // 22px
+    --font-size-h4: 1.25rem;    // 20px
+  }
+
+  // Desktop+
+  @media (min-width: map.get($breakpoints, 'lg')) {
+    --font-size-h1: 2.5rem;     // 40px
+    --font-size-h2: 2rem;       // 32px
+    --font-size-h3: 1.5rem;     // 24px
+    --font-size-h4: 1.25rem;    // 20px
+  }
+
+  // -------------------------------------------------------------------------
+  // GRID RESPONSIVE COLUMNS
+  // -------------------------------------------------------------------------
+
+  // Mobile: 1-2 columns
+  --grid-cols-stats: 1;
+  --grid-cols-cards: 1;
+  --grid-cols-form: 1;
+
+  // Small mobile+
+  @media (min-width: map.get($breakpoints, 'sm')) {
+    --grid-cols-stats: 2;
+    --grid-cols-cards: 2;
+  }
+
+  // Tablet+
+  @media (min-width: map.get($breakpoints, 'md')) {
+    --grid-cols-stats: 2;
+    --grid-cols-cards: 2;
+    --grid-cols-form: 2;
+  }
+
+  // Desktop+
+  @media (min-width: map.get($breakpoints, 'lg')) {
+    --grid-cols-stats: 4;
+    --grid-cols-cards: 3;
+  }
+
+  // Large desktop+
+  @media (min-width: map.get($breakpoints, 'xl')) {
+    --grid-cols-cards: 4;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// UTILITY CLASSES
+// -----------------------------------------------------------------------------
+
+/// Hide on mobile (below md breakpoint)
+.hide-mobile {
+  @include respond-below('md') {
+    display: none !important;
+  }
+}
+
+/// Show only on mobile
+.show-mobile-only {
+  display: none !important;
+
+  @include respond-below('md') {
+    display: block !important;
+  }
+}
+
+/// Hide on tablet (md to lg)
+.hide-tablet {
+  @include respond-between('md', 'lg') {
+    display: none !important;
+  }
+}
+
+/// Hide on desktop (lg and above)
+.hide-desktop {
+  @include respond-to('lg') {
+    display: none !important;
+  }
+}
+
+/// Show only on desktop
+.show-desktop-only {
+  display: none !important;
+
+  @include respond-to('lg') {
+    display: block !important;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// TOUCH TARGET SIZES (WCAG 2.1 AAA)
+// -----------------------------------------------------------------------------
+
+// Minimum touch target: 44x44px
+$touch-target-min: 44px;
+
+/// Mixin to ensure touch-friendly target size
+@mixin touch-target {
+  min-width: $touch-target-min;
+  min-height: $touch-target-min;
+}
+
+// -----------------------------------------------------------------------------
+// CONTAINER QUERIES (Future-proofing)
+// -----------------------------------------------------------------------------
+// Note: Container queries are supported in modern browsers
+// Use for component-level responsiveness
+
+/// Define a container context
+@mixin container-context($name: null) {
+  container-type: inline-size;
+  @if $name {
+    container-name: #{$name};
+  }
+}
+
+/// Container query mixin
+/// @param {Number} $min-width - Minimum container width
+/// @param {String} $name - Optional container name
+@mixin container-query($min-width, $name: null) {
+  @if $name {
+    @container #{$name} (min-width: #{$min-width}) {
+      @content;
+    }
+  } @else {
+    @container (min-width: #{$min-width}) {
+      @content;
+    }
+  }
+}

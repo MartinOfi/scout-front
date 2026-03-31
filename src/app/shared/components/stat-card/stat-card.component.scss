@@ -1,12 +1,19 @@
 // =============================================================================
 // STAT CARD - KPI Display Component
 // =============================================================================
+@use 'app/shared/styles/responsive' as *;
 
 .stat-card {
   background: white;
   border-radius: 8px;
-  padding: var(--spacing-lg);
+  // Mobile-first: smaller padding
+  padding: var(--spacing-md);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+
+  // Desktop: larger padding
+  @include respond-to('md') {
+    padding: var(--spacing-lg);
+  }
   transition:
     box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1),
     transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -76,16 +83,32 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+    // Mobile-first: smaller icon badge
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1);
 
+    // Desktop: larger icon badge
+    @include respond-to('md') {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+    }
+
     mat-icon {
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
+      // Mobile-first: smaller icon
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
       transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+
+      // Desktop: larger icon
+      @include respond-to('md') {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
     }
 
     // Variant: Success (green)
@@ -124,11 +147,17 @@
   // ---------------------------------------------------------------------------
 
   &__title {
-    font-size: 13px;
+    // Mobile-first: slightly smaller
+    font-size: 11px;
     font-weight: 500;
     color: #6b7280; // gray-500 with slight warmth
     letter-spacing: 0.01em;
     text-transform: uppercase;
+
+    // Desktop: standard size
+    @include respond-to('md') {
+      font-size: 13px;
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -136,13 +165,19 @@
   // ---------------------------------------------------------------------------
 
   &__value {
-    font-size: 28px;
+    // Mobile-first: smaller value
+    font-size: 22px;
     font-weight: 600;
     color: var(--gray-900);
     margin: 0;
     font-family: var(--font-family-headings);
     font-feature-settings: 'tnum' 1, 'lnum' 1; // Tabular numbers for alignment
     letter-spacing: -0.02em;
+
+    // Desktop: larger value
+    @include respond-to('md') {
+      font-size: 28px;
+    }
   }
 
   // ---------------------------------------------------------------------------

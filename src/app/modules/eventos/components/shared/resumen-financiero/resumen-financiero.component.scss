@@ -1,3 +1,11 @@
+// =============================================================================
+// RESUMEN FINANCIERO - Financial summary card for events
+// Mobile-first responsive design
+// =============================================================================
+
+@use 'app/shared/styles/responsive' as *;
+@use 'app/shared/styles/tokens' as t;
+
 .resumen-card {
   max-width: 800px;
   margin: 0 auto;
@@ -5,23 +13,51 @@
 
 .resumen-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  // Mobile-first: single column stack
+  grid-template-columns: 1fr;
+  gap: 16px;
   padding: 16px 0;
+
+  // Small screens+: 2 columns
+  @include respond-to('xs') {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  // Tablet+: full 3-column layout
+  @include respond-to('md') {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
 }
 
 .resumen-item {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px;
+  // Mobile-first: compact spacing
+  gap: 12px;
+  padding: 12px;
   border-radius: 8px;
-  background-color: #f5f5f5;
+  background-color: t.$stone-100;
+
+  // Tablet+: more spacious
+  @include respond-to('sm') {
+    gap: 16px;
+    padding: 16px;
+  }
 
   mat-icon {
-    font-size: 32px;
-    width: 32px;
-    height: 32px;
+    // Mobile-first: smaller icon
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+
+    // Tablet+: larger icon
+    @include respond-to('sm') {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+    }
   }
 
   .content {
@@ -31,15 +67,21 @@
 
     .label {
       font-size: 12px;
-      color: rgba(0, 0, 0, 0.60);
+      color: t.$stone-500;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
     .value {
-      font-size: 24px;
+      // Mobile-first: smaller value
+      font-size: 20px;
       font-weight: 600;
-      color: rgba(0, 0, 0, 0.87);
+      color: t.$stone-800;
+
+      // Tablet+: larger value
+      @include respond-to('sm') {
+        font-size: 24px;
+      }
     }
   }
 
@@ -47,18 +89,18 @@
     grid-column: 1 / -1;
 
     &.positivo {
-      background-color: #e8f5e9;
+      background-color: color-mix(in srgb, t.$color-success 12%, white);
 
       .value {
-        color: #2e7d32;
+        color: t.$color-success;
       }
     }
 
     &.negativo {
-      background-color: #ffebee;
+      background-color: color-mix(in srgb, t.$color-error 12%, white);
 
       .value {
-        color: #c62828;
+        color: t.$color-error;
       }
     }
   }

@@ -1,10 +1,11 @@
 // ============================================================================
-// Shared Dialog Styles
+// Shared Dialog Styles - Mobile-first responsive
 // Reusable styles for all Material dialogs in the application
 // ============================================================================
 
 @use 'sass:color';
 @use 'tokens' as t;
+@use 'responsive' as *;
 
 // ============================================================================
 // Design Tokens (using centralized values)
@@ -36,11 +37,26 @@ $dialog-transition: t.$transition-fast;
       box-shadow: $dialog-shadow !important;
       overflow: hidden;
     }
+
+    // Mobile: slightly reduced border-radius for edge-to-edge feel
+    @media (max-width: 767px) {
+      --mdc-dialog-container-shape: #{$dialog-radius-lg};
+
+      .mdc-dialog__surface {
+        border-radius: $dialog-radius-lg !important;
+      }
+    }
   }
 
   .mat-mdc-dialog-content {
     padding: 0 !important;
-    max-height: 70vh;
+
+    // Mobile: taller max-height for more content visibility
+    max-height: 80vh;
+
+    @include respond-to('md') {
+      max-height: 70vh;
+    }
   }
 
   .mat-mdc-dialog-actions {
@@ -66,13 +82,21 @@ $dialog-transition: t.$transition-fast;
   align-items: center;
   gap: 10px;
   margin: 0;
-  padding: 20px 24px 16px;
-  font-size: 1.125rem;
   font-weight: 600;
   color: t.$stone-900;
   letter-spacing: -0.01em;
   border-bottom: 1px solid t.$stone-200;
   background-color: white;
+
+  // Mobile-first: compact padding
+  padding: 16px 16px 12px;
+  font-size: 1rem;
+
+  // Desktop: more spacious
+  @include respond-to('md') {
+    padding: 20px 24px 16px;
+    font-size: 1.125rem;
+  }
 
   mat-icon {
     color: t.$brand-burgundy;
@@ -83,17 +107,38 @@ $dialog-transition: t.$transition-fast;
 }
 
 @mixin dialog-content($min-width: 380px, $max-width: 480px) {
-  padding: 24px 28px;
-  min-width: $min-width;
-  max-width: $max-width;
   background-color: white;
+
+  // Mobile-first: fluid width, compact padding
+  padding: 16px;
+  min-width: auto;
+  max-width: none;
+  width: 100%;
+
+  // Desktop: fixed widths, more spacious padding
+  @include respond-to('md') {
+    padding: 24px 28px;
+    min-width: $min-width;
+    max-width: $max-width;
+    width: auto;
+  }
 }
 
 @mixin dialog-actions {
   display: flex;
-  justify-content: flex-end;
   gap: 12px;
   border-top: 1px solid t.$stone-200;
+
+  // Mobile-first: stacked buttons, compact padding
+  flex-direction: column-reverse;
+  padding: 12px 16px 16px;
+
+  // Desktop: horizontal layout, more spacious
+  @include respond-to('md') {
+    flex-direction: row;
+    justify-content: flex-end;
+    padding: 16px 24px 20px;
+  }
 }
 
 // ============================================================================
@@ -101,12 +146,25 @@ $dialog-transition: t.$transition-fast;
 // ============================================================================
 
 @mixin btn-base {
-  padding: 12px 24px;
   border-radius: $dialog-radius-md;
-  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: all $dialog-transition;
+
+  // Mobile-first: full width, touch-friendly size (44px min-height)
+  width: 100%;
+  padding: 14px 24px;
+  min-height: 44px;
+  font-size: 1rem;
+  justify-content: center;
+
+  // Desktop: auto width, compact sizing
+  @include respond-to('md') {
+    width: auto;
+    padding: 12px 24px;
+    min-height: auto;
+    font-size: 0.875rem;
+  }
 }
 
 @mixin btn-secondary {
@@ -178,16 +236,34 @@ $dialog-transition: t.$transition-fast;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-right: auto;
   background-color: white;
   border: 1px solid t.$color-error;
   color: t.$color-error-dark;
-  padding: 10px 16px;
   border-radius: $dialog-radius-md;
-  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: all $dialog-transition;
+
+  // Mobile-first: full width, touch-friendly, appears last (order: 3)
+  width: 100%;
+  padding: 14px 16px;
+  min-height: 44px;
+  font-size: 1rem;
+  justify-content: center;
+  margin-right: 0;
+  order: 3;
+  margin-top: 8px;
+
+  // Desktop: auto width, compact, positioned left
+  @include respond-to('md') {
+    width: auto;
+    padding: 10px 16px;
+    min-height: auto;
+    font-size: 0.875rem;
+    margin-right: auto;
+    order: unset;
+    margin-top: 0;
+  }
 
   mat-icon {
     font-size: 18px;
@@ -280,22 +356,15 @@ $dialog-transition: t.$transition-fast;
 }
 
 // ============================================================================
-// Responsive
+// Full-Screen Mobile Dialog Mixin
 // ============================================================================
 
-@mixin dialog-responsive {
-  @media (max-width: 600px) {
-    .dialog-content {
-      min-width: auto;
-      padding: 16px;
-    }
-
-    .dialog-title {
-      padding: 16px 16px 12px;
-    }
-
-    .dialog-actions {
-      padding: 12px 16px 16px;
+@mixin dialog-fullscreen-mobile {
+  // Mobile: Full viewport width with slight margins
+  @media (max-width: 767px) {
+    .mat-mdc-dialog-container {
+      max-width: calc(100vw - 32px) !important;
+      max-height: calc(100vh - 48px) !important;
     }
   }
 }

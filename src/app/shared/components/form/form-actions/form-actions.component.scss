@@ -1,24 +1,70 @@
+// =============================================================================
+// FORM ACTIONS - Responsive form action buttons
+// =============================================================================
 @use '../form-tokens' as *;
+@use 'app/shared/styles/responsive' as *;
+
+/**
+ * Form actions component with responsive button layout
+ *
+ * Mobile-first design with:
+ * - Stacked buttons on mobile (full width)
+ * - Horizontal buttons on desktop
+ * - Touch-friendly spacing
+ * - Consistent padding across breakpoints
+ */
 
 :host {
   display: block;
   width: 100%;
 }
 
+// ---------------------------------------------------------------------------
+// Form Actions Container
+// ---------------------------------------------------------------------------
 .scout-form-actions {
-  padding: 20px;
-  padding-bottom: 0;
+  // Mobile-first: compact padding
+  padding: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
   border-top: 1px solid $stone-200;
 
+  // Desktop: comfortable padding
+  @include respond-to('md') {
+    padding: 20px;
+    padding-bottom: 0;
+  }
+
   &--dense {
-    padding: 16px 28px 20px;
+    // Mobile-first
+    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md);
+
+    // Desktop
+    @include respond-to('md') {
+      padding: 16px 28px 20px;
+    }
   }
 }
 
+// ---------------------------------------------------------------------------
+// Actions Row - Button layout
+// ---------------------------------------------------------------------------
 .scout-form-actions__row {
   display: flex;
-  gap: 12px;
+  // Mobile-first: horizontal layout (submit RIGHT of cancel)
+  flex-direction: row;
+  gap: var(--spacing-sm);
   flex-wrap: wrap;
+  align-items: center;
+
+  // Desktop: slightly larger gap
+  @include respond-to('md') {
+    gap: 12px;
+  }
+
+  // Buttons auto-size based on content
+  > * {
+    flex: 0 0 auto;
+  }
 
   &--end {
     justify-content: flex-end;
@@ -30,6 +76,24 @@
 
   &--between {
     justify-content: space-between;
+  }
+
+  // Optional: reverse order (cancel on right, submit on left)
+  &--mobile-reverse {
+    flex-direction: row-reverse;
+
+    @include respond-to('md') {
+      flex-direction: row;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Accessibility - Reduced Motion
+// ---------------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+  .scout-form-actions__row > * {
+    transition: none;
   }
 }
 

@@ -1,3 +1,8 @@
+// =============================================================================
+// ENHANCED DATA TABLE - Responsive table with checkboxes and actions
+// =============================================================================
+@use 'app/shared/styles/responsive' as *;
+
 /**
  * Estilos específicos para el componente de tabla mejorada con checkboxes y acciones
  *
@@ -23,15 +28,180 @@
   width: 100%;
 }
 
-// Estilos para checkboxes - usando color indigo del proyecto
+// ---------------------------------------------------------------------------
+// Table Wrapper - Horizontal scroll with sticky first column
+// ---------------------------------------------------------------------------
+.table-wrapper {
+  // Mobile: horizontal scroll
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
+    }
+  }
+
+  // Sticky first column on mobile (checkbox column)
+  table {
+    th:first-child,
+    td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      background: white;
+
+      // Subtle shadow to indicate scroll
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: -8px;
+        bottom: 0;
+        width: 8px;
+        background: linear-gradient(90deg, rgba(0, 0, 0, 0.06) 0%, transparent 100%);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+    }
+
+    th:first-child {
+      background: #f9fafb;
+    }
+  }
+
+  // Show shadow when scrolled
+  &.is-scrolled table {
+    th:first-child::after,
+    td:first-child::after {
+      opacity: 1;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Table Header Cell - Mobile-first sizing
+// ---------------------------------------------------------------------------
+.table-header-cell {
+  // Mobile-first: compact sizing
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap;
+  background: #f9fafb;
+
+  // Desktop: larger sizing
+  @include respond-to('md') {
+    padding: 12px 16px;
+    font-size: 12px;
+  }
+
+  &:first-child {
+    // Mobile-first: smaller padding
+    padding-left: 12px;
+
+    @include respond-to('md') {
+      padding-left: 20px;
+    }
+  }
+
+  &:last-child {
+    // Mobile-first: smaller padding
+    padding-right: 12px;
+
+    @include respond-to('md') {
+      padding-right: 20px;
+    }
+  }
+
+  &.cursor-pointer {
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: #f3f4f6;
+    }
+
+    &:focus {
+      outline: 2px solid var(--color-primary-indigo, #242167);
+      outline-offset: 2px;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Table Body Cell - Mobile-first sizing
+// ---------------------------------------------------------------------------
+.table-body-cell {
+  // Mobile-first: compact sizing
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  font-size: 13px;
+  color: #111827;
+  vertical-align: middle;
+
+  // Desktop: larger sizing
+  @include respond-to('md') {
+    padding: 16px;
+    font-size: 14px;
+  }
+
+  &:first-child {
+    // Mobile-first: smaller padding
+    padding-left: 12px;
+
+    @include respond-to('md') {
+      padding-left: 20px;
+    }
+  }
+
+  &:last-child {
+    // Mobile-first: smaller padding
+    padding-right: 12px;
+
+    @include respond-to('md') {
+      padding-right: 20px;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Checkboxes - Touch-friendly sizing (WCAG 44x44px minimum)
+// ---------------------------------------------------------------------------
 .select-all-checkbox,
 .item-checkbox {
-  width: 16px;
-  height: 16px;
+  // Mobile-first: larger touch target
+  width: 20px;
+  height: 20px;
+  min-width: 44px;
+  min-height: 44px;
   cursor: pointer;
   accent-color: var(--color-primary-indigo, #242167);
   border-radius: 4px;
   transition: all 0.2s ease;
+
+  // Desktop: standard size
+  @include respond-to('md') {
+    width: 16px;
+    height: 16px;
+    min-width: auto;
+    min-height: auto;
+  }
 
   &:hover {
     accent-color: var(--color-indigo-dark, #1a184d);
@@ -43,11 +213,16 @@
   }
 }
 
-// Estilos para botones de acción
+// ---------------------------------------------------------------------------
+// Action Buttons - Mobile touch-friendly
+// ---------------------------------------------------------------------------
 .action-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  // Mobile-first: minimum touch target 44x44px
+  min-width: 44px;
+  min-height: 44px;
   font-size: 14px;
   font-weight: 500;
   border-radius: 8px;
@@ -55,11 +230,23 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 4px;
+  padding: 8px;
+
+  // Desktop: smaller buttons
+  @include respond-to('md') {
+    min-width: auto;
+    min-height: auto;
+    padding: 4px;
+  }
 
   &:focus {
     outline: none;
     box-shadow: 0 0 0 2px white, 0 0 0 4px var(--color-primary-indigo, #242167);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-indigo, #242167);
+    outline-offset: 2px;
   }
 
   &:disabled {
@@ -85,24 +272,43 @@
 
   mat-icon {
     flex-shrink: 0;
-    font-size: 1.25rem !important;
-    width: 1.25rem !important;
-    height: 1.25rem !important;
-    line-height: 1.25rem !important;
+    // Mobile-first: larger icons
+    font-size: 1.5rem !important;
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    line-height: 1.5rem !important;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+
+    // Desktop: standard size
+    @include respond-to('md') {
+      font-size: 1.25rem !important;
+      width: 1.25rem !important;
+      height: 1.25rem !important;
+      line-height: 1.25rem !important;
+    }
   }
 }
 
-// Estados de status con bordes redondeados - usando colores del proyecto
+// ---------------------------------------------------------------------------
+// Status Badges - Mobile-first sizing
+// ---------------------------------------------------------------------------
 .status-badge {
   position: relative;
   display: inline-block;
-  padding: 4px 12px;
+  // Mobile-first: smaller padding
+  padding: 3px 10px;
+  font-size: 11px;
   font-weight: 600;
   line-height: 1.25;
   border-radius: 9999px;
+
+  // Desktop: larger padding
+  @include respond-to('md') {
+    padding: 4px 12px;
+    font-size: 12px;
+  }
 
   // Estados usando colores semánticos del proyecto
   &.scheduled {
@@ -159,19 +365,26 @@
   }
 }
 
-// Hover effects para mejor UX
+// ---------------------------------------------------------------------------
+// Table Row States
+// ---------------------------------------------------------------------------
 .table-row {
   transition: background-color 0.2s ease;
 
   &:hover {
     background-color: #f9fafb;
   }
+
+  &.selected {
+    background-color: #e3f2fd;
+  }
 }
 
-// Mejoras de accesibilidad para headers
-th[class*="cursor-pointer"]:focus {
-  outline: 2px solid var(--color-primary-indigo, #242167);
-  outline-offset: 2px;
+// Filas alternadas si está habilitado
+tr[class*="bg-gray-50"] {
+  .table-body-cell {
+    background-color: #f9fafb;
+  }
 }
 
 // Estados de hover mejorados con transiciones suaves
@@ -179,27 +392,62 @@ tr[class*="hover\\:bg-gray-100"]:hover {
   transition: background-color 0.2s ease;
 }
 
-// Responsividad adicional para pantallas muy pequeñas
-@media (max-width: 640px) {
-  .overflow-x-auto {
-    -webkit-overflow-scrolling: touch;
+// ---------------------------------------------------------------------------
+// Empty State - Mobile responsive
+// ---------------------------------------------------------------------------
+.empty-state {
+  text-align: center;
+  // Mobile-first: compact padding
+  padding: var(--spacing-lg) var(--spacing-md);
+
+  // Desktop: larger padding
+  @include respond-to('md') {
+    padding: 32px 0;
   }
 
-  // Ajustes para checkboxes en móviles
-  .select-all-checkbox,
-  .item-checkbox {
-    width: 18px;
-    height: 18px;
+  svg {
+    margin: 0 auto;
+    // Mobile-first: smaller icon
+    height: 40px;
+    width: 40px;
+    color: #9ca3af;
+
+    // Desktop: larger icon
+    @include respond-to('md') {
+      height: 48px;
+      width: 48px;
+    }
   }
 
-  // Ajustes para botones de acción en móviles
-  .action-btn {
-    padding: 4px 8px;
-    font-size: 12px;
+  h3 {
+    margin-top: 8px;
+    // Mobile-first: smaller text
+    font-size: 13px;
+    font-weight: 500;
+    color: #111827;
+
+    // Desktop: larger text
+    @include respond-to('md') {
+      font-size: 14px;
+    }
+  }
+
+  p {
+    margin-top: 4px;
+    // Mobile-first: smaller text
+    font-size: 13px;
+    color: #6b7280;
+
+    // Desktop: larger text
+    @include respond-to('md') {
+      font-size: 14px;
+    }
   }
 }
 
-// Estados de loading
+// ---------------------------------------------------------------------------
+// Loading States
+// ---------------------------------------------------------------------------
 .loading {
   opacity: 0.6;
   pointer-events: none;
@@ -216,50 +464,14 @@ tr[class*="hover\\:bg-gray-100"]:hover {
   animation: spin 1s linear infinite;
 }
 
-// Estados vacíos
-.empty-state {
-  text-align: center;
-  padding: 32px 0;
-
-  svg {
-    margin: 0 auto;
-    height: 48px;
-    width: 48px;
-    color: #9ca3af;
-  }
-
-  h3 {
-    margin-top: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #111827;
-  }
-
-  p {
-    margin-top: 4px;
-    font-size: 14px;
-    color: #6b7280;
-  }
+// Loading spinner color usando indigo del proyecto
+.border-b-2.border-blue-600 {
+  border-bottom-color: var(--color-primary-indigo, #242167);
 }
 
-// Mejoras de accesibilidad para botones de acción
-.action-btn:focus-visible {
-  outline: 2px solid var(--color-primary-indigo, #242167);
-  outline-offset: 2px;
-}
-
-// Transiciones suaves para todos los elementos interactivos
-.select-all-checkbox,
-.item-checkbox,
-.action-btn,
-.table-row {
-  transition: all 0.2s ease;
-}
-
-// Estados de selección visual
-.table-row.selected {
-  background-color: #e3f2fd;
-}
+// ---------------------------------------------------------------------------
+// Accessibility Enhancements
+// ---------------------------------------------------------------------------
 
 // Mejoras de contraste para accesibilidad
 @media (prefers-contrast: high) {
@@ -285,9 +497,19 @@ tr[class*="hover\\:bg-gray-100"]:hover {
   .animate-spin {
     animation: none;
   }
+
+  .table-wrapper table {
+    th:first-child::after,
+    td:first-child::after {
+      transition: none;
+    }
+  }
 }
 
-// Loading spinner color usando indigo del proyecto
-.border-b-2.border-blue-600 {
-  border-bottom-color: var(--color-primary-indigo, #242167);
+// Transiciones suaves para todos los elementos interactivos
+.select-all-checkbox,
+.item-checkbox,
+.action-btn,
+.table-row {
+  transition: all 0.2s ease;
 }

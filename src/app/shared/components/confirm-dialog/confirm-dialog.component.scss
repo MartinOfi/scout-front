@@ -5,6 +5,7 @@
  */
 
 @use '../../../shared/styles/tokens' as t;
+@use '../../../shared/styles/responsive' as *;
 
 // ============================================================================
 // Design Tokens
@@ -58,12 +59,23 @@ $shadow-dialog: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 
 :host ::ng-deep {
   .mat-mdc-dialog-container {
-    --mdc-dialog-container-shape: #{$radius-xl};
+    // Mobile: slightly smaller border-radius
+    --mdc-dialog-container-shape: #{$radius-lg};
+
+    @include respond-to('md') {
+      --mdc-dialog-container-shape: #{$radius-xl};
+    }
 
     .mdc-dialog__surface {
-      border-radius: $radius-xl !important;
       box-shadow: $shadow-dialog !important;
       overflow: hidden;
+
+      // Mobile: smaller border-radius
+      border-radius: $radius-lg !important;
+
+      @include respond-to('md') {
+        border-radius: $radius-xl !important;
+      }
     }
   }
 
@@ -91,9 +103,19 @@ $shadow-dialog: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 // ============================================================================
 
 .confirm-dialog {
-  padding: 24px;
-  min-width: 320px;
   text-align: center;
+
+  // Mobile-first: fluid width, compact padding
+  padding: 20px 16px;
+  min-width: auto;
+  width: 100%;
+
+  // Desktop: fixed min-width, more spacious padding
+  @include respond-to('md') {
+    padding: 24px;
+    min-width: 320px;
+    width: auto;
+  }
 
   // ──────────────────────────────────────────────────────────────────────────
   // Icon
@@ -238,10 +260,29 @@ $shadow-dialog: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   &__actions {
     display: flex;
     gap: 12px;
-    justify-content: center;
+
+    // Mobile-first: stacked buttons, full width
+    flex-direction: column-reverse;
+    width: 100%;
+
+    // Desktop: horizontal layout, centered
+    @include respond-to('md') {
+      flex-direction: row;
+      justify-content: center;
+      width: auto;
+    }
 
     &--center {
       justify-content: center;
+    }
+
+    // Mobile button styling
+    app-button {
+      width: 100%;
+
+      @include respond-to('md') {
+        width: auto;
+      }
     }
   }
 }

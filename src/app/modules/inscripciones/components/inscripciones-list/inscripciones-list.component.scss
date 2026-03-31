@@ -1,33 +1,73 @@
+// =============================================================================
+// INSCRIPCIONES LIST - Main inscriptions list with stats
+// Mobile-first responsive design
+// =============================================================================
+
+@use 'app/shared/styles/responsive' as *;
+
 // Simplified Stats Summary
 .stats-summary {
   display: flex;
-  align-items: center;
-  gap: var(--spacing-xl);
+  // Mobile-first: stack vertically
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-md);
   background: white;
   border-radius: 12px;
   padding: var(--spacing-lg) var(--spacing-xl);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   margin-bottom: var(--spacing-lg);
+
+  // Tablet+: horizontal layout
+  @include respond-to('md') {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-xl);
+  }
 }
 
 .stats-summary-main {
   flex: 1;
   display: flex;
-  align-items: center;
-  gap: var(--spacing-xl);
+  // Mobile-first: stack vertically
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-md);
+
+  // Tablet+: horizontal layout
+  @include respond-to('md') {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-xl);
+  }
 }
 
 .stats-total {
   display: flex;
-  flex-direction: column;
+  // Mobile-first: row layout, centered
+  flex-direction: row;
+  justify-content: center;
   align-items: center;
+  gap: var(--spacing-sm);
   min-width: 80px;
 
+  // Tablet+: column layout
+  @include respond-to('md') {
+    flex-direction: column;
+    gap: 0;
+  }
+
   &-number {
-    font-size: 2.5rem;
+    // Mobile-first: smaller text
+    font-size: 2rem;
     font-weight: 700;
     line-height: 1;
     color: var(--gray-900);
+
+    // Tablet+: larger text
+    @include respond-to('md') {
+      font-size: 2.5rem;
+    }
   }
 
   &-label {
@@ -36,7 +76,13 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--gray-500);
-    margin-top: var(--spacing-xs);
+    // Mobile-first: no margin (row layout)
+    margin-top: 0;
+
+    // Tablet+: add margin (column layout)
+    @include respond-to('md') {
+      margin-top: var(--spacing-xs);
+    }
   }
 }
 
@@ -75,6 +121,13 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-md);
+  // Mobile-first: centered
+  justify-content: center;
+
+  // Tablet+: default alignment
+  @include respond-to('md') {
+    justify-content: flex-start;
+  }
 }
 
 .legend-item {
@@ -105,6 +158,15 @@
   align-items: center;
   gap: var(--spacing-xs);
   white-space: nowrap;
+  // Mobile-first: full width, centered
+  width: 100%;
+  justify-content: center;
+
+  // Tablet+: auto width
+  @include respond-to('md') {
+    width: auto;
+    justify-content: flex-start;
+  }
 
   mat-icon {
     font-size: 20px;
@@ -117,15 +179,40 @@
 .inscripciones-tabs {
   &-container-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    // Mobile-first: stack vertically
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+
+    // Tablet+: horizontal layout
+    @include respond-to('md') {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    // Button full width on mobile
+    app-button {
+      width: 100%;
+
+      @include respond-to('md') {
+        width: auto;
+      }
+    }
   }
 
   &-container {
     background: white;
     border-radius: 8px;
-    padding: var(--spacing-lg);
+    // Mobile-first: compact padding
+    padding: var(--spacing-md);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    // Tablet+: more spacious
+    @include respond-to('md') {
+      padding: var(--spacing-lg);
+    }
   }
 }
 
@@ -154,43 +241,5 @@
     color: var(--gray-600);
     margin: 0;
     font-size: 14px;
-  }
-}
-
-// Responsive
-@media (max-width: 768px) {
-  .stats-summary {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--spacing-md);
-  }
-
-  .stats-summary-main {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--spacing-md);
-  }
-
-  .stats-total {
-    flex-direction: row;
-    justify-content: center;
-    gap: var(--spacing-sm);
-
-    &-number {
-      font-size: 2rem;
-    }
-
-    &-label {
-      margin-top: 0;
-    }
-  }
-
-  .stats-rama-legend {
-    justify-content: center;
-  }
-
-  .dashboard-btn {
-    width: 100%;
-    justify-content: center;
   }
 }

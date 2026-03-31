@@ -5,6 +5,7 @@ import {
   output,
   inject,
   computed,
+  input,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -28,8 +29,14 @@ export class SidebarComponent {
   private readonly router = inject(Router);
   private readonly authState = inject(AuthStateService);
 
+  /** Whether sidebar is in mobile drawer mode */
+  readonly isMobileDrawer = input(false);
+
   readonly isCollapsed = signal(false);
   readonly collapsed = output<boolean>();
+
+  /** Emitted when a menu item is clicked (for closing mobile drawer) */
+  readonly itemClicked = output<void>();
 
   readonly menuItems: readonly SidebarItem[] = [
     { icon: 'dashboard', label: 'Dashboard', route: '/dashboard' },

@@ -1,18 +1,24 @@
 // =============================================================================
 // CAJA DRAWER - Side panel for viewing caja details
 // Refactored: Clean SCSS, WCAG AAA contrast on burgundy backgrounds
+// Mobile-first responsive design
 // =============================================================================
+
+@use 'app/shared/styles/responsive' as *;
 
 .caja-drawer {
   display: flex;
   flex-direction: column;
   height: 100%;
   background: var(--surface-primary);
-  width: 380px;
-  max-width: 100vw;
 
-  @media (max-width: 480px) {
-    width: 100vw;
+  // Mobile-first: full width on small screens
+  width: 100vw;
+
+  // Tablet+: constrained width
+  @include respond-to('sm') {
+    width: 380px;
+    max-width: 90vw;
   }
 }
 
@@ -22,9 +28,15 @@
 // =============================================================================
 
 .drawer-header {
-  padding: var(--spacing-lg);
+  // Mobile-first: compact padding
+  padding: var(--spacing-md);
   background: var(--color-primary-burgundy);
   color: #ffffff;
+
+  // Tablet+: more spacious
+  @include respond-to('sm') {
+    padding: var(--spacing-lg);
+  }
 
   &__row {
     display: flex;
@@ -70,13 +82,19 @@
 }
 
 .caja-saldo {
-  font-size: var(--text-4xl);
+  // Mobile-first: smaller text
+  font-size: var(--text-3xl);
   font-weight: 700;
   margin: 0;
   font-family: var(--font-family-headings);
   font-variant-numeric: tabular-nums lining-nums;
   letter-spacing: -0.02em;
   line-height: 1;
+
+  // Tablet+: larger text
+  @include respond-to('sm') {
+    font-size: var(--text-4xl);
+  }
 
   &.negative {
     color: var(--color-danger-light);

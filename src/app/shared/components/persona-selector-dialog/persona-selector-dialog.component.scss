@@ -4,6 +4,7 @@
 // ============================================================================
 
 @use '../../styles/dialog' as dialog;
+@use '../../styles/responsive' as *;
 @use '../form/form-tokens' as tokens;
 
 // ============================================================================
@@ -68,7 +69,14 @@
 .selector-form {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+
+  // Mobile-first: tighter spacing
+  gap: 16px;
+
+  // Desktop: more spacious
+  @include respond-to('md') {
+    gap: 24px;
+  }
 
   ::ng-deep app-form-field .scout-field {
     margin-bottom: 0;
@@ -118,7 +126,7 @@
 }
 
 // ============================================================================
-// Responsive (using shared)
+// Full-Screen Mobile Support (using shared)
 // ============================================================================
 
-@include dialog.dialog-responsive;
+@include dialog.dialog-fullscreen-mobile;

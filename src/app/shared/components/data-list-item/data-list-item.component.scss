@@ -1,9 +1,19 @@
 // =============================================================================
 // DATA LIST ITEM - Individual list row with icon, text, and value
 // =============================================================================
+@use 'app/shared/styles/responsive' as *;
 
 :host {
-  display: block;
+  // Mobile: inline-block to allow natural width in scroll container
+  display: inline-block;
+  width: 100%;
+  min-width: max-content;
+
+  // Desktop: standard block
+  @include respond-to('md') {
+    display: block;
+    min-width: 0;
+  }
 
   // Subtle divider between items
   &:not(:last-child)::after {
@@ -24,14 +34,26 @@
 .data-list-item {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md) var(--spacing-lg);
+  // Mobile-first: compact spacing
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
   margin: 0 var(--spacing-xs);
   border-radius: 8px;
   transition:
     background-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
     transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
   cursor: default;
+  // Mobile: prevent shrinking, allow natural width
+  flex-shrink: 0;
+  white-space: nowrap;
+
+  // Desktop: larger spacing, allow flexible sizing
+  @include respond-to('md') {
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    flex-shrink: 1;
+    white-space: normal;
+  }
 
   &:hover {
     background-color: rgba(0, 0, 0, 0.02);
@@ -58,16 +80,32 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
+    // Mobile-first: smaller icon badge
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     flex-shrink: 0;
 
+    // Desktop: larger icon badge
+    @include respond-to('md') {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+    }
+
     mat-icon {
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
+      // Mobile-first: smaller icon
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
       transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+
+      // Desktop: larger icon
+      @include respond-to('md') {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
     }
 
     // Variant: Success
@@ -100,30 +138,48 @@
   // ---------------------------------------------------------------------------
 
   &__content {
-    flex: 1;
-    min-width: 0;
+    // Mobile: auto width, no truncation (parent scrolls)
+    flex: 1 0 auto;
     display: flex;
     flex-direction: column;
     gap: 3px;
+
+    // Desktop: flexible sizing with truncation
+    @include respond-to('md') {
+      flex: 1 1 0;
+      min-width: 0;
+    }
   }
 
   &__primary {
-    font-size: 14px;
+    // Mobile-first: compact, no wrap (parent scrolls)
+    font-size: 13px;
     font-weight: 500;
     color: var(--gray-900);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     letter-spacing: 0.01em;
+
+    // Desktop: truncate with ellipsis
+    @include respond-to('md') {
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 
   &__secondary {
-    font-size: 12px;
-    color: #6b7280; // Slightly warmer gray
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    // Mobile-first: compact (parent scrolls)
+    font-size: 11px;
+    color: #6b7280;
     letter-spacing: 0.01em;
+
+    // Desktop: truncate with ellipsis
+    @include respond-to('md') {
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -131,14 +187,21 @@
   // ---------------------------------------------------------------------------
 
   &__value {
-    font-size: 14px;
+    // Mobile-first: smaller value badge
+    font-size: 12px;
     font-weight: 600;
     font-family: var(--font-family-headings);
     font-feature-settings: 'tnum' 1, 'lnum' 1; // Tabular numbers
     flex-shrink: 0;
-    padding: 4px 10px;
+    padding: 3px 8px;
     border-radius: 6px;
     transition: background-color 200ms ease;
+
+    // Desktop: larger value badge
+    @include respond-to('md') {
+      font-size: 14px;
+      padding: 4px 10px;
+    }
 
     // Positive value (income)
     &--success {

@@ -1,7 +1,38 @@
-<div class="layout-container" [class.sidebar-collapsed]="sidebarCollapsed()">
-  <app-sidebar (collapsed)="onSidebarCollapsed($event)" />
-  <main class="main-content">
-    <app-page-header />
-    <router-outlet />
-  </main>
-</div>
+<mat-sidenav-container class="layout-container" [class.sidebar-collapsed]="sidebarCollapsed()">
+  <mat-sidenav
+    #sidenav
+    [mode]="sidenavMode()"
+    [opened]="sidenavOpened()"
+    [disableClose]="!isMobile()"
+    (openedChange)="onSidenavOpenedChange($event)"
+    class="layout-sidenav"
+    [class.mobile]="isMobile()"
+  >
+    <app-sidebar
+      (collapsed)="onSidebarCollapsed($event)"
+      (itemClicked)="closeSidebarOnMobile()"
+      [isMobileDrawer]="isMobile()"
+    />
+  </mat-sidenav>
+
+  <mat-sidenav-content class="layout-content">
+    @if (isMobile()) {
+      <header class="mobile-header">
+        <button
+          type="button"
+          mat-icon-button
+          class="menu-button"
+          (click)="toggleSidebar()"
+          aria-label="Abrir menú de navegación"
+        >
+          <mat-icon>menu</mat-icon>
+        </button>
+        <span class="mobile-page-title">{{ pageTitle() }}</span>
+      </header>
+    }
+    <main class="main-content">
+      <app-page-header class="hide-mobile" />
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

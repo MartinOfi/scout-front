@@ -1,4 +1,17 @@
+// =============================================================================
+// NUMBER FIELD - Mobile-first responsive number input
+// =============================================================================
 @use '../form-tokens' as *;
+@use 'app/shared/styles/responsive' as *;
+
+/**
+ * Number field with responsive styling
+ *
+ * Mobile-first design inherits from input-base mixin:
+ * - Touch-friendly height (44px minimum)
+ * - 16px font-size to prevent iOS zoom
+ * - Always show spinners on mobile for touch interaction
+ */
 
 :host {
   display: block;
@@ -11,27 +24,52 @@
   // Tabular numbers for alignment
   font-variant-numeric: tabular-nums;
 
+  // Mobile-first: always show spinners for touch (iOS/Android native controls)
+  // On desktop: hide spinners until hover/focus
+
   // Style number spinners
   &::-webkit-inner-spin-button,
   &::-webkit-outer-spin-button {
     height: auto;
-    opacity: 0;
     transition: opacity $transition-fast;
+
+    // Mobile: always visible for touch
+    opacity: 1;
+
+    // Desktop: hide until hover/focus
+    @include respond-to('md') {
+      opacity: 0;
+    }
   }
 
-  &:hover,
-  &:focus {
-    &::-webkit-inner-spin-button,
-    &::-webkit-outer-spin-button {
-      opacity: 1;
+  // Desktop: show on hover/focus
+  @include respond-to('md') {
+    &:hover,
+    &:focus {
+      &::-webkit-inner-spin-button,
+      &::-webkit-outer-spin-button {
+        opacity: 1;
+      }
     }
   }
 
   // Firefox
   -moz-appearance: textfield;
 
-  &:hover,
-  &:focus {
-    -moz-appearance: auto;
+  @include respond-to('md') {
+    &:hover,
+    &:focus {
+      -moz-appearance: auto;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Accessibility - Reduced Motion
+// ---------------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+  .scout-input--number::-webkit-inner-spin-button,
+  .scout-input--number::-webkit-outer-spin-button {
+    transition: none;
   }
 }

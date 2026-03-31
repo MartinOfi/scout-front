@@ -1,0 +1,54 @@
+// =============================================================================
+// EMPTY STATE - Display when no data is available
+// =============================================================================
+@use 'app/shared/styles/responsive' as *;
+
+.empty-state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  // Mobile-first: compact padding
+  padding: var(--spacing-xl) var(--spacing-md);
+  gap: var(--spacing-sm);
+  color: rgba(0, 0, 0, 0.54);
+  // Mobile-first: smaller min-height
+  min-height: 200px;
+
+  // Desktop: larger dimensions
+  @include respond-to('md') {
+    padding: 48px var(--spacing-lg);
+    gap: var(--spacing-md);
+    min-height: 300px;
+  }
+}
+
+.empty-icon {
+  // Mobile-first: smaller icon
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: rgba(0, 0, 0, 0.26);
+
+  // Desktop: larger icon
+  @include respond-to('md') {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+  }
+}
+
+.empty-message {
+  // Mobile-first: slightly smaller text
+  font-size: 14px;
+  margin: 0;
+  text-align: center;
+  max-width: 320px;
+  line-height: 1.5;
+
+  // Desktop: larger text and width
+  @include respond-to('md') {
+    font-size: 16px;
+    max-width: 400px;
+  }
+}

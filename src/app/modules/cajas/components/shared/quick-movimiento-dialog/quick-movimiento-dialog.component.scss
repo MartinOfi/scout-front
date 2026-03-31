@@ -5,6 +5,7 @@
 @use 'sass:color';
 @use '../../../../../shared/styles/tokens' as t;
 @use '../../../../../shared/styles/dialog' as dialog;
+@use 'app/shared/styles/responsive' as *;
 
 // ============================================================================
 // Host & Material Dialog Container Override
@@ -133,29 +134,50 @@
 }
 
 // ============================================================================
-// Responsive
+// Mobile-First Responsive
 // ============================================================================
 
-@media (max-width: 600px) {
-  .dialog-content {
-    min-width: auto;
-    padding: t.$spacing-md;
-  }
+// Mobile-first: compact styles as base
+.dialog-content {
+  min-width: auto;
+  padding: t.$spacing-md;
 
-  .dialog-title {
-    padding: 16px 16px 12px;
+  @include respond-to('sm') {
+    min-width: 440px;
+    padding: t.$spacing-lg;
   }
+}
 
-  .form-grid {
-    gap: 14px;
+.dialog-title {
+  padding: 16px 16px 12px;
+
+  @include respond-to('sm') {
+    padding: 20px 24px 16px;
   }
+}
 
-  .caja-info {
-    padding: 10px 14px;
-    font-size: 0.875rem;
+.form-grid {
+  gap: 14px;
+
+  @include respond-to('sm') {
+    gap: t.$spacing-md;
   }
+}
 
-  .dialog-actions {
-    padding: 12px 16px 16px;
+.caja-info {
+  padding: 10px 14px;
+  font-size: 0.875rem;
+
+  @include respond-to('sm') {
+    padding: 12px 16px;
+    font-size: 0.9375rem;
+  }
+}
+
+.dialog-actions {
+  padding: 12px 16px 16px;
+
+  @include respond-to('sm') {
+    padding: 16px 24px 20px;
   }
 }

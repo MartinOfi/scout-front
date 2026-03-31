@@ -1,20 +1,29 @@
+// =============================================================================
+// PERSONA HEADER STYLES
+// Mobile-first responsive design
+// =============================================================================
+
+@use 'app/shared/styles/responsive' as *;
 @use '../../../../../../shared/styles/tokens' as t;
 
 $card-radius: 16px;
 
 .persona-header {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
+  // Mobile-first: vertical stack
+  flex-direction: column;
+  gap: 12px;
   padding: 16px 20px;
   background: white;
   border-radius: $card-radius;
   box-shadow: t.$shadow-card;
 
-  @media (max-width: 640px) {
-    flex-direction: column;
-    gap: 12px;
+  // Tablet+: horizontal layout
+  @include respond-to('sm') {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
   }
 
   &__left {
@@ -30,10 +39,14 @@ $card-radius: 16px;
     align-items: center;
     gap: 12px;
     flex-shrink: 0;
+    // Mobile-first: full width with space-between
+    width: 100%;
+    justify-content: space-between;
 
-    @media (max-width: 640px) {
-      width: 100%;
-      justify-content: space-between;
+    // Tablet+: auto width
+    @include respond-to('sm') {
+      width: auto;
+      justify-content: flex-end;
     }
   }
 

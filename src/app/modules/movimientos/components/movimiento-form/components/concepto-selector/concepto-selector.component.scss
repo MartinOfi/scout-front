@@ -1,5 +1,11 @@
+// =============================================================================
+// CONCEPTO SELECTOR - Transaction concept dropdown
+// Mobile-first responsive design
+// =============================================================================
+
 @use '../../../../../../shared/styles/tokens' as *;
 @use '../../../../../../shared/components/form/form-tokens' as form;
+@use 'app/shared/styles/responsive' as *;
 
 :host {
   display: block;

@@ -1,3 +1,11 @@
+// =============================================================================
+// PRODUCTO EDITOR - Product management table for events
+// Mobile-first responsive design
+// =============================================================================
+
+@use 'app/shared/styles/responsive' as *;
+@use 'app/shared/styles/tokens' as t;
+
 .producto-editor {
   display: flex;
   flex-direction: column;
@@ -7,28 +15,58 @@
 .header {
   h3 {
     margin: 0;
-    font-size: 18px;
+    // Mobile-first: smaller heading
+    font-size: 16px;
     font-weight: 500;
+
+    // Tablet+: larger heading
+    @include respond-to('sm') {
+      font-size: 18px;
+    }
   }
 }
 
 .add-form {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr auto;
-  gap: 16px;
+  // Mobile-first: single column stack
+  grid-template-columns: 1fr;
+  gap: 12px;
   align-items: start;
   padding: 16px;
-  background-color: #f5f5f5;
-  border-radius: 4px;
+  background-color: t.$stone-100;
+  border-radius: 8px;
+
+  // Small screens+: 2 columns
+  @include respond-to('xs') {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  // Tablet+: full 4-column layout
+  @include respond-to('md') {
+    grid-template-columns: 2fr 1fr 1fr auto;
+  }
 }
 
 .productos-table {
   width: 100%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: t.$shadow-card;
+
+  // Mobile: enable horizontal scroll
+  &-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 .empty-state {
   text-align: center;
-  padding: 32px;
-  color: rgba(0, 0, 0, 0.45);
+  // Mobile-first: compact padding
+  padding: 24px 16px;
+  color: t.$stone-500;
+
+  // Tablet+: more spacious
+  @include respond-to('sm') {
+    padding: 32px;
+  }
 }

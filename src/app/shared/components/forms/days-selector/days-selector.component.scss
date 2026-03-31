@@ -1,8 +1,16 @@
+// =============================================================================
+// DAYS SELECTOR - Mobile-first responsive day selection grid
+// =============================================================================
+@use 'app/shared/styles/responsive' as *;
+
 /**
- * Estilos para el componente selector múltiple de días
- * 
- * Basado en las especificaciones del todo.md líneas 68, 91
- * Estilos del selector
+ * Days selector component with responsive grid
+ *
+ * Mobile-first design with:
+ * - 2 columns on mobile for compact display
+ * - Auto-fit columns on desktop
+ * - Touch-friendly checkboxes (44x44px target)
+ * - Horizontal scroll for quick selection on mobile
  */
 
 .days-selector {
@@ -11,11 +19,21 @@
   width: 100%;
 }
 
+// ---------------------------------------------------------------------------
+// Label
+// ---------------------------------------------------------------------------
 .days-selector-label {
   font-weight: 500;
   color: #374151;
-  margin-bottom: 0.5rem;
-  font-size: 0.875rem;
+  // Mobile-first: smaller margin
+  margin-bottom: var(--spacing-xs);
+  font-size: 0.8125rem;
+
+  // Desktop: standard sizing
+  @include respond-to('md') {
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
 
   .required-indicator {
     color: #ef4444;
@@ -23,20 +41,55 @@
   }
 }
 
+// ---------------------------------------------------------------------------
+// Quick Selection Buttons
+// ---------------------------------------------------------------------------
 .quick-selection {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  // Mobile-first: horizontal scroll
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+  padding-bottom: var(--spacing-xs);
+
+  // Hide scrollbar on mobile but allow scroll
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  // Desktop: wrap if needed
+  @include respond-to('md') {
+    overflow-x: visible;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0;
+  }
 
   .quick-btn {
-    padding: 0.25rem 0.75rem;
+    // Mobile-first: touch-friendly size
+    padding: var(--spacing-xs) var(--spacing-sm);
+    min-height: 36px;
+    min-width: fit-content;
+    flex-shrink: 0;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     background-color: white;
     color: #374151;
-    font-size: 0.75rem;
+    font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.15s ease-in-out;
+
+    // Desktop: standard sizing
+    @include respond-to('md') {
+      padding: 0.25rem 0.75rem;
+      min-height: auto;
+      font-size: 0.75rem;
+      border-radius: 4px;
+    }
 
     &:hover:not(:disabled) {
       background-color: #f3f4f6;
@@ -51,26 +104,50 @@
   }
 }
 
+// ---------------------------------------------------------------------------
+// Days Grid
+// ---------------------------------------------------------------------------
 .days-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 0.5rem;
+  // Mobile-first: 2 columns for compact display
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-xs);
 
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
+  // Tablet: 3-4 columns
+  @include respond-to('sm') {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
+  // Desktop: auto-fit with minmax
+  @include respond-to('md') {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   }
 }
 
+// ---------------------------------------------------------------------------
+// Day Item - Individual day checkbox
+// ---------------------------------------------------------------------------
 .day-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
+  gap: var(--spacing-xs);
+  // Mobile-first: touch-friendly padding
+  padding: var(--spacing-sm);
+  min-height: 44px;
   border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border-radius: 8px;
   background-color: white;
   cursor: pointer;
   transition: all 0.15s ease-in-out;
+
+  // Desktop: standard sizing
+  @include respond-to('md') {
+    padding: 0.5rem;
+    min-height: auto;
+    gap: 0.5rem;
+    border-radius: 6px;
+  }
 
   &:hover:not(.disabled) {
     background-color: #f9fafb;
@@ -90,25 +167,62 @@
   }
 }
 
+// ---------------------------------------------------------------------------
+// Day Checkbox - Touch-friendly
+// ---------------------------------------------------------------------------
 .day-checkbox {
-  width: 16px;
-  height: 16px;
+  // Mobile-first: larger checkbox for touch
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
   cursor: pointer;
   accent-color: #3b82f6;
+
+  // Desktop: standard size
+  @include respond-to('md') {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+  }
 
   &:disabled {
     cursor: not-allowed;
   }
 }
 
+// ---------------------------------------------------------------------------
+// Day Name
+// ---------------------------------------------------------------------------
 .day-name {
-  font-size: 0.875rem;
+  // Mobile-first: slightly smaller
+  font-size: 0.8125rem;
   font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  // Desktop: standard size
+  @include respond-to('md') {
+    font-size: 0.875rem;
+  }
 }
 
+// ---------------------------------------------------------------------------
+// Error Message
+// ---------------------------------------------------------------------------
 .error-message {
   color: #ef4444;
   font-size: 0.75rem;
-  margin-top: 0.25rem;
+  margin-top: var(--spacing-xs);
+}
+
+// ---------------------------------------------------------------------------
+// Accessibility - Reduced Motion
+// ---------------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+  .quick-btn,
+  .day-item {
+    transition: none;
+  }
 }
 

@@ -1,6 +1,9 @@
 // =============================================================================
 // FONDO CARD - Clickable rama fund card
+// Mobile-first responsive design
 // =============================================================================
+
+@use 'app/shared/styles/responsive' as *;
 
 .fondo-card {
   border-radius: 8px;
@@ -12,8 +15,14 @@
   transition:
     background-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
-  padding: var(--spacing-md);
+  // Mobile-first: compact padding
+  padding: var(--spacing-sm);
   border-radius: 8px;
+
+  // Desktop: more spacious
+  @include respond-to('md') {
+    padding: var(--spacing-md);
+  }
 
   &:hover {
     background-color: var(--hover-overlay);
@@ -37,10 +46,18 @@
 }
 
 .rama-icon {
-  font-size: 28px;
-  width: 28px;
-  height: 28px;
+  // Mobile-first: slightly smaller
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
   color: var(--color-primary-indigo);
+
+  // Desktop: larger
+  @include respond-to('md') {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
 }
 
 .rama-label {
@@ -66,15 +83,27 @@
 }
 
 .saldo-display {
-  padding-left: 36px; // Align with label after icon
+  // Mobile-first: smaller alignment
+  padding-left: 32px;
+
+  // Desktop: align with larger icon
+  @include respond-to('md') {
+    padding-left: 36px;
+  }
 }
 
 .saldo-amount {
-  font-size: var(--text-3xl);
+  // Mobile-first: smaller text
+  font-size: var(--text-2xl);
   font-weight: 600;
   color: var(--text-primary);
   font-family: var(--font-family-headings);
   font-variant-numeric: tabular-nums lining-nums;
+
+  // Desktop: larger text
+  @include respond-to('md') {
+    font-size: var(--text-3xl);
+  }
 
   &.negativo {
     color: var(--color-danger);

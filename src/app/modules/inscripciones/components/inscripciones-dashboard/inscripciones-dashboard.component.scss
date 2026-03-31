@@ -1,3 +1,10 @@
+// =============================================================================
+// INSCRIPCIONES DASHBOARD - Dashboard overview
+// Mobile-first responsive design
+// =============================================================================
+
+@use 'app/shared/styles/responsive' as *;
+
 .dashboard-container {
   display: flex;
   flex-direction: column;

@@ -1,8 +1,29 @@
+// =============================================================================
+// DATE FIELD - Mobile-first responsive date input
+// =============================================================================
 @use '../form-tokens' as *;
+@use 'app/shared/styles/responsive' as *;
+
+/**
+ * Date field with responsive styling
+ *
+ * Mobile-first design inherits from input-base mixin:
+ * - Touch-friendly height (44px minimum)
+ * - 16px font-size to prevent iOS zoom
+ * - Larger touch targets for calendar picker
+ */
 
 :host {
   display: block;
   width: 100%;
+}
+
+.scout-input {
+  @include input-base;
+
+  &--error {
+    @include input-error;
+  }
 }
 
 .scout-input--date {
@@ -11,8 +32,15 @@
     cursor: pointer;
     opacity: 0.6;
     transition: opacity $transition-fast;
-    padding: 4px;
-    margin-right: -4px;
+
+    // Mobile-first: larger touch target
+    padding: 8px;
+    margin-right: -8px;
+
+    @include respond-to('md') {
+      padding: 4px;
+      margin-right: -4px;
+    }
 
     &:hover {
       opacity: 1;
@@ -22,5 +50,14 @@
   // Firefox styling
   &::-moz-calendar-picker-indicator {
     cursor: pointer;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Accessibility - Reduced Motion
+// ---------------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+  .scout-input--date::-webkit-calendar-picker-indicator {
+    transition: none;
   }
 }

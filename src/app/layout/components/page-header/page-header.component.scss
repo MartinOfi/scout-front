@@ -1,15 +1,31 @@
+@use 'app/shared/styles/responsive' as *;
+
 .page-header {
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+
+  @include respond-to('md') {
+    margin-bottom: var(--spacing-lg);
+  }
 
   .page-title {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 600;
-    margin: 0 0 var(--spacing-sm);
+    margin: 0 0 var(--spacing-xs);
+    line-height: 1.2;
+
+    @include respond-to('md') {
+      font-size: 2rem;
+      margin: 0 0 var(--spacing-sm);
+    }
   }
 
   .page-subtitle {
-    font-size: 1rem;
+    font-size: 0.875rem;
     color: var(--gray-700);
     margin: 0;
+
+    @include respond-to('md') {
+      font-size: 1rem;
+    }
   }
 }

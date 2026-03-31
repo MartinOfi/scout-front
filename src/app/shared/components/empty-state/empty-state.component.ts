@@ -22,33 +22,8 @@ import { MatIconModule } from '@angular/material/icon';
       </button>
     </div>
   `,
-  styles: [`
-    .empty-state-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 48px 16px;
-      gap: 16px;
-      color: rgba(0, 0, 0, 0.54);
-      min-height: 300px;
-    }
-
-    .empty-icon {
-      font-size: 64px;
-      width: 64px;
-      height: 64px;
-      color: rgba(0, 0, 0, 0.26);
-    }
-
-    .empty-message {
-      font-size: 16px;
-      margin: 0;
-      text-align: center;
-      max-width: 400px;
-    }
-  `],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./empty-state.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EmptyStateComponent {
   readonly icon = input<string>('inbox');

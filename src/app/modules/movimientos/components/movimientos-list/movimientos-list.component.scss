@@ -1,7 +1,9 @@
 // =============================================================================
 // MOVIMIENTOS LIST COMPONENT STYLES
-// Unified pattern matching personas-dashboard
+// Mobile-first responsive design
 // =============================================================================
+
+@use 'app/shared/styles/responsive' as *;
 
 .movimientos-list-container {
   display: flex;
@@ -16,8 +18,14 @@
 .movimientos-content {
   background: white;
   border-radius: 8px;
-  padding: var(--spacing-lg);
+  // Mobile-first: compact padding
+  padding: var(--spacing-md);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  // Tablet+: more spacious
+  @include respond-to('md') {
+    padding: var(--spacing-lg);
+  }
 
   &__header {
     display: flex;
@@ -84,25 +92,31 @@
 
 .pagination-controls {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
+  // Mobile-first: stacked layout
+  flex-direction: column;
+  align-items: stretch;
   gap: var(--spacing-md);
   padding-top: var(--spacing-md);
   margin-top: var(--spacing-md);
   border-top: 1px solid var(--gray-200);
 
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: stretch;
+  // Tablet+: horizontal layout
+  @include respond-to('md') {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
   }
 }
 
 .pagination-info {
   flex: 1;
+  // Mobile-first: centered text
+  text-align: center;
 
-  @media (max-width: 768px) {
-    text-align: center;
+  // Tablet+: left-aligned
+  @include respond-to('md') {
+    text-align: left;
   }
 }
 
@@ -124,10 +138,12 @@
   align-items: center;
   gap: var(--spacing-xs);
   flex: 1;
-  justify-content: flex-end;
+  // Mobile-first: centered
+  justify-content: center;
 
-  @media (max-width: 768px) {
-    justify-content: center;
+  // Tablet+: right-aligned
+  @include respond-to('md') {
+    justify-content: flex-end;
   }
 
   .page-size-select {

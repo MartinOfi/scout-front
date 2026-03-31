@@ -6,8 +6,14 @@
 //
 // NOTE: This file now imports from centralized tokens for consistency.
 // Re-exports are provided for backwards compatibility with existing imports.
+//
+// MOBILE-FIRST RESPONSIVE:
+// - 16px font-size on mobile prevents iOS auto-zoom
+// - 44px minimum height on mobile for WCAG touch targets
+// - Compact sizing on desktop for information density
 
 @use '../../styles/tokens' as t;
+@use '../../styles/responsive' as *;
 
 // -----------------------------------------------------------------------------
 // COLOR TOKENS (Re-exported from centralized tokens)
@@ -83,16 +89,30 @@ $shadow-card-hover: t.$shadow-card-hover;
 
 @mixin input-base {
   width: 100%;
-  padding: $input-padding-y $input-padding-x;
   font-family: var(--font-family-base);
-  font-size: 15px;
   line-height: 1.5;
   color: $stone-800;
   background-color: $stone-50;
   border: $input-border-width solid $stone-300;
-  border-radius: $input-border-radius;
   box-shadow: $shadow-input-inset;
   transition: border-color $transition-fast, box-shadow $transition-fast, background-color $transition-fast;
+  box-sizing: border-box;
+
+  // Mobile-first: touch-friendly sizing
+  // 16px font prevents iOS auto-zoom on focus
+  // 44px min-height for WCAG touch targets
+  padding: 12px $input-padding-x;
+  min-height: 44px;
+  font-size: 16px;
+  border-radius: 8px;
+
+  // Desktop: compact sizing for information density
+  @include respond-to('md') {
+    padding: $input-padding-y $input-padding-x;
+    min-height: auto;
+    font-size: 15px;
+    border-radius: $input-border-radius;
+  }
 
   &::placeholder {
     color: $stone-400;
@@ -130,13 +150,21 @@ $shadow-card-hover: t.$shadow-card-hover;
 
 @mixin label-base {
   display: block;
-  margin-bottom: $label-margin-bottom;
   font-family: var(--font-family-base);
-  font-size: 14px;
   font-weight: 500;
   line-height: 1.4;
   color: $stone-700;
   letter-spacing: 0.01em;
+
+  // Mobile-first: slightly smaller labels
+  margin-bottom: var(--spacing-xs);
+  font-size: 13px;
+
+  // Desktop: standard label sizing
+  @include respond-to('md') {
+    margin-bottom: $label-margin-bottom;
+    font-size: 14px;
+  }
 }
 
 @mixin hint-text {
@@ -155,11 +183,19 @@ $shadow-card-hover: t.$shadow-card-hover;
 }
 
 // Form grid layout - use for multi-column form layouts
+// Mobile-first: single column on mobile, multi-column on tablet+
 // Automatically removes field margins and uses gap instead
 @mixin form-grid($columns: 2) {
   display: grid;
-  grid-template-columns: repeat($columns, 1fr);
-  gap: $field-row-gap $field-column-gap;
+  // Mobile-first: single column (each field 100% width)
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+
+  // Tablet+: multi-column layout
+  @include respond-to('md') {
+    grid-template-columns: repeat($columns, 1fr);
+    gap: $field-row-gap $field-column-gap;
+  }
 
   // Remove bottom margin from form fields inside grid (use gap instead)
   app-form-field {
@@ -176,8 +212,6 @@ $shadow-card-hover: t.$shadow-card-hover;
 
 @mixin checkbox-base {
   appearance: none;
-  width: $checkbox-size;
-  height: $checkbox-size;
   border: $input-border-width solid $stone-300;
   border-radius: $checkbox-radius;
   background-color: white;
@@ -185,6 +219,18 @@ $shadow-card-hover: t.$shadow-card-hover;
   transition: all $transition-fast;
   position: relative;
   flex-shrink: 0;
+
+  // Mobile-first: larger checkbox for touch (24px)
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+
+  // Desktop: standard checkbox size
+  @include respond-to('md') {
+    width: $checkbox-size;
+    height: $checkbox-size;
+    min-width: $checkbox-size;
+  }
 
   &:hover:not(:disabled) {
     border-color: $brand-burgundy-light;
@@ -206,11 +252,19 @@ $shadow-card-hover: t.$shadow-card-hover;
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 5px;
-      height: 9px;
       border: solid white;
       border-width: 0 2px 2px 0;
       transform: translate(-50%, -60%) rotate(45deg);
+
+      // Mobile: larger checkmark
+      width: 6px;
+      height: 11px;
+
+      // Desktop: standard checkmark
+      @include respond-to('md') {
+        width: 5px;
+        height: 9px;
+      }
     }
   }
 

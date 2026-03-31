@@ -2,6 +2,7 @@
 // KPI DASHBOARD - Comprehensive Inscripciones Dashboard
 // Editorial aesthetic with asymmetric layout and smooth animations
 // =============================================================================
+@use 'app/shared/styles/responsive' as *;
 
 // Design tokens (local)
 $color-burgundy: #812128;
@@ -42,31 +43,36 @@ $duration-slow: 500ms;
 
 .kpi-hero {
   display: grid;
-  grid-template-columns: 200px 1fr;
-  gap: var(--spacing-xl);
-  padding: var(--spacing-xl);
+  // Mobile-first: single column
+  grid-template-columns: 1fr;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
   background: white;
   border-radius: 16px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   border-left: 4px solid $color-burgundy;
 
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-lg);
+  // Desktop: two columns
+  @include respond-to('md') {
+    grid-template-columns: 200px 1fr;
+    gap: var(--spacing-xl);
+    padding: var(--spacing-xl);
   }
 
   &__total {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding-right: var(--spacing-xl);
-    border-right: 1px solid rgba(0, 0, 0, 0.06);
+    // Mobile-first: bottom border
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 
-    @media (max-width: 768px) {
-      padding-right: 0;
-      border-right: none;
-      padding-bottom: var(--spacing-lg);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    // Desktop: right border
+    @include respond-to('md') {
+      padding-bottom: 0;
+      border-bottom: none;
+      padding-right: var(--spacing-xl);
+      border-right: 1px solid rgba(0, 0, 0, 0.06);
     }
   }
 
@@ -81,15 +87,17 @@ $duration-slow: 500ms;
 
   &__value {
     font-family: var(--font-family-headings);
-    font-size: 56px;
+    // Mobile-first: smaller value
+    font-size: 42px;
     font-weight: 600;
     line-height: 1;
     color: var(--gray-900);
     letter-spacing: -0.03em;
     font-feature-settings: 'tnum' 1, 'lnum' 1;
 
-    @media (max-width: 480px) {
-      font-size: 42px;
+    // Desktop: larger value
+    @include respond-to('sm') {
+      font-size: 56px;
     }
   }
 
@@ -207,16 +215,19 @@ $duration-slow: 500ms;
 
 .financial-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  // Mobile-first: single column
+  grid-template-columns: 1fr;
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-xl);
 
-  @media (max-width: 1024px) {
+  // Tablet: 2 columns
+  @include respond-to('sm') {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr;
+  // Desktop: 4 columns
+  @include respond-to('lg') {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -335,15 +346,21 @@ $duration-slow: 500ms;
 
 .payment-progress {
   display: flex;
+  // Mobile-first: column layout
+  flex-direction: column;
+  text-align: center;
   align-items: center;
-  gap: var(--spacing-xl);
-  padding: var(--spacing-lg);
+  gap: var(--spacing-lg);
+  padding: var(--spacing-md);
   background: linear-gradient(135deg, rgba($color-indigo, 0.03) 0%, rgba($color-burgundy, 0.03) 100%);
   border-radius: 12px;
 
-  @media (max-width: 640px) {
-    flex-direction: column;
-    text-align: center;
+  // Desktop: row layout
+  @include respond-to('sm') {
+    flex-direction: row;
+    text-align: left;
+    gap: var(--spacing-xl);
+    padding: var(--spacing-lg);
   }
 
   &__ring {
@@ -453,11 +470,13 @@ $duration-slow: 500ms;
 
 .debtors-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  // Mobile-first: single column
+  grid-template-columns: 1fr;
   gap: var(--spacing-md);
 
-  @media (max-width: 900px) {
-    grid-template-columns: 1fr;
+  // Desktop: 3 columns
+  @include respond-to('lg') {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -643,11 +662,18 @@ $duration-slow: 500ms;
 
 .skeleton-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  // Mobile-first: single column
+  grid-template-columns: 1fr;
   gap: var(--spacing-md);
 
-  @media (max-width: 1024px) {
+  // Tablet: 2 columns
+  @include respond-to('sm') {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  // Desktop: 4 columns
+  @include respond-to('lg') {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 

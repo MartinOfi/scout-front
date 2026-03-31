@@ -1,4 +1,17 @@
+// =============================================================================
+// CHECKBOX FIELD - Mobile-first responsive checkbox input
+// =============================================================================
 @use '../form-tokens' as *;
+@use 'app/shared/styles/responsive' as *;
+
+/**
+ * Checkbox field with responsive styling
+ *
+ * Mobile-first design:
+ * - Touch-friendly checkbox size (24px mobile, 20px desktop)
+ * - Card variant with responsive padding
+ * - WCAG compliant touch targets
+ */
 
 :host {
   display: block;
@@ -7,9 +20,15 @@
 .scout-checkbox-label {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
   cursor: pointer;
   user-select: none;
+
+  // Mobile-first: larger gap for touch
+  gap: 14px;
+
+  @include respond-to('md') {
+    gap: 12px;
+  }
 
   &:has(.scout-checkbox:disabled) {
     cursor: not-allowed;
@@ -18,11 +37,20 @@
 
   // Card variant - elevated interactive cards
   &--card {
-    padding: 16px;
     background-color: white;
     border: 1.5px solid $stone-200;
-    border-radius: 12px;
     transition: all $transition-fast;
+
+    // Mobile-first: touch-friendly padding
+    padding: var(--spacing-md);
+    border-radius: 10px;
+    min-height: 44px;
+
+    @include respond-to('md') {
+      padding: 16px;
+      border-radius: 12px;
+      min-height: auto;
+    }
 
     &:hover:not(:has(.scout-checkbox:disabled)) {
       border-color: $stone-300;
@@ -49,15 +77,36 @@
 
 .scout-checkbox-text {
   font-family: var(--font-family-base);
-  font-size: 14px;
   font-weight: 500;
   line-height: 1.4;
   color: $stone-700;
+
+  // Mobile-first: slightly smaller text
+  font-size: 13px;
+
+  @include respond-to('md') {
+    font-size: 14px;
+  }
 }
 
 .scout-checkbox-description {
   font-family: var(--font-family-base);
-  font-size: 13px;
   line-height: 1.4;
   color: $stone-500;
+
+  // Mobile-first: compact description
+  font-size: 12px;
+
+  @include respond-to('md') {
+    font-size: 13px;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Accessibility - Reduced Motion
+// ---------------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+  .scout-checkbox-label--card {
+    transition: none;
+  }
 }

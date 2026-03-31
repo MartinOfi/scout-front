@@ -1,10 +1,12 @@
 // =============================================================================
 // INSCRIPCIÓN DETAIL - LOGBOOK-INSPIRED DESIGN
+// Mobile-first responsive design
 // =============================================================================
 // Warm, editorial layout that tells the payment story of a scout.
 // Uses stone palette with burgundy brand accents from system.md
 
 @use '../../../../shared/styles/tokens' as t;
+@use 'app/shared/styles/responsive' as *;
 
 // -----------------------------------------------------------------------------
 // LAYOUT TOKENS
@@ -36,12 +38,14 @@ $card-padding-compact: 20px;
 
 .detail-page {
   min-height: 100%;
-  padding: 24px;
-  padding-bottom: 48px;
+  // Mobile-first: compact padding
+  padding: 16px;
+  padding-bottom: 32px;
 
-  @media (max-width: 640px) {
-    padding: 16px;
-    padding-bottom: 32px;
+  // Tablet+: more spacious
+  @include respond-to('sm') {
+    padding: 24px;
+    padding-bottom: 48px;
   }
 }
 
@@ -59,17 +63,20 @@ $card-padding-compact: 20px;
 
 .detail-header {
   display: flex;
+  // Mobile-first: stack vertically
+  flex-direction: column;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
   padding: 16px 20px;
   background: white;
   border-radius: $card-radius;
   box-shadow: t.$shadow-card;
 
-  @media (max-width: 640px) {
-    flex-direction: column;
-    gap: 12px;
+  // Tablet+: horizontal layout
+  @include respond-to('sm') {
+    flex-direction: row;
+    gap: 16px;
   }
 
   &__left {
@@ -85,10 +92,14 @@ $card-padding-compact: 20px;
     align-items: center;
     gap: 12px;
     flex-shrink: 0;
+    // Mobile-first: full width, spread
+    width: 100%;
+    justify-content: space-between;
 
-    @media (max-width: 640px) {
-      width: 100%;
-      justify-content: space-between;
+    // Tablet+: auto width
+    @include respond-to('sm') {
+      width: auto;
+      justify-content: flex-end;
     }
   }
 
@@ -319,20 +330,28 @@ $card-padding-compact: 20px;
 
   &__item {
     flex: 1;
-    min-width: 100px;
+    // Mobile-first: 50% width, with bottom border
+    min-width: 50%;
     display: flex;
     flex-direction: column;
     gap: 2px;
     padding: 12px 16px;
     border-right: 1px solid t.$stone-200;
+    border-bottom: 1px solid t.$stone-200;
 
     &:last-child {
       border-right: none;
     }
 
-    @media (max-width: 480px) {
-      min-width: 50%;
-      border-bottom: 1px solid t.$stone-200;
+    // Remove bottom border from last two items on mobile
+    &:nth-last-child(-n+2) {
+      border-bottom: none;
+    }
+
+    // Small screens+: flexible width, no bottom border
+    @include respond-to('xs') {
+      min-width: 100px;
+      border-bottom: none;
 
       &:nth-last-child(-n+2) {
         border-bottom: none;
@@ -374,11 +393,13 @@ $card-padding-compact: 20px;
 
 .detail-main {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  // Mobile-first: single column
+  grid-template-columns: 1fr;
   gap: 20px;
 
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
+  // Tablet+: two columns
+  @include respond-to('md') {
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -745,11 +766,13 @@ $card-padding-compact: 20px;
 .detail-actions {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   gap: 10px;
+  // Mobile-first: spread buttons
+  justify-content: space-between;
 
-  @media (max-width: 480px) {
-    justify-content: space-between;
+  // Small screens+: align right
+  @include respond-to('xs') {
+    justify-content: flex-end;
   }
 }
 

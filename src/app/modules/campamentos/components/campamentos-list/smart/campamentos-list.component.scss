@@ -1,8 +1,10 @@
 // =============================================================================
 // CAMPAMENTOS LIST - UNIFIED PATTERN
+// Mobile-first responsive design
 // =============================================================================
 
 @use '../../../../../shared/styles/tokens' as t;
+@use 'app/shared/styles/responsive' as *;
 
 // -----------------------------------------------------------------------------
 // REDUCED MOTION
@@ -36,29 +38,34 @@
 
 .camps-stats {
   display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 16px 24px;
+  // Mobile-first: vertical stack
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  padding: 16px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   margin-bottom: var(--spacing-lg);
 
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
-    padding: 16px;
+  // Tablet+: horizontal layout
+  @include respond-to('md') {
+    flex-direction: row;
+    align-items: center;
+    gap: 24px;
+    padding: 16px 24px;
   }
 }
 
 .camps-stats__action {
-  margin-left: auto;
   flex-shrink: 0;
+  // Mobile-first: full width
+  width: 100%;
 
-  @media (max-width: 768px) {
-    margin-left: 0;
-    width: 100%;
+  // Tablet+: auto width with margin
+  @include respond-to('md') {
+    margin-left: auto;
+    width: auto;
   }
 }
 
@@ -86,13 +93,15 @@
 }
 
 .camps-stats__divider {
-  width: 1px;
-  height: 40px;
+  // Mobile-first: horizontal divider
+  width: 100%;
+  height: 1px;
   background-color: t.$stone-200;
 
-  @media (max-width: 768px) {
-    width: 100%;
-    height: 1px;
+  // Tablet+: vertical divider
+  @include respond-to('md') {
+    width: 1px;
+    height: 40px;
   }
 }
 
@@ -144,11 +153,13 @@
 
 .camps-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  // Mobile-first: single column
+  grid-template-columns: 1fr;
   gap: 20px;
 
-  @media (max-width: 400px) {
-    grid-template-columns: 1fr;
+  // Small screens+: auto-fill grid
+  @include respond-to('xs') {
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   }
 }
 

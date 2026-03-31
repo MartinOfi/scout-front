@@ -24,6 +24,9 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": ["src"]
+            },
             "assets": [
               {
                 "glob": "**/*",
@@ -83,6 +86,9 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
+            "stylePreprocessorOptions": {
+              "includePaths": ["src"]
+            },
             "include": [
               "src/app/modules/cajas/components/caja-grupo/caja-grupo.component.spec.ts",
               "src/app/modules/cajas/components/fondos-rama/fondos-rama.component.spec.ts",

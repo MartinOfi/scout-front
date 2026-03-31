@@ -1,3 +1,9 @@
+// =============================================================================
+// DOCUMENTACION CARD STYLES
+// Mobile-first responsive design
+// =============================================================================
+
+@use 'app/shared/styles/responsive' as *;
 @use '../../../../../../shared/styles/tokens' as t;
 
 $card-radius: 8px;
@@ -33,11 +39,13 @@ $card-radius: 8px;
 
 .doc-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  // Mobile-first: single column stack
+  grid-template-columns: 1fr;
   gap: 8px;
 
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr;
+  // Small screens+: 2-column layout
+  @include respond-to('xs') {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 

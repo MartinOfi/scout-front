@@ -1,3 +1,8 @@
+// =============================================================================
+// DATA TABLE - Responsive table with horizontal scroll and sticky columns
+// =============================================================================
+@use 'app/shared/styles/responsive' as *;
+
 /**
  * Estilos específicos para el componente de tabla reutilizable
  *
@@ -23,23 +28,101 @@
   width: 100%;
 }
 
+// ---------------------------------------------------------------------------
+// Table Wrapper - Horizontal scroll with sticky first column
+// ---------------------------------------------------------------------------
+.table-wrapper {
+  // Mobile: horizontal scroll
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
+    }
+  }
+
+  // Sticky first column on mobile
+  table {
+    th:first-child,
+    td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      background: white;
+
+      // Subtle shadow to indicate scroll
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: -8px;
+        bottom: 0;
+        width: 8px;
+        background: linear-gradient(90deg, rgba(0, 0, 0, 0.06) 0%, transparent 100%);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+    }
+  }
+
+  // Show shadow when scrolled
+  &.is-scrolled table {
+    th:first-child::after,
+    td:first-child::after {
+      opacity: 1;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Table Header Cell - Mobile-first sizing
+// ---------------------------------------------------------------------------
 .table-header-cell {
-  padding: 12px 16px;
+  // Mobile-first: compact sizing
+  padding: 10px 12px;
   text-align: left;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: #374151;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   border-bottom: 1px solid #e5e7eb;
   white-space: nowrap;
+  background: #f9fafb;
+
+  // Desktop: larger sizing
+  @include respond-to('md') {
+    padding: 12px 16px;
+    font-size: 12px;
+  }
 
   &:first-child {
-    padding-left: 20px;
+    // Mobile-first: smaller padding
+    padding-left: 12px;
+
+    @include respond-to('md') {
+      padding-left: 20px;
+    }
   }
 
   &:last-child {
-    padding-right: 20px;
+    // Mobile-first: smaller padding
+    padding-right: 12px;
+
+    @include respond-to('md') {
+      padding-right: 20px;
+    }
   }
 
   &.cursor-pointer {
@@ -62,21 +145,40 @@
   color: #6b7280;
 }
 
-// Estilos para las celdas del cuerpo de la tabla según el wireframe
+// ---------------------------------------------------------------------------
+// Table Body Cell - Mobile-first sizing
+// ---------------------------------------------------------------------------
 .table-body-cell {
-  padding: 16px;
+  // Mobile-first: compact sizing
+  padding: 12px;
   border-bottom: 1px solid #e5e7eb;
   background-color: #ffffff;
-  font-size: 14px;
+  font-size: 13px;
   color: #111827;
   vertical-align: middle;
 
+  // Desktop: larger sizing
+  @include respond-to('md') {
+    padding: 16px;
+    font-size: 14px;
+  }
+
   &:first-child {
-    padding-left: 20px;
+    // Mobile-first: smaller padding
+    padding-left: 12px;
+
+    @include respond-to('md') {
+      padding-left: 20px;
+    }
   }
 
   &:last-child {
-    padding-right: 20px;
+    // Mobile-first: smaller padding
+    padding-right: 12px;
+
+    @include respond-to('md') {
+      padding-right: 20px;
+    }
   }
 }
 
@@ -92,12 +194,9 @@ tr[class*="hover\\:bg-gray-100"]:hover {
   transition: background-color 0.2s ease;
 }
 
-// Responsividad adicional para pantallas muy pequeñas
-@media (max-width: 640px) {
-  .overflow-x-auto {
-    -webkit-overflow-scrolling: touch;
-  }
-}
+// ---------------------------------------------------------------------------
+// Mobile Optimizations - Handled by table-wrapper above
+// ---------------------------------------------------------------------------
 
 // Estados de loading
 .loading {
@@ -105,29 +204,59 @@ tr[class*="hover\\:bg-gray-100"]:hover {
   pointer-events: none;
 }
 
-// Estilos de paginación
+// ---------------------------------------------------------------------------
+// Pagination - Mobile-first responsive
+// ---------------------------------------------------------------------------
 .pagination-info {
-  margin-top: 16px;
+  // Mobile-first: compact margin
+  margin-top: var(--spacing-sm);
   text-align: center;
 
+  @include respond-to('md') {
+    margin-top: 16px;
+  }
+
   p {
-    font-size: 14px;
+    // Mobile-first: smaller text
+    font-size: 12px;
     color: #4b5563;
     font-weight: 500;
+
+    @include respond-to('md') {
+      font-size: 14px;
+    }
   }
 }
 
 .pagination-controls {
-  margin-top: 16px;
+  // Mobile-first: compact margin
+  margin-top: var(--spacing-sm);
   display: flex;
   justify-content: center;
+  // Mobile: allow horizontal scroll if needed
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  @include respond-to('md') {
+    margin-top: 16px;
+    overflow-x: visible;
+  }
+
+  // Mobile: NEVER wrap - keep all elements horizontal
+  .flex.items-center {
+    flex-wrap: nowrap;
+    gap: var(--spacing-xs);
+    min-width: max-content;
+  }
 
   .pagination-btn {
     display: inline-flex;
     align-items: center;
-    padding: 8px 12px;
+    // Mobile-first: smaller, touch-friendly buttons (min 44px height)
+    padding: 10px 12px;
+    min-height: 44px;
     border: 1px solid #d1d5db;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     border-radius: 8px;
     color: #374151;
@@ -135,6 +264,22 @@ tr[class*="hover\\:bg-gray-100"]:hover {
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     transition: all 0.2s ease;
     cursor: pointer;
+
+    // Desktop: standard sizing
+    @include respond-to('md') {
+      padding: 8px 12px;
+      min-height: auto;
+      font-size: 14px;
+    }
+
+    // Mobile: hide text, show only icons
+    span:not(.sr-only) {
+      display: none;
+
+      @include respond-to('sm') {
+        display: inline;
+      }
+    }
 
     &:hover:not(:disabled) {
       background-color: #f9fafb;
@@ -151,28 +296,50 @@ tr[class*="hover\\:bg-gray-100"]:hover {
     }
 
     svg {
-      margin-right: 4px;
+      // Mobile-first: larger touch target
+      width: 20px;
+      height: 20px;
+      margin-right: 2px;
+
+      @include respond-to('sm') {
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+      }
     }
 
     &:last-child svg {
-      margin-left: 4px;
+      margin-left: 2px;
       margin-right: 0;
+
+      @include respond-to('sm') {
+        margin-left: 4px;
+      }
     }
   }
 
   .page-number-btn {
-    display: inline-flex;
-    align-items: center;
-    padding: 8px 12px;
-    border: 1px solid #d1d5db;
-    font-size: 14px;
-    font-weight: 500;
-    border-radius: 8px;
-    color: #374151;
-    background-color: white;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    transition: all 0.2s ease;
-    cursor: pointer;
+    // Mobile-first: HIDE page numbers (show only current page indicator)
+    display: none;
+
+    // Desktop: show page number buttons
+    @include respond-to('sm') {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 12px;
+      min-width: auto;
+      min-height: auto;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 8px;
+      color: #374151;
+      background-color: white;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
 
     &:hover:not(.active) {
       background-color: #f9fafb;
@@ -193,13 +360,33 @@ tr[class*="hover\\:bg-gray-100"]:hover {
       }
     }
   }
+
+  // Mobile-only: simple page indicator (show between prev/next arrows)
+  .page-indicator-mobile {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    white-space: nowrap;
+    padding: 0 var(--spacing-xs);
+
+    @include respond-to('sm') {
+      display: none;
+    }
+  }
 }
 
-// Estilos para botones de acción
+// ---------------------------------------------------------------------------
+// Action Buttons - Mobile touch-friendly
+// ---------------------------------------------------------------------------
 .action-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  // Mobile-first: minimum touch target 44x44px
+  min-width: 44px;
+  min-height: 44px;
   font-size: 14px;
   font-weight: 500;
   border-radius: 8px;
@@ -207,7 +394,14 @@ tr[class*="hover\\:bg-gray-100"]:hover {
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 4px;
+  padding: 8px;
+
+  // Desktop: smaller buttons
+  @include respond-to('md') {
+    min-width: auto;
+    min-height: auto;
+    padding: 4px;
+  }
 
   &:focus {
     outline: none;
@@ -236,12 +430,22 @@ tr[class*="hover\\:bg-gray-100"]:hover {
   }
 }
 
-// Estilos para barra de progreso de puntualidad
+// ---------------------------------------------------------------------------
+// Punctuality Bar - Mobile responsive
+// ---------------------------------------------------------------------------
 .punctuality-bar {
-  min-width: 60px;
-  height: 8px;
-  border-radius: 4px;
+  // Mobile-first: smaller bar
+  min-width: 50px;
+  height: 6px;
+  border-radius: 3px;
   transition: width 0.3s ease;
+
+  // Desktop: larger bar
+  @include respond-to('md') {
+    min-width: 60px;
+    height: 8px;
+    border-radius: 4px;
+  }
 }
 
 // Colores específicos para la barra - usando colores del proyecto
