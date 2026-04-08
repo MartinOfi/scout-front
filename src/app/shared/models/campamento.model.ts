@@ -213,6 +213,7 @@ export interface CampamentoKpisDto {
   totalARecaudar: number;
   totalRecaudado: number;
   totalGastado: number;
+  totalPendienteReembolso: number;
   balance: number;
   deudaTotal: number;
   cantidadParticipantes: number;

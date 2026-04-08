@@ -66,7 +66,7 @@ interface KpiConfig {
   readonly title: string;
   readonly key: keyof Pick<
     CampamentoKpisDto,
-    'totalARecaudar' | 'totalRecaudado' | 'totalGastado' | 'balance'
+    'totalARecaudar' | 'totalRecaudado' | 'totalGastado' | 'totalPendienteReembolso' | 'balance'
   >;
   readonly variant: StatCardVariant;
 }
@@ -135,6 +135,12 @@ export class CampamentoDetailComponent implements OnInit {
     { icon: 'account_balance', title: 'Total a Recaudar', key: 'totalARecaudar', variant: 'info' },
     { icon: 'payments', title: 'Recaudado', key: 'totalRecaudado', variant: 'success' },
     { icon: 'shopping_cart', title: 'Gastado', key: 'totalGastado', variant: 'warning' },
+    {
+      icon: 'undo',
+      title: 'Reembolsos Pendientes',
+      key: 'totalPendienteReembolso',
+      variant: 'danger',
+    },
     { icon: 'savings', title: 'Balance', key: 'balance', variant: 'primary' },
   ];
 

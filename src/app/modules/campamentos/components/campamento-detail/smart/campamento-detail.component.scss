@@ -273,16 +273,45 @@ $section-gap: 20px;
   display: grid;
   // Mobile-first: single column
   grid-template-columns: 1fr;
-  gap: 12px;
+  gap: 10px;
 
   // Small screens+: 2 columns
   @include respond-to('xs') {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  // Desktop+: 4 columns
+  // Tablet+: 3 columns
+  @include respond-to('sm') {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  // Desktop+: 5 columns (one per KPI)
   @include respond-to('md') {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  // Compact stat-cards so all 5 fit comfortably
+  ::ng-deep .stat-card {
+    padding: 12px;
+
+    &__value {
+      font-size: 18px;
+    }
+
+    &__header {
+      margin-bottom: 8px;
+    }
+
+    &__icon {
+      width: 28px;
+      height: 28px;
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
   }
 }
 
