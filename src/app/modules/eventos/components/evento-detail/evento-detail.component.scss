@@ -1,0 +1,459 @@
+// =============================================================================
+// EVENTO DETAIL STYLES
+// Mirrors campamento-detail layout — mobile-first responsive design
+// =============================================================================
+
+@use '../../../../shared/styles/tokens' as t;
+@use 'app/shared/styles/responsive' as *;
+
+// -----------------------------------------------------------------------------
+// LAYOUT TOKENS
+// -----------------------------------------------------------------------------
+
+$card-radius: 12px;
+$section-gap: 20px;
+
+// -----------------------------------------------------------------------------
+// PAGE CONTAINER
+// -----------------------------------------------------------------------------
+
+.detail-page {
+  min-height: 100%;
+}
+
+.detail-content {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: $section-gap;
+}
+
+// -----------------------------------------------------------------------------
+// HEADER
+// -----------------------------------------------------------------------------
+
+.detail-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px;
+  background: white;
+  border-radius: $card-radius;
+  box-shadow: t.$shadow-card;
+
+  @include respond-to('sm') {
+    flex-direction: row;
+  }
+
+  &__left {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__badge {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, t.$brand-burgundy 0%, #a32d36 100%);
+    border-radius: 12px;
+    color: white;
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__name {
+    margin: 0;
+    font-size: clamp(1.25rem, 3vw, 1.5rem);
+    font-weight: 600;
+    color: t.$stone-900;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  &__dates {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: t.$stone-600;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      color: t.$stone-400;
+    }
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    width: 100%;
+    justify-content: space-between;
+
+    @include respond-to('sm') {
+      width: auto;
+      justify-content: flex-end;
+    }
+  }
+
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px 8px 10px;
+    background: transparent;
+    border: 1px solid t.$stone-200;
+    border-radius: 8px;
+    color: t.$stone-600;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background-color t.$transition-fast,
+      border-color t.$transition-fast;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &:hover {
+      background-color: t.$stone-50;
+      border-color: t.$stone-300;
+    }
+  }
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: 1px solid t.$stone-200;
+  border-radius: 8px;
+  color: t.$stone-500;
+  cursor: pointer;
+  transition:
+    background-color t.$transition-fast,
+    color t.$transition-fast;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background-color: t.$stone-50;
+    color: t.$stone-700;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// KPI SECTION
+// -----------------------------------------------------------------------------
+
+.kpi-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+
+  @include respond-to('xs') {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include respond-to('sm') {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  // Compact stat-cards
+  ::ng-deep .stat-card {
+    padding: 12px;
+
+    &__value {
+      font-size: 18px;
+    }
+
+    &__header {
+      margin-bottom: 8px;
+    }
+
+    &__icon {
+      width: 28px;
+      height: 28px;
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// TABS SECTION
+// -----------------------------------------------------------------------------
+
+.tabs-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tabs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+// -----------------------------------------------------------------------------
+// TAB CONTENT
+// -----------------------------------------------------------------------------
+
+.tab-content {
+  min-height: 200px;
+}
+
+.tab-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  background: white;
+  border-radius: $card-radius;
+  box-shadow: t.$shadow-card;
+  text-align: center;
+
+  &__icon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: t.$stone-100;
+    border-radius: 50%;
+    color: t.$stone-400;
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  &__text {
+    margin: 0 0 4px;
+    font-size: 15px;
+    font-weight: 600;
+    color: t.$stone-700;
+  }
+
+  &__hint {
+    margin: 0;
+    font-size: 13px;
+    color: t.$stone-500;
+  }
+}
+
+// Tab toolbar (action buttons above tab content)
+.tab-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background-color: t.$brand-burgundy;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color t.$transition-fast;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background-color: t.$brand-burgundy-light;
+  }
+
+  &--positive {
+    background-color: #16a34a;
+
+    &:hover {
+      background-color: #15803d;
+    }
+  }
+
+  &--danger {
+    background-color: t.$brand-burgundy;
+
+    &:hover {
+      background-color: t.$brand-burgundy-light;
+    }
+  }
+}
+
+// White card wrapper around data tables (mirrors personas-tabs-container pattern)
+.table-container {
+  background: white;
+  border-radius: 8px;
+  padding: var(--spacing-lg);
+  box-shadow: t.$shadow-card;
+}
+
+// Data list (productos / ventas)
+.data-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: white;
+    border-radius: $card-radius;
+    box-shadow: t.$shadow-card;
+  }
+
+  &__name {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 600;
+    color: t.$stone-800;
+  }
+
+  &__value {
+    font-size: 14px;
+    font-weight: 500;
+    color: t.$stone-700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__sub {
+    font-size: 12px;
+    color: t.$stone-500;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.productos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+
+// -----------------------------------------------------------------------------
+// LOADING & ERROR STATES
+// -----------------------------------------------------------------------------
+
+.detail-loading,
+.detail-error,
+.detail-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  padding: 32px;
+}
+
+// -----------------------------------------------------------------------------
+// ACTION BUTTONS
+// -----------------------------------------------------------------------------
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color t.$transition-fast,
+    transform t.$transition-fast;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &--primary {
+    background-color: t.$brand-burgundy;
+    border: none;
+    color: white;
+
+    &:hover {
+      background-color: t.$brand-burgundy-light;
+    }
+
+    &:active {
+      transform: scale(0.97);
+    }
+  }
+}

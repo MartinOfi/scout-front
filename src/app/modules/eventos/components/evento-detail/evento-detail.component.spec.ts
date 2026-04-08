@@ -1,331 +1,237 @@
 /**
  * EventoDetailComponent Tests
- * Tests smart component behavior for evento detail view
- * Coverage target: 90%+ | TDD Pattern: RED-GREEN-REFACTOR
+ * Jasmine + Karma — TDD Pattern: RED-GREEN-REFACTOR
+ * Coverage target: 90%+
  */
 
-import { vi } from 'vitest';
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Router, ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { of } from 'rxjs';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { EventoDetailComponent } from './evento-detail.component';
 import { EventosStateService } from '../../services/eventos-state.service';
-import { Evento } from '../../../../shared/models';
-import { MockRouter, MockActivatedRoute } from '../../../../shared/testing/common-mocks';
-import { MockEventosStateService, createMockEvento } from '../../testing/eventos-test-utils';
+import { TipoEvento } from '../../../../shared/enums';
+import { Evento, EventoKpis, Producto, VentaProducto, ResumenVentas } from '../../../../shared/models';
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function makeEvento(overrides: Partial<Evento> = {}): Evento {
+  return {
+    id: 'evt-1',
+    nombre: 'Bazar Primavera',
+    tipo: TipoEvento.VENTA,
+    fecha: '2026-06-15',
+    descripcion: 'Descripción test',
+    destinoGanancia: null,
+    tipoEvento: null,
+    productos: [],
+    createdAt: '2026-01-01',
+    updatedAt: '2026-01-01',
+    ...overrides,
+  } as Evento;
+}
+
+function makeKpis(overrides: Partial<EventoKpis> = {}): EventoKpis {
+  return {
+    totalIngresos: 5000,
+    totalGastado: 1000,
+    totalPendienteReembolso: 500,
+    balance: 4000,
+    ...overrides,
+  };
+}
+
+function makeResumenVentas(): ResumenVentas {
+  return {
+    productos: [],
+    ventasPorVendedor: [],
+    gananciaTotal: 3000,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Mock state factory
+// ---------------------------------------------------------------------------
+
+function createMockState() {
+  return {
+    selected: signal<Evento | null>(null),
+    loading: signal<boolean>(false),
+    error: signal<string | null>(null),
+    kpis: signal<Record<string, EventoKpis>>({}),
+    productos: signal<Record<string, Producto[]>>({}),
+    ventas: signal<Record<string, VentaProducto[]>>({}),
+    resumenVentas: signal<Record<string, ResumenVentas>>({}),
+    loadById: jasmine.createSpy('loadById'),
+    loadKpis: jasmine.createSpy('loadKpis'),
+    loadProductos: jasmine.createSpy('loadProductos'),
+    loadVentas: jasmine.createSpy('loadVentas'),
+    loadResumenVentas: jasmine.createSpy('loadResumenVentas'),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
 
 describe('EventoDetailComponent', () => {
   let component: EventoDetailComponent;
   let fixture: ComponentFixture<EventoDetailComponent>;
-  let mockStateService: MockEventosStateService;
-  let mockRouter: MockRouter;
-  let mockActivatedRoute: MockActivatedRoute;
+  let mockState: ReturnType<typeof createMockState>;
+  let mockRouter: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
-    mockStateService = {
-      selected: signal<Evento | null>(null),
-      loading: signal<boolean>(false),
-      error: signal<string | null>(null),
-      select: vi.fn(),
-      delete: vi.fn().mockReturnValue(of(undefined)),
-    };
-
-    mockRouter = {
-      navigate: vi.fn().mockResolvedValue(true),
-    };
-
-    mockActivatedRoute = {
-      params: of({ id: 'evt-123' }),
-    };
+    mockState = createMockState();
+    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+    mockRouter.navigate.and.returnValue(Promise.resolve(true));
 
     await TestBed.configureTestingModule({
-      imports: [EventoDetailComponent],
+      imports: [EventoDetailComponent, NoopAnimationsModule],
       providers: [
-        { provide: EventosStateService, useValue: mockStateService },
+        { provide: EventosStateService, useValue: mockState },
         { provide: Router, useValue: mockRouter },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: { get: () => 'evt-1' } } },
+        },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(EventoDetailComponent);
     component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
+  // ─── Creation ────────────────────────────────────────────────────────────────
 
-  describe('Component Initialization', () => {
-    it('should create the component', () => {
+  describe('Component creation', () => {
+    it('should create', () => {
       expect(component).toBeTruthy();
     });
 
-    it('should inject dependencies correctly', () => {
-      expect(component.state).toBe(mockStateService);
-      expect(component['router']).toBe(mockRouter);
+    it('should expose loading signal from state', () => {
+      expect(component.loading).toBe(mockState.loading as ReturnType<typeof signal<boolean>>);
     });
 
-    it('should extract id from route params', fakeAsync(() => {
-      fixture.detectChanges();
-      setTimeout(() => {
-        expect(component.eventoId()).toBe('evt-123');
-        });
-      tick();
-    });
-
-    it('should select evento in state service on init', fakeAsync(() => {
-      fixture.detectChanges();
-      setTimeout(() => {
-        expect(mockStateService.select).toHaveBeenCalledWith('evt-123');
-        });
-      tick();
+    it('should expose error signal from state', () => {
+      expect(component.error).toBe(mockState.error as ReturnType<typeof signal<string | null>>);
     });
   });
 
-  describe('Evento Selection', () => {
-    it('should expose selected evento from state service', () => {
-      const mockEvento: Evento = { id: 'evt-123', nombre: 'Evento Scout' }
-      mockStateService.selected.set(mockEvento);
-      TestBed.flushEffects();
+  // ─── ngOnInit — data loading ──────────────────────────────────────────────
 
-      const result = component.evento();
-
-      expect(result).toEqual(mockEvento);
-      expect(result?.nombre).toBe('Evento Scout');
+  describe('ngOnInit — data loading', () => {
+    it('should call loadById on init', () => {
+      expect(mockState.loadById).toHaveBeenCalledWith('evt-1');
     });
 
-    it('should update evento when state service selection changes', () => {
-      const e1 = { id: 'evt-123', nombre: 'Evento 1' }
-      const e2 = { id: 'evt-123', nombre: 'Evento 1 Updated' }
-
-      mockStateService.selected.set(e1);
-      TestBed.flushEffects();
-      expect(component.evento()?.nombre).toBe('Evento 1');
-
-      mockStateService.selected.set(e2);
-      TestBed.flushEffects();
-      expect(component.evento()?.nombre).toBe('Evento 1 Updated');
+    it('should call loadKpis on init', () => {
+      expect(mockState.loadKpis).toHaveBeenCalledWith('evt-1');
     });
 
-    it('should expose null when no evento selected', () => {
-      mockStateService.selected.set(null);
-      TestBed.flushEffects();
-
-      expect(component.evento()).toBeNull();
+    it('should call loadProductos and loadVentas for VENTA evento', () => {
+      // setUp: evento is VENTA type (default mockState.selected is null during init,
+      // but loadProductos/loadVentas are called unconditionally by the component)
+      expect(mockState.loadProductos).toHaveBeenCalledWith('evt-1');
+      expect(mockState.loadVentas).toHaveBeenCalledWith('evt-1');
+      expect(mockState.loadResumenVentas).toHaveBeenCalledWith('evt-1');
     });
   });
 
-  describe('Navigation Actions', () => {
-    it('should navigate back on onBack', () => {
+  // ─── Computed signals ─────────────────────────────────────────────────────
+
+  describe('Computed signals', () => {
+    it('should derive evento from state.selected', () => {
+      const ev = makeEvento();
+      mockState.selected.set(ev);
+      expect(component.evento()).toBe(ev);
+    });
+
+    it('should derive eventKpis from state.kpis for this eventoId', () => {
+      const kpis = makeKpis();
+      mockState.kpis.set({ 'evt-1': kpis });
+      expect(component.eventoKpis()).toBe(kpis);
+    });
+
+    it('should return null kpis when id not in state', () => {
+      mockState.kpis.set({});
+      expect(component.eventoKpis()).toBeNull();
+    });
+
+    it('should derive eventProductos from state.productos', () => {
+      const prods: Producto[] = [{ id: 'p-1', eventoId: 'evt-1', nombre: 'Empanada', precioVenta: 200, precioCosto: 100, createdAt: '', updatedAt: '' }];
+      mockState.productos.set({ 'evt-1': prods });
+      expect(component.eventoProductos()).toEqual(prods);
+    });
+
+    it('should return empty array when no productos', () => {
+      mockState.productos.set({});
+      expect(component.eventoProductos()).toEqual([]);
+    });
+
+    it('should derive eventoResumenVentas from state.resumenVentas', () => {
+      const resumen = makeResumenVentas();
+      mockState.resumenVentas.set({ 'evt-1': resumen });
+      expect(component.eventoResumenVentas()).toBe(resumen);
+    });
+  });
+
+  // ─── Tabs ─────────────────────────────────────────────────────────────────
+
+  describe('Tabs', () => {
+    it('should default to first tab', () => {
+      expect(component.activeTab()).toBeTruthy();
+    });
+
+    it('should change active tab on onTabChange', () => {
+      component.onTabChange('movimientos');
+      expect(component.activeTab()).toBe('movimientos');
+    });
+
+    it('should expose tabs array', () => {
+      expect(component.tabs.length).toBeGreaterThan(0);
+    });
+
+    it('should expose ventas tab for VENTA evento type', () => {
+      mockState.selected.set(makeEvento({ tipo: TipoEvento.VENTA }));
+      const keys = component.tabs.map(t => t.key);
+      expect(keys).toContain('ventas');
+      expect(keys).toContain('productos');
+    });
+  });
+
+  // ─── KPI configs ─────────────────────────────────────────────────────────
+
+  describe('KPI configs', () => {
+    it('should expose 4 kpiConfigs', () => {
+      expect(component.kpiConfigs.length).toBe(4);
+    });
+
+    it('should include totalIngresos config', () => {
+      const keys = component.kpiConfigs.map(k => k.key);
+      expect(keys).toContain('totalIngresos');
+    });
+
+    it('should include balance config', () => {
+      const keys = component.kpiConfigs.map(k => k.key);
+      expect(keys).toContain('balance');
+    });
+  });
+
+  // ─── Navigation ───────────────────────────────────────────────────────────
+
+  describe('Navigation', () => {
+    it('should navigate to /eventos on onBack', () => {
       component.onBack();
-
-      expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/eventos']);
     });
 
-    it('should navigate to edit on onEdit', () => {
-      const mockEvento: Evento = { id: 'evt-123' }
-      mockStateService.selected.set(mockEvento);
-
+    it('should navigate to edit page on onEdit', () => {
       component.onEdit();
-
-      expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/eventos', 'evt-123', 'editar']);
-    });
-  });
-
-  describe('Delete Action', () => {
-    it('should delete evento when confirmed', fakeAsync(() => {
-      const mockEvento: Evento = { id: 'evt-123' }
-      mockStateService.selected.set(mockEvento);
-
-      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
-      mockStateService.delete.mockReturnValue(of(undefined));
-
-      if (component.onDelete) {
-        component.onDelete();
-      }
-
-      setTimeout(() => {
-        expect(confirmSpy).toHaveBeenCalled();
-        confirmSpy.mockRestore();
-        });
-      tick();
-    });
-
-    it('should NOT delete evento when user cancels', fakeAsync(() => {
-      const mockEvento: Evento = { id: 'evt-123' }
-      mockStateService.selected.set(mockEvento);
-
-      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
-
-      if (component.onDelete) {
-        component.onDelete();
-      }
-
-      setTimeout(() => {
-        expect(mockStateService.delete).not.toHaveBeenCalled();
-        confirmSpy.mockRestore();
-        });
-      tick();
-    });
-  });
-
-  describe('Loading and Error States', () => {
-    it('should expose loading signal from state service', () => {
-      mockStateService.loading.set(true);
-      TestBed.flushEffects();
-      expect(component.loading()).toBe(true);
-
-      mockStateService.loading.set(false);
-      TestBed.flushEffects();
-      expect(component.loading()).toBe(false);
-    });
-
-    it('should expose error signal from state service', () => {
-      const errorMsg = 'Failed to load evento';
-      mockStateService.error.set(errorMsg);
-      TestBed.flushEffects();
-      expect(component.error()).toBe(errorMsg);
-
-      mockStateService.error.set(null);
-      TestBed.flushEffects();
-      expect(component.error()).toBeNull();
-    });
-
-    it('should handle loading state', () => {
-      mockStateService.loading.set(true);
-      TestBed.flushEffects();
-
-      expect(component.loading()).toBe(true);
-      expect(component.error()).toBeNull();
-    });
-
-    it('should handle error state', () => {
-      const errorMsg = 'Network error';
-      mockStateService.error.set(errorMsg);
-      TestBed.flushEffects();
-
-      expect(component.error()).toBe(errorMsg);
-      expect(component.loading()).toBe(false);
-    });
-  });
-
-  describe('Not Found State', () => {
-    it('should handle evento not found', () => {
-      mockStateService.selected.set(null);
-      mockStateService.loading.set(false);
-      mockStateService.error.set(null);
-      TestBed.flushEffects();
-
-      expect(component.evento()).toBeNull();
-      expect(component.loading()).toBe(false);
-    });
-
-    it('should show not found message when evento is null and not loading', () => {
-      mockStateService.selected.set(null);
-      mockStateService.loading.set(false);
-      mockStateService.error.set(null);
-      TestBed.flushEffects();
-
-      const evento = component.evento();
-
-      expect(evento).toBeNull();
-    });
-
-    it('should navigate back when clicking action in not found state', () => {
-      mockStateService.selected.set(null);
-      TestBed.flushEffects();
-
-      component.onBack();
-
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/eventos']);
-    });
-  });
-
-  describe('Route Params Handling', () => {
-    it('should handle different evento IDs', fakeAsync(() => {
-      const id1 = 'evt-123';
-      mockActivatedRoute.params = of({ id: id1 });
-
-      fixture.detectChanges();
-      setTimeout(() => {
-        expect(component.eventoId()).toBe('evt-123');
-        });
-      tick();
-    });
-
-    it('should re-select when route params change', fakeAsync(() => {
-      const id1 = 'evt-123';
-      const id2 = 'evt-456';
-
-      mockActivatedRoute.params = of({ id: id1 });
-      fixture.detectChanges();
-
-      setTimeout(() => {
-        expect(mockStateService.select).toHaveBeenCalledWith(id1);
-
-        mockActivatedRoute.params = of({ id: id2 });
-        component.ngOnInit();
-
-        expect(mockStateService.select).toHaveBeenCalledWith(id2);
-        });
-      tick();
-    });
-  });
-
-  describe('Data Display', () => {
-    it('should display evento information when loaded', () => {
-      const mockEvento: Evento = {
-        id: 'evt-123',
-        nombre: 'Campamento Scout 2024',
-      }
-      mockStateService.selected.set(mockEvento);
-      TestBed.flushEffects();
-
-      const evento = component.evento();
-
-      expect(evento?.nombre).toBe('Campamento Scout 2024');
-    });
-
-    it('should handle evento with optional fields', () => {
-      const mockEvento: Evento = {
-        id: 'evt-123',
-        nombre: 'Evento',
-      }
-      mockStateService.selected.set(mockEvento);
-      TestBed.flushEffects();
-
-      const evento = component.evento();
-
-      expect(evento?.nombre).toBe('Evento');
-    });
-  });
-
-  describe('Component Lifecycle', () => {
-    it('should initialize on component creation', fakeAsync(() => {
-      fixture.detectChanges();
-
-      setTimeout(() => {
-        expect(component.eventoId()).toBe('evt-123');
-        expect(mockStateService.select).toHaveBeenCalledWith('evt-123');
-        });
-      tick();
-    });
-
-    it('should maintain eventoId throughout component lifetime', fakeAsync(() => {
-      fixture.detectChanges();
-
-      setTimeout(() => {
-        const id1 = component.eventoId();
-        const id2 = component.eventoId();
-
-        expect(id1).toBe(id2);
-        expect(id1).toBe('evt-123');
-        });
-      tick();
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/eventos', 'evt-1', 'editar']);
     });
   });
 });
