@@ -21,6 +21,7 @@ import { from, switchMap } from 'rxjs';
 
 import { CampamentosStateService } from '../../../services';
 import { CajasApiService } from '../../../../cajas/services/cajas-api.service';
+import { PersonasApiService } from '../../../../personas/services/personas-api.service';
 import {
   LoadingSpinnerComponent,
   ConfirmDialogService,
@@ -47,6 +48,10 @@ import {
   PagoCampamentoDialogData,
   PagoCampamentoDialogResult,
 } from '../../shared/pago-campamento-dialog/pago-campamento-dialog.component';
+import {
+  GastoCampamentoDialogData,
+  GastoCampamentoDialogResult,
+} from '../../shared/gasto-campamento-dialog/gasto-campamento-dialog.component';
 import {
   PersonaSelectorDialogData,
   PersonaSelectorDialogResult,
@@ -88,6 +93,7 @@ export class CampamentoDetailComponent implements OnInit {
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly dialog = inject(MatDialog);
   private readonly cajasApi = inject(CajasApiService);
+  private readonly personasApi = inject(PersonasApiService);
   readonly state = inject(CampamentosStateService);
 
   // Consolidated detail data from state
@@ -285,8 +291,40 @@ export class CampamentoDetailComponent implements OnInit {
   }
 
   onRegistrarGasto(): void {
-    // TODO: Abrir dialog para registrar gasto
-    console.log('Registrar gasto');
+    const camp = this.campamento();
+    if (!camp) return;
+
+    this.personasApi
+      .getAll()
+      .pipe(
+        switchMap((responsables) => {
+          const dialogData: GastoCampamentoDialogData = {
+            campamentoId: camp.id,
+            responsables,
+          };
+          return this.openGastoDialog(dialogData);
+        }),
+        switchMap((dialogRef) => dialogRef.afterClosed()),
+      )
+      .subscribe((result: GastoCampamentoDialogResult | undefined) => {
+        if (!result) return;
+        this.state.registrarGasto(camp.id, result.dto).subscribe();
+      });
+  }
+
+  private openGastoDialog(dialogData: GastoCampamentoDialogData) {
+    return from(
+      import('../../shared/gasto-campamento-dialog/gasto-campamento-dialog.component').then(
+        ({ GastoCampamentoDialogComponent }) => {
+          return this.dialog.open(GastoCampamentoDialogComponent, {
+            width: '640px',
+            maxWidth: '90vw',
+            data: dialogData,
+            disableClose: false,
+          });
+        },
+      ),
+    );
   }
 
   private openPaymentDialog(dialogData: PagoCampamentoDialogData) {

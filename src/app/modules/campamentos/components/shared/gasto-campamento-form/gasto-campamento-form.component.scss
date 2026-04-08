@@ -1,29 +1,51 @@
 // =============================================================================
 // GASTO CAMPAMENTO FORM STYLES
 // =============================================================================
-// Consistent form spacing using design tokens
 
 @use '../../../../../shared/styles/tokens' as t;
-@use '../../../../../shared/components/form/form-tokens' as form;
 
 .gasto-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   padding: 16px;
 }
 
-.form-grid {
-  @include form.form-grid(2);
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 
-  .full-width {
-    @include form.form-field-full;
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
   }
 }
 
-.actions {
+.input-with-prefix {
   display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 8px;
+  align-items: center;
+  gap: 6px;
+}
+
+.input-prefix {
+  font-size: 0.9rem;
+  color: t.$stone-500;
+  font-weight: 500;
+}
+
+.reembolso-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(t.$color-warning, 0.08) 0%, rgba(t.$color-warning, 0.14) 100%);
+  border: 1px solid rgba(t.$color-warning, 0.3);
+  border-left: 3px solid t.$color-warning;
+  border-radius: t.$radius-default;
+
+  &__text {
+    font-size: 0.8125rem;
+    color: t.$stone-600;
+    line-height: 1.5;
+  }
 }

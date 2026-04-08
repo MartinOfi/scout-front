@@ -37,6 +37,7 @@ describe('GastoCampamentoFormComponent', () => {
     fixture = TestBed.createComponent(GastoCampamentoFormComponent);
     component = fixture.componentInstance;
     component.responsables = mockResponsables;
+    component.personasParaReembolsar = mockResponsables;
     fixture.detectChanges();
   });
 
@@ -45,12 +46,15 @@ describe('GastoCampamentoFormComponent', () => {
   });
 
   describe('Form Initialization', () => {
-    it('should initialize form with empty values except estadoPago', () => {
+    it('should initialize form with empty values except estadoPago and fecha', () => {
       expect(component.form.value.monto).toBe('');
       expect(component.form.value.descripcion).toBe('');
       expect(component.form.value.responsableId).toBe('');
       expect(component.form.value.medioPago).toBe('');
       expect(component.form.value.estadoPago).toBe(EstadoPago.PAGADO);
+      expect(component.form.value.personaAReembolsarId).toBe('');
+      // fecha defaults to today in YYYY-MM-DD format
+      expect(component.form.value.fecha).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     });
 
     it('should have required validators on all fields', () => {
@@ -74,35 +78,125 @@ describe('GastoCampamentoFormComponent', () => {
 
       expect(descripcion?.hasError('maxlength')).toBe(true);
     });
+
+    it('should filter mediosPago to only efectivo and transferencia', () => {
+      const values = component.mediosPago.map((m) => m.value);
+      expect(values).toContain('efectivo');
+      expect(values).toContain('transferencia');
+      expect(values).not.toContain('saldo_personal');
+    });
+  });
+
+  describe('Conditional personaAReembolsarId validator', () => {
+    it('should NOT require personaAReembolsarId when estadoPago is pagado', () => {
+      component.form.patchValue({ estadoPago: EstadoPago.PAGADO });
+      fixture.detectChanges();
+
+      const ctrl = component.form.get('personaAReembolsarId');
+      expect(ctrl?.hasError('required')).toBe(false);
+    });
+
+    it('should require personaAReembolsarId when estadoPago is pendiente_reembolso', () => {
+      component.form.patchValue({ estadoPago: EstadoPago.PENDIENTE_REEMBOLSO });
+      fixture.detectChanges();
+
+      const ctrl = component.form.get('personaAReembolsarId');
+      expect(ctrl?.hasError('required')).toBe(true);
+    });
+
+    it('should clear personaAReembolsarId value when switching back to pagado', () => {
+      component.form.patchValue({ estadoPago: EstadoPago.PENDIENTE_REEMBOLSO });
+      component.form.patchValue({ personaAReembolsarId: 'resp-1' });
+      component.form.patchValue({ estadoPago: EstadoPago.PAGADO });
+      fixture.detectChanges();
+
+      expect(component.form.get('personaAReembolsarId')?.value).toBe('');
+    });
+
+    it('isPendienteReembolso should be true when estadoPago is pendiente_reembolso', () => {
+      component.form.patchValue({ estadoPago: EstadoPago.PENDIENTE_REEMBOLSO });
+      expect(component.isPendienteReembolso).toBe(true);
+    });
+
+    it('isPendienteReembolso should be false when estadoPago is pagado', () => {
+      component.form.patchValue({ estadoPago: EstadoPago.PAGADO });
+      expect(component.isPendienteReembolso).toBe(false);
+    });
   });
 
   describe('onSubmit Method', () => {
-    it('should emit submit with valid form', () => {
-      vi.spyOn(component.submit, 'emit');
+    it('should emit formSubmit with valid form (pagado, no personaAReembolsarId)', () => {
+      vi.spyOn(component.formSubmit, 'emit');
 
       component.form.patchValue({
         monto: 500,
         descripcion: 'Compra de alimentos',
         responsableId: 'resp-1',
         medioPago: 'efectivo',
-        estadoPago: EstadoPago.PAGADO
+        estadoPago: EstadoPago.PAGADO,
+        fecha: '2026-04-08',
       });
 
       component.onSubmit();
 
-      expect(component.submit.emit).toHaveBeenCalledWith({
+      expect(component.formSubmit.emit).toHaveBeenCalledWith({
         monto: 500,
         descripcion: 'Compra de alimentos',
         responsableId: 'resp-1',
         medioPago: 'efectivo',
-        estadoPago: EstadoPago.PAGADO
+        estadoPago: EstadoPago.PAGADO,
+        fecha: '2026-04-08',
+        personaAReembolsarId: undefined
       });
     });
 
-    it('should NOT emit when form is invalid', () => {
-      vi.spyOn(component.submit, 'emit');
+    it('should emit formSubmit with personaAReembolsarId when pendiente_reembolso', () => {
+      vi.spyOn(component.formSubmit, 'emit');
+
+      component.form.patchValue({ estadoPago: EstadoPago.PENDIENTE_REEMBOLSO });
+      component.form.patchValue({
+        monto: 800,
+        descripcion: 'Alquiler predio',
+        responsableId: 'resp-1',
+        medioPago: 'transferencia',
+        fecha: '2026-04-08',
+        personaAReembolsarId: 'resp-1'
+      });
+
       component.onSubmit();
-      expect(component.submit.emit).not.toHaveBeenCalled();
+
+      expect(component.formSubmit.emit).toHaveBeenCalledWith({
+        monto: 800,
+        descripcion: 'Alquiler predio',
+        responsableId: 'resp-1',
+        medioPago: 'transferencia',
+        estadoPago: EstadoPago.PENDIENTE_REEMBOLSO,
+        fecha: '2026-04-08',
+        personaAReembolsarId: 'resp-1'
+      });
+    });
+
+    it('should NOT emit when pendiente_reembolso but no personaAReembolsarId', () => {
+      vi.spyOn(component.formSubmit, 'emit');
+
+      component.form.patchValue({ estadoPago: EstadoPago.PENDIENTE_REEMBOLSO });
+      component.form.patchValue({
+        monto: 500,
+        descripcion: 'Test',
+        responsableId: 'resp-1',
+        medioPago: 'efectivo',
+        fecha: '2026-04-08',
+        // personaAReembolsarId intentionally empty
+      });
+
+      component.onSubmit();
+      expect(component.formSubmit.emit).not.toHaveBeenCalled();
+    });
+
+    it('should NOT emit when form is invalid', () => {
+      vi.spyOn(component.formSubmit, 'emit');
+      component.onSubmit();
+      expect(component.formSubmit.emit).not.toHaveBeenCalled();
     });
 
     it('should mark all fields as touched when invalid', () => {
@@ -115,19 +209,20 @@ describe('GastoCampamentoFormComponent', () => {
     });
 
     it('should convert monto to number', () => {
-      vi.spyOn(component.submit, 'emit');
+      vi.spyOn(component.formSubmit, 'emit');
 
       component.form.patchValue({
         monto: '500.50',
         descripcion: 'Test',
         responsableId: 'resp-1',
         medioPago: 'efectivo',
-        estadoPago: EstadoPago.PAGADO
+        estadoPago: EstadoPago.PAGADO,
+        fecha: '2026-04-08',
       });
 
       component.onSubmit();
 
-      const emittedData = (component.submit.emit as jasmine.Spy).calls.mostRecent().args[0];
+      const emittedData = (component.formSubmit.emit as ReturnType<typeof vi.spyOn>).mock.calls[0][0];
       expect(typeof emittedData.monto).toBe('number');
       expect(emittedData.monto).toBe(500.50);
     });
@@ -144,7 +239,7 @@ describe('GastoCampamentoFormComponent', () => {
   describe('Template Rendering', () => {
     it('should display all form fields', () => {
       const inputs = fixture.nativeElement.querySelectorAll('input');
-      const selects = fixture.nativeElement.querySelectorAll('mat-select');
+      const selects = fixture.nativeElement.querySelectorAll('select');
       const textareas = fixture.nativeElement.querySelectorAll('textarea');
 
       expect(inputs.length).toBeGreaterThan(0);
@@ -152,9 +247,20 @@ describe('GastoCampamentoFormComponent', () => {
       expect(textareas.length).toBeGreaterThan(0);
     });
 
-    it('should display responsables in select', () => {
-      const nativeElement = fixture.nativeElement;
-      expect(nativeElement.textContent).toContain('Juan Pérez');
+    it('should show personaAReembolsarId field when estadoPago is pendiente_reembolso', () => {
+      component.form.patchValue({ estadoPago: EstadoPago.PENDIENTE_REEMBOLSO });
+      fixture.detectChanges();
+
+      const el = fixture.nativeElement.querySelector('#persona-reembolsar-select');
+      expect(el).toBeTruthy();
+    });
+
+    it('should hide personaAReembolsarId field when estadoPago is pagado', () => {
+      component.form.patchValue({ estadoPago: EstadoPago.PAGADO });
+      fixture.detectChanges();
+
+      const el = fixture.nativeElement.querySelector('#persona-reembolsar-select');
+      expect(el).toBeFalsy();
     });
   });
 
@@ -167,19 +273,20 @@ describe('GastoCampamentoFormComponent', () => {
     });
 
     it('should handle decimal monto values', () => {
-      vi.spyOn(component.submit, 'emit');
+      vi.spyOn(component.formSubmit, 'emit');
 
       component.form.patchValue({
         monto: 123.45,
         descripcion: 'Test',
         responsableId: 'resp-1',
         medioPago: 'efectivo',
-        estadoPago: EstadoPago.PAGADO
+        estadoPago: EstadoPago.PAGADO,
+        fecha: '2026-04-08',
       });
 
       component.onSubmit();
 
-      expect(component.submit.emit).toHaveBeenCalled();
+      expect(component.formSubmit.emit).toHaveBeenCalled();
     });
   });
 });

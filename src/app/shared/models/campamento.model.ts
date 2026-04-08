@@ -142,6 +142,7 @@ export interface RegistrarGastoCampamentoDto {
   responsableId: string;
   medioPago: MedioPago;
   estadoPago: EstadoPago;
+  fecha: string;
   personaAReembolsarId?: string;
 }
 

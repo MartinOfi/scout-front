@@ -196,6 +196,7 @@ export class CampamentosFormBuilder {
       responsableId: form.value.responsableId as string,
       medioPago: form.value.medioPago as MedioPago,
       estadoPago: form.value.estadoPago as EstadoPago,
+      fecha: form.value.fecha as string,
     };
   }
 }

@@ -1,0 +1,27 @@
+// =============================================================================
+// GASTO CAMPAMENTO DIALOG
+// =============================================================================
+
+@use '../../../../../shared/styles/tokens' as t;
+@use '../../../../../shared/styles/dialog' as dialog;
+
+:host {
+  display: block;
+}
+
+:host ::ng-deep {
+  @include dialog.dialog-container-override;
+}
+
+.dialog-container {
+  padding: 1rem;
+}
+
+.dialog-title {
+  @include dialog.dialog-title;
+}
+
+.dialog-content {
+  @include dialog.dialog-content(480px, 640px);
+  padding: 0 !important;
+}

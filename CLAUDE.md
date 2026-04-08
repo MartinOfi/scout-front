@@ -21,6 +21,40 @@ It uses modern Angular patterns (standalone components, functional routing guard
 | Testing | `src/**/*.spec.ts` | Jasmine + Karma |
 | Build | `angular.json` | Angular CLI 21 |
 
+## MANDATORY: Shared Directory Check Before Any Implementation
+
+> **CRITICAL — Non-negotiable. This rule applies BEFORE writing any new code.**
+
+Before creating ANY new component, service, model, enum, pipe, form, validator, constant, style, config, or utility, you MUST inspect the shared directory to check what already exists:
+
+```
+src/app/shared/
+├── components/    ← Check for reusable UI components
+├── config/        ← Check for app-wide configuration
+├── constants/     ← Check for existing constants
+├── enums/         ← Check for existing enums
+├── forms/         ← Check for reusable form groups/controls
+├── models/        ← Check for existing interfaces and types
+├── pipes/         ← Check for existing pipes
+├── services/      ← Check for existing shared services
+├── styles/        ← Check for existing style utilities
+├── testing/       ← Check for existing test helpers/mocks
+├── utils/         ← Check for existing utility functions
+└── validators/    ← Check for existing custom validators
+```
+
+### Enforcement Checklist (run BEFORE implementation)
+
+- [ ] Run `Glob` on `src/app/shared/**/*` to list all existing shared artifacts
+- [ ] Search with `Grep` for the concept you need (e.g., enum name, interface name, validator logic)
+- [ ] If a match exists → **reuse or extend it**, never duplicate
+- [ ] If no match exists → create in `shared/` if the artifact is reusable across 2+ modules, otherwise in the feature module
+- [ ] **Never create a local copy of something already in `shared/`**
+
+Violating this rule introduces code duplication and diverging implementations. There are no exceptions.
+
+---
+
 ## Tech Stack
 
 - **Language:** TypeScript 5.9 (strict mode, ES2022 target)

@@ -1,8 +1,9 @@
-<form [formGroup]="form" class="gasto-form">
-  <div class="form-grid">
-    <!-- Monto -->
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="gasto-form">
+
+  <!-- Monto + Fecha -->
+  <div class="form-row">
     <app-form-field
-      label="Monto del Gasto"
+      label="Monto"
       [forId]="'monto-input'"
       [required]="true"
       [invalid]="!!(form.get('monto')?.invalid && form.get('monto')?.touched)"
@@ -24,46 +25,58 @@
       }
     </app-form-field>
 
-    <!-- Responsable -->
     <app-form-field
-      label="Responsable"
-      [forId]="'responsable-select'"
+      label="Fecha"
+      [forId]="'fecha-input'"
       [required]="true"
-      [invalid]="!!(form.get('responsableId')?.invalid && form.get('responsableId')?.touched)"
+      [invalid]="!!(form.get('fecha')?.invalid && form.get('fecha')?.touched)"
     >
-      <app-select-field
-        id="responsable-select"
-        formControlName="responsableId"
-        placeholder="Seleccionar responsable"
-        [options]="responsables"
-        [optionValueFn]="getResponsableId"
-        [optionLabelFn]="getResponsableLabel"
-      />
-      <span error>Seleccione un responsable</span>
+      <app-date-field id="fecha-input" formControlName="fecha" />
+      <span error>La fecha es requerida</span>
     </app-form-field>
+  </div>
 
-    <!-- Descripción -->
-    <app-form-field
-      label="Descripción del Gasto"
-      [forId]="'descripcion-input'"
-      [required]="true"
-      [invalid]="!!(form.get('descripcion')?.invalid && form.get('descripcion')?.touched)"
-      class="full-width"
-    >
-      <app-textarea-field
-        id="descripcion-input"
-        formControlName="descripcion"
-        [rows]="3"
-        placeholder="Ej: Compra de alimentos, transporte, etc."
-      />
-      @if (form.get('descripcion')?.hasError('required')) {
-        <span error>La descripción es requerida</span>
-      } @else if (form.get('descripcion')?.hasError('maxlength')) {
-        <span error>Máximo 500 caracteres</span>
-      }
-    </app-form-field>
+  <!-- Responsable -->
+  <app-form-field
+    label="Responsable"
+    [forId]="'responsable-select'"
+    [required]="true"
+    [invalid]="!!(form.get('responsableId')?.invalid && form.get('responsableId')?.touched)"
+  >
+    <app-select-field
+      id="responsable-select"
+      formControlName="responsableId"
+      placeholder="Seleccionar responsable"
+      [options]="responsables"
+      optionValue="id"
+      optionLabel="nombre"
+      [searchable]="true"
+    />
+    <span error>Seleccione un responsable</span>
+  </app-form-field>
 
-    <!-- Medio de Pago -->
+  <!-- Descripción -->
+  <app-form-field
+    label="Descripción"
+    [forId]="'descripcion-input'"
+    [required]="true"
+    [invalid]="!!(form.get('descripcion')?.invalid && form.get('descripcion')?.touched)"
+  >
+    <app-textarea-field
+      id="descripcion-input"
+      formControlName="descripcion"
+      [rows]="2"
+      placeholder="Ej: Compra de alimentos, transporte, etc."
+    />
+    @if (form.get('descripcion')?.hasError('required')) {
+      <span error>La descripción es requerida</span>
+    } @else if (form.get('descripcion')?.hasError('maxlength')) {
+      <span error>Máximo 500 caracteres</span>
+    }
+  </app-form-field>
+
+  <!-- Medio de Pago + Estado de Pago -->
+  <div class="form-row">
     <app-form-field
       label="Medio de Pago"
       [forId]="'medio-pago-select'"
@@ -75,11 +88,12 @@
         formControlName="medioPago"
         placeholder="Seleccionar medio"
         [options]="mediosPago"
+        optionValue="value"
+        optionLabel="label"
       />
       <span error>Seleccione un medio de pago</span>
     </app-form-field>
 
-    <!-- Estado de Pago -->
     <app-form-field
       label="Estado de Pago"
       [forId]="'estado-pago-select'"
@@ -91,19 +105,55 @@
         formControlName="estadoPago"
         placeholder="Seleccionar estado"
         [options]="estadosPago"
+        optionValue="value"
+        optionLabel="label"
       />
       <span error>Seleccione un estado</span>
     </app-form-field>
   </div>
 
-  <div class="scout-form-actions">
-    <div class="scout-form-actions__row scout-form-actions__row--between">
-      <button type="button" class="btn-secondary" (click)="onCancel()">
-        Cancelar
-      </button>
-      <button type="submit" class="btn-primary" (click)="onSubmit()">
-        Registrar Gasto
-      </button>
+  <!-- Persona a Reembolsar (solo cuando estadoPago = pendiente_reembolso) -->
+  @if (isPendienteReembolso) {
+    <div class="reembolso-banner">
+      <span class="reembolso-banner__text">
+        Este gasto no descuenta del saldo de la caja. Se registra como pendiente de reembolso para la persona seleccionada.
+      </span>
     </div>
-  </div>
+
+    <app-form-field
+      label="Persona a Reembolsar"
+      [forId]="'persona-reembolsar-select'"
+      [required]="true"
+      [invalid]="!!(form.get('personaAReembolsarId')?.invalid && form.get('personaAReembolsarId')?.touched)"
+    >
+      <app-select-field
+        id="persona-reembolsar-select"
+        formControlName="personaAReembolsarId"
+        placeholder="Seleccionar persona que adelantó el dinero"
+        [options]="personasParaReembolsar"
+        optionValue="id"
+        optionLabel="nombre"
+        [searchable]="true"
+      />
+      <span error>Seleccione la persona que adelantó el dinero</span>
+    </app-form-field>
+  }
+
+  <!-- Actions -->
+  <app-form-actions [borderTop]="true" align="end">
+    <app-button
+      variant="secondary"
+      type="button"
+      (clicked)="onCancel()"
+    >
+      Cancelar
+    </app-button>
+    <app-button
+      variant="primary"
+      type="submit"
+    >
+      Registrar Gasto
+    </app-button>
+  </app-form-actions>
+
 </form>
