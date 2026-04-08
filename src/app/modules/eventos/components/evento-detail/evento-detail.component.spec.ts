@@ -12,7 +12,13 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { EventoDetailComponent } from './evento-detail.component';
 import { EventosStateService } from '../../services/eventos-state.service';
 import { TipoEvento } from '../../../../shared/enums';
-import { Evento, EventoKpis, Producto, VentaProducto, ResumenVentas } from '../../../../shared/models';
+import {
+  Evento,
+  EventoKpis,
+  Producto,
+  VentaProducto,
+  ResumenVentas,
+} from '../../../../shared/models';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -36,7 +42,8 @@ function makeEvento(overrides: Partial<Evento> = {}): Evento {
 
 function makeKpis(overrides: Partial<EventoKpis> = {}): EventoKpis {
   return {
-    totalIngresos: 5000,
+    totalRecaudado: 5000,
+    gananciaVentas: 2000,
     totalGastado: 1000,
     totalPendienteReembolso: 500,
     balance: 4000,
@@ -162,7 +169,17 @@ describe('EventoDetailComponent', () => {
     });
 
     it('should derive eventProductos from state.productos', () => {
-      const prods: Producto[] = [{ id: 'p-1', eventoId: 'evt-1', nombre: 'Empanada', precioVenta: 200, precioCosto: 100, createdAt: '', updatedAt: '' }];
+      const prods: Producto[] = [
+        {
+          id: 'p-1',
+          eventoId: 'evt-1',
+          nombre: 'Empanada',
+          precioVenta: 200,
+          precioCosto: 100,
+          createdAt: '',
+          updatedAt: '',
+        },
+      ];
       mockState.productos.set({ 'evt-1': prods });
       expect(component.eventoProductos()).toEqual(prods);
     });
@@ -197,7 +214,7 @@ describe('EventoDetailComponent', () => {
 
     it('should expose ventas tab for VENTA evento type', () => {
       mockState.selected.set(makeEvento({ tipo: TipoEvento.VENTA }));
-      const keys = component.tabs.map(t => t.key);
+      const keys = component.tabs.map((t) => t.key);
       expect(keys).toContain('ventas');
       expect(keys).toContain('productos');
     });
@@ -206,17 +223,22 @@ describe('EventoDetailComponent', () => {
   // ─── KPI configs ─────────────────────────────────────────────────────────
 
   describe('KPI configs', () => {
-    it('should expose 4 kpiConfigs', () => {
-      expect(component.kpiConfigs.length).toBe(4);
+    it('should expose 5 kpiConfigs', () => {
+      expect(component.kpiConfigs.length).toBe(5);
     });
 
-    it('should include totalIngresos config', () => {
-      const keys = component.kpiConfigs.map(k => k.key);
-      expect(keys).toContain('totalIngresos');
+    it('should include totalRecaudado config', () => {
+      const keys = component.kpiConfigs.map((k) => k.key);
+      expect(keys).toContain('totalRecaudado');
+    });
+
+    it('should include gananciaVentas config', () => {
+      const keys = component.kpiConfigs.map((k) => k.key);
+      expect(keys).toContain('gananciaVentas');
     });
 
     it('should include balance config', () => {
-      const keys = component.kpiConfigs.map(k => k.key);
+      const keys = component.kpiConfigs.map((k) => k.key);
       expect(keys).toContain('balance');
     });
   });

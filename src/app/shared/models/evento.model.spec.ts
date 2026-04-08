@@ -9,7 +9,6 @@ import {
   ResumenVendedor,
   RegisterVentasLoteDto,
   VentaItemDto,
-  CerrarEventoVentaDto,
   RegistrarIngresoEventoDto,
   RegistrarGastoEventoDto,
   VentaProducto,
@@ -20,12 +19,14 @@ import { MedioPagoEnum, EstadoPago } from '../enums/movimiento.enum';
 describe('EventoKpis interface', () => {
   it('should compile with all required fields', () => {
     const kpis: EventoKpis = {
-      totalIngresos: 1000,
+      totalRecaudado: 1000,
+      gananciaVentas: 400,
       totalGastado: 200,
       totalPendienteReembolso: 50,
       balance: 800,
     };
-    expect(kpis.totalIngresos).toBe(1000);
+    expect(kpis.totalRecaudado).toBe(1000);
+    expect(kpis.gananciaVentas).toBe(400);
     expect(kpis.totalGastado).toBe(200);
     expect(kpis.totalPendienteReembolso).toBe(50);
     expect(kpis.balance).toBe(800);
@@ -90,15 +91,6 @@ describe('VentaItemDto', () => {
       cantidad: 5,
     };
     expect(item.cantidad).toBe(5);
-  });
-});
-
-describe('CerrarEventoVentaDto', () => {
-  it('should compile with medioPago', () => {
-    const dto: CerrarEventoVentaDto = {
-      medioPago: MedioPagoEnum.EFECTIVO,
-    };
-    expect(dto.medioPago).toBe('efectivo');
   });
 });
 

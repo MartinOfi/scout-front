@@ -2,179 +2,157 @@
   <div class="detail-content">
 
     @if (loading() && !evento()) {
-      <div class="detail-loading">
-        <app-loading-spinner />
-      </div>
+    <div class="detail-loading">
+      <app-loading-spinner />
+    </div>
     } @else if (error() && !evento()) {
-      <div class="detail-error">
-        <p>{{ error() }}</p>
-        <button class="action-btn action-btn--primary" (click)="onBack()">Volver</button>
-      </div>
+    <div class="detail-error">
+      <p>{{ error() }}</p>
+      <button class="action-btn action-btn--primary" (click)="onBack()">Volver</button>
+    </div>
     } @else if (!evento()) {
-      <div class="detail-empty">
-        <app-empty-state icon="event_busy" message="Evento no encontrado" />
-      </div>
+    <div class="detail-empty">
+      <app-empty-state icon="event_busy" message="Evento no encontrado" />
+    </div>
     } @else {
 
-      <!-- Header -->
-      <header class="detail-header">
-        <div class="detail-header__left">
-          <div class="detail-header__badge">
-            <mat-icon>{{ evento()!.tipo === tipoEvento.VENTA ? 'store' : 'groups' }}</mat-icon>
-          </div>
-          <div class="detail-header__info">
-            <h1 class="detail-header__name">{{ evento()!.nombre }}</h1>
-            <div class="detail-header__meta">
-              <span class="detail-header__dates">
-                <mat-icon>calendar_today</mat-icon>
-                {{ evento()!.fecha | date:'mediumDate':'':'es-AR' }}
-              </span>
-              @if (evento()!.tipoEvento) {
-                <span class="detail-header__dates">
-                  <mat-icon>label</mat-icon>
-                  {{ evento()!.tipoEvento }}
-                </span>
-              }
-            </div>
-          </div>
+    <!-- Header -->
+    <header class="detail-header">
+      <div class="detail-header__left">
+        <div class="detail-header__badge">
+          <mat-icon>{{ evento()!.tipo === tipoEvento.VENTA ? 'store' : 'groups' }}</mat-icon>
         </div>
-
-        <div class="detail-header__right">
-          <app-button variant="outline" size="sm" icon="arrow_back" (clicked)="onBack()">Volver</app-button>
-          @if (evento()!.tipo === tipoEvento.VENTA) {
-            <app-button variant="danger" size="sm" icon="lock" (clicked)="openCerrarDialog()">Cerrar</app-button>
-          }
-          <app-button variant="outline" size="sm" icon="edit" (clicked)="onEdit()" />
-        </div>
-      </header>
-
-      <!-- KPI Grid -->
-      <section class="kpi-section" aria-label="KPIs financieros">
-        <div class="kpi-grid">
-          @for (kpi of kpiConfigs; track kpi.key) {
-            <app-stat-card
-              [icon]="kpi.icon"
-              [title]="kpi.title"
-              [value]="eventoKpis() ? eventoKpis()![kpi.key] : 0"
-              [variant]="kpi.variant"
-              format="currency"
-            />
-          }
-        </div>
-      </section>
-
-      <!-- Tabs + Tab Content -->
-      <section class="tabs-section">
-        <div class="tabs-header">
-          <app-button-tabs
-            [tabs]="getTabsForEvento(evento()!)"
-            [activeTab]="activeTab()"
-            (tabChange)="onTabChange($event)"
-          />
-        </div>
-
-        <div class="tab-content">
-
-          <!-- PRODUCTOS tab -->
-          @if (activeTab() === 'productos') {
-            <div class="tab-toolbar">
-              <app-button icon="add" (clicked)="openProductoDialog()">Gestionar Productos</app-button>
-            </div>
-            @if (eventoProductos().length === 0) {
-              <div class="tab-empty">
-                <div class="tab-empty__icon"><mat-icon>inventory_2</mat-icon></div>
-                <p class="tab-empty__text">Sin productos</p>
-                <p class="tab-empty__hint">Agregá productos para registrar ventas.</p>
-              </div>
-            } @else {
-              <div class="productos-grid">
-                @for (prod of eventoProductos(); track prod.id) {
-                  <app-producto-card [producto]="prod" (remove)="onRemoveProducto($event)" />
-                }
-              </div>
+        <div class="detail-header__info">
+          <h1 class="detail-header__name">{{ evento()!.nombre }}</h1>
+          <div class="detail-header__meta">
+            <span class="detail-header__dates">
+              <mat-icon>calendar_today</mat-icon>
+              {{ evento()!.fecha | date:'mediumDate':'':'es-AR' }}
+            </span>
+            @if (evento()!.tipoEvento) {
+            <span class="detail-header__dates">
+              <mat-icon>label</mat-icon>
+              {{ evento()!.tipoEvento }}
+            </span>
             }
-          }
-
-          <!-- VENTAS tab -->
-          @if (activeTab() === 'ventas') {
-            <div class="tab-toolbar">
-              <app-text-field
-                type="search"
-                placeholder="Buscar por vendedor..."
-                [ngModel]="vendedorSearch()"
-                (ngModelChange)="onVendedorSearchChange($event)"
-              />
-              <app-button icon="add_shopping_cart" (clicked)="navigateToVentasLote()">Registrar Ventas en Lote</app-button>
-            </div>
-            <div class="table-container">
-              @if (vendedorSearching()) {
-                <app-loading-spinner message="Filtrando..." />
-              } @else if (ventasTableData().length === 0) {
-                <div class="tab-empty">
-                  <div class="tab-empty__icon"><mat-icon>point_of_sale</mat-icon></div>
-                  <p class="tab-empty__text">Sin ventas registradas</p>
-                  <p class="tab-empty__hint">Usá el botón de arriba para registrar ventas en lote.</p>
-                </div>
-              } @else {
-                <app-data-table
-                  [data]="ventasTableData()"
-                  [columns]="ventasColumns"
-                  [config]="{ showHeader: true, hoverable: true }"
-                />
-              }
-            </div>
-          }
-
-          <!-- MOVIMIENTOS tab -->
-          @if (activeTab() === 'movimientos') {
-            <div class="tab-toolbar">
-              @if (evento()!.tipo === tipoEvento.GRUPO) {
-                <app-button variant="success" icon="add_circle" (clicked)="openIngresoDialog()">Registrar Ingreso</app-button>
-              }
-              <app-button icon="remove_circle" (clicked)="openGastoDialog()">Registrar Gasto</app-button>
-            </div>
-
-            @if (eventoMovimientos().length === 0) {
-              <div class="tab-empty">
-                <div class="tab-empty__icon"><mat-icon>swap_horiz</mat-icon></div>
-                <p class="tab-empty__text">Sin movimientos registrados</p>
-                <p class="tab-empty__hint">Usá los botones de arriba para registrar ingresos y gastos.</p>
-              </div>
-            } @else {
-              <div class="movimientos-list">
-                @for (mov of eventoMovimientos(); track mov.id) {
-                  <article
-                    class="movimiento-row"
-                    [class.movimiento-row--ingreso]="mov.tipo === 'ingreso'"
-                    [class.movimiento-row--egreso]="mov.tipo === 'egreso'">
-
-                    <div class="movimiento-row__icon">
-                      <mat-icon>{{ mov.tipo === 'ingreso' ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
-                    </div>
-
-                    <div class="movimiento-row__info">
-                      <span class="movimiento-row__date">{{ mov.fecha | date:'d MMM yyyy' }}</span>
-                      <span class="movimiento-row__description">{{ mov.descripcion ?? 'Sin descripción' }}</span>
-                      @if (mov.responsable) {
-                        <span class="movimiento-row__responsable">{{ mov.responsable.nombre }} {{ mov.responsable.apellido }}</span>
-                      }
-                    </div>
-
-                    <div
-                      class="movimiento-row__amount"
-                      [class.movimiento-row__amount--positive]="mov.tipo === 'ingreso'"
-                      [class.movimiento-row__amount--negative]="mov.tipo === 'egreso'">
-                      {{ (mov.tipo === 'ingreso' ? '+' : '-') + (mov.monto | currency:'ARS':'symbol':'1.0-0') }}
-                    </div>
-
-                  </article>
-                }
-              </div>
-            }
-          }
-
+          </div>
         </div>
-      </section>
+      </div>
+
+      <div class="detail-header__right">
+        <app-button variant="outline" size="sm" icon="arrow_back" (clicked)="onBack()">Volver</app-button>
+        <app-button variant="outline" size="sm" icon="edit" (clicked)="onEdit()" />
+      </div>
+    </header>
+
+    <!-- KPI Grid -->
+    <section class="kpi-section" aria-label="KPIs financieros">
+      <div class="kpi-grid">
+        @for (kpi of kpiConfigs; track kpi.key) {
+        <app-stat-card [icon]="kpi.icon" [title]="kpi.title" [value]="eventoKpis() ? eventoKpis()![kpi.key] : 0"
+          [variant]="kpi.variant" format="currency" />
+        }
+      </div>
+    </section>
+
+    <!-- Tabs + Tab Content -->
+    <section class="tabs-section">
+      <div class="tabs-header">
+        <app-button-tabs [tabs]="getTabsForEvento(evento()!)" [activeTab]="activeTab()"
+          (tabChange)="onTabChange($event)" />
+      </div>
+
+      <div class="tab-content">
+
+        <!-- PRODUCTOS tab -->
+        @if (activeTab() === 'productos') {
+        <div class="tab-toolbar">
+          <app-button icon="add" (clicked)="openProductoDialog()">Gestionar Productos</app-button>
+        </div>
+        @if (eventoProductos().length === 0) {
+        <div class="tab-empty">
+          <div class="tab-empty__icon"><mat-icon>inventory_2</mat-icon></div>
+          <p class="tab-empty__text">Sin productos</p>
+          <p class="tab-empty__hint">Agregá productos para registrar ventas.</p>
+        </div>
+        } @else {
+        <div class="productos-grid">
+          @for (prod of eventoProductos(); track prod.id) {
+          <app-producto-card [producto]="prod" (remove)="onRemoveProducto($event)" />
+          }
+        </div>
+        }
+        }
+
+        <!-- VENTAS tab -->
+        @if (activeTab() === 'ventas') {
+        <div class="tab-toolbar">
+          <app-text-field type="search" placeholder="Buscar por vendedor..." [ngModel]="vendedorSearch()"
+            (ngModelChange)="onVendedorSearchChange($event)" />
+          <app-button icon="add_shopping_cart" (clicked)="navigateToVentasLote()">Registrar Ventas en Lote</app-button>
+        </div>
+        <div class="table-container">
+          @if (vendedorSearching()) {
+          <app-loading-spinner message="Filtrando..." />
+          } @else if (ventasTableData().length === 0) {
+          <div class="tab-empty">
+            <div class="tab-empty__icon"><mat-icon>point_of_sale</mat-icon></div>
+            <p class="tab-empty__text">Sin ventas registradas</p>
+            <p class="tab-empty__hint">Usá el botón de arriba para registrar ventas en lote.</p>
+          </div>
+          } @else {
+          <app-data-table [data]="ventasTableData()" [columns]="ventasColumns"
+            [config]="{ showHeader: true, hoverable: true }" />
+          }
+        </div>
+        }
+
+        <!-- MOVIMIENTOS tab -->
+        @if (activeTab() === 'movimientos') {
+        <div class="tab-toolbar">
+          @if (evento()!.tipo === tipoEvento.GRUPO) {
+          <app-button variant="success" icon="add_circle" (clicked)="openIngresoDialog()">Registrar Ingreso</app-button>
+          }
+          <app-button icon="remove_circle" (clicked)="openGastoDialog()">Registrar Gasto</app-button>
+        </div>
+
+        @if (eventoMovimientos().length === 0) {
+        <div class="tab-empty">
+          <div class="tab-empty__icon"><mat-icon>swap_horiz</mat-icon></div>
+          <p class="tab-empty__text">Sin movimientos registrados</p>
+          <p class="tab-empty__hint">Usá los botones de arriba para registrar ingresos y gastos.</p>
+        </div>
+        } @else {
+        <div class="movimientos-list">
+          @for (mov of eventoMovimientos(); track mov.id) {
+          <article class="movimiento-row" [class.movimiento-row--ingreso]="mov.tipo === 'ingreso'"
+            [class.movimiento-row--egreso]="mov.tipo === 'egreso'">
+
+            <div class="movimiento-row__icon">
+              <mat-icon>{{ mov.tipo === 'ingreso' ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+            </div>
+
+            <div class="movimiento-row__info">
+              <span class="movimiento-row__date">{{ mov.fecha | date:'d MMM yyyy' }}</span>
+              <span class="movimiento-row__description">{{ mov.descripcion ?? 'Sin descripción' }}</span>
+              @if (mov.responsable) {
+              <span class="movimiento-row__responsable">{{ mov.responsable.nombre }}</span>
+              }
+            </div>
+
+            <div class="movimiento-row__amount" [class.movimiento-row__amount--positive]="mov.tipo === 'ingreso'"
+              [class.movimiento-row__amount--negative]="mov.tipo === 'egreso'">
+              {{ (mov.tipo === 'ingreso' ? '+' : '-') + (mov.monto | currency:'ARS':'symbol':'1.0-0') }}
+            </div>
+
+          </article>
+          }
+        </div>
+        }
+        }
+
+      </div>
+    </section>
 
     }
 

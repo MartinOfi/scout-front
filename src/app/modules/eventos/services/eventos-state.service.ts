@@ -21,7 +21,6 @@ import {
   UpdateProductoDto,
   CreateVentaProductoDto,
   RegisterVentasLoteDto,
-  CerrarEventoVentaDto,
   RegistrarIngresoEventoDto,
   RegistrarGastoEventoDto,
 } from '../../../shared/models';
@@ -341,26 +340,6 @@ export class EventosStateService {
         this.loadKpis(eventoId);
       }),
       catchError((err: unknown) => this._catchError(err, 'Error al registrar gasto')),
-      finalize(() => this._loading.set(false)),
-    );
-  }
-
-  // ============================================================================
-  // Cerrar Evento
-  // ============================================================================
-
-  cerrarEvento(
-    eventoId: string,
-    dto: CerrarEventoVentaDto,
-  ): Observable<{ message: string; movimientos: Movimiento[] }> {
-    this._loading.set(true);
-
-    return this.apiService.cerrar(eventoId, dto).pipe(
-      tap(() => {
-        this.notificationService.showSuccess('Evento cerrado exitosamente');
-        this.loadKpis(eventoId);
-      }),
-      catchError((err: unknown) => this._catchError(err, 'Error al cerrar evento')),
       finalize(() => this._loading.set(false)),
     );
   }

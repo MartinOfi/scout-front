@@ -53,7 +53,7 @@ interface KpiConfig {
   readonly title: string;
   readonly key: keyof Pick<
     EventoKpis,
-    'totalIngresos' | 'totalGastado' | 'totalPendienteReembolso' | 'balance'
+    'totalRecaudado' | 'gananciaVentas' | 'totalGastado' | 'totalPendienteReembolso' | 'balance'
   >;
   readonly variant: StatCardVariant;
 }
@@ -135,7 +135,8 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   readonly tabs: TabConfig[] = TABS_VENTA;
 
   readonly kpiConfigs: readonly KpiConfig[] = [
-    { icon: 'payments', title: 'Ingresos', key: 'totalIngresos', variant: 'info' },
+    { icon: 'payments', title: 'Recaudado', key: 'totalRecaudado', variant: 'info' },
+    { icon: 'trending_up', title: 'Ganancia Ventas', key: 'gananciaVentas', variant: 'success' },
     { icon: 'shopping_cart', title: 'Gastado', key: 'totalGastado', variant: 'warning' },
     {
       icon: 'undo',
@@ -272,31 +273,6 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
             maxWidth: '95vw',
             data: { eventoId: this.eventoId, responsables: this.personas() },
             disableClose: false,
-          });
-        },
-      ),
-    ).subscribe();
-  }
-
-  openCerrarDialog(): void {
-    from(
-      import('../shared/cerrar-evento-dialog/cerrar-evento-dialog.component').then(
-        ({ CerrarEventoDialogComponent }) => {
-          const ref = this.dialog.open(CerrarEventoDialogComponent, {
-            width: '480px',
-            maxWidth: '95vw',
-            data: {
-              eventoId: this.eventoId,
-              nombreEvento: this.evento()?.nombre ?? '',
-              kpis: this.eventoKpis(),
-            },
-          });
-          ref.afterClosed().subscribe((result) => {
-            if (result?.dto) {
-              this.state.cerrarEvento(this.eventoId, result.dto).subscribe({
-                next: () => this.router.navigate(['/eventos']),
-              });
-            }
           });
         },
       ),

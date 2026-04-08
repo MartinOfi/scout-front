@@ -12,7 +12,6 @@ import {
   UpdateProductoDto,
   CreateVentaProductoDto,
   RegisterVentasLoteDto,
-  CerrarEventoVentaDto,
   RegistrarIngresoEventoDto,
   RegistrarGastoEventoDto,
 } from '../../../shared/models';
@@ -151,20 +150,6 @@ export class EventosApiService {
   registrarGasto(eventoId: string, dto: RegistrarGastoEventoDto): Observable<Movimiento> {
     return this.http.post<Movimiento, RegistrarGastoEventoDto>(
       `${this.endpoint}/${eventoId}/gastos`,
-      dto,
-    );
-  }
-
-  // ============================================================================
-  // CIERRE DE EVENTO
-  // ============================================================================
-
-  cerrar(
-    eventoId: string,
-    dto: CerrarEventoVentaDto,
-  ): Observable<{ message: string; movimientos: Movimiento[] }> {
-    return this.http.post<{ message: string; movimientos: Movimiento[] }, CerrarEventoVentaDto>(
-      `${this.endpoint}/${eventoId}/cerrar`,
       dto,
     );
   }

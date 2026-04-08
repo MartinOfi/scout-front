@@ -15,7 +15,7 @@ describe('ResumenFinancieroComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ResumenFinancieroComponent]
+      imports: [ResumenFinancieroComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ResumenFinancieroComponent);
@@ -30,31 +30,31 @@ describe('ResumenFinancieroComponent', () => {
   describe('Computed Properties', () => {
     describe('resultadoNeto', () => {
       it('should calculate positive resultado neto correctly', () => {
-        component.totalIngresos = 1000;
+        component.totalRecaudado = 1000;
         component.totalEgresos = 400;
         expect(component.resultadoNeto).toBe(600);
       });
 
       it('should calculate negative resultado neto correctly', () => {
-        component.totalIngresos = 500;
+        component.totalRecaudado = 500;
         component.totalEgresos = 800;
         expect(component.resultadoNeto).toBe(-300);
       });
 
       it('should calculate zero resultado neto correctly', () => {
-        component.totalIngresos = 500;
+        component.totalRecaudado = 500;
         component.totalEgresos = 500;
         expect(component.resultadoNeto).toBe(0);
       });
 
       it('should handle zero ingresos', () => {
-        component.totalIngresos = 0;
+        component.totalRecaudado = 0;
         component.totalEgresos = 100;
         expect(component.resultadoNeto).toBe(-100);
       });
 
       it('should handle zero egresos', () => {
-        component.totalIngresos = 100;
+        component.totalRecaudado = 100;
         component.totalEgresos = 0;
         expect(component.resultadoNeto).toBe(100);
       });
@@ -62,19 +62,19 @@ describe('ResumenFinancieroComponent', () => {
 
     describe('esPositivo', () => {
       it('should return true when resultado is positive', () => {
-        component.totalIngresos = 1000;
+        component.totalRecaudado = 1000;
         component.totalEgresos = 400;
         expect(component.esPositivo).toBe(true);
       });
 
       it('should return false when resultado is negative', () => {
-        component.totalIngresos = 400;
+        component.totalRecaudado = 400;
         component.totalEgresos = 1000;
         expect(component.esPositivo).toBe(false);
       });
 
       it('should return true when resultado is zero (break-even)', () => {
-        component.totalIngresos = 500;
+        component.totalRecaudado = 500;
         component.totalEgresos = 500;
         expect(component.esPositivo).toBe(true);
       });
@@ -83,7 +83,7 @@ describe('ResumenFinancieroComponent', () => {
 
   describe('Template Rendering', () => {
     it('should display total ingresos correctly', () => {
-      component.totalIngresos = 1234.56;
+      component.totalRecaudado = 1234.56;
       component.totalEgresos = 0;
       fixture.detectChanges();
 
@@ -92,7 +92,7 @@ describe('ResumenFinancieroComponent', () => {
     });
 
     it('should display total egresos correctly', () => {
-      component.totalIngresos = 0;
+      component.totalRecaudado = 0;
       component.totalEgresos = 987.65;
       fixture.detectChanges();
 
@@ -101,7 +101,7 @@ describe('ResumenFinancieroComponent', () => {
     });
 
     it('should display resultado neto correctly', () => {
-      component.totalIngresos = 1000;
+      component.totalRecaudado = 1000;
       component.totalEgresos = 400;
       fixture.detectChanges();
 
@@ -110,7 +110,7 @@ describe('ResumenFinancieroComponent', () => {
     });
 
     it('should display correct icons', () => {
-      component.totalIngresos = 1000;
+      component.totalRecaudado = 1000;
       component.totalEgresos = 400;
       fixture.detectChanges();
 
@@ -121,7 +121,7 @@ describe('ResumenFinancieroComponent', () => {
     });
 
     it('should show error icon when resultado is negative', () => {
-      component.totalIngresos = 400;
+      component.totalRecaudado = 400;
       component.totalEgresos = 1000;
       fixture.detectChanges();
 
@@ -132,7 +132,7 @@ describe('ResumenFinancieroComponent', () => {
 
   describe('CSS Classes', () => {
     it('should apply "positivo" class when resultado is positive', () => {
-      component.totalIngresos = 1000;
+      component.totalRecaudado = 1000;
       component.totalEgresos = 400;
       fixture.detectChanges();
 
@@ -142,7 +142,7 @@ describe('ResumenFinancieroComponent', () => {
     });
 
     it('should apply "negativo" class when resultado is negative', () => {
-      component.totalIngresos = 400;
+      component.totalRecaudado = 400;
       component.totalEgresos = 1000;
       fixture.detectChanges();
 
@@ -152,7 +152,7 @@ describe('ResumenFinancieroComponent', () => {
     });
 
     it('should apply "positivo" class when resultado is zero', () => {
-      component.totalIngresos = 500;
+      component.totalRecaudado = 500;
       component.totalEgresos = 500;
       fixture.detectChanges();
 
@@ -163,7 +163,7 @@ describe('ResumenFinancieroComponent', () => {
 
   describe('Mat-Icon Colors', () => {
     it('should apply "primary" color to ingresos icon', () => {
-      component.totalIngresos = 1000;
+      component.totalRecaudado = 1000;
       component.totalEgresos = 0;
       fixture.detectChanges();
 
@@ -172,7 +172,7 @@ describe('ResumenFinancieroComponent', () => {
     });
 
     it('should apply "warn" color to egresos icon', () => {
-      component.totalIngresos = 0;
+      component.totalRecaudado = 0;
       component.totalEgresos = 1000;
       fixture.detectChanges();
 
@@ -181,7 +181,7 @@ describe('ResumenFinancieroComponent', () => {
     });
 
     it('should apply "primary" color to resultado icon when positive', () => {
-      component.totalIngresos = 1000;
+      component.totalRecaudado = 1000;
       component.totalEgresos = 400;
       fixture.detectChanges();
 
@@ -190,7 +190,7 @@ describe('ResumenFinancieroComponent', () => {
     });
 
     it('should apply "warn" color to resultado icon when negative', () => {
-      component.totalIngresos = 400;
+      component.totalRecaudado = 400;
       component.totalEgresos = 1000;
       fixture.detectChanges();
 

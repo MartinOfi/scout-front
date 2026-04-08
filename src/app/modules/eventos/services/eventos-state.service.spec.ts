@@ -22,13 +22,9 @@ const apiServiceSpy = jasmine.createSpyObj('EventosApiService', [
   'registrarVentasLote',
   'registrarIngreso',
   'registrarGasto',
-  'cerrar',
 ]);
 
-const notificationSpy = jasmine.createSpyObj('NotificationService', [
-  'showSuccess',
-  'showError',
-]);
+const notificationSpy = jasmine.createSpyObj('NotificationService', ['showSuccess', 'showError']);
 
 describe('EventosStateService', () => {
   let service: EventosStateService;
@@ -58,7 +54,8 @@ describe('EventosStateService', () => {
   describe('loadKpis', () => {
     it('should call getKpis and update _kpis signal', () => {
       const kpis = {
-        totalIngresos: 1000,
+        totalRecaudado: 1000,
+        gananciaVentas: 400,
         totalGastado: 200,
         totalPendienteReembolso: 50,
         balance: 800,
@@ -86,7 +83,17 @@ describe('EventosStateService', () => {
 
   describe('registrarVentasLote', () => {
     it('should call registrarVentasLote on apiService', () => {
-      const ventas = [{ id: 'v1', eventoId: 'e1', productoId: 'p1', vendedorId: 'ven1', cantidad: 3, createdAt: '', updatedAt: '' }];
+      const ventas = [
+        {
+          id: 'v1',
+          eventoId: 'e1',
+          productoId: 'p1',
+          vendedorId: 'ven1',
+          cantidad: 3,
+          createdAt: '',
+          updatedAt: '',
+        },
+      ];
       apiServiceSpy.registrarVentasLote.and.returnValue(of(ventas));
       const dto = { vendedorId: 'ven1', items: [{ productoId: 'p1', cantidad: 3 }] };
       service.registrarVentasLote('e1', dto).subscribe();
@@ -129,19 +136,17 @@ describe('EventosStateService', () => {
     });
   });
 
-  describe('cerrarEvento', () => {
-    it('should call cerrar and show success notification', () => {
-      apiServiceSpy.cerrar.and.returnValue(of({ message: 'ok', movimientos: [] }));
-      const dto = { medioPago: MedioPagoEnum.EFECTIVO };
-      service.cerrarEvento('e1', dto).subscribe();
-      expect(apiServiceSpy.cerrar).toHaveBeenCalledWith('e1', dto);
-      expect(notificationSpy.showSuccess).toHaveBeenCalled();
-    });
-  });
-
   describe('updateProducto', () => {
     it('should call updateProducto and update local state', () => {
-      const updated = { id: 'p1', eventoId: 'e1', nombre: 'Updated', precioVenta: 200, precioCosto: 100, createdAt: '', updatedAt: '' };
+      const updated = {
+        id: 'p1',
+        eventoId: 'e1',
+        nombre: 'Updated',
+        precioVenta: 200,
+        precioCosto: 100,
+        createdAt: '',
+        updatedAt: '',
+      };
       apiServiceSpy.updateProducto.and.returnValue(of(updated));
       service.updateProducto('e1', 'p1', { nombre: 'Updated' }).subscribe();
       expect(apiServiceSpy.updateProducto).toHaveBeenCalledWith('p1', { nombre: 'Updated' });

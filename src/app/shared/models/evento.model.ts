@@ -7,6 +7,14 @@
 import { TipoEvento, DestinoGanancia } from '../enums';
 import { MedioPagoEnum, EstadoPago } from '../enums/movimiento.enum';
 
+export interface ResumenFinanciero {
+  totalRecaudado: number;
+  gananciaVentas: number;
+  totalGastado: number;
+  totalPendienteReembolso: number;
+  balance: number;
+}
+
 /**
  * Evento (Sale event or group event)
  */
@@ -19,6 +27,7 @@ export interface Evento {
   destinoGanancia: DestinoGanancia | null; // Only for TipoEvento.VENTA
   tipoEvento: string | null; // Only for TipoEvento.GRUPO (e.g. "Kermesse")
   productos: Producto[];
+  resumenFinanciero?: ResumenFinanciero;
   createdAt: string;
   updatedAt: string;
 }
@@ -72,10 +81,11 @@ export interface VentaProducto {
  * Backend: GET /eventos/:id/kpis
  */
 export interface EventoKpis {
-  totalIngresos: number;
+  totalRecaudado: number; // Total revenue (ventas + ingresos manuales)
+  gananciaVentas: number; // (precioVenta - precioCosto) × cantidadVendida
   totalGastado: number; // Only gastos with estadoPago === PAGADO
   totalPendienteReembolso: number; // Gastos with estadoPago === PENDIENTE_REEMBOLSO
-  balance: number; // totalIngresos - totalGastado
+  balance: number; // totalRecaudado - totalGastado
 }
 
 /**
@@ -172,6 +182,7 @@ export interface CreateVentaProductoDto {
   productoId: string;
   vendedorId: string;
   cantidad: number;
+  medioPago: MedioPagoEnum;
 }
 
 /**
@@ -190,14 +201,6 @@ export interface RegisterVentasLoteDto {
   vendedorId: string;
   medioPago: MedioPagoEnum;
   items: VentaItemDto[];
-}
-
-/**
- * DTO for closing a sale event
- * Backend: POST /eventos/:id/cerrar
- */
-export interface CerrarEventoVentaDto {
-  medioPago: MedioPagoEnum;
 }
 
 /**

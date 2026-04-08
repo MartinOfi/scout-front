@@ -11,21 +11,17 @@ import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'app-resumen-financiero',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatCardModule,
-    MatIconModule
-  ],
+  imports: [CommonModule, MatCardModule, MatIconModule],
   templateUrl: './resumen-financiero.component.html',
   styleUrl: './resumen-financiero.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResumenFinancieroComponent {
-  @Input({ required: true }) totalIngresos!: number;
+  @Input({ required: true }) totalRecaudado!: number;
   @Input({ required: true }) totalEgresos!: number;
 
   get resultadoNeto(): number {
-    return this.totalIngresos - this.totalEgresos;
+    return this.totalRecaudado - this.totalEgresos;
   }
 
   get esPositivo(): boolean {
