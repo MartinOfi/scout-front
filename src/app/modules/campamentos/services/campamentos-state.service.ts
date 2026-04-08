@@ -26,6 +26,7 @@ import {
   UpdatePagoDto,
   ResultadoPagoDto,
 } from '../../../shared/models';
+import { FiltroMovimientosCampamento } from '../../../shared/enums';
 
 import { CampamentosApiService } from './campamentos-api.service';
 import { NotificationService } from '../../../shared/services';
@@ -117,14 +118,18 @@ export class CampamentosStateService {
 
   /**
    * Cargar detalle consolidado de un campamento
-   * Incluye: info, participantes con estado de pagos, movimientos y KPIs
+   * Incluye: info, participantes con estado de pagos, movimientos filtrados y KPIs
+   * Los KPIs siempre se calculan sobre todos los movimientos (backend)
    */
-  loadDetalle(id: string): void {
+  loadDetalle(
+    id: string,
+    filtro: FiltroMovimientosCampamento = FiltroMovimientosCampamento.TODOS,
+  ): void {
     this._loading.set(true);
     this._error.set(null);
     this._selectedId.set(id);
 
-    this.apiService.getDetalle(id).subscribe({
+    this.apiService.getDetalle(id, filtro).subscribe({
       next: (detalle: CampamentoDetalleDto) => {
         this._detalle.set(detalle);
         this._loading.set(false);

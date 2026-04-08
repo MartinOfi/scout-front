@@ -14,6 +14,7 @@ import {
 } from '../../../shared/models';
 import { HttpService } from '../../../shared/services';
 import { API_CONFIG } from '../../../shared/constants';
+import { FiltroMovimientosCampamento } from '../../../shared/enums';
 
 /**
  * API service for Campamentos module
@@ -43,10 +44,16 @@ export class CampamentosApiService {
 
   /**
    * Get consolidated campamento detail
-   * Includes: campamento info, participantes with payment status, all movements, and KPIs
+   * Includes: campamento info, participantes with payment status, filtered movements, and KPIs
+   * KPIs are always calculated over all movements regardless of filter
    */
-  getDetalle(id: string): Observable<CampamentoDetalleDto> {
-    return this.http.get<CampamentoDetalleDto>(`${this.endpoint}/${id}/detalle`);
+  getDetalle(
+    id: string,
+    filtro: FiltroMovimientosCampamento = FiltroMovimientosCampamento.TODOS,
+  ): Observable<CampamentoDetalleDto> {
+    return this.http.get<CampamentoDetalleDto>(`${this.endpoint}/${id}/detalle`, {
+      filtroMovimientos: filtro,
+    });
   }
 
   /**

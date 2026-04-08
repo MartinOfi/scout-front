@@ -198,9 +198,9 @@
           <app-button-tabs [tabs]="filtroTabs" [activeTab]="filtroMovimientos()"
             (tabChange)="onFiltroChange($event)" />
         </div>
-        @if (movimientosFiltrados().length > 0) {
+        @if (movimientos().length > 0) {
         <div class="movimientos-list">
-          @for (movimiento of movimientosFiltrados(); track movimiento.id) {
+          @for (movimiento of movimientos(); track movimiento.id) {
           <article class="movimiento-card" [class.movimiento-card--ingreso]="movimiento.tipo === 'ingreso'"
             [class.movimiento-card--egreso]="movimiento.tipo === 'egreso'">
             <div class="movimiento-card__icon">

@@ -52,12 +52,7 @@ import {
   PersonaSelectorDialogResult,
 } from '../../../../../shared/components/persona-selector-dialog/persona-selector-dialog.component';
 import { AddParticipanteDto } from '../../../../../shared/models';
-import {
-  PersonaType,
-  FiltroMovimientosCampamento,
-  ConceptoMovimiento,
-  TipoMovimientoEnum,
-} from '../../../../../shared/enums';
+import { PersonaType, FiltroMovimientosCampamento } from '../../../../../shared/enums';
 
 interface KpiConfig {
   readonly icon: string;
@@ -133,25 +128,6 @@ export class CampamentoDetailComponent implements OnInit {
     { icon: 'savings', title: 'Balance', key: 'balance', variant: 'primary' },
   ];
 
-  /** Movements filtered by active filtroMovimientos */
-  readonly movimientosFiltrados = computed((): MovimientoCampamentoDto[] => {
-    const todos = this.movimientos();
-    switch (this.filtroMovimientos()) {
-      case FiltroMovimientosCampamento.INGRESOS:
-        return todos.filter((m) => m.tipo === TipoMovimientoEnum.INGRESO);
-      case FiltroMovimientosCampamento.EGRESOS:
-        return todos.filter((m) => m.tipo === TipoMovimientoEnum.EGRESO);
-      case FiltroMovimientosCampamento.GASTOS:
-        return todos.filter(
-          (m) =>
-            m.tipo === TipoMovimientoEnum.EGRESO &&
-            m.concepto !== ConceptoMovimiento.USO_SALDO_PERSONAL,
-        );
-      default:
-        return todos;
-    }
-  });
-
   /** Progress percentage */
   readonly progressPercent = computed((): number => {
     const k = this.kpis();
@@ -177,8 +153,7 @@ export class CampamentoDetailComponent implements OnInit {
   }
 
   loadCampamento(id: string): void {
-    // Single API call loads all detail data (campamento info, participants, movements, KPIs)
-    this.state.loadDetalle(id);
+    this.state.loadDetalle(id, this.filtroMovimientos());
   }
 
   onTabChange(key: string): void {
@@ -186,7 +161,12 @@ export class CampamentoDetailComponent implements OnInit {
   }
 
   onFiltroChange(key: string): void {
-    this.filtroMovimientos.set(key as FiltroMovimientosCampamento);
+    const filtro = key as FiltroMovimientosCampamento;
+    this.filtroMovimientos.set(filtro);
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.state.loadDetalle(id, filtro);
+    }
   }
 
   onEdit(): void {
