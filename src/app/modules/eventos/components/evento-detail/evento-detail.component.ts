@@ -260,15 +260,11 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
     from(
       import('../shared/gasto-evento-dialog/gasto-evento-dialog.component').then(
         ({ GastoEventoDialogComponent }) => {
-          const ref = this.dialog.open(GastoEventoDialogComponent, {
+          this.dialog.open(GastoEventoDialogComponent, {
             width: '480px',
             maxWidth: '95vw',
-            data: { responsables: this.personas() },
-          });
-          ref.afterClosed().subscribe((result) => {
-            if (result?.dto) {
-              this.state.registrarGasto(this.eventoId, result.dto).subscribe();
-            }
+            data: { eventoId: this.eventoId, responsables: this.personas() },
+            disableClose: false,
           });
         },
       ),
