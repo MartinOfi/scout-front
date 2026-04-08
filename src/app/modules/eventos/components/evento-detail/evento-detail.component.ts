@@ -13,7 +13,7 @@ import {
   signal,
   computed,
 } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -26,6 +26,7 @@ import { TipoEvento } from '../../../../shared/enums';
 import {
   Evento,
   EventoKpis,
+  Movimiento,
   Persona,
   Producto,
   VentaProducto,
@@ -73,6 +74,7 @@ const TABS_GRUPO: TabConfig[] = [{ key: 'movimientos', label: 'Movimientos', ico
     FormsModule,
     MatIconModule,
     DatePipe,
+    CurrencyPipe,
     StatCardComponent,
     ButtonTabsComponent,
     LoadingSpinnerComponent,
@@ -120,6 +122,10 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
 
   readonly eventoResumenVentas = computed((): ResumenVentas | null =>
     this.eventoId ? (this.state.resumenVentas()[this.eventoId] ?? null) : null,
+  );
+
+  readonly eventoMovimientos = computed((): Movimiento[] =>
+    this.eventoId ? (this.state.movimientos()[this.eventoId] ?? []) : [],
   );
 
   readonly activeTab = signal<string>('');
@@ -181,6 +187,7 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
     this.state.loadProductos(id);
     this.state.loadVentas(id);
     this.state.loadResumenVentas(id);
+    this.state.loadMovimientos(id);
     this.activeTab.set('productos');
 
     this.personasApi.getAll().subscribe((ps) => this.personas.set(ps));

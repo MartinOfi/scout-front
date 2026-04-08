@@ -45,6 +45,7 @@ export class EventosStateService {
   private readonly _ventas: WritableSignal<Record<string, VentaProducto[]>> = signal({});
   private readonly _kpis: WritableSignal<Record<string, EventoKpis>> = signal({});
   private readonly _resumenVentas: WritableSignal<Record<string, ResumenVentas>> = signal({});
+  private readonly _movimientos: WritableSignal<Record<string, Movimiento[]>> = signal({});
   private readonly _loading: WritableSignal<boolean> = signal(false);
   private readonly _error: WritableSignal<string | null> = signal(null);
   private readonly _selectedId: WritableSignal<string | null> = signal(null);
@@ -58,6 +59,7 @@ export class EventosStateService {
   readonly ventas: Signal<Record<string, VentaProducto[]>> = this._ventas.asReadonly();
   readonly kpis: Signal<Record<string, EventoKpis>> = this._kpis.asReadonly();
   readonly resumenVentas: Signal<Record<string, ResumenVentas>> = this._resumenVentas.asReadonly();
+  readonly movimientos: Signal<Record<string, Movimiento[]>> = this._movimientos.asReadonly();
   readonly loading: Signal<boolean> = this._loading.asReadonly();
   readonly error: Signal<string | null> = this._error.asReadonly();
 
@@ -177,6 +179,20 @@ export class EventosStateService {
 
     obs$.subscribe();
     return obs$;
+  }
+
+  loadMovimientos(eventoId: string, filters?: { tipo?: string; concepto?: string }): void {
+    this._loading.set(true);
+
+    this.apiService.getMovimientos(eventoId, filters).subscribe({
+      next: (movimientos) => {
+        this._movimientos.update((prev) => ({ ...prev, [eventoId]: movimientos }));
+        this._loading.set(false);
+      },
+      error: (err: unknown) => {
+        this._handleError(err, 'Error al cargar movimientos');
+      },
+    });
   }
 
   // ============================================================================

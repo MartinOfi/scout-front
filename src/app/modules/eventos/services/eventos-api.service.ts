@@ -124,6 +124,20 @@ export class EventosApiService {
   }
 
   // ============================================================================
+  // MOVIMIENTOS
+  // ============================================================================
+
+  getMovimientos(
+    eventoId: string,
+    filters?: { tipo?: string; concepto?: string },
+  ): Observable<Movimiento[]> {
+    const params: Record<string, string> = {};
+    if (filters?.tipo) params['tipo'] = filters.tipo;
+    if (filters?.concepto) params['concepto'] = filters.concepto;
+    return this.http.get<Movimiento[]>(`${this.endpoint}/${eventoId}/movimientos`, params);
+  }
+
+  // ============================================================================
   // INGRESOS Y GASTOS
   // ============================================================================
 

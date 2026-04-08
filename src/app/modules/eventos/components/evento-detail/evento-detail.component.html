@@ -133,11 +133,44 @@
               }
               <app-button icon="remove_circle" (clicked)="openGastoDialog()">Registrar Gasto</app-button>
             </div>
-            <div class="tab-empty">
-              <div class="tab-empty__icon"><mat-icon>swap_horiz</mat-icon></div>
-              <p class="tab-empty__text">Sin movimientos registrados</p>
-              <p class="tab-empty__hint">Usá los botones de arriba para registrar ingresos y gastos.</p>
-            </div>
+
+            @if (eventoMovimientos().length === 0) {
+              <div class="tab-empty">
+                <div class="tab-empty__icon"><mat-icon>swap_horiz</mat-icon></div>
+                <p class="tab-empty__text">Sin movimientos registrados</p>
+                <p class="tab-empty__hint">Usá los botones de arriba para registrar ingresos y gastos.</p>
+              </div>
+            } @else {
+              <div class="movimientos-list">
+                @for (mov of eventoMovimientos(); track mov.id) {
+                  <article
+                    class="movimiento-row"
+                    [class.movimiento-row--ingreso]="mov.tipo === 'ingreso'"
+                    [class.movimiento-row--egreso]="mov.tipo === 'egreso'">
+
+                    <div class="movimiento-row__icon">
+                      <mat-icon>{{ mov.tipo === 'ingreso' ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+                    </div>
+
+                    <div class="movimiento-row__info">
+                      <span class="movimiento-row__date">{{ mov.fecha | date:'d MMM yyyy' }}</span>
+                      <span class="movimiento-row__description">{{ mov.descripcion ?? 'Sin descripción' }}</span>
+                      @if (mov.responsable) {
+                        <span class="movimiento-row__responsable">{{ mov.responsable.nombre }} {{ mov.responsable.apellido }}</span>
+                      }
+                    </div>
+
+                    <div
+                      class="movimiento-row__amount"
+                      [class.movimiento-row__amount--positive]="mov.tipo === 'ingreso'"
+                      [class.movimiento-row__amount--negative]="mov.tipo === 'egreso'">
+                      {{ (mov.tipo === 'ingreso' ? '+' : '-') + (mov.monto | currency:'ARS':'symbol':'1.0-0') }}
+                    </div>
+
+                  </article>
+                }
+              </div>
+            }
           }
 
         </div>

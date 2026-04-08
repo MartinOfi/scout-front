@@ -308,6 +308,98 @@ $section-gap: 20px;
 
 
 // -----------------------------------------------------------------------------
+// MOVIMIENTOS LIST
+// -----------------------------------------------------------------------------
+
+.movimientos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.movimiento-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: white;
+  border: 1px solid t.$stone-200;
+  border-left: 3px solid transparent;
+
+  &--ingreso { border-left-color: t.$color-success; }
+  &--egreso  { border-left-color: t.$color-error; }
+
+  &__icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: t.$stone-100;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  &--ingreso &__icon {
+    background-color: color-mix(in srgb, t.$color-success 12%, transparent);
+    color: t.$color-success;
+  }
+
+  &--egreso &__icon {
+    background-color: color-mix(in srgb, t.$color-error 12%, transparent);
+    color: t.$color-error;
+  }
+
+  &__info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  &__date {
+    font-size: 11px;
+    font-weight: 500;
+    color: t.$stone-500;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  &__description {
+    font-size: 14px;
+    font-weight: 500;
+    color: t.$stone-800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__responsable {
+    font-size: 12px;
+    color: t.$stone-500;
+  }
+
+  &__amount {
+    flex-shrink: 0;
+    font-size: 15px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+
+    &--positive { color: t.$color-success; }
+    &--negative { color: t.$color-error; }
+  }
+}
+
+// -----------------------------------------------------------------------------
 // LOADING & ERROR STATES
 // -----------------------------------------------------------------------------
 
