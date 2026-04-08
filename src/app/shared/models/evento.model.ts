@@ -7,7 +7,7 @@
 import { TipoEvento, DestinoGanancia } from '../enums';
 import { MedioPagoEnum, EstadoPago } from '../enums/movimiento.enum';
 
-export interface ResumenFinanciero {
+export interface EventoResumenFinanciero {
   totalRecaudado: number;
   gananciaVentas: number;
   totalGastado: number;
@@ -27,7 +27,7 @@ export interface Evento {
   destinoGanancia: DestinoGanancia | null; // Only for TipoEvento.VENTA
   tipoEvento: string | null; // Only for TipoEvento.GRUPO (e.g. "Kermesse")
   productos: Producto[];
-  resumenFinanciero?: ResumenFinanciero;
+  resumenFinanciero?: EventoResumenFinanciero;
   createdAt: string;
   updatedAt: string;
 }

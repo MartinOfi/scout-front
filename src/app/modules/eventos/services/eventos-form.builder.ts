@@ -175,6 +175,7 @@ export class EventosFormBuilder {
       productoId: form.value.productoId as string,
       vendedorId: form.value.vendedorId as string,
       cantidad: Number(form.value.cantidad),
+      medioPago: form.value.medioPago as MedioPagoEnum,
     };
   }
 

@@ -16,6 +16,7 @@ import { FormGroup, FormBuilder, ReactiveFormsModule, Validators } from '@angula
 
 import { Producto, Persona, CreateVentaProductoDto } from '../../../../../shared/models';
 import { positiveNumberValidator } from '../../../../../shared/validators/custom-validators';
+import { MedioPagoEnum, MEDIO_PAGO_LABELS } from '../../../../../shared/enums/movimiento.enum';
 
 // Shared Form Components
 import { FormFieldComponent } from '../../../../../shared/components/form/form-field/form-field.component';
@@ -47,11 +48,19 @@ export class VentaRegistroComponent implements OnInit {
 
   constructor(private fb: FormBuilder) {}
 
+  readonly medioPagoOptions = Object.values(MedioPagoEnum).map((v) => ({
+    value: v,
+    label: MEDIO_PAGO_LABELS[v],
+  }));
+  readonly getMedioPagoValue = (o: { value: MedioPagoEnum }): string => o.value;
+  readonly getMedioPagoLabel = (o: { value: MedioPagoEnum; label: string }): string => o.label;
+
   ngOnInit(): void {
     this.form = this.fb.group({
       productoId: ['', [Validators.required]],
       vendedorId: ['', [Validators.required]],
       cantidad: [1, [Validators.required, positiveNumberValidator(), Validators.min(1)]],
+      medioPago: [MedioPagoEnum.EFECTIVO, [Validators.required]],
     });
   }
 
@@ -89,6 +98,7 @@ export class VentaRegistroComponent implements OnInit {
       productoId: this.form.value.productoId as string,
       vendedorId: this.form.value.vendedorId as string,
       cantidad: Number(this.form.value.cantidad),
+      medioPago: this.form.value.medioPago as MedioPagoEnum,
     };
 
     this.submit.emit(dto);
