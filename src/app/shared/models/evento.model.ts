@@ -188,6 +188,7 @@ export interface VentaItemDto {
  */
 export interface RegisterVentasLoteDto {
   vendedorId: string;
+  medioPago: MedioPagoEnum;
   items: VentaItemDto[];
 }
 

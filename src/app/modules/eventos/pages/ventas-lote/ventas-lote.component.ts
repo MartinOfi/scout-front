@@ -28,6 +28,7 @@ import { EventosStateService } from '../../services/eventos-state.service';
 import { PersonasApiService } from '../../../personas/services/personas-api.service';
 import { Producto, RegisterVentasLoteDto, VentaItemDto } from '../../../../shared/models';
 import { Persona } from '../../../../shared/models';
+import { MedioPagoEnum, MEDIO_PAGO_LABELS } from '../../../../shared/enums/movimiento.enum';
 import { SelectFieldComponent } from '../../../../shared/components/form/select-field/select-field.component';
 import { FormFieldComponent } from '../../../../shared/components/form/form-field/form-field.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
@@ -68,6 +69,7 @@ export class VentasLoteComponent implements OnInit {
 
   readonly form: FormGroup = this.fb.group({
     vendedorId: ['', Validators.required],
+    medioPago: [MedioPagoEnum.EFECTIVO, Validators.required],
     cantidades: this.fb.record<number>({}),
   });
 
@@ -78,6 +80,12 @@ export class VentasLoteComponent implements OnInit {
   // Option helpers for SelectField
   readonly getPersonaId = (p: Persona): string => p.id;
   readonly getPersonaLabel = (p: Persona): string => p.nombre;
+
+  readonly medioPagoOptions: { value: MedioPagoEnum; label: string }[] = Object.values(
+    MedioPagoEnum,
+  ).map((v) => ({ value: v, label: MEDIO_PAGO_LABELS[v] }));
+  readonly getMedioPagoValue = (o: { value: MedioPagoEnum; label: string }): string => o.value;
+  readonly getMedioPagoLabel = (o: { value: MedioPagoEnum; label: string }): string => o.label;
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -117,7 +125,7 @@ export class VentasLoteComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.form.get('vendedorId')?.invalid) {
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
@@ -130,6 +138,7 @@ export class VentasLoteComponent implements OnInit {
 
     const dto: RegisterVentasLoteDto = {
       vendedorId: this.form.get('vendedorId')?.value as string,
+      medioPago: this.form.get('medioPago')?.value as MedioPagoEnum,
       items,
     };
 

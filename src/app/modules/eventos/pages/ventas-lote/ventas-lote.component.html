@@ -45,6 +45,30 @@
           </app-form-field>
         </div>
 
+        <!-- Medio de pago -->
+        <div class="form-card">
+          <h2 class="form-card__title">
+            <mat-icon>payments</mat-icon>
+            Medio de Pago
+          </h2>
+          <app-form-field
+            label="Forma de pago"
+            forId="medio-pago-select"
+            [required]="true"
+            [invalid]="!!(form.get('medioPago')?.invalid && form.get('medioPago')?.touched)"
+          >
+            <app-select-field
+              id="medio-pago-select"
+              formControlName="medioPago"
+              [options]="medioPagoOptions"
+              [optionValueFn]="getMedioPagoValue"
+              [optionLabelFn]="getMedioPagoLabel"
+              placeholder="Seleccioná el medio de pago"
+            />
+            <span error>El medio de pago es requerido</span>
+          </app-form-field>
+        </div>
+
         <!-- Products table -->
         <div class="form-card">
           <h2 class="form-card__title">

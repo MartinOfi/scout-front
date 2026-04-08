@@ -71,12 +71,14 @@ describe('ResumenVentas interface', () => {
 });
 
 describe('RegisterVentasLoteDto', () => {
-  it('should compile with vendedorId and items', () => {
+  it('should compile with vendedorId, medioPago and items', () => {
     const dto: RegisterVentasLoteDto = {
       vendedorId: 'uuid-vendedor',
+      medioPago: MedioPagoEnum.EFECTIVO,
       items: [{ productoId: 'uuid-producto', cantidad: 3 }],
     };
     expect(dto.vendedorId).toBe('uuid-vendedor');
+    expect(dto.medioPago).toBe(MedioPagoEnum.EFECTIVO);
     expect(dto.items.length).toBe(1);
   });
 });
