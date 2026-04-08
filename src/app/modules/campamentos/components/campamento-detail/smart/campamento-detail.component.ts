@@ -17,11 +17,13 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { from, switchMap } from 'rxjs';
+import { from, firstValueFrom, switchMap } from 'rxjs';
 
 import { CampamentosStateService } from '../../../services';
 import { CajasApiService } from '../../../../cajas/services/cajas-api.service';
 import { PersonasApiService } from '../../../../personas/services/personas-api.service';
+import { MovimientosApiService } from '../../../../movimientos/services/movimientos-api.service';
+import { MovimientoCampamentoCardComponent } from '../../shared/movimiento-campamento-card/movimiento-campamento-card.component';
 import {
   LoadingSpinnerComponent,
   ConfirmDialogService,
@@ -57,7 +59,7 @@ import {
   PersonaSelectorDialogResult,
 } from '../../../../../shared/components/persona-selector-dialog/persona-selector-dialog.component';
 import { AddParticipanteDto } from '../../../../../shared/models';
-import { PersonaType, FiltroMovimientosCampamento } from '../../../../../shared/enums';
+import { EstadoPago, PersonaType, FiltroMovimientosCampamento } from '../../../../../shared/enums';
 
 interface KpiConfig {
   readonly icon: string;
@@ -80,6 +82,7 @@ interface KpiConfig {
     EmptyStateComponent,
     StatCardComponent,
     ButtonTabsComponent,
+    MovimientoCampamentoCardComponent,
     CurrencyPipe,
     DatePipe,
   ],
@@ -94,6 +97,7 @@ export class CampamentoDetailComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly cajasApi = inject(CajasApiService);
   private readonly personasApi = inject(PersonasApiService);
+  private readonly movimientosApi = inject(MovimientosApiService);
   readonly state = inject(CampamentosStateService);
 
   // Consolidated detail data from state
@@ -287,6 +291,33 @@ export class CampamentoDetailComponent implements OnInit {
       .subscribe((result: PagoCampamentoDialogResult | undefined) => {
         if (!result) return;
         this.handleDialogResult(camp.id, participante.id, result);
+      });
+  }
+
+  onPagarReembolso(movimiento: MovimientoCampamentoDto): void {
+    const camp = this.campamento();
+    if (!camp) return;
+
+    const message = [
+      `Monto: $${movimiento.monto.toLocaleString('es-AR')}`,
+      `Descripción: ${movimiento.descripcion ?? 'Sin descripción'}`,
+      `Responsable: ${movimiento.responsableNombre}`,
+    ].join('\n');
+
+    this.confirmDialog
+      .confirmAsync(
+        'Confirmar pago de reembolso',
+        message,
+        () =>
+          firstValueFrom(
+            this.movimientosApi.update(movimiento.id, { estadoPago: EstadoPago.PAGADO }),
+          ).then(() => undefined),
+        { icon: 'payments', confirmText: 'Pagar', cancelText: 'Cancelar' },
+      )
+      .subscribe((result) => {
+        if (result.confirmed) {
+          this.loadCampamento(camp.id);
+        }
       });
   }
 

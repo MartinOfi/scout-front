@@ -1,0 +1,167 @@
+// =============================================================================
+// MOVIMIENTO CAMPAMENTO CARD
+// =============================================================================
+
+@use '../../../../../shared/styles/tokens' as t;
+@use 'app/shared/styles/responsive' as *;
+
+$card-radius: 12px;
+
+.movimiento-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: white;
+  border-radius: $card-radius;
+  box-shadow: t.$shadow-card;
+  border-left: 3px solid transparent;
+  flex-wrap: wrap;
+
+  @include respond-to('sm') {
+    flex-wrap: nowrap;
+  }
+
+  &--ingreso {
+    border-left-color: t.$color-success;
+  }
+
+  &--egreso {
+    border-left-color: t.$color-error;
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  &--ingreso &__icon {
+    background-color: color-mix(in srgb, t.$color-success 12%, transparent);
+    color: t.$color-success;
+  }
+
+  &--egreso &__icon {
+    background-color: color-mix(in srgb, t.$color-error 12%, transparent);
+    color: t.$color-error;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-basis: calc(100% - 56px);
+
+    @include respond-to('sm') {
+      flex-basis: auto;
+    }
+  }
+
+  &__date {
+    font-size: 11px;
+    font-weight: 500;
+    color: t.$stone-500;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  &__description {
+    font-size: 14px;
+    font-weight: 500;
+    color: t.$stone-800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__responsable {
+    font-size: 12px;
+    color: t.$stone-500;
+  }
+
+  &__amount {
+    flex-shrink: 0;
+    font-size: 15px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    order: 3;
+
+    @include respond-to('sm') {
+      order: unset;
+    }
+
+    &--positive {
+      color: t.$color-success;
+    }
+
+    &--negative {
+      color: t.$color-error;
+    }
+  }
+
+  &__meta {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    order: 4;
+
+    @include respond-to('sm') {
+      flex-direction: column;
+      align-items: flex-end;
+      order: unset;
+    }
+  }
+
+  &__medio {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 6px;
+    background-color: t.$stone-100;
+    border-radius: 4px;
+    color: t.$stone-600;
+    text-transform: uppercase;
+  }
+
+  &__estado {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+
+    &--pagado {
+      background-color: color-mix(in srgb, t.$color-success 12%, transparent);
+      color: t.$color-success;
+    }
+
+    &--pendiente {
+      background-color: color-mix(in srgb, t.$color-error 12%, transparent);
+      color: t.$color-error;
+      cursor: pointer;
+      user-select: none;
+
+      &:hover {
+        background-color: color-mix(in srgb, t.$color-error 22%, transparent);
+      }
+
+      &:focus-visible {
+        outline: 2px solid t.$color-error;
+        outline-offset: 2px;
+      }
+    }
+  }
+}

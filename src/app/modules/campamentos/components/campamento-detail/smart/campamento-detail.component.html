@@ -201,38 +201,9 @@
         @if (movimientos().length > 0) {
         <div class="movimientos-list">
           @for (movimiento of movimientos(); track movimiento.id) {
-          <article class="movimiento-card" [class.movimiento-card--ingreso]="movimiento.tipo === 'ingreso'"
-            [class.movimiento-card--egreso]="movimiento.tipo === 'egreso'">
-            <div class="movimiento-card__icon">
-              @if (movimiento.tipo === 'ingreso') {
-              <mat-icon>arrow_downward</mat-icon>
-              } @else {
-              <mat-icon>arrow_upward</mat-icon>
-              }
-            </div>
-            <div class="movimiento-card__info">
-              <span class="movimiento-card__date">{{ movimiento.fecha | date:'d MMM yyyy' }}</span>
-              <span class="movimiento-card__description">{{ movimiento.descripcion ?? 'Sin descripción' }}</span>
-              <span class="movimiento-card__responsable">{{ movimiento.responsableNombre }}</span>
-            </div>
-            <div class="movimiento-card__amount"
-              [class.movimiento-card__amount--positive]="movimiento.tipo === 'ingreso'"
-              [class.movimiento-card__amount--negative]="movimiento.tipo === 'egreso'">
-              @if (movimiento.tipo === 'ingreso') {
-              +{{ movimiento.monto | currency:'ARS':'symbol':'1.0-0' }}
-              } @else {
-              -{{ movimiento.monto | currency:'ARS':'symbol':'1.0-0' }}
-              }
-            </div>
-            <div class="movimiento-card__meta">
-              <span class="movimiento-card__medio">{{ movimiento.medioPago }}</span>
-              <span class="movimiento-card__estado"
-                [class.movimiento-card__estado--pagado]="movimiento.estadoPago === 'pagado'"
-                [class.movimiento-card__estado--pendiente]="movimiento.estadoPago === 'pendiente_reembolso'">
-                {{ movimiento.estadoPago }}
-              </span>
-            </div>
-          </article>
+          <app-movimiento-campamento-card
+            [movimiento]="movimiento"
+            (pagarReembolso)="onPagarReembolso($event)" />
           }
         </div>
         } @else {
