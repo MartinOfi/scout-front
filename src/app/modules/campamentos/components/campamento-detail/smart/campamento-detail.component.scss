@@ -19,6 +19,7 @@ $section-gap: 20px;
 // -----------------------------------------------------------------------------
 
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -33,19 +34,9 @@ $section-gap: 20px;
 
 .detail-page {
   min-height: 100%;
-  // Mobile-first: compact padding
-  padding: 16px;
-  padding-bottom: 32px;
-
-  // Tablet+: more spacious padding
-  @include respond-to('sm') {
-    padding: 24px;
-    padding-bottom: 48px;
-  }
 }
 
 .detail-content {
-  max-width: 960px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
