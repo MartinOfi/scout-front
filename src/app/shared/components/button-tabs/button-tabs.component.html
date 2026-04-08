@@ -2,7 +2,9 @@
   <div class="button-tabs">
     @for (tab of tabs(); track tab.key) {
     <button type="button" class="button-tab" [class.active]="activeTab() === tab.key" (click)="onTabClick(tab.key)">
+      @if (tab.icon) {
       <mat-icon>{{ tab.icon }}</mat-icon>
+      }
       <span>{{ tab.label }}</span>
     </button>
     }

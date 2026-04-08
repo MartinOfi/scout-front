@@ -193,9 +193,14 @@
       <!-- Tab Content: Movimientos -->
       @if (activeTab() === 'movimientos') {
       <div class="tab-content">
-        @if (movimientos().length > 0) {
+        <!-- Movement filters -->
+        <div class="movimientos-filtros">
+          <app-button-tabs [tabs]="filtroTabs" [activeTab]="filtroMovimientos()"
+            (tabChange)="onFiltroChange($event)" />
+        </div>
+        @if (movimientosFiltrados().length > 0) {
         <div class="movimientos-list">
-          @for (movimiento of movimientos(); track movimiento.id) {
+          @for (movimiento of movimientosFiltrados(); track movimiento.id) {
           <article class="movimiento-card" [class.movimiento-card--ingreso]="movimiento.tipo === 'ingreso'"
             [class.movimiento-card--egreso]="movimiento.tipo === 'egreso'">
             <div class="movimiento-card__icon">
@@ -236,7 +241,7 @@
             <mat-icon>receipt_long</mat-icon>
           </div>
           <p class="tab-empty__text">Sin movimientos</p>
-          <p class="tab-empty__hint">Registrá pagos o gastos para ver el historial</p>
+          <p class="tab-empty__hint">No hay movimientos para el filtro seleccionado</p>
         </div>
         }
       </div>

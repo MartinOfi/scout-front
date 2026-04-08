@@ -52,7 +52,12 @@ import {
   PersonaSelectorDialogResult,
 } from '../../../../../shared/components/persona-selector-dialog/persona-selector-dialog.component';
 import { AddParticipanteDto } from '../../../../../shared/models';
-import { PersonaType } from '../../../../../shared/enums';
+import {
+  PersonaType,
+  FiltroMovimientosCampamento,
+  ConceptoMovimiento,
+  TipoMovimientoEnum,
+} from '../../../../../shared/enums';
 
 interface KpiConfig {
   readonly icon: string;
@@ -101,10 +106,23 @@ export class CampamentoDetailComponent implements OnInit {
   /** Active tab key */
   readonly activeTab = signal<string>('participantes');
 
+  /** Active movements filter */
+  readonly filtroMovimientos = signal<FiltroMovimientosCampamento>(
+    FiltroMovimientosCampamento.TODOS,
+  );
+
   /** Tab configurations */
   readonly tabs: TabConfig[] = [
     { key: 'participantes', label: 'Participantes', icon: 'people' },
     { key: 'movimientos', label: 'Movimientos', icon: 'swap_horiz' },
+  ];
+
+  /** Filter tab configurations for movimientos */
+  readonly filtroTabs: TabConfig[] = [
+    { key: FiltroMovimientosCampamento.TODOS, label: 'Todos' },
+    { key: FiltroMovimientosCampamento.INGRESOS, label: 'Ingresos' },
+    { key: FiltroMovimientosCampamento.EGRESOS, label: 'Egresos' },
+    { key: FiltroMovimientosCampamento.GASTOS, label: 'Gastos' },
   ];
 
   /** KPI configurations - mapped to CampamentoKpisDto keys */
@@ -114,6 +132,25 @@ export class CampamentoDetailComponent implements OnInit {
     { icon: 'shopping_cart', title: 'Gastado', key: 'totalGastado', variant: 'warning' },
     { icon: 'savings', title: 'Balance', key: 'balance', variant: 'primary' },
   ];
+
+  /** Movements filtered by active filtroMovimientos */
+  readonly movimientosFiltrados = computed((): MovimientoCampamentoDto[] => {
+    const todos = this.movimientos();
+    switch (this.filtroMovimientos()) {
+      case FiltroMovimientosCampamento.INGRESOS:
+        return todos.filter((m) => m.tipo === TipoMovimientoEnum.INGRESO);
+      case FiltroMovimientosCampamento.EGRESOS:
+        return todos.filter((m) => m.tipo === TipoMovimientoEnum.EGRESO);
+      case FiltroMovimientosCampamento.GASTOS:
+        return todos.filter(
+          (m) =>
+            m.tipo === TipoMovimientoEnum.EGRESO &&
+            m.concepto !== ConceptoMovimiento.USO_SALDO_PERSONAL,
+        );
+      default:
+        return todos;
+    }
+  });
 
   /** Progress percentage */
   readonly progressPercent = computed((): number => {
@@ -146,6 +183,10 @@ export class CampamentoDetailComponent implements OnInit {
 
   onTabChange(key: string): void {
     this.activeTab.set(key);
+  }
+
+  onFiltroChange(key: string): void {
+    this.filtroMovimientos.set(key as FiltroMovimientosCampamento);
   }
 
   onEdit(): void {

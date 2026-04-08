@@ -9,6 +9,7 @@ import {
   MedioPago,
   EstadoPago,
   TipoMovimiento,
+  ConceptoMovimiento,
   PersonaType,
   Rama,
   EstadoPagoCampamento,
@@ -195,6 +196,7 @@ export interface MovimientoCampamentoDto {
   id: string;
   fecha: Date;
   tipo: TipoMovimiento;
+  concepto: ConceptoMovimiento;
   monto: number;
   descripcion?: string;
   medioPago: MedioPago;

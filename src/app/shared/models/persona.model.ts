@@ -78,6 +78,8 @@ export interface CreateEducadorDto {
   nombre: string;
   rama?: Rama;
   cargo: CargoEducador;
+  email?: string;
+  password?: string;
 }
 
 /**

@@ -17,8 +17,8 @@ export interface TabConfig {
   key: string;
   /** Display label for the tab */
   label: string;
-  /** Material icon name */
-  icon: string;
+  /** Material icon name (optional) */
+  icon?: string;
 }
 
 @Component({

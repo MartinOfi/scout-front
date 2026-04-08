@@ -19,7 +19,10 @@ import {
 } from '../../../shared/models';
 
 import { Rama, CargoEducador } from '../../../shared/enums';
-import { safeTextValidator } from '../../../shared/validators/custom-validators';
+import {
+  safeTextValidator,
+  credencialesValidator,
+} from '../../../shared/validators/custom-validators';
 
 @Injectable({
   providedIn: 'root',
@@ -116,19 +119,24 @@ export class PersonasFormBuilder {
    * Backend accepts: nombre, rama (optional), cargo
    */
   buildCreateEducadorForm(): FormGroup {
-    return this.fb.group({
-      nombre: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(100),
-          safeTextValidator(),
+    return this.fb.group(
+      {
+        nombre: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(2),
+            Validators.maxLength(100),
+            safeTextValidator(),
+          ],
         ],
-      ],
-      rama: [null],
-      cargo: ['', [Validators.required]],
-    });
+        rama: [null],
+        cargo: ['', [Validators.required]],
+        email: ['', [Validators.email]],
+        password: ['', [Validators.minLength(6)]],
+      },
+      { validators: credencialesValidator() },
+    );
   }
 
   /**
@@ -155,10 +163,14 @@ export class PersonasFormBuilder {
    * Extraer DTO del formulario de educador
    */
   extractCreateEducadorDto(form: FormGroup): CreateEducadorDto {
+    const email = (form.value.email as string)?.trim() || undefined;
+    const password = (form.value.password as string)?.trim() || undefined;
     return {
       nombre: form.value.nombre as string,
       rama: form.value.rama ?? undefined,
       cargo: form.value.cargo as CargoEducador,
+      email,
+      password,
     };
   }
 

@@ -72,6 +72,50 @@
               />
               <span error>El cargo es requerido</span>
             </app-form-field>
+
+            <!-- Credenciales (solo en creación, ambas opcionales pero vinculadas) -->
+            @if (!isEditing) {
+              <app-form-field
+                label="Email"
+                [forId]="'email-input'"
+                hint="Opcional — si ingresás email, la contraseña es obligatoria"
+                [invalid]="!!(form.get('email')?.touched && (form.get('email')?.hasError('email') || (form.hasError('credencialesIncompletas') && !form.get('email')?.value)))"
+              >
+                <app-text-field
+                  id="email-input"
+                  formControlName="email"
+                  placeholder="correo@ejemplo.com"
+                />
+                <span error>
+                  @if (form.get('email')?.hasError('email')) {
+                    Ingresá un email válido
+                  } @else {
+                    El email es requerido si ingresás contraseña
+                  }
+                </span>
+              </app-form-field>
+
+              <app-form-field
+                label="Contraseña"
+                [forId]="'password-input'"
+                hint="Mínimo 6 caracteres"
+                [invalid]="!!(form.get('password')?.touched && (form.get('password')?.hasError('minlength') || (form.hasError('credencialesIncompletas') && !form.get('password')?.value)))"
+              >
+                <app-text-field
+                  id="password-input"
+                  formControlName="password"
+                  type="password"
+                  placeholder="Contraseña de acceso"
+                />
+                <span error>
+                  @if (form.get('password')?.hasError('minlength')) {
+                    Mínimo 6 caracteres
+                  } @else {
+                    La contraseña es requerida si ingresás email
+                  }
+                </span>
+              </app-form-field>
+            }
           </form>
         }
       </div>

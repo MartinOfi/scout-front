@@ -4,11 +4,7 @@
  * SIN any - tipado estricto
  */
 
-import {
-  AbstractControl,
-  ValidationErrors,
-  ValidatorFn,
-} from '@angular/forms';
+import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { RAMAS } from '../enums';
 
 /**
@@ -100,18 +96,21 @@ export function ramaValidator(): ValidatorFn {
  * Valida que el rango de fechas sea válido
  * Uso: dateRangeValidator(startControlName, endControlName)
  */
-export function dateRangeValidator(
-  startFieldName: string,
-  endFieldName: string
-): ValidatorFn {
+export function dateRangeValidator(startFieldName: string, endFieldName: string): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     if (!(control instanceof AbstractControl) || !('controls' in control)) {
       return null;
     }
 
-    const formGroup = control as unknown as { controls: Record<string, AbstractControl | undefined> };
+    const formGroup = control as unknown as {
+      controls: Record<string, AbstractControl | undefined>;
+    };
 
-    if (!formGroup.controls || !formGroup.controls[startFieldName] || !formGroup.controls[endFieldName]) {
+    if (
+      !formGroup.controls ||
+      !formGroup.controls[startFieldName] ||
+      !formGroup.controls[endFieldName]
+    ) {
       return null;
     }
 
@@ -132,6 +131,27 @@ export function dateRangeValidator(
           end: endValue,
         },
       };
+    }
+
+    return null;
+  };
+}
+
+/**
+ * Valida que si se ingresa email, la contraseña sea obligatoria y viceversa.
+ * Aplicar a nivel de FormGroup (no de control individual).
+ * Uso: this.fb.group({...}, { validators: credencialesValidator() })
+ */
+export function credencialesValidator(): ValidatorFn {
+  return (group: AbstractControl): ValidationErrors | null => {
+    const email = (group.get('email')?.value as string | null)?.trim() ?? '';
+    const password = (group.get('password')?.value as string | null)?.trim() ?? '';
+
+    const hasEmail = email.length > 0;
+    const hasPassword = password.length > 0;
+
+    if (hasEmail !== hasPassword) {
+      return { credencialesIncompletas: true };
     }
 
     return null;
