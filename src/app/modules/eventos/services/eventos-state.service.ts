@@ -5,8 +5,8 @@
  */
 
 import { Injectable, Signal, WritableSignal, computed, signal, inject } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
-import { tap, catchError, finalize } from 'rxjs/operators';
+import { EMPTY, Observable, throwError } from 'rxjs';
+import { catchError, finalize, map, tap } from 'rxjs/operators';
 
 import {
   Evento,
@@ -160,18 +160,23 @@ export class EventosStateService {
     });
   }
 
-  loadResumenVentas(eventoId: string, vendedor?: string): void {
+  loadResumenVentas(eventoId: string, vendedor?: string): Observable<void> {
     this._loading.set(true);
 
-    this.apiService.getResumenVentas(eventoId, vendedor).subscribe({
-      next: (resumen) => {
+    const obs$ = this.apiService.getResumenVentas(eventoId, vendedor).pipe(
+      tap((resumen) => {
         this._resumenVentas.update((prev) => ({ ...prev, [eventoId]: resumen }));
         this._loading.set(false);
-      },
-      error: (err: unknown) => {
+      }),
+      catchError((err: unknown) => {
         this._handleError(err, 'Error al cargar resumen de ventas');
-      },
-    });
+        return EMPTY;
+      }),
+      map(() => undefined as void),
+    );
+
+    obs$.subscribe();
+    return obs$;
   }
 
   // ============================================================================

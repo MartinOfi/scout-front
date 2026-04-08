@@ -98,6 +98,7 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   private readonly vendedorSearch$ = new Subject<string>();
 
   readonly vendedorSearch = signal('');
+  readonly vendedorSearching = signal(false);
 
   readonly loading = this.state.loading;
   readonly personas = signal<Persona[]>([]);
@@ -187,7 +188,10 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
     this.vendedorSearch$
       .pipe(debounceTime(400), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe((query) => {
-        this.state.loadResumenVentas(this.eventoId, query || undefined);
+        this.state.loadResumenVentas(this.eventoId, query || undefined).subscribe({
+          next: () => this.vendedorSearching.set(false),
+          error: () => this.vendedorSearching.set(false),
+        });
       });
   }
 
@@ -198,6 +202,7 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
 
   onVendedorSearchChange(value: string): void {
     this.vendedorSearch.set(value);
+    this.vendedorSearching.set(true);
     this.vendedorSearch$.next(value);
   }
 

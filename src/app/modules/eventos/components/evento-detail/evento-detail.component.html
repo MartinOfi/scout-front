@@ -107,7 +107,9 @@
               <app-button icon="add_shopping_cart" (clicked)="navigateToVentasLote()">Registrar Ventas en Lote</app-button>
             </div>
             <div class="table-container">
-              @if (ventasTableData().length === 0) {
+              @if (vendedorSearching()) {
+                <app-loading-spinner message="Filtrando..." />
+              } @else if (ventasTableData().length === 0) {
                 <div class="tab-empty">
                   <div class="tab-empty__icon"><mat-icon>point_of_sale</mat-icon></div>
                   <p class="tab-empty__text">Sin ventas registradas</p>
