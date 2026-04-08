@@ -12,6 +12,7 @@ import { map } from 'rxjs/operators';
 import {
   ConfirmDialogComponent,
   ConfirmDialogData,
+  ConfirmDialogDetail,
   ConfirmDialogResult,
 } from '../components/confirm-dialog/confirm-dialog.component';
 
@@ -168,6 +169,7 @@ export class ConfirmDialogService {
       cancelText?: string;
       entityName?: string;
       warning?: string;
+      details?: ConfirmDialogDetail[];
     },
   ): Observable<ConfirmDialogResult> {
     const onAction = async (): Promise<void> => {
@@ -188,6 +190,7 @@ export class ConfirmDialogService {
       isDestructive: false,
       entityName: options?.entityName,
       warning: options?.warning,
+      details: options?.details,
       onAction,
     };
 

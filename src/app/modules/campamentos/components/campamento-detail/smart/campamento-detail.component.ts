@@ -298,21 +298,24 @@ export class CampamentoDetailComponent implements OnInit {
     const camp = this.campamento();
     if (!camp) return;
 
-    const message = [
-      `Monto: $${movimiento.monto.toLocaleString('es-AR')}`,
-      `Descripción: ${movimiento.descripcion ?? 'Sin descripción'}`,
-      `Responsable: ${movimiento.responsableNombre}`,
-    ].join('\n');
-
     this.confirmDialog
       .confirmAsync(
         'Confirmar pago de reembolso',
-        message,
+        '¿Confirmás que este gasto fue reembolsado?',
         () =>
           firstValueFrom(
             this.movimientosApi.update(movimiento.id, { estadoPago: EstadoPago.PAGADO }),
           ).then(() => undefined),
-        { icon: 'payments', confirmText: 'Pagar', cancelText: 'Cancelar' },
+        {
+          icon: 'payments',
+          confirmText: 'Pagar',
+          cancelText: 'Cancelar',
+          details: [
+            { label: 'Monto', value: `$${movimiento.monto.toLocaleString('es-AR')}` },
+            { label: 'Descripción', value: movimiento.descripcion ?? 'Sin descripción' },
+            { label: 'Responsable', value: movimiento.responsableNombre },
+          ],
+        },
       )
       .subscribe((result) => {
         if (result.confirmed) {
