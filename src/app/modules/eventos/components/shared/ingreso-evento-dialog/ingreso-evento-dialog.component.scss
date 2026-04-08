@@ -1,0 +1,16 @@
+.dialog-container {
+  min-width: 380px;
+  max-width: 520px;
+}
+
+.dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.dialog-content {
+  padding-top: 0.5rem;
+}

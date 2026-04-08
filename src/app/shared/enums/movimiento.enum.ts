@@ -83,13 +83,14 @@ export const CONCEPTO_MOVIMIENTO_LABELS: Record<ConceptoMovimiento, string> = {
 /**
  * Payment methods
  */
-export const MEDIOS_PAGO = ['efectivo', 'transferencia', 'saldo_personal'] as const;
+export const MEDIOS_PAGO = ['efectivo', 'transferencia', 'saldo_personal', 'mixto'] as const;
 export type MedioPago = (typeof MEDIOS_PAGO)[number];
 
 export enum MedioPagoEnum {
   EFECTIVO = 'efectivo',
   TRANSFERENCIA = 'transferencia',
   SALDO_PERSONAL = 'saldo_personal',
+  MIXTO = 'mixto',
 }
 
 /**
@@ -99,6 +100,7 @@ export const MEDIO_PAGO_LABELS: Record<MedioPago, string> = {
   efectivo: 'Efectivo',
   transferencia: 'Transferencia',
   saldo_personal: 'Saldo Personal',
+  mixto: 'Mixto',
 } as const;
 
 /**

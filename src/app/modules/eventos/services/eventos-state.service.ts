@@ -1,7 +1,7 @@
 /**
  * Eventos State Service
  * Gestiona estado con Signals (Angular 21)
- * SIN any - tipado estricto
+ * SIN any — tipado estricto
  */
 
 import { Injectable, Signal, WritableSignal, computed, signal, inject } from '@angular/core';
@@ -10,14 +10,20 @@ import { tap, catchError, finalize } from 'rxjs/operators';
 
 import {
   Evento,
-  EventoConResumen,
+  EventoKpis,
   Producto,
   VentaProducto,
+  ResumenVentas,
   Movimiento,
   CreateEventoDto,
   UpdateEventoDto,
   CreateProductoDto,
+  UpdateProductoDto,
   CreateVentaProductoDto,
+  RegisterVentasLoteDto,
+  CerrarEventoVentaDto,
+  RegistrarIngresoEventoDto,
+  RegistrarGastoEventoDto,
 } from '../../../shared/models';
 
 import { EventosApiService } from './eventos-api.service';
@@ -31,13 +37,14 @@ export class EventosStateService {
   private readonly notificationService = inject(NotificationService);
 
   // ============================================================================
-  // State Signals (private - writable)
+  // State Signals (private — writable)
   // ============================================================================
 
   private readonly _eventos: WritableSignal<Evento[]> = signal([]);
   private readonly _productos: WritableSignal<Record<string, Producto[]>> = signal({});
   private readonly _ventas: WritableSignal<Record<string, VentaProducto[]>> = signal({});
-  private readonly _resumenes: WritableSignal<Record<string, EventoConResumen>> = signal({});
+  private readonly _kpis: WritableSignal<Record<string, EventoKpis>> = signal({});
+  private readonly _resumenVentas: WritableSignal<Record<string, ResumenVentas>> = signal({});
   private readonly _loading: WritableSignal<boolean> = signal(false);
   private readonly _error: WritableSignal<string | null> = signal(null);
   private readonly _selectedId: WritableSignal<string | null> = signal(null);
@@ -49,12 +56,13 @@ export class EventosStateService {
   readonly eventos: Signal<Evento[]> = this._eventos.asReadonly();
   readonly productos: Signal<Record<string, Producto[]>> = this._productos.asReadonly();
   readonly ventas: Signal<Record<string, VentaProducto[]>> = this._ventas.asReadonly();
-  readonly resumenes: Signal<Record<string, EventoConResumen>> = this._resumenes.asReadonly();
+  readonly kpis: Signal<Record<string, EventoKpis>> = this._kpis.asReadonly();
+  readonly resumenVentas: Signal<Record<string, ResumenVentas>> = this._resumenVentas.asReadonly();
   readonly loading: Signal<boolean> = this._loading.asReadonly();
   readonly error: Signal<string | null> = this._error.asReadonly();
 
   // ============================================================================
-  // Computed Signals (derived state)
+  // Computed Signals
   // ============================================================================
 
   readonly selected = computed((): Evento | null => {
@@ -62,280 +70,306 @@ export class EventosStateService {
     return this._eventos().find((e) => e.id === id) ?? null;
   });
 
-  readonly totalEventos = computed((): number => {
-    return this._eventos().length;
-  });
+  readonly totalEventos = computed((): number => this._eventos().length);
 
   // ============================================================================
-  // Actions
+  // Evento Actions
   // ============================================================================
 
-  /**
-   * Cargar todos los eventos
-   */
   load(): void {
     this._loading.set(true);
     this._error.set(null);
 
     this.apiService.getAll().subscribe({
-      next: (eventos: Evento[]) => {
+      next: (eventos) => {
         this._eventos.set(eventos);
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar eventos';
-        this._error.set(errorMsg);
-        this._loading.set(false);
-        this.notificationService.showError(errorMsg);
+        this._handleError(err, 'Error al cargar eventos');
       },
     });
   }
 
-  /**
-   * Crear un nuevo evento
-   */
+  loadById(id: string): void {
+    this._loading.set(true);
+    this._error.set(null);
+
+    this.apiService.getById(id).subscribe({
+      next: (evento) => {
+        this._eventos.update((prev) => {
+          const exists = prev.some((e) => e.id === id);
+          return exists ? prev.map((e) => (e.id === id ? evento : e)) : [...prev, evento];
+        });
+        this._selectedId.set(id);
+        this._loading.set(false);
+      },
+      error: (err: unknown) => {
+        this._handleError(err, 'Error al cargar el evento');
+      },
+    });
+  }
+
   create(dto: CreateEventoDto): Observable<Evento> {
     this._loading.set(true);
     this._error.set(null);
 
     return this.apiService.create(dto).pipe(
-      tap((evento: Evento) => {
+      tap((evento) => {
         this._eventos.update((prev) => [...prev, evento]);
         this.notificationService.showSuccess('Evento creado exitosamente');
       }),
-      catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al crear evento';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
-        return throwError(() => err);
-      }),
-      finalize(() => this._loading.set(false))
+      catchError((err: unknown) => this._catchError(err, 'Error al crear evento')),
+      finalize(() => this._loading.set(false)),
     );
   }
 
-  /**
-   * Actualizar un evento (PATCH)
-   */
   update(id: string, dto: UpdateEventoDto): Observable<Evento> {
     this._loading.set(true);
     this._error.set(null);
 
     return this.apiService.update(id, dto).pipe(
-      tap((evento: Evento) => {
-        this._eventos.update((prev) =>
-          prev.map((e) => (e.id === id ? evento : e))
-        );
+      tap((evento) => {
+        this._eventos.update((prev) => prev.map((e) => (e.id === id ? evento : e)));
         this.notificationService.showSuccess('Evento actualizado exitosamente');
       }),
-      catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al actualizar evento';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
-        return throwError(() => err);
-      }),
-      finalize(() => this._loading.set(false))
+      catchError((err: unknown) => this._catchError(err, 'Error al actualizar evento')),
+      finalize(() => this._loading.set(false)),
     );
   }
 
-  /**
-   * Cargar productos de un evento
-   */
-  loadProductos(eventoId: string): void {
-    this._loading.set(true);
-    this._error.set(null);
+  select(id: string | null): void {
+    this._selectedId.set(id);
+  }
 
-    this.apiService.getProductos(eventoId).subscribe({
-      next: (productos: Producto[]) => {
-        this._productos.update((prev) => ({
-          ...prev,
-          [eventoId]: productos,
-        }));
+  // ============================================================================
+  // KPIs & Resumen Actions
+  // ============================================================================
+
+  loadKpis(eventoId: string): void {
+    this._loading.set(true);
+
+    this.apiService.getKpis(eventoId).subscribe({
+      next: (kpis) => {
+        this._kpis.update((prev) => ({ ...prev, [eventoId]: kpis }));
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar productos';
-        this._error.set(errorMsg);
-        this._loading.set(false);
-        this.notificationService.showError(errorMsg);
+        this._handleError(err, 'Error al cargar KPIs');
       },
     });
   }
 
-  /**
-   * Crear un producto para un evento
-   */
+  loadResumenVentas(eventoId: string, vendedor?: string): void {
+    this._loading.set(true);
+
+    this.apiService.getResumenVentas(eventoId, vendedor).subscribe({
+      next: (resumen) => {
+        this._resumenVentas.update((prev) => ({ ...prev, [eventoId]: resumen }));
+        this._loading.set(false);
+      },
+      error: (err: unknown) => {
+        this._handleError(err, 'Error al cargar resumen de ventas');
+      },
+    });
+  }
+
+  // ============================================================================
+  // Producto Actions
+  // ============================================================================
+
+  loadProductos(eventoId: string): void {
+    this._loading.set(true);
+
+    this.apiService.getProductos(eventoId).subscribe({
+      next: (productos) => {
+        this._productos.update((prev) => ({ ...prev, [eventoId]: productos }));
+        this._loading.set(false);
+      },
+      error: (err: unknown) => {
+        this._handleError(err, 'Error al cargar productos');
+      },
+    });
+  }
+
   createProducto(eventoId: string, dto: CreateProductoDto): Observable<Producto> {
     this._loading.set(true);
-    this._error.set(null);
 
     return this.apiService.createProducto(eventoId, dto).pipe(
-      tap((producto: Producto) => {
+      tap((producto) => {
         this._productos.update((prev) => ({
           ...prev,
           [eventoId]: [...(prev[eventoId] ?? []), producto],
         }));
         this.notificationService.showSuccess('Producto creado exitosamente');
       }),
-      catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al crear producto';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
-        return throwError(() => err);
-      }),
-      finalize(() => this._loading.set(false))
+      catchError((err: unknown) => this._catchError(err, 'Error al crear producto')),
+      finalize(() => this._loading.set(false)),
     );
   }
 
-  /**
-   * Cargar ventas de un evento
-   */
+  updateProducto(
+    eventoId: string,
+    productoId: string,
+    dto: UpdateProductoDto,
+  ): Observable<Producto> {
+    this._loading.set(true);
+
+    return this.apiService.updateProducto(productoId, dto).pipe(
+      tap((updated) => {
+        this._productos.update((prev) => ({
+          ...prev,
+          [eventoId]: (prev[eventoId] ?? []).map((p) => (p.id === productoId ? updated : p)),
+        }));
+        this.notificationService.showSuccess('Producto actualizado exitosamente');
+      }),
+      catchError((err: unknown) => this._catchError(err, 'Error al actualizar producto')),
+      finalize(() => this._loading.set(false)),
+    );
+  }
+
+  deleteProducto(eventoId: string, productoId: string): Observable<void> {
+    this._loading.set(true);
+
+    return this.apiService.deleteProducto(productoId).pipe(
+      tap(() => {
+        this._productos.update((prev) => ({
+          ...prev,
+          [eventoId]: (prev[eventoId] ?? []).filter((p) => p.id !== productoId),
+        }));
+        this.notificationService.showSuccess('Producto eliminado exitosamente');
+      }),
+      catchError((err: unknown) => this._catchError(err, 'Error al eliminar producto')),
+      finalize(() => this._loading.set(false)),
+    );
+  }
+
+  // ============================================================================
+  // Venta Actions
+  // ============================================================================
+
   loadVentas(eventoId: string): void {
     this._loading.set(true);
-    this._error.set(null);
 
     this.apiService.getVentas(eventoId).subscribe({
-      next: (ventas: VentaProducto[]) => {
-        this._ventas.update((prev) => ({
-          ...prev,
-          [eventoId]: ventas,
-        }));
+      next: (ventas) => {
+        this._ventas.update((prev) => ({ ...prev, [eventoId]: ventas }));
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar ventas';
-        this._error.set(errorMsg);
-        this._loading.set(false);
-        this.notificationService.showError(errorMsg);
+        this._handleError(err, 'Error al cargar ventas');
       },
     });
   }
 
-  /**
-   * Registrar una venta
-   */
   registrarVenta(eventoId: string, dto: CreateVentaProductoDto): Observable<VentaProducto> {
     this._loading.set(true);
-    this._error.set(null);
 
     return this.apiService.registrarVenta(eventoId, dto).pipe(
-      tap((venta: VentaProducto) => {
+      tap((venta) => {
         this._ventas.update((prev) => ({
           ...prev,
           [eventoId]: [...(prev[eventoId] ?? []), venta],
         }));
         this.notificationService.showSuccess('Venta registrada exitosamente');
       }),
-      catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al registrar venta';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
-        return throwError(() => err);
-      }),
-      finalize(() => this._loading.set(false))
+      catchError((err: unknown) => this._catchError(err, 'Error al registrar venta')),
+      finalize(() => this._loading.set(false)),
     );
   }
 
-  /**
-   * Registrar ingreso en evento
-   */
-  registrarIngreso(
-    eventoId: string,
-    monto: number,
-    descripcion: string
-  ): Observable<Movimiento> {
+  registrarVentasLote(eventoId: string, dto: RegisterVentasLoteDto): Observable<VentaProducto[]> {
     this._loading.set(true);
-    this._error.set(null);
 
-    return this.apiService.registrarIngreso(eventoId, monto, descripcion).pipe(
+    return this.apiService.registrarVentasLote(eventoId, dto).pipe(
+      tap((nuevasVentas) => {
+        this._ventas.update((prev) => ({
+          ...prev,
+          [eventoId]: [...(prev[eventoId] ?? []), ...nuevasVentas],
+        }));
+        this.notificationService.showSuccess('Ventas registradas exitosamente');
+      }),
+      catchError((err: unknown) => this._catchError(err, 'Error al registrar ventas')),
+      finalize(() => this._loading.set(false)),
+    );
+  }
+
+  // ============================================================================
+  // Ingreso / Gasto Actions
+  // ============================================================================
+
+  registrarIngreso(eventoId: string, dto: RegistrarIngresoEventoDto): Observable<Movimiento> {
+    this._loading.set(true);
+
+    return this.apiService.registrarIngreso(eventoId, dto).pipe(
       tap(() => {
         this.notificationService.showSuccess('Ingreso registrado exitosamente');
+        this.loadKpis(eventoId);
       }),
-      catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al registrar ingreso';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
-        return throwError(() => err);
-      }),
-      finalize(() => this._loading.set(false))
+      catchError((err: unknown) => this._catchError(err, 'Error al registrar ingreso')),
+      finalize(() => this._loading.set(false)),
     );
   }
 
-  /**
-   * Registrar egreso en evento
-   */
-  registrarEgreso(
-    eventoId: string,
-    monto: number,
-    descripcion: string,
-    responsableId: string,
-    medioPago: string,
-    estadoPago: string
-  ): Observable<Movimiento> {
+  registrarGasto(eventoId: string, dto: RegistrarGastoEventoDto): Observable<Movimiento> {
     this._loading.set(true);
-    this._error.set(null);
 
-    return this.apiService.registrarEgreso(
-      eventoId,
-      monto,
-      descripcion,
-      responsableId,
-      medioPago,
-      estadoPago
-    ).pipe(
+    return this.apiService.registrarGasto(eventoId, dto).pipe(
       tap(() => {
-        this.notificationService.showSuccess('Egreso registrado exitosamente');
+        this.notificationService.showSuccess('Gasto registrado exitosamente');
+        this.loadKpis(eventoId);
       }),
-      catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al registrar egreso';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
-        return throwError(() => err);
-      }),
-      finalize(() => this._loading.set(false))
+      catchError((err: unknown) => this._catchError(err, 'Error al registrar gasto')),
+      finalize(() => this._loading.set(false)),
     );
   }
 
-  /**
-   * Cargar resumen financiero de evento
-   */
-  loadResumen(eventoId: string): void {
+  // ============================================================================
+  // Cerrar Evento
+  // ============================================================================
+
+  cerrarEvento(
+    eventoId: string,
+    dto: CerrarEventoVentaDto,
+  ): Observable<{ message: string; movimientos: Movimiento[] }> {
     this._loading.set(true);
-    this._error.set(null);
 
-    this.apiService.getResumen(eventoId).subscribe({
-      next: (resumen: { totalIngresos: number; totalEgresos: number; resultadoNeto: number }) => {
-        this._resumenes.update((prev) => ({
-          ...prev,
-          [eventoId]: { ...this.selected(), ...resumen } as EventoConResumen,
-        }));
-        this._loading.set(false);
-      },
-      error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar resumen';
-        this._error.set(errorMsg);
-        this._loading.set(false);
-        this.notificationService.showError(errorMsg);
-      },
-    });
+    return this.apiService.cerrar(eventoId, dto).pipe(
+      tap(() => {
+        this.notificationService.showSuccess('Evento cerrado exitosamente');
+        this.loadKpis(eventoId);
+      }),
+      catchError((err: unknown) => this._catchError(err, 'Error al cerrar evento')),
+      finalize(() => this._loading.set(false)),
+    );
   }
 
-  /**
-   * Seleccionar un evento
-   */
-  select(id: string | null): void {
-    this._selectedId.set(id);
-  }
+  // ============================================================================
+  // Util
+  // ============================================================================
 
-  /**
-   * Limpiar estado
-   */
   clear(): void {
     this._eventos.set([]);
     this._productos.set({});
     this._ventas.set({});
-    this._resumenes.set({});
+    this._kpis.set({});
+    this._resumenVentas.set({});
     this._loading.set(false);
     this._error.set(null);
     this._selectedId.set(null);
+  }
+
+  private _handleError(err: unknown, fallback: string): void {
+    const msg = err instanceof Error ? err.message : fallback;
+    this._error.set(msg);
+    this._loading.set(false);
+    this.notificationService.showError(msg);
+  }
+
+  private _catchError(err: unknown, fallback: string): Observable<never> {
+    const msg = err instanceof Error ? err.message : fallback;
+    this._error.set(msg);
+    this.notificationService.showError(msg);
+    return throwError(() => err);
   }
 }

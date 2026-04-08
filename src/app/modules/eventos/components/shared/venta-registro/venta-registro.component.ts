@@ -3,7 +3,14 @@
  * Max 100 líneas - SIN any
  */
 
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy,
+  OnInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormGroup, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -23,11 +30,11 @@ import { SelectFieldComponent } from '../../../../../shared/components/form/sele
     ReactiveFormsModule,
     FormFieldComponent,
     NumberFieldComponent,
-    SelectFieldComponent
+    SelectFieldComponent,
   ],
   templateUrl: './venta-registro.component.html',
   styleUrl: './venta-registro.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VentaRegistroComponent implements OnInit {
   @Input() productos: Producto[] = [];
@@ -43,20 +50,21 @@ export class VentaRegistroComponent implements OnInit {
   ngOnInit(): void {
     this.form = this.fb.group({
       productoId: ['', [Validators.required]],
-      personaId: ['', [Validators.required]],
-      cantidad: [1, [Validators.required, positiveNumberValidator(), Validators.min(1)]]
+      vendedorId: ['', [Validators.required]],
+      cantidad: [1, [Validators.required, positiveNumberValidator(), Validators.min(1)]],
     });
   }
 
   // Option functions for select fields
   getProductoId = (producto: Producto): string => producto.id;
-  getProductoLabel = (producto: Producto): string => `${producto.nombre} - $${producto.precioVenta.toFixed(2)}`;
+  getProductoLabel = (producto: Producto): string =>
+    `${producto.nombre} - $${producto.precioVenta.toFixed(2)}`;
   getPersonaId = (persona: Persona): string => persona.id;
   getPersonaLabel = (persona: Persona): string => persona.nombre;
 
   get productoSeleccionado(): Producto | undefined {
     const id = this.form.get('productoId')?.value;
-    return this.productos.find(p => p.id === id);
+    return this.productos.find((p) => p.id === id);
   }
 
   get totalVenta(): number {
@@ -79,8 +87,8 @@ export class VentaRegistroComponent implements OnInit {
 
     const dto: CreateVentaProductoDto = {
       productoId: this.form.value.productoId as string,
-      personaId: this.form.value.personaId as string,
-      cantidad: Number(this.form.value.cantidad)
+      vendedorId: this.form.value.vendedorId as string,
+      cantidad: Number(this.form.value.cantidad),
     };
 
     this.submit.emit(dto);

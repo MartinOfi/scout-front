@@ -40,19 +40,11 @@
         </div>
 
         <div class="detail-header__right">
-          <button class="detail-header__back" (click)="onBack()">
-            <mat-icon>arrow_back</mat-icon>
-            Volver
-          </button>
+          <app-button variant="outline" size="sm" icon="arrow_back" (clicked)="onBack()">Volver</app-button>
           @if (evento()!.tipo === tipoEvento.VENTA) {
-            <button class="btn-action btn-action--danger" (click)="openCerrarDialog()" title="Cerrar evento">
-              <mat-icon>lock</mat-icon>
-              Cerrar
-            </button>
+            <app-button variant="danger" size="sm" icon="lock" (clicked)="openCerrarDialog()">Cerrar</app-button>
           }
-          <button class="btn-icon" (click)="onEdit()" title="Editar evento">
-            <mat-icon>edit</mat-icon>
-          </button>
+          <app-button variant="outline" size="sm" icon="edit" (clicked)="onEdit()" />
         </div>
       </header>
 
@@ -86,10 +78,7 @@
           <!-- PRODUCTOS tab -->
           @if (activeTab() === 'productos') {
             <div class="tab-toolbar">
-              <button class="btn-action" (click)="openProductoDialog()">
-                <mat-icon>add</mat-icon>
-                Gestionar Productos
-              </button>
+              <app-button icon="add" (clicked)="openProductoDialog()">Gestionar Productos</app-button>
             </div>
             @if (eventoProductos().length === 0) {
               <div class="tab-empty">
@@ -109,10 +98,13 @@
           <!-- VENTAS tab -->
           @if (activeTab() === 'ventas') {
             <div class="tab-toolbar">
-              <button class="btn-action" (click)="navigateToVentasLote()">
-                <mat-icon>add_shopping_cart</mat-icon>
-                Registrar Ventas en Lote
-              </button>
+              <app-text-field
+                type="search"
+                placeholder="Buscar por vendedor..."
+                [ngModel]="vendedorSearch()"
+                (ngModelChange)="onVendedorSearchChange($event)"
+              />
+              <app-button icon="add_shopping_cart" (clicked)="navigateToVentasLote()">Registrar Ventas en Lote</app-button>
             </div>
             <div class="table-container">
               @if (ventasTableData().length === 0) {
@@ -135,15 +127,9 @@
           @if (activeTab() === 'movimientos') {
             <div class="tab-toolbar">
               @if (evento()!.tipo === tipoEvento.GRUPO) {
-                <button class="btn-action btn-action--positive" (click)="openIngresoDialog()">
-                  <mat-icon>add_circle</mat-icon>
-                  Registrar Ingreso
-                </button>
+                <app-button variant="success" icon="add_circle" (clicked)="openIngresoDialog()">Registrar Ingreso</app-button>
               }
-              <button class="btn-action" (click)="openGastoDialog()">
-                <mat-icon>remove_circle</mat-icon>
-                Registrar Gasto
-              </button>
+              <app-button icon="remove_circle" (clicked)="openGastoDialog()">Registrar Gasto</app-button>
             </div>
             <div class="tab-empty">
               <div class="tab-empty__icon"><mat-icon>swap_horiz</mat-icon></div>

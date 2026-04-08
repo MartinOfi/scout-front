@@ -1,0 +1,16 @@
+<div class="dialog-container">
+
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon>add_circle</mat-icon>
+    Registrar Ingreso
+  </h2>
+
+  <mat-dialog-content class="dialog-content">
+    <app-ingreso-form
+      [responsables]="data.responsables"
+      (formSubmit)="onFormSubmit($event)"
+      (cancel)="onCancel()"
+    />
+  </mat-dialog-content>
+
+</div>

@@ -48,7 +48,7 @@ export class SidebarComponent {
     },
     { icon: 'swap_horiz', label: 'Movimientos', route: '/movimientos' },
     { icon: 'hiking', label: 'Campamentos', route: '/campamentos' },
-    // { icon: 'event', label: 'Eventos', route: '/eventos' },
+    { icon: 'event', label: 'Eventos', route: '/eventos' },
     { icon: 'people', label: 'Gestión de Personas', route: '/personas' },
     // { icon: 'assessment', label: 'Reportes', route: '/reportes' },
     { icon: 'settings', label: 'Configuración', route: '/configuracion' },

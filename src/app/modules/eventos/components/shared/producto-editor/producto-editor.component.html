@@ -1,109 +1,50 @@
-<div class="producto-editor">
-  <div class="header">
-    <h3>Productos</h3>
-  </div>
+<form [formGroup]="form" (ngSubmit)="onAdd()" class="producto-form">
 
-  <!-- Add Product Form -->
-  <form [formGroup]="form" class="add-form">
-    <app-form-field
-      label="Nombre del Producto"
-      [forId]="'nombre-input'"
-      [required]="true"
-      [invalid]="!!(form.get('nombre')?.invalid && form.get('nombre')?.touched)"
-    >
-      <app-text-field
-        id="nombre-input"
-        formControlName="nombre"
-        placeholder="Ej: Empanadas"
-      />
-      <span error>El nombre es requerido</span>
-    </app-form-field>
+  <!-- Nombre -->
+  <app-form-field label="Nombre del Producto" [forId]="'nombre-input'" [required]="true"
+    [invalid]="!!(form.get('nombre')?.invalid && form.get('nombre')?.touched)">
+    <app-text-field id="nombre-input" formControlName="nombre" placeholder="Ej: Empanadas" />
+    @if (form.get('nombre')?.hasError('required')) {
+    <span error>El nombre es requerido</span>
+    } @else if (form.get('nombre')?.hasError('minlength')) {
+    <span error>Mínimo 2 caracteres</span>
+    }
+  </app-form-field>
 
-    <app-form-field
-      label="Precio de Costo"
-      [forId]="'precio-costo-input'"
-      [required]="true"
-      [invalid]="!!(form.get('precioCosto')?.invalid && form.get('precioCosto')?.touched)"
-    >
-      <div class="input-with-prefix">
-        <span class="input-prefix">$</span>
-        <app-number-field
-          id="precio-costo-input"
-          formControlName="precioCosto"
-          [min]="0"
-          [step]="0.01"
-          placeholder="0.00"
-        />
-      </div>
-      <span error>Requerido</span>
-    </app-form-field>
-
-    <app-form-field
-      label="Precio de Venta"
-      [forId]="'precio-venta-input'"
-      [required]="true"
-      [invalid]="!!(form.get('precioVenta')?.invalid && form.get('precioVenta')?.touched)"
-    >
-      <div class="input-with-prefix">
-        <span class="input-prefix">$</span>
-        <app-number-field
-          id="precio-venta-input"
-          formControlName="precioVenta"
-          [min]="0"
-          [step]="0.01"
-          placeholder="0.00"
-        />
-      </div>
-      <span error>Requerido</span>
-    </app-form-field>
-
-    <button type="button" class="btn-primary" (click)="onAdd()">
-      <i class="fas fa-plus"></i>
-      Agregar
-    </button>
-  </form>
-
-  <!-- Products Table -->
-  <table mat-table [dataSource]="productos" class="productos-table">
-    <ng-container matColumnDef="nombre">
-      <th mat-header-cell *matHeaderCellDef>Producto</th>
-      <td mat-cell *matCellDef="let producto">{{ producto.nombre }}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="precioCosto">
-      <th mat-header-cell *matHeaderCellDef>Costo</th>
-      <td mat-cell *matCellDef="let producto">${{ producto.precioCosto | number:'1.2-2' }}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="precioVenta">
-      <th mat-header-cell *matHeaderCellDef>Venta</th>
-      <td mat-cell *matCellDef="let producto">${{ producto.precioVenta | number:'1.2-2' }}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="margen">
-      <th mat-header-cell *matHeaderCellDef>Margen</th>
-      <td mat-cell *matCellDef="let producto">
-        ${{ calcularMargen(producto) | number:'1.2-2' }}
-        ({{ calcularPorcentajeMargen(producto) | number:'1.0-0' }}%)
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef>Acciones</th>
-      <td mat-cell *matCellDef="let producto">
-        <button mat-icon-button color="warn" (click)="onRemove(producto.id)">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </td>
-    </ng-container>
-
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
-
-  @if (productos.length === 0) {
-    <div class="empty-state">
-      <p>No hay productos agregados</p>
+  <!-- Precio de Costo -->
+  <app-form-field label="Precio de Costo" [forId]="'precio-costo-input'" [required]="true"
+    [invalid]="!!(form.get('precioCosto')?.invalid && form.get('precioCosto')?.touched)">
+    <div class="input-with-prefix">
+      <span class="input-prefix">$</span>
+      <app-number-field id="precio-costo-input" formControlName="precioCosto" [min]="0" [step]="0.01"
+        placeholder="0.00" />
     </div>
-  }
-</div>
+    @if (form.get('precioCosto')?.hasError('required')) {
+    <span error>El precio de costo es requerido</span>
+    } @else if (form.get('precioCosto')?.hasError('positiveNumber')) {
+    <span error>Debe ser un número positivo</span>
+    }
+  </app-form-field>
+
+  <!-- Precio de Venta -->
+  <app-form-field label="Precio de Venta" [forId]="'precio-venta-input'" [required]="true"
+    [invalid]="!!(form.get('precioVenta')?.invalid && form.get('precioVenta')?.touched)">
+    <div class="input-with-prefix">
+      <span class="input-prefix">$</span>
+      <app-number-field id="precio-venta-input" formControlName="precioVenta" [min]="0" [step]="0.01"
+        placeholder="0.00" />
+    </div>
+    @if (form.get('precioVenta')?.hasError('required')) {
+    <span error>El precio de venta es requerido</span>
+    } @else if (form.get('precioVenta')?.hasError('positiveNumber')) {
+    <span error>Debe ser un número positivo</span>
+    }
+  </app-form-field>
+
+  <!-- Actions -->
+  <app-form-actions [borderTop]="true" align="end">
+    <app-button variant="secondary" type="button" (clicked)="onCancel()">Cerrar</app-button>
+    <app-button variant="primary" type="submit">Agregar Producto</app-button>
+  </app-form-actions>
+
+</form>

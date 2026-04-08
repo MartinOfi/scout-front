@@ -1,0 +1,38 @@
+<article class="producto-card">
+
+  <div class="producto-card__header">
+    <span class="producto-card__nombre">{{ producto().nombre }}</span>
+    <button
+      mat-icon-button
+      class="producto-card__delete"
+      (click)="onRemove()"
+      aria-label="Eliminar producto"
+    >
+      <mat-icon>delete_outline</mat-icon>
+    </button>
+  </div>
+
+  <div class="producto-card__price">
+    <span class="producto-card__price-value">{{ format(producto().precioVenta) }}</span>
+    <span class="producto-card__price-label">precio de venta</span>
+  </div>
+
+  <div class="producto-card__stats">
+    <div class="producto-card__stat">
+      <span class="producto-card__stat-label">costo</span>
+      <span class="producto-card__stat-value">{{ format(producto().precioCosto) }}</span>
+    </div>
+    <div class="producto-card__stat" [ngClass]="gananciaClass()">
+      <span class="producto-card__stat-label">ganancia</span>
+      <span class="producto-card__stat-value">{{ format(ganancia()) }}</span>
+    </div>
+  </div>
+
+  @if (producto().cantidadVendida !== undefined) {
+    <div class="producto-card__ventas">
+      <mat-icon>shopping_bag</mat-icon>
+      <span>{{ producto().cantidadVendida }} vendidas</span>
+    </div>
+  }
+
+</article>

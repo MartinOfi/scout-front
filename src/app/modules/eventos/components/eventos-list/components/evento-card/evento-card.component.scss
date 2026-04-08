@@ -1,0 +1,265 @@
+// =============================================================================
+// EVENTO CARD - EXPEDITION-INSPIRED DESIGN
+// Mirrors campamento-card aesthetics
+// =============================================================================
+
+@use '../../../../../../shared/styles/tokens' as t;
+@use 'app/shared/styles/responsive' as *;
+
+// -----------------------------------------------------------------------------
+// CARD CONTAINER
+// -----------------------------------------------------------------------------
+
+.evento-card {
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  box-shadow: t.$shadow-card;
+  overflow: hidden;
+  transition:
+    transform 200ms ease-out,
+    box-shadow 200ms ease-out;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// TIPO BADGE (top-right)
+// -----------------------------------------------------------------------------
+
+.evento-card__tipo-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+
+  mat-icon {
+    font-size: 12px;
+    width: 12px;
+    height: 12px;
+  }
+
+  &--venta {
+    background-color: color-mix(in srgb, t.$brand-burgundy 12%, transparent);
+    color: t.$brand-burgundy;
+  }
+
+  &--grupo {
+    background-color: color-mix(in srgb, t.$color-success 12%, transparent);
+    color: t.$color-success;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// CARD HEADER WITH BADGE
+// -----------------------------------------------------------------------------
+
+.evento-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 16px 12px;
+}
+
+.evento-card__badge {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, t.$brand-burgundy 0%, #a32d36 100%);
+  border-radius: 10px;
+  color: white;
+
+  mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.evento-card__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.evento-card__name {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: t.$stone-900;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.evento-card__date {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: t.$stone-500;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// CARD BODY - STATS
+// -----------------------------------------------------------------------------
+
+.evento-card__body {
+  padding: 0 16px 12px;
+}
+
+.evento-card__stats {
+  display: flex;
+  gap: 8px;
+}
+
+.evento-card__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 16px;
+  background-color: t.$stone-50;
+  border-radius: 8px;
+  min-width: 64px;
+
+  &--wide {
+    padding: 8px 12px;
+    min-width: unset;
+    flex: 1;
+    align-items: flex-start;
+  }
+}
+
+.evento-card__stat-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: t.$stone-800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.evento-card__stat-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: t.$stone-500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+// -----------------------------------------------------------------------------
+// DESCRIPTION (optional)
+// -----------------------------------------------------------------------------
+
+.evento-card__description {
+  margin: 0 0 0;
+  padding: 0 16px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: t.$stone-600;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// -----------------------------------------------------------------------------
+// CARD FOOTER - ACTIONS
+// -----------------------------------------------------------------------------
+
+.evento-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: 1px solid t.$stone-100;
+  background-color: t.$stone-50;
+}
+
+.evento-card__action-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background-color: t.$brand-burgundy;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  &:hover {
+    background-color: t.$brand-burgundy-light;
+  }
+}
+
+.evento-card__actions-secondary {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.evento-card__action-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: t.$stone-400;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    background-color: t.$stone-200;
+    color: t.$stone-700;
+  }
+}

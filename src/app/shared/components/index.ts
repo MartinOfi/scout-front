@@ -22,3 +22,4 @@ export * from './filters/generic-filters/generic-filters.component';
 export * from './forms/days-selector/days-selector.component';
 export * from './kpi-dashboard/kpi-dashboard.component';
 export * from './persona-selector-dialog/persona-selector-dialog.component';
+export * from './producto-card/producto-card.component';

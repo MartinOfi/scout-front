@@ -1,38 +1,96 @@
-<div class="eventos-list-container">
-  <header class="page-header">
-    <h1>Eventos</h1>
-    <app-button variant="primary" icon="add" (clicked)="onCreate()">
-      Nuevo Evento
-    </app-button>
-  </header>
+<main class="eventos-page">
+  <div class="eventos-content">
 
-  <app-evento-filters (filterChange)="onFiltroChange($event)" />
+    <!-- Loading State -->
+    @if (loading()) {
+      <div class="eventos-loading">
+        <app-loading-spinner></app-loading-spinner>
+      </div>
+    }
 
-  @if (loading()) {
-    <div class="loading-state">
-      <mat-spinner diameter="50"></mat-spinner>
-      <p>Cargando eventos...</p>
-    </div>
-  } @else if (error()) {
-    <div class="error-state">
-      <mat-icon color="warn">error</mat-icon>
-      <p>{{ error() }}</p>
-      <app-button variant="secondary" (clicked)="state.load()">Reintentar</app-button>
-    </div>
-  } @else if (tableData().length === 0) {
-    <div class="empty-state">
-      <mat-icon>event_busy</mat-icon>
-      <p>No hay eventos disponibles</p>
-      @if (filtroTipo() !== 'todos' || filtroBusqueda()) {
-        <p class="hint">Intenta ajustar los filtros</p>
+    <!-- Error State -->
+    @if (error()) {
+      <div class="eventos-error">
+        <mat-icon color="warn">error_outline</mat-icon>
+        <span>{{ error() }}</span>
+      </div>
+    }
+
+    <!-- Content (Stats + Filters + Grid) -->
+    @if (!loading() && !error()) {
+
+      @if (eventos().length === 0) {
+        <!-- Empty State (no events at all) -->
+        <div class="eventos-empty">
+          <div class="eventos-empty__icon">
+            <mat-icon>event_busy</mat-icon>
+          </div>
+          <h2 class="eventos-empty__title">No hay eventos registrados</h2>
+          <p class="eventos-empty__text">
+            Comienza creando tu primer evento para gestionar ventas y actividades grupales.
+          </p>
+          <button type="button" class="eventos-empty__action" (click)="onCreate()">
+            <mat-icon>add</mat-icon>
+            Crear Evento
+          </button>
+        </div>
+      } @else {
+
+        <!-- Stats Summary Bar with Action -->
+        <section class="eventos-stats" aria-label="Resumen de eventos">
+          <div class="eventos-stats__total">
+            <span class="eventos-stats__number">{{ stats().total }}</span>
+            <span class="eventos-stats__label">Eventos</span>
+          </div>
+          <div class="eventos-stats__divider" aria-hidden="true"></div>
+          <div class="eventos-stats__breakdown">
+            <div class="eventos-stats__item">
+              <span class="eventos-stats__dot eventos-stats__dot--venta" aria-hidden="true"></span>
+              <span class="eventos-stats__item-label">Ventas</span>
+              <span class="eventos-stats__item-count">{{ stats().venta }}</span>
+            </div>
+            <div class="eventos-stats__item">
+              <span class="eventos-stats__dot eventos-stats__dot--grupo" aria-hidden="true"></span>
+              <span class="eventos-stats__item-label">Grupo</span>
+              <span class="eventos-stats__item-count">{{ stats().grupo }}</span>
+            </div>
+          </div>
+          <app-button
+            class="eventos-stats__action"
+            icon="add"
+            variant="primary"
+            (clicked)="onCreate()">
+            Crear Evento
+          </app-button>
+        </section>
+
+        <!-- Filters -->
+        <app-generic-filters
+          [filterConfigs]="filterConfigs"
+          [autoApply]="true"
+          [inline]="true"
+          (filtersChanged)="onFiltroChange($event)"
+        />
+
+        <!-- Events Grid or Filtered Empty -->
+        @if (eventosFiltrados().length === 0) {
+          <div class="eventos-empty eventos-empty--filtered">
+            <mat-icon>search_off</mat-icon>
+            <p>No hay eventos que coincidan con los filtros.</p>
+          </div>
+        } @else {
+          <section class="eventos-grid" aria-label="Lista de eventos">
+            @for (evento of eventosFiltrados(); track evento.id) {
+              <app-evento-card
+                [evento]="evento"
+                (select)="onSelect($event)"
+                (edit)="onEdit($event)">
+              </app-evento-card>
+            }
+          </section>
+        }
+
       }
-    </div>
-  } @else {
-    <app-data-table
-      [data]="tableData()"
-      [columns]="tableColumns"
-      [config]="{ showHeader: true, hoverable: true }"
-      (actionClick)="onActionClick($event)"
-      (rowClick)="onRowClick($event)" />
-  }
-</div>
+    }
+  </div>
+</main>

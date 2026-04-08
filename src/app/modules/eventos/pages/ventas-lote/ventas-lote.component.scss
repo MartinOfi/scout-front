@@ -1,0 +1,290 @@
+@use '../../../../shared/styles/tokens' as t;
+@use 'app/shared/styles/responsive' as *;
+
+$card-radius: 12px;
+
+.ventas-lote-page {
+  min-height: 100%;
+}
+
+.ventas-lote-content {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+// -----------------------------------------------------------------------------
+// HEADER
+// -----------------------------------------------------------------------------
+
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  background: white;
+  border-radius: $card-radius;
+  box-shadow: t.$shadow-card;
+
+  @include respond-to('sm') {
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+  }
+
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px 8px 10px;
+    background: transparent;
+    border: 1px solid t.$stone-200;
+    border-radius: 8px;
+    color: t.$stone-600;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color t.$transition-fast;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &:hover {
+      background-color: t.$stone-50;
+    }
+  }
+
+  &__title {
+    margin: 0 0 4px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: t.$stone-900;
+  }
+
+  &__subtitle {
+    margin: 0;
+    font-size: 13px;
+    color: t.$stone-500;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// FORM
+// -----------------------------------------------------------------------------
+
+.ventas-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-card {
+  padding: 20px;
+  background: white;
+  border-radius: $card-radius;
+  box-shadow: t.$shadow-card;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 16px;
+    font-size: 15px;
+    font-weight: 600;
+    color: t.$stone-800;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      color: t.$brand-burgundy;
+    }
+  }
+}
+
+.no-products {
+  margin: 0;
+  font-size: 14px;
+  color: t.$stone-500;
+  text-align: center;
+  padding: 24px 0;
+}
+
+// -----------------------------------------------------------------------------
+// PRODUCTS TABLE
+// -----------------------------------------------------------------------------
+
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  th {
+    padding: 8px 12px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: t.$stone-500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid t.$stone-100;
+  }
+
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid t.$stone-50;
+    vertical-align: middle;
+  }
+}
+
+.col-nombre {
+  flex: 1;
+  color: t.$stone-800;
+  font-weight: 500;
+}
+
+.col-precio,
+.col-subtotal {
+  text-align: right;
+  white-space: nowrap;
+  color: t.$stone-700;
+  font-variant-numeric: tabular-nums;
+}
+
+.col-cantidad {
+  width: 100px;
+  text-align: center;
+}
+
+.product-row {
+  transition: background-color t.$transition-fast;
+
+  &--active {
+    background-color: rgba(t.$brand-burgundy, 0.03);
+  }
+
+  &:last-child td {
+    border-bottom: none;
+  }
+}
+
+.cantidad-input {
+  width: 72px;
+  padding: 6px 8px;
+  border: 1px solid t.$stone-200;
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
+  color: t.$stone-800;
+  background: t.$stone-50;
+  transition: border-color t.$transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: t.$brand-burgundy;
+    background: white;
+  }
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+.total-row {
+  background-color: t.$stone-50;
+
+  .total-label {
+    font-weight: 600;
+    color: t.$stone-700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 12px;
+  }
+
+  .total-value {
+    text-align: right;
+    font-weight: 700;
+    font-size: 15px;
+    color: t.$stone-900;
+    font-variant-numeric: tabular-nums;
+    padding: 12px;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// ACTIONS
+// -----------------------------------------------------------------------------
+
+.page-loading {
+  display: flex;
+  justify-content: center;
+  padding: 60px 0;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color t.$transition-fast,
+    opacity t.$transition-fast;
+  border: none;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &__spinner {
+    animation: spin 1s linear infinite;
+  }
+
+  &--primary {
+    background-color: t.$brand-burgundy;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: t.$brand-burgundy-light;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &--secondary {
+    background-color: white;
+    border: 1px solid t.$stone-200;
+    color: t.$stone-700;
+
+    &:hover {
+      background-color: t.$stone-50;
+    }
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

@@ -1,40 +1,114 @@
 <div class="scout-form-page">
   <div class="scout-form-wrapper scout-form-wrapper--single">
     <div class="scout-form-card">
+
       <!-- Header -->
       <header class="scout-form-header scout-form-header--with-divider">
         <h1 class="scout-form-title">
-          <i class="fas fa-calendar-alt scout-form-icon"></i>
-          {{ isEditing ? 'Editar Evento' : 'Nuevo Evento' }}
+          <mat-icon class="scout-form-icon">event</mat-icon>
+          {{ isEditing() ? 'Editar Evento' : 'Nuevo Evento' }}
         </h1>
         <p class="scout-form-subtitle">
-          {{ isEditing ? 'Modifica los datos del evento' : 'Registra un nuevo evento o venta' }}
+          {{ isEditing() ? 'Modifica los datos del evento' : 'Registra un nuevo evento o venta' }}
         </p>
       </header>
 
       <!-- Content -->
       <div class="scout-form-body">
-        @if (loading()) {
+
+        @if (error()) {
+          <div class="scout-form-error" role="alert">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ error() }}</span>
+          </div>
+        }
+
+        @if (loadingData()) {
           <div class="loading-state">
             <div class="loading-spinner"></div>
-            <p class="loading-text">Cargando...</p>
+            <p class="loading-text">Cargando datos del evento...</p>
           </div>
         } @else {
-          <form [formGroup]="eventoForm" (ngSubmit)="onSubmit()">
+          <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
             <!-- Nombre -->
             <app-form-field
               label="Nombre"
               [forId]="'nombre-input'"
               [required]="true"
-              [invalid]="!!(eventoForm.get('nombre')?.invalid && eventoForm.get('nombre')?.touched)"
+              [invalid]="!!(form.get('nombre')?.invalid && form.get('nombre')?.touched)"
             >
               <app-text-field
                 id="nombre-input"
                 formControlName="nombre"
                 placeholder="Nombre del evento"
               />
-              <span error>El nombre es requerido</span>
+              <span error>El nombre es requerido (mínimo 3 caracteres)</span>
             </app-form-field>
+
+            <!-- Tipo -->
+            <app-form-field
+              label="Tipo de evento"
+              [forId]="'tipo-select'"
+              [required]="true"
+              [invalid]="!!(form.get('tipo')?.invalid && form.get('tipo')?.touched)"
+            >
+              <app-select-field
+                id="tipo-select"
+                formControlName="tipo"
+                placeholder="Seleccionar tipo"
+                [options]="tipoOptions"
+                optionValue="value"
+                optionLabel="label"
+              />
+              <span error>El tipo es requerido</span>
+            </app-form-field>
+
+            <!-- Fecha -->
+            <app-form-field
+              label="Fecha"
+              [forId]="'fecha-input'"
+              [required]="true"
+              [invalid]="!!(form.get('fecha')?.invalid && form.get('fecha')?.touched)"
+            >
+              <app-date-field
+                id="fecha-input"
+                formControlName="fecha"
+                placeholder="AAAA-MM-DD"
+              />
+              <span error>La fecha es requerida</span>
+            </app-form-field>
+
+            <!-- tipoEvento (solo para GRUPO) -->
+            @if (form.get('tipo')?.value === tipoEvento.GRUPO) {
+              <app-form-field
+                label="Tipo de actividad grupal"
+                [forId]="'tipoEvento-input'"
+              >
+                <app-text-field
+                  id="tipoEvento-input"
+                  formControlName="tipoEvento"
+                  placeholder="Ej: reunión, salida, campito..."
+                />
+              </app-form-field>
+            }
+
+            <!-- Destino Ganancia (solo para VENTA) -->
+            @if (form.get('tipo')?.value === tipoEvento.VENTA) {
+              <app-form-field
+                label="Destino de ganancia"
+                [forId]="'destino-select'"
+              >
+                <app-select-field
+                  id="destino-select"
+                  formControlName="destinoGanancia"
+                  placeholder="Seleccionar destino"
+                  [options]="destinoOptions"
+                  optionValue="value"
+                  optionLabel="label"
+                />
+              </app-form-field>
+            }
 
             <!-- Descripción -->
             <app-form-field
@@ -49,70 +123,24 @@
               />
             </app-form-field>
 
-            <!-- Tipo -->
-            <app-form-field
-              label="Tipo"
-              [forId]="'tipo-select'"
-              [required]="true"
-              [invalid]="!!(eventoForm.get('tipo')?.invalid && eventoForm.get('tipo')?.touched)"
-            >
-              <app-select-field
-                id="tipo-select"
-                formControlName="tipo"
-                placeholder="Seleccionar tipo"
-                [options]="tipoOptions"
-                optionValue="value"
-                optionLabel="label"
-              />
-              <span error>El tipo es requerido</span>
-            </app-form-field>
-
-            <!-- Fecha - mantiene mat-datepicker -->
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Fecha</mat-label>
-              <input matInput [matDatepicker]="picker" formControlName="fecha">
-              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-              <mat-datepicker #picker></mat-datepicker>
-            </mat-form-field>
-
-            <!-- Destino Ganancia (solo para eventos de venta) -->
-            @if (eventoForm.get('tipo')?.value === tipoEvento.VENTA) {
-              <app-form-field
-                label="Destino Ganancia"
-                [forId]="'destino-select'"
-              >
-                <app-select-field
-                  id="destino-select"
-                  formControlName="destinoGanancia"
-                  placeholder="Seleccionar destino"
-                  [options]="destinoOptions"
-                  optionValue="value"
-                  optionLabel="label"
-                />
-              </app-form-field>
-            }
           </form>
         }
       </div>
 
       <!-- Actions -->
-      @if (!loading()) {
-        <div class="scout-form-actions">
-          <div class="scout-form-actions__row scout-form-actions__row--between">
-            <button type="button" class="btn-secondary" (click)="onCancel()">
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              class="btn-primary"
-              [disabled]="eventoForm.invalid || loading()"
-              (click)="onSubmit()"
-            >
-              {{ isEditing ? 'Actualizar' : 'Crear' }}
-            </button>
-          </div>
-        </div>
+      @if (!loadingData()) {
+        <app-form-actions align="end">
+          <app-button variant="secondary" (clicked)="onCancel()">Cancelar</app-button>
+          <app-button
+            variant="primary"
+            [disabled]="form.invalid || loading()"
+            (clicked)="onSubmit()"
+          >
+            {{ isEditing() ? 'Actualizar' : 'Crear Evento' }}
+          </app-button>
+        </app-form-actions>
       }
+
     </div>
   </div>
 </div>

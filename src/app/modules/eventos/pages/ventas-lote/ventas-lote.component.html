@@ -1,0 +1,128 @@
+<div class="ventas-lote-page">
+  <div class="ventas-lote-content">
+
+    <!-- Header -->
+    <header class="page-header">
+      <button class="page-header__back" (click)="onBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Volver
+      </button>
+      <div class="page-header__info">
+        <h1 class="page-header__title">Registrar Ventas en Lote</h1>
+        <p class="page-header__subtitle">Seleccioná un vendedor y cargá las cantidades vendidas.</p>
+      </div>
+    </header>
+
+    @if (loading()) {
+      <div class="page-loading">
+        <app-loading-spinner />
+      </div>
+    } @else {
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="ventas-form">
+
+        <!-- Vendedor selector -->
+        <div class="form-card">
+          <h2 class="form-card__title">
+            <mat-icon>person</mat-icon>
+            Vendedor
+          </h2>
+          <app-form-field
+            label="Responsable de las ventas"
+            forId="vendedor-select"
+            [required]="true"
+            [invalid]="!!(form.get('vendedorId')?.invalid && form.get('vendedorId')?.touched)"
+          >
+            <app-select-field
+              id="vendedor-select"
+              formControlName="vendedorId"
+              [options]="personas()"
+              [optionValueFn]="getPersonaId"
+              [optionLabelFn]="getPersonaLabel"
+              placeholder="Seleccioná un vendedor"
+            />
+            <span error>El vendedor es requerido</span>
+          </app-form-field>
+        </div>
+
+        <!-- Products table -->
+        <div class="form-card">
+          <h2 class="form-card__title">
+            <mat-icon>inventory_2</mat-icon>
+            Cantidades Vendidas
+          </h2>
+
+          @if (productos().length === 0) {
+            <p class="no-products">No hay productos cargados para este evento.</p>
+          } @else {
+            <!-- Build controls reactively -->
+            @for (prod of productos(); track prod.id) {
+              @if (buildCantidadControls(productos()) === undefined) {}
+            }
+
+            <table class="products-table">
+              <thead>
+                <tr>
+                  <th class="col-nombre">Producto</th>
+                  <th class="col-precio">Precio Unit.</th>
+                  <th class="col-cantidad">Cantidad</th>
+                  <th class="col-subtotal">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody formGroupName="cantidades">
+                @for (prod of productos(); track prod.id) {
+                  <tr class="product-row" [class.product-row--active]="getCantidad(prod.id) > 0">
+                    <td class="col-nombre">{{ prod.nombre }}</td>
+                    <td class="col-precio">{{ prod.precioVenta | currency:'ARS':'symbol':'1.0-0':'es-AR' }}</td>
+                    <td class="col-cantidad">
+                      <input
+                        type="number"
+                        class="cantidad-input"
+                        [formControlName]="prod.id"
+                        min="0"
+                        step="1"
+                        placeholder="0"
+                      />
+                    </td>
+                    <td class="col-subtotal">
+                      {{ getSubtotal(prod) | currency:'ARS':'symbol':'1.0-0':'es-AR' }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td colspan="3" class="total-label">Total General</td>
+                  <td class="total-value">{{ totalGeneral | currency:'ARS':'symbol':'1.0-0':'es-AR' }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          }
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <button type="button" class="btn btn--secondary" (click)="onBack()">
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn btn--primary"
+            [disabled]="submitting() || productos().length === 0"
+          >
+            @if (submitting()) {
+              <mat-icon class="btn__spinner">sync</mat-icon>
+              Registrando...
+            } @else {
+              <mat-icon>check</mat-icon>
+              Registrar Ventas
+            }
+          </button>
+        </div>
+
+      </form>
+
+    }
+
+  </div>
+</div>

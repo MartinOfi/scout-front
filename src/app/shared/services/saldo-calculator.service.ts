@@ -40,9 +40,7 @@ export class SaldoCalculatorService {
    * Uses GET /movimientos/saldo/:cajaId
    */
   calcularSaldoCaja(cajaId: string): Observable<number> {
-    return this.cajasApi.getSaldo(cajaId).pipe(
-      map(response => response.saldo)
-    );
+    return this.cajasApi.getSaldo(cajaId).pipe(map((response) => response.saldo));
   }
 
   /**
@@ -51,8 +49,8 @@ export class SaldoCalculatorService {
    */
   calcularSaldoGrupo(): Observable<number> {
     return this.cajasApi.getCajaGrupo().pipe(
-      switchMap(caja => this.cajasApi.getSaldo(caja.id)),
-      map(response => response.saldo)
+      switchMap((caja) => this.cajasApi.getSaldo(caja.id)),
+      map((response) => response.saldo),
     );
   }
 
@@ -63,14 +61,14 @@ export class SaldoCalculatorService {
   calcularSaldoFondoRama(rama: Rama): Observable<number> {
     const cajaType = RAMA_TO_CAJA_TYPE[rama];
     return this.cajasApi.getByType(cajaType).pipe(
-      switchMap(cajas => {
+      switchMap((cajas) => {
         const caja = cajas[0];
         if (!caja) {
           throw new Error(`No se encontró caja para rama ${rama}`);
         }
         return this.cajasApi.getSaldo(caja.id);
       }),
-      map(response => response.saldo)
+      map((response) => response.saldo),
     );
   }
 
@@ -78,22 +76,17 @@ export class SaldoCalculatorService {
    * Calculate saldo of a personal account by caja ID
    */
   calcularSaldoCuentaPersonal(cajaId: string): Observable<number> {
-    return this.cajasApi.getSaldo(cajaId).pipe(
-      map(response => response.saldo)
-    );
+    return this.cajasApi.getSaldo(cajaId).pipe(map((response) => response.saldo));
   }
 
   /**
    * Calculate event profit from sales
    */
-  calcularGananciaEvento(
-    ventas: VentaProducto[], 
-    productos: Producto[]
-  ): number {
+  calcularGananciaEvento(ventas: VentaProducto[], productos: Producto[]): number {
     return ventas.reduce((ganancia, venta) => {
-      const producto = productos.find(p => p.id === venta.productoId);
+      const producto = productos.find((p) => p.id === venta.productoId);
       if (!producto) return ganancia;
-      return ganancia + ((producto.precioVenta - producto.precioCosto) * venta.cantidad);
+      return ganancia + (producto.precioVenta - producto.precioCosto) * venta.cantidad;
     }, 0);
   }
 
@@ -107,20 +100,17 @@ export class SaldoCalculatorService {
   /**
    * Calculate profit per person for an event
    */
-  calcularGananciaPorPersona(
-    ventas: VentaProducto[],
-    productos: Producto[]
-  ): Map<string, number> {
+  calcularGananciaPorPersona(ventas: VentaProducto[], productos: Producto[]): Map<string, number> {
     const gananciaPorPersona = new Map<string, number>();
 
-    ventas.forEach(venta => {
-      const producto = productos.find(p => p.id === venta.productoId);
+    ventas.forEach((venta) => {
+      const producto = productos.find((p) => p.id === venta.productoId);
       if (!producto) return;
 
       const gananciaVenta = (producto.precioVenta - producto.precioCosto) * venta.cantidad;
-      
-      const gananciaActual = gananciaPorPersona.get(venta.personaId) || 0;
-      gananciaPorPersona.set(venta.personaId, gananciaActual + gananciaVenta);
+
+      const gananciaActual = gananciaPorPersona.get(venta.vendedorId) || 0;
+      gananciaPorPersona.set(venta.vendedorId, gananciaActual + gananciaVenta);
     });
 
     return gananciaPorPersona;

@@ -1,0 +1,17 @@
+<div class="dialog-container">
+
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon>receipt_long</mat-icon>
+    Registrar Gasto
+  </h2>
+
+  <mat-dialog-content class="dialog-content">
+    <app-gasto-campamento-form
+      [responsables]="data.responsables"
+      [personasParaReembolsar]="data.responsables"
+      (formSubmit)="onFormSubmit($event)"
+      (cancel)="onCancel()"
+    />
+  </mat-dialog-content>
+
+</div>

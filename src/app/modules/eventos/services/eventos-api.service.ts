@@ -2,22 +2,27 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
   Evento,
-  EventoConResumen,
+  EventoKpis,
   Producto,
   VentaProducto,
+  ResumenVentas,
   CreateEventoDto,
   UpdateEventoDto,
   CreateProductoDto,
+  UpdateProductoDto,
   CreateVentaProductoDto,
-  Movimiento,
+  RegisterVentasLoteDto,
+  CerrarEventoVentaDto,
+  RegistrarIngresoEventoDto,
+  RegistrarGastoEventoDto,
 } from '../../../shared/models';
+import { Movimiento } from '../../../shared/models';
 import { HttpService } from '../../../shared/services';
 import { API_CONFIG } from '../../../shared/constants';
 
 /**
  * API service for Eventos module
- * SIN any - all methods are typed
- * PRD F10, F11: Eventos de Venta y Eventos de Grupo
+ * All methods typed — no any
  */
 @Injectable({
   providedIn: 'root',
@@ -26,217 +31,127 @@ export class EventosApiService {
   private readonly http = inject(HttpService);
   private readonly endpoint = API_CONFIG.ENDPOINTS.EVENTOS;
 
-  /**
-   * Get all eventos
-   */
+  // ============================================================================
+  // EVENTOS
+  // ============================================================================
+
   getAll(): Observable<Evento[]> {
     return this.http.get<Evento[]>(this.endpoint);
   }
 
-  /**
-   * Get evento by ID
-   */
   getById(id: string): Observable<Evento> {
     return this.http.get<Evento>(`${this.endpoint}/${id}`);
   }
 
-  /**
-   * Create a new evento
-   */
   create(dto: CreateEventoDto): Observable<Evento> {
     return this.http.post<Evento, CreateEventoDto>(this.endpoint, dto);
   }
 
-  /**
-   * Update an evento (PATCH)
-   */
   update(id: string, dto: UpdateEventoDto): Observable<Evento> {
-    return this.http.patch<Evento, UpdateEventoDto>(
-      `${this.endpoint}/${id}`,
-      dto
-    );
+    return this.http.patch<Evento, UpdateEventoDto>(`${this.endpoint}/${id}`, dto);
   }
 
-  /**
-   * Get financial summary of evento
-   */
-  getResumen(
-    id: string
-  ): Observable<{
-    totalIngresos: number;
-    totalEgresos: number;
-    resultadoNeto: number;
-  }> {
-    return this.http.get(`${this.endpoint}/${id}/resumen`);
-  }
-
-  /**
-   * Delete an evento (soft delete)
-   */
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.endpoint}/${id}`);
   }
 
   // ============================================================================
-  // PRODUCTOS (Sale events only)
+  // KPIs & RESUMEN
   // ============================================================================
 
-  /**
-   * Get all productos of an evento
-   */
+  getKpis(eventoId: string): Observable<EventoKpis> {
+    return this.http.get<EventoKpis>(`${this.endpoint}/${eventoId}/kpis`);
+  }
+
+  getResumenVentas(eventoId: string, vendedor?: string): Observable<ResumenVentas> {
+    const params: Record<string, string> = {};
+    if (vendedor) params['vendedor'] = vendedor;
+    return this.http.get<ResumenVentas>(`${this.endpoint}/${eventoId}/resumen-ventas`, params);
+  }
+
+  // ============================================================================
+  // PRODUCTOS
+  // Note: deleteProducto and updateProducto use /eventos/productos/:productoId
+  // (no eventoId in URL — backend owns the ID)
+  // ============================================================================
+
   getProductos(eventoId: string): Observable<Producto[]> {
     return this.http.get<Producto[]>(`${this.endpoint}/${eventoId}/productos`);
   }
 
-  /**
-   * Create a new producto for an evento
-   */
-  createProducto(
-    eventoId: string,
-    dto: CreateProductoDto
-  ): Observable<Producto> {
+  createProducto(eventoId: string, dto: CreateProductoDto): Observable<Producto> {
     return this.http.post<Producto, CreateProductoDto>(
       `${this.endpoint}/${eventoId}/productos`,
-      dto
+      dto,
     );
   }
 
-  /**
-   * Delete a producto
-   */
-  deleteProducto(eventoId: string, productoId: string): Observable<void> {
-    return this.http.delete<void>(
-      `${this.endpoint}/${eventoId}/productos/${productoId}`
+  updateProducto(productoId: string, dto: UpdateProductoDto): Observable<Producto> {
+    return this.http.patch<Producto, UpdateProductoDto>(
+      `${this.endpoint}/productos/${productoId}`,
+      dto,
     );
   }
 
+  deleteProducto(productoId: string): Observable<void> {
+    return this.http.delete<void>(`${this.endpoint}/productos/${productoId}`);
+  }
+
   // ============================================================================
-  // VENTAS (Sale records for sale events)
+  // VENTAS
   // ============================================================================
 
-  /**
-   * Get all ventas for an evento
-   */
   getVentas(eventoId: string): Observable<VentaProducto[]> {
-    return this.http.get<VentaProducto[]>(
-      `${this.endpoint}/${eventoId}/ventas`
-    );
+    return this.http.get<VentaProducto[]>(`${this.endpoint}/${eventoId}/ventas`);
   }
 
-  /**
-   * Register a venta de producto
-   */
-  registrarVenta(
-    eventoId: string,
-    dto: CreateVentaProductoDto
-  ): Observable<VentaProducto> {
+  registrarVenta(eventoId: string, dto: CreateVentaProductoDto): Observable<VentaProducto> {
     return this.http.post<VentaProducto, CreateVentaProductoDto>(
       `${this.endpoint}/${eventoId}/ventas`,
-      dto
+      dto,
     );
   }
 
-  /**
-   * Delete a venta
-   */
+  registrarVentasLote(eventoId: string, dto: RegisterVentasLoteDto): Observable<VentaProducto[]> {
+    return this.http.post<VentaProducto[], RegisterVentasLoteDto>(
+      `${this.endpoint}/${eventoId}/ventas/lote`,
+      dto,
+    );
+  }
+
   deleteVenta(eventoId: string, ventaId: string): Observable<void> {
-    return this.http.delete<void>(
-      `${this.endpoint}/${eventoId}/ventas/${ventaId}`
-    );
+    return this.http.delete<void>(`${this.endpoint}/${eventoId}/ventas/${ventaId}`);
   }
 
   // ============================================================================
-  // INGRESOS Y EGRESOS
+  // INGRESOS Y GASTOS
   // ============================================================================
 
-  /**
-   * Register an ingreso for evento
-   */
-  registrarIngreso(
-    eventoId: string,
-    monto: number,
-    descripcion: string
-  ): Observable<Movimiento> {
-    return this.http.post<Movimiento, { monto: number; descripcion: string }>(
+  registrarIngreso(eventoId: string, dto: RegistrarIngresoEventoDto): Observable<Movimiento> {
+    return this.http.post<Movimiento, RegistrarIngresoEventoDto>(
       `${this.endpoint}/${eventoId}/ingresos`,
-      {
-        monto,
-        descripcion,
-      }
+      dto,
     );
   }
 
-  /**
-   * Register an egreso for evento
-   */
-  registrarEgreso(
-    eventoId: string,
-    monto: number,
-    descripcion: string,
-    responsableId: string,
-    medioPago: string,
-    estadoPago: string
-  ): Observable<Movimiento> {
-    return this.http.post<
-      Movimiento,
-      {
-        monto: number;
-        descripcion: string;
-        responsableId: string;
-        medioPago: string;
-        estadoPago: string;
-      }
-    >(`${this.endpoint}/${eventoId}/egresos`, {
-      monto,
-      descripcion,
-      responsableId,
-      medioPago,
-      estadoPago,
-    });
+  registrarGasto(eventoId: string, dto: RegistrarGastoEventoDto): Observable<Movimiento> {
+    return this.http.post<Movimiento, RegistrarGastoEventoDto>(
+      `${this.endpoint}/${eventoId}/gastos`,
+      dto,
+    );
   }
 
   // ============================================================================
   // CIERRE DE EVENTO
   // ============================================================================
 
-  /**
-   * Close an evento and distribute earnings
-   * Backend: POST /eventos/:id/cerrar
-   */
   cerrar(
     eventoId: string,
-    medioPago: string
+    dto: CerrarEventoVentaDto,
   ): Observable<{ message: string; movimientos: Movimiento[] }> {
-    return this.http.post<
-      { message: string; movimientos: Movimiento[] },
-      { medioPago: string }
-    >(`${this.endpoint}/${eventoId}/cerrar`, { medioPago });
-  }
-
-  /**
-   * Get resumen de ventas for evento
-   * Backend: GET /eventos/:id/resumen-ventas
-   */
-  getResumenVentas(eventoId: string): Observable<{
-    eventoId: string;
-    totalVentas: number;
-    totalCosto: number;
-    gananciaTotal: number;
-    ventasPorProducto: Array<{
-      productoId: string;
-      nombre: string;
-      cantidadVendida: number;
-      ingresos: number;
-      costo: number;
-      ganancia: number;
-    }>;
-    ventasPorVendedor: Array<{
-      vendedorId: string;
-      nombre: string;
-      cantidadVendida: number;
-      ganancia: number;
-    }>;
-  }> {
-    return this.http.get(`${this.endpoint}/${eventoId}/resumen-ventas`);
+    return this.http.post<{ message: string; movimientos: Movimiento[] }, CerrarEventoVentaDto>(
+      `${this.endpoint}/${eventoId}/cerrar`,
+      dto,
+    );
   }
 }

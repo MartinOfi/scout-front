@@ -30,6 +30,8 @@ export class PasswordInputComponent implements ControlValueAccessor {
     minlength: 'Mínimo 6 caracteres',
   });
 
+  readonly inputId = `password-input-${Math.random().toString(36).slice(2)}`;
+
   readonly disabled = signal(false);
   readonly value = signal('');
   readonly touched = signal(false);
@@ -53,7 +55,7 @@ export class PasswordInputComponent implements ControlValueAccessor {
   }
 
   get hasError(): boolean {
-    return !!this.control?.invalid && this.touched();
+    return !!this.control?.invalid && !!this.control?.touched;
   }
 
   get currentError(): string | null {

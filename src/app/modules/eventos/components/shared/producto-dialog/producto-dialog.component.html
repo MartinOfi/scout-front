@@ -1,0 +1,19 @@
+<div class="dialog-container">
+
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon>inventory_2</mat-icon>
+    Gestionar Productos
+  </h2>
+
+  <mat-dialog-content class="dialog-content">
+    <div class="dialog-body">
+      @if (saving()) {
+        <div class="saving-overlay">
+          <mat-spinner diameter="32" />
+        </div>
+      }
+      <app-producto-editor (addProducto)="onAdd($event)" (cancel)="onClose()" />
+    </div>
+  </mat-dialog-content>
+
+</div>

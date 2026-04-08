@@ -1,0 +1,173 @@
+// =============================================================================
+// PRODUCTO CARD — clean hierarchy, MagicUI glare-hover sweep
+// =============================================================================
+
+@use 'app/shared/styles/tokens' as t;
+
+.producto-card {
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  border-radius: t.$radius-card;
+  box-shadow: t.$shadow-sm;
+  transition: box-shadow 220ms ease, transform 220ms ease;
+
+  // ─── Left accent bar ──────────────────────────────────────────────────────
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, t.$brand-burgundy 0%, t.$brand-indigo 100%);
+    pointer-events: none;
+  }
+
+  // ─── Glare sweep on hover (MagicUI glare-hover pattern, pure CSS) ─────────
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background-image: linear-gradient(
+      -45deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.45) 50%,
+      transparent 62%
+    );
+    background-size: 300% 300%;
+    background-position: -100% -100%;
+    transition: background-position 600ms ease-in-out;
+  }
+
+  &:hover {
+    box-shadow: t.$shadow-lg;
+    transform: translateY(-2px);
+
+    &::before {
+      background-position: 200% 200%;
+    }
+
+    .producto-card__delete {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  // ─── Header ────────────────────────────────────────────────────────────────
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 6px 4px 16px;
+    gap: 4px;
+  }
+
+  &__nombre {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: t.$text-primary;
+    letter-spacing: -0.01em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__delete {
+    flex-shrink: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease, color 150ms ease;
+    color: t.$stone-400 !important;
+    position: relative;
+    z-index: 3;
+
+    &:hover {
+      color: t.$color-error !important;
+    }
+  }
+
+  // ─── Price hero ────────────────────────────────────────────────────────────
+  &__price {
+    padding: 6px 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  &__price-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: t.$text-primary;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  &__price-label {
+    font-size: 0.6875rem;
+    color: t.$text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+
+  // ─── Stats row ─────────────────────────────────────────────────────────────
+  &__stats {
+    display: flex;
+    border-top: 1px solid t.$border-light;
+  }
+
+  &__stat {
+    flex: 1;
+    padding: 10px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    & + & {
+      border-left: 1px solid t.$border-light;
+    }
+
+    &-label {
+      font-size: 0.6875rem;
+      color: t.$text-muted;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    &-value {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: t.$text-secondary;
+    }
+
+    // ─── Profit coloring ──────────────────────────────────────────────────
+    &--positive &-value {
+      color: t.$color-success;
+    }
+
+    &--negative &-value {
+      color: t.$color-error;
+    }
+  }
+
+  // ─── Ventas count (future backend field) ───────────────────────────────────
+  &__ventas {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 16px;
+    border-top: 1px solid t.$border-light;
+    font-size: 0.75rem;
+    color: t.$text-muted;
+
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+  }
+}

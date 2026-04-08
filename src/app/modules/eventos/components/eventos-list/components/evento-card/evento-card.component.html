@@ -1,0 +1,70 @@
+<article class="evento-card" (click)="onSelect()">
+
+  <!-- Tipo Badge -->
+  <div
+    class="evento-card__tipo-badge"
+    [class.evento-card__tipo-badge--venta]="isVenta"
+    [class.evento-card__tipo-badge--grupo]="!isVenta">
+    <mat-icon>{{ isVenta ? 'storefront' : 'groups' }}</mat-icon>
+    <span>{{ tipoLabel }}</span>
+  </div>
+
+  <!-- Header -->
+  <header class="evento-card__header">
+    <div class="evento-card__badge">
+      <mat-icon>{{ isVenta ? 'sell' : 'event' }}</mat-icon>
+    </div>
+    <div class="evento-card__info">
+      <h3 class="evento-card__name">{{ evento.nombre }}</h3>
+      <div class="evento-card__date">
+        <mat-icon>calendar_today</mat-icon>
+        <span>{{ evento.fecha | date:'d MMM yyyy' }}</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Stats -->
+  <div class="evento-card__body">
+    <div class="evento-card__stats">
+      @if (isVenta) {
+        <div class="evento-card__stat">
+          <span class="evento-card__stat-value">{{ productosCount }}</span>
+          <span class="evento-card__stat-label">Productos</span>
+        </div>
+      }
+      @if (!isVenta && evento.tipoEvento) {
+        <div class="evento-card__stat evento-card__stat--wide">
+          <span class="evento-card__stat-value">{{ evento.tipoEvento }}</span>
+          <span class="evento-card__stat-label">Tipo de evento</span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Description (if exists) -->
+  @if (evento.descripcion) {
+    <p class="evento-card__description">{{ evento.descripcion }}</p>
+  }
+
+  <!-- Footer Actions -->
+  <footer class="evento-card__footer">
+    <button
+      type="button"
+      class="evento-card__action-primary"
+      (click)="onSelect(); $event.stopPropagation()">
+      <mat-icon>visibility</mat-icon>
+      Ver detalle
+    </button>
+    <div class="evento-card__actions-secondary">
+      <button
+        type="button"
+        class="evento-card__action-icon unstyled"
+        data-testid="edit-btn"
+        (click)="onEdit(); $event.stopPropagation()"
+        aria-label="Editar evento">
+        <mat-icon>edit</mat-icon>
+      </button>
+    </div>
+  </footer>
+
+</article>

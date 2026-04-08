@@ -1,0 +1,94 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="ingreso-form">
+
+  <!-- Monto -->
+  <app-form-field
+    label="Monto"
+    [forId]="'monto-input'"
+    [required]="true"
+    [invalid]="!!(form.get('monto')?.invalid && form.get('monto')?.touched)"
+  >
+    <div class="input-with-prefix">
+      <span class="input-prefix">$</span>
+      <app-number-field
+        id="monto-input"
+        formControlName="monto"
+        [min]="0"
+        [step]="0.01"
+        placeholder="0.00"
+      />
+    </div>
+    @if (form.get('monto')?.hasError('required')) {
+      <span error>El monto es requerido</span>
+    } @else if (form.get('monto')?.hasError('positiveNumber')) {
+      <span error>Debe ser un número positivo</span>
+    }
+  </app-form-field>
+
+  <!-- Descripción -->
+  <app-form-field
+    label="Descripción"
+    [forId]="'descripcion-input'"
+    [required]="true"
+    [invalid]="!!(form.get('descripcion')?.invalid && form.get('descripcion')?.touched)"
+  >
+    <app-textarea-field
+      id="descripcion-input"
+      formControlName="descripcion"
+      [rows]="2"
+      placeholder="Ej: Venta de rifas, cuotas, etc."
+    />
+    @if (form.get('descripcion')?.hasError('required')) {
+      <span error>La descripción es requerida</span>
+    } @else if (form.get('descripcion')?.hasError('maxlength')) {
+      <span error>Máximo 500 caracteres</span>
+    }
+  </app-form-field>
+
+  <!-- Responsable -->
+  <app-form-field
+    label="Responsable"
+    [forId]="'responsable-select'"
+    [required]="true"
+    [invalid]="!!(form.get('responsableId')?.invalid && form.get('responsableId')?.touched)"
+  >
+    <app-select-field
+      id="responsable-select"
+      formControlName="responsableId"
+      placeholder="Seleccionar responsable"
+      [options]="responsables"
+      optionValue="id"
+      optionLabel="nombre"
+      [searchable]="true"
+    />
+    <span error>Seleccione un responsable</span>
+  </app-form-field>
+
+  <!-- Medio de Pago -->
+  <app-form-field
+    label="Medio de Pago"
+    [forId]="'medio-pago-select'"
+    [required]="true"
+    [invalid]="!!(form.get('medioPago')?.invalid && form.get('medioPago')?.touched)"
+  >
+    <app-select-field
+      id="medio-pago-select"
+      formControlName="medioPago"
+      placeholder="Seleccionar medio"
+      [options]="mediosPago"
+      optionValue="value"
+      optionLabel="label"
+    />
+    <span error>Seleccione un medio de pago</span>
+  </app-form-field>
+
+  <!-- Actions -->
+  <app-form-actions [borderTop]="true" align="end">
+    <app-button variant="secondary" type="button" (clicked)="onCancel()">
+      Cancelar
+    </app-button>
+    <app-button variant="primary" type="submit">
+      Registrar Ingreso
+    </app-button>
+  </app-form-actions>
+
+</form>

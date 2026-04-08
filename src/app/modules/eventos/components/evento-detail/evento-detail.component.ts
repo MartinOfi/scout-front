@@ -7,16 +7,18 @@
 import {
   Component,
   OnInit,
+  OnDestroy,
   ChangeDetectionStrategy,
   inject,
   signal,
   computed,
 } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
-import { from } from 'rxjs';
+import { from, Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
 import { EventosStateService } from '../../services/eventos-state.service';
 import { PersonasApiService } from '../../../personas/services/personas-api.service';
@@ -42,6 +44,8 @@ import {
 } from '../../../../shared/components/button-tabs/button-tabs.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { TextFieldComponent } from '../../../../shared/components/form/text-field/text-field.component';
 
 interface KpiConfig {
   readonly icon: string;
@@ -66,8 +70,8 @@ const TABS_GRUPO: TabConfig[] = [{ key: 'movimientos', label: 'Movimientos', ico
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     MatIconModule,
-    CurrencyPipe,
     DatePipe,
     StatCardComponent,
     ButtonTabsComponent,
@@ -75,12 +79,14 @@ const TABS_GRUPO: TabConfig[] = [{ key: 'movimientos', label: 'Movimientos', ico
     EmptyStateComponent,
     ProductoCardComponent,
     DataTableComponent,
+    ButtonComponent,
+    TextFieldComponent,
   ],
   templateUrl: './evento-detail.component.html',
   styleUrls: ['./evento-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EventoDetailComponent implements OnInit {
+export class EventoDetailComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly dialog = inject(MatDialog);
@@ -88,6 +94,10 @@ export class EventoDetailComponent implements OnInit {
   private readonly personasApi = inject(PersonasApiService);
 
   private eventoId = '';
+  private readonly destroy$ = new Subject<void>();
+  private readonly vendedorSearch$ = new Subject<string>();
+
+  readonly vendedorSearch = signal('');
 
   readonly loading = this.state.loading;
   readonly personas = signal<Persona[]>([]);
@@ -173,6 +183,22 @@ export class EventoDetailComponent implements OnInit {
     this.activeTab.set('productos');
 
     this.personasApi.getAll().subscribe((ps) => this.personas.set(ps));
+
+    this.vendedorSearch$
+      .pipe(debounceTime(400), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe((query) => {
+        this.state.loadResumenVentas(this.eventoId, query || undefined);
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  onVendedorSearchChange(value: string): void {
+    this.vendedorSearch.set(value);
+    this.vendedorSearch$.next(value);
   }
 
   onTabChange(key: string): void {

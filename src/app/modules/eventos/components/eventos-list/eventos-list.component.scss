@@ -1,0 +1,248 @@
+// =============================================================================
+// EVENTOS LIST — UNIFIED PATTERN
+// Mirrors campamentos-list aesthetics
+// =============================================================================
+
+@use '../../../../shared/styles/tokens' as t;
+@use 'app/shared/styles/responsive' as *;
+
+// -----------------------------------------------------------------------------
+// REDUCED MOTION
+// -----------------------------------------------------------------------------
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// PAGE CONTAINER
+// -----------------------------------------------------------------------------
+
+.eventos-page {
+  min-height: 100%;
+}
+
+.eventos-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// -----------------------------------------------------------------------------
+// STATS SUMMARY BAR
+// -----------------------------------------------------------------------------
+
+.eventos-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: var(--spacing-lg);
+
+  @include respond-to('md') {
+    flex-direction: row;
+    align-items: center;
+    gap: 24px;
+    padding: 16px 24px;
+  }
+}
+
+.eventos-stats__action {
+  flex-shrink: 0;
+  width: 100%;
+
+  @include respond-to('md') {
+    margin-left: auto;
+    width: auto;
+  }
+}
+
+.eventos-stats__total {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.eventos-stats__number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: t.$brand-burgundy;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.eventos-stats__label {
+  font-size: 14px;
+  font-weight: 500;
+  color: t.$stone-500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.eventos-stats__divider {
+  width: 100%;
+  height: 1px;
+  background-color: t.$stone-200;
+
+  @include respond-to('md') {
+    width: 1px;
+    height: 40px;
+  }
+}
+
+.eventos-stats__breakdown {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  flex: 1;
+}
+
+.eventos-stats__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.eventos-stats__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+
+  &--venta {
+    background-color: t.$brand-burgundy;
+  }
+
+  &--grupo {
+    background-color: t.$color-success;
+  }
+}
+
+.eventos-stats__item-label {
+  font-size: 13px;
+  color: t.$stone-600;
+}
+
+.eventos-stats__item-count {
+  font-size: 14px;
+  font-weight: 700;
+  color: t.$stone-800;
+}
+
+// -----------------------------------------------------------------------------
+// EVENTS GRID
+// -----------------------------------------------------------------------------
+
+.eventos-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin-top: var(--spacing-lg);
+
+  @include respond-to('xs') {
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  }
+}
+
+// -----------------------------------------------------------------------------
+// LOADING & EMPTY STATES
+// -----------------------------------------------------------------------------
+
+.eventos-loading,
+.eventos-error,
+.eventos-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 48px 24px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  text-align: center;
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    color: t.$stone-400;
+    margin-bottom: 16px;
+  }
+
+  &--filtered {
+    min-height: 200px;
+    box-shadow: none;
+    background: t.$stone-50;
+    border-radius: 8px;
+    margin-top: var(--spacing-lg);
+  }
+}
+
+.eventos-empty__icon {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, t.$stone-100 0%, t.$stone-200 100%);
+  border-radius: 50%;
+  margin-bottom: 16px;
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    color: t.$stone-400;
+    margin-bottom: 0;
+  }
+}
+
+.eventos-empty__title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: t.$stone-800;
+}
+
+.eventos-empty__text {
+  margin: 0 0 20px;
+  font-size: 14px;
+  color: t.$stone-500;
+  max-width: 280px;
+}
+
+.eventos-empty__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  background-color: t.$brand-burgundy;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    margin-bottom: 0;
+    color: white;
+  }
+
+  &:hover {
+    background-color: t.$brand-burgundy-light;
+  }
+}

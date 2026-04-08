@@ -1,27 +1,40 @@
 /**
  * Evento Form Component
- * Smart Component - max 200 lineas
+ * Smart Component - max 200 líneas
  * SIN any - tipado estricto
  */
 
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  inject,
+  signal,
+  effect,
+  computed,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { ReactiveFormsModule, FormGroup } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 
 import { EventosStateService } from '../../services/eventos-state.service';
-import { CreateEventoDto, UpdateEventoDto } from '../../../../shared/models';
-import { TipoEvento, DestinoGanancia, DESTINO_GANANCIA_LABELS, TIPO_EVENTO_LABELS } from '../../../../shared/enums';
+import { EventosFormBuilder } from '../../services/eventos-form.builder';
+import {
+  TipoEvento,
+  DestinoGanancia,
+  DESTINO_GANANCIA_LABELS,
+  TIPO_EVENTO_LABELS,
+} from '../../../../shared/enums';
 
 // Shared Form Components
 import { FormFieldComponent } from '../../../../shared/components/form/form-field/form-field.component';
 import { TextFieldComponent } from '../../../../shared/components/form/text-field/text-field.component';
 import { TextareaFieldComponent } from '../../../../shared/components/form/textarea-field/textarea-field.component';
+import { DateFieldComponent } from '../../../../shared/components/form/date-field/date-field.component';
 import { SelectFieldComponent } from '../../../../shared/components/form/select-field/select-field.component';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { FormActionsComponent } from '../../../../shared/components/form/form-actions/form-actions.component';
 
 interface SelectOption {
   value: string;
@@ -34,93 +47,98 @@ interface SelectOption {
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
+    MatIconModule,
     FormFieldComponent,
     TextFieldComponent,
     TextareaFieldComponent,
-    SelectFieldComponent
+    DateFieldComponent,
+    SelectFieldComponent,
+    ButtonComponent,
+    FormActionsComponent,
   ],
   templateUrl: './evento-form.component.html',
   styleUrls: ['./evento-form.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EventoFormComponent implements OnInit {
-  private readonly state: EventosStateService = inject(EventosStateService);
+  readonly state: EventosStateService = inject(EventosStateService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  private readonly fb = inject(FormBuilder);
+  private readonly formBuilder = inject(EventosFormBuilder);
 
+  readonly form: FormGroup = this.formBuilder.buildCreateForm();
+  readonly isEditing = signal(false);
   readonly loading = this.state.loading;
-  readonly tipoEvento = TipoEvento;
-  readonly tipoLabels = TIPO_EVENTO_LABELS;
-  readonly destinoLabels = DESTINO_GANANCIA_LABELS;
-  readonly destinos: DestinoGanancia[] = Object.values(DestinoGanancia);
+  readonly error = this.state.error;
+  readonly loadingData = computed(() => this.state.loading() && this.isEditing());
 
-  // Options for select fields
+  readonly tipoEvento = TipoEvento;
+
   readonly tipoOptions: SelectOption[] = [
     { value: TipoEvento.GRUPO, label: TIPO_EVENTO_LABELS[TipoEvento.GRUPO] },
-    { value: TipoEvento.VENTA, label: TIPO_EVENTO_LABELS[TipoEvento.VENTA] }
+    { value: TipoEvento.VENTA, label: TIPO_EVENTO_LABELS[TipoEvento.VENTA] },
   ];
 
-  readonly destinoOptions: SelectOption[] = Object.values(DestinoGanancia).map(d => ({
+  readonly destinoOptions: SelectOption[] = Object.values(DestinoGanancia).map((d) => ({
     value: d,
-    label: DESTINO_GANANCIA_LABELS[d]
+    label: DESTINO_GANANCIA_LABELS[d],
   }));
 
-  eventoForm: FormGroup = this.fb.group({
-    nombre: ['', [Validators.required, Validators.maxLength(100)]],
-    descripcion: ['', Validators.maxLength(500)],
-    tipo: [TipoEvento.GRUPO, Validators.required],
-    fecha: [new Date(), Validators.required],
-    destinoGanancia: [null]
-  });
+  private formPopulated = false;
 
-  isEditing = false;
-  eventoId: string | null = null;
-
-  ngOnInit(): void {
-    this.eventoId = this.route.snapshot.paramMap.get('id');
-    this.isEditing = !!this.eventoId;
-
-    if (this.isEditing && this.eventoId) {
-      this.loadEvento(this.eventoId);
-    }
+  constructor() {
+    effect(() => {
+      const evento = this.state.selected();
+      if (evento && this.isEditing() && !this.formPopulated) {
+        this.form.patchValue({
+          nombre: evento.nombre,
+          tipo: evento.tipo,
+          fecha: evento.fecha,
+          descripcion: evento.descripcion ?? '',
+          destinoGanancia: evento.destinoGanancia ?? null,
+          tipoEvento: evento.tipoEvento ?? '',
+        });
+        this.formPopulated = true;
+      }
+    });
   }
 
-  private loadEvento(id: string): void {
-    this.state.select(id);
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.isEditing.set(true);
+      this.state.loadById(id);
+    }
   }
 
   onSubmit(): void {
-    if (this.eventoForm.invalid) {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
-    const formValue = this.eventoForm.value;
-    const dto: CreateEventoDto = {
-      nombre: formValue.nombre,
-      descripcion: formValue.descripcion,
-      tipo: formValue.tipo,
-      fecha: formValue.fecha.toISOString(),
-      destinoGanancia: formValue.destinoGanancia
-    };
+    if (this.isEditing()) {
+      const id = this.route.snapshot.paramMap.get('id');
+      if (!id) return;
 
-    if (this.isEditing && this.eventoId) {
-      const updateDto: UpdateEventoDto = dto;
-      this.state.update(this.eventoId, updateDto).subscribe(() => {
-        this.router.navigate(['/eventos']);
+      const dto = this.formBuilder.extractUpdateDto(this.form);
+      this.state.update(id, dto).subscribe({
+        next: () => this.router.navigate(['/eventos', id]),
       });
     } else {
-      this.state.create(dto).subscribe(() => {
-        this.router.navigate(['/eventos']);
+      const dto = this.formBuilder.extractCreateDto(this.form);
+      this.state.create(dto).subscribe({
+        next: (evento) => this.router.navigate(['/eventos', evento.id]),
       });
     }
   }
 
   onCancel(): void {
-    this.router.navigate(['/eventos']);
+    if (this.isEditing()) {
+      const id = this.route.snapshot.paramMap.get('id');
+      this.router.navigate(['/eventos', id]);
+    } else {
+      this.router.navigate(['/eventos']);
+    }
   }
 }
