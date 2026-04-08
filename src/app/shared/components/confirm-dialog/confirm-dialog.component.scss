@@ -198,6 +198,51 @@ $shadow-dialog: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   }
 
   // ──────────────────────────────────────────────────────────────────────────
+  // Details Block
+  // ──────────────────────────────────────────────────────────────────────────
+
+  &__details {
+    margin: 0 0 24px;
+    padding: 12px 16px;
+    background-color: t.$stone-50;
+    border: 1px solid t.$stone-200;
+    border-radius: $radius-lg;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__details-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+
+    &:not(:last-child) {
+      padding-bottom: 8px;
+      border-bottom: 1px solid t.$stone-100;
+    }
+  }
+
+  &__details-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: t.$stone-500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  &__details-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: t.$stone-800;
+    text-align: right;
+    margin: 0;
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
   // Warning Box
   // ──────────────────────────────────────────────────────────────────────────
 

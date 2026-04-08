@@ -7,11 +7,7 @@
 import { Injectable, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import {
-  CreateMovimientoDto,
-  UpdateMovimientoDto,
-  Movimiento,
-} from '../../../shared/models';
+import { CreateMovimientoDto, UpdateMovimientoDto, Movimiento } from '../../../shared/models';
 
 import {
   TipoMovimientoEnum,
@@ -43,22 +39,9 @@ export class MovimientosFormBuilder {
     return this.fb.group({
       cajaId: ['', [Validators.required]],
       tipo: ['', [Validators.required]],
-      monto: [
-        '',
-        [
-          Validators.required,
-          positiveNumberValidator(),
-          decimalValidator(2),
-        ],
-      ],
+      monto: ['', [Validators.required, positiveNumberValidator(), decimalValidator(2)]],
       concepto: ['', [Validators.required]],
-      descripcion: [
-        '',
-        [
-          Validators.maxLength(500),
-          safeTextValidator(),
-        ],
-      ],
+      descripcion: ['', [Validators.maxLength(500), safeTextValidator()]],
       responsableId: ['', [Validators.required]],
       medioPago: ['', [Validators.required]],
       requiereComprobante: [false],
@@ -77,15 +60,9 @@ export class MovimientosFormBuilder {
    */
   buildEditForm(movimiento: Movimiento): FormGroup {
     return this.fb.group({
-      descripcion: [
-        movimiento.descripcion ?? '',
-        [
-          Validators.maxLength(500),
-          safeTextValidator(),
-        ],
-      ],
+      descripcion: [movimiento.descripcion ?? '', [Validators.maxLength(500)]],
       comprobanteEntregado: [movimiento.comprobanteEntregado ?? false],
-      estadoPago: [movimiento.estadoPago, [Validators.required]],
+      estadoPago: [movimiento.estadoPago ?? '', [Validators.required]],
     });
   }
 
@@ -135,21 +112,8 @@ export class MovimientosFormBuilder {
    */
   buildGastoGeneralForm(): FormGroup {
     return this.fb.group({
-      monto: [
-        '',
-        [
-          Validators.required,
-          positiveNumberValidator(),
-          decimalValidator(2),
-        ],
-      ],
-      descripcion: [
-        '',
-        [
-          Validators.maxLength(500),
-          safeTextValidator(),
-        ],
-      ],
+      monto: ['', [Validators.required, positiveNumberValidator(), decimalValidator(2)]],
+      descripcion: ['', [Validators.maxLength(500), safeTextValidator()]],
       responsableId: ['', [Validators.required]],
       medioPago: ['', [Validators.required]],
       estadoPago: ['', [Validators.required]],
@@ -184,22 +148,8 @@ export class MovimientosFormBuilder {
    */
   buildIngresoForm(): FormGroup {
     return this.fb.group({
-      monto: [
-        '',
-        [
-          Validators.required,
-          positiveNumberValidator(),
-          decimalValidator(2),
-        ],
-      ],
-      descripcion: [
-        '',
-        [
-          Validators.required,
-          Validators.maxLength(500),
-          safeTextValidator(),
-        ],
-      ],
+      monto: ['', [Validators.required, positiveNumberValidator(), decimalValidator(2)]],
+      descripcion: ['', [Validators.required, Validators.maxLength(500), safeTextValidator()]],
     });
   }
 
@@ -208,22 +158,8 @@ export class MovimientosFormBuilder {
    */
   buildEgresoForm(): FormGroup {
     return this.fb.group({
-      monto: [
-        '',
-        [
-          Validators.required,
-          positiveNumberValidator(),
-          decimalValidator(2),
-        ],
-      ],
-      descripcion: [
-        '',
-        [
-          Validators.required,
-          Validators.maxLength(500),
-          safeTextValidator(),
-        ],
-      ],
+      monto: ['', [Validators.required, positiveNumberValidator(), decimalValidator(2)]],
+      descripcion: ['', [Validators.required, Validators.maxLength(500), safeTextValidator()]],
       responsableId: ['', [Validators.required]],
       medioPago: ['', [Validators.required]],
       estadoPago: ['', [Validators.required]],

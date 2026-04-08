@@ -18,6 +18,12 @@ import { ButtonComponent, ButtonVariant } from '../button/button.component';
 /** Dialog states for async operations */
 export type ConfirmDialogState = 'confirm' | 'loading' | 'error' | 'success';
 
+/** A single label/value row shown inside the details block */
+export interface ConfirmDialogDetail {
+  label: string;
+  value: string;
+}
+
 /** Configuration for the confirm dialog */
 export interface ConfirmDialogData {
   /** Dialog title */
@@ -34,6 +40,8 @@ export interface ConfirmDialogData {
   isDestructive: boolean;
 
   // Optional async mode properties
+  /** Structured key-value rows rendered below the message */
+  details?: ConfirmDialogDetail[];
   /** Optional warning message displayed in amber box */
   warning?: string;
   /** Entity name for loading/success messages (e.g., "inscripción") */
@@ -68,6 +76,18 @@ export interface ConfirmDialogResult {
 
         <!-- Message -->
         <p class="confirm-dialog__message">{{ data.message }}</p>
+
+        <!-- Details (optional structured key-value rows) -->
+        @if (data.details?.length) {
+          <dl class="confirm-dialog__details">
+            @for (detail of data.details; track detail.label) {
+              <div class="confirm-dialog__details-row">
+                <dt class="confirm-dialog__details-label">{{ detail.label }}</dt>
+                <dd class="confirm-dialog__details-value">{{ detail.value }}</dd>
+              </div>
+            }
+          </dl>
+        }
 
         <!-- Warning Box (optional) -->
         @if (data.warning) {
