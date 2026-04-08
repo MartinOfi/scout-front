@@ -87,6 +87,15 @@ export interface ChangePasswordDto {
 }
 
 /**
+ * Change email request DTO
+ * PATCH /auth/email
+ */
+export interface ChangeEmailDto {
+  readonly newEmail: string;
+  readonly currentPassword: string;
+}
+
+/**
  * Decoded JWT payload structure
  * Used internally for token validation
  */

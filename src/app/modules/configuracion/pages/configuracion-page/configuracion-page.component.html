@@ -1,23 +1,148 @@
-<app-form-container title="Configuración de Inscripciones" icon="settings">
-  <app-form-field label="Monto Inscripción Scout Argentina">
-    <app-number-field
-      [formControl]="montoScoutArgentinaCtrl"
-      [min]="0"
-      placeholder="0">
-    </app-number-field>
-  </app-form-field>
+<div class="config-page">
 
-  <app-form-field label="Monto Inscripción de Grupo">
-    <app-number-field
-      [formControl]="montoGrupoCtrl"
-      [min]="0"
-      placeholder="0">
-    </app-number-field>
-  </app-form-field>
+  <!-- ── Card 1: Mi Perfil ───────────────────────────────────── -->
+  <section class="config-card">
+    <header class="config-card__header">
+      <div class="config-card__title-row">
+        <mat-icon class="config-card__icon">person</mat-icon>
+        <h1 class="config-card__title">Mi Perfil</h1>
+      </div>
+    </header>
 
-  <app-form-actions>
-    <app-button variant="primary" (clicked)="guardar()">
-      Guardar
-    </app-button>
-  </app-form-actions>
-</app-form-container>
+    <div class="config-card__body">
+
+      <!-- Info de solo lectura -->
+      @if (authState.currentUser(); as user) {
+      <div class="profile-info">
+        <div class="profile-info__item">
+          <span class="profile-info__label">Nombre</span>
+          <span class="profile-info__value">{{ user.nombre }}</span>
+        </div>
+        <div class="profile-info__item">
+          <span class="profile-info__label">Tipo</span>
+          <span class="profile-info__value">{{ user.tipo }}</span>
+        </div>
+      </div>
+      }
+
+      <!-- Separador -->
+      <div class="config-divider"></div>
+
+      <!-- Cambiar email -->
+      <form [formGroup]="emailForm" (ngSubmit)="guardarEmail()" class="config-section">
+        <h2 class="config-section__title">Cambiar email</h2>
+
+        <app-form-field label="Nuevo email" [required]="true">
+          <app-email-field
+            formControlName="newEmail"
+            placeholder="nuevo@email.com">
+          </app-email-field>
+        </app-form-field>
+
+        <app-form-field label="Contraseña actual" [required]="true">
+          <app-password-input
+            formControlName="currentPasswordForEmail"
+            [icon]="'lock'"
+            [errorMessages]="{ required: 'Requerida', minlength: 'Mínimo 8 caracteres' }">
+          </app-password-input>
+        </app-form-field>
+
+        <div class="config-actions">
+          <app-button
+            type="submit"
+            variant="primary"
+            [disabled]="emailForm.invalid || savingEmail()">
+            {{ savingEmail() ? 'Guardando...' : 'Guardar email' }}
+          </app-button>
+        </div>
+      </form>
+
+      <!-- Separador -->
+      <div class="config-divider"></div>
+
+      <!-- Cambiar contraseña -->
+      <form [formGroup]="passwordForm" (ngSubmit)="guardarPassword()" class="config-section">
+        <h2 class="config-section__title">Cambiar contraseña</h2>
+
+        <app-form-field label="Contraseña actual" [required]="true">
+          <app-password-input
+            formControlName="currentPassword"
+            [icon]="'lock'"
+            [errorMessages]="{ required: 'Requerida', minlength: 'Mínimo 8 caracteres' }">
+          </app-password-input>
+        </app-form-field>
+
+        <app-form-field label="Nueva contraseña" [required]="true">
+          <app-password-input
+            formControlName="newPassword"
+            [icon]="'lock_open'"
+            [errorMessages]="{ required: 'Requerida', minlength: 'Mínimo 8 caracteres' }">
+          </app-password-input>
+        </app-form-field>
+
+        <app-form-field
+          label="Confirmar nueva contraseña"
+          [required]="true"
+          [invalid]="passwordMismatch">
+          <app-password-input
+            formControlName="confirmPassword"
+            [icon]="'lock_open'"
+            [errorMessages]="{ required: 'Requerida' }">
+          </app-password-input>
+          @if (passwordMismatch) {
+          <p class="config-error">Las contraseñas no coinciden</p>
+          }
+        </app-form-field>
+
+        <div class="config-actions">
+          <app-button
+            type="submit"
+            variant="primary"
+            [disabled]="passwordForm.invalid || savingPassword()">
+            {{ savingPassword() ? 'Guardando...' : 'Cambiar contraseña' }}
+          </app-button>
+        </div>
+      </form>
+
+    </div>
+  </section>
+
+  <!-- ── Card 2: Configuración de Inscripciones ─────────────── -->
+  <section class="config-card">
+    <header class="config-card__header">
+      <div class="config-card__title-row">
+        <mat-icon class="config-card__icon">settings</mat-icon>
+        <h1 class="config-card__title">Configuración de Inscripciones</h1>
+      </div>
+    </header>
+
+    <div class="config-card__body">
+      <div class="config-section">
+
+        <app-form-field label="Monto Inscripción Scout Argentina">
+          <app-number-field
+            [formControl]="montoScoutArgentinaCtrl"
+            [min]="0"
+            placeholder="0">
+          </app-number-field>
+        </app-form-field>
+
+        <app-form-field label="Monto Inscripción de Grupo">
+          <app-number-field
+            [formControl]="montoGrupoCtrl"
+            [min]="0"
+            placeholder="0">
+          </app-number-field>
+        </app-form-field>
+
+        <div class="config-actions">
+          <app-button variant="primary" (clicked)="guardarInscripciones()">
+            Guardar
+          </app-button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</div>

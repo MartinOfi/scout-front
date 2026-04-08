@@ -1,0 +1,165 @@
+@use 'app/shared/styles/responsive' as *;
+
+// =============================================================================
+// Configuracion Page Layout
+// =============================================================================
+
+.config-page {
+  min-height: 100vh;
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+
+  @include respond-to('sm') {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  @include respond-to('lg') {
+    flex-direction: row;
+    align-items: flex-start;
+    padding: var(--spacing-xl) var(--spacing-lg);
+  }
+}
+
+// =============================================================================
+// Card
+// =============================================================================
+
+.config-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e7e5e4;
+  overflow: hidden;
+
+  @include respond-to('md') {
+    border-radius: 16px;
+  }
+
+  @include respond-to('lg') {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__header {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid #e7e5e4;
+
+    @include respond-to('md') {
+      padding: var(--spacing-lg) var(--spacing-xl);
+    }
+  }
+
+  &__title-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  &__icon {
+    color: #78716c;
+    font-size: 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  &__title {
+    font-family: var(--font-family-headings);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1c1917;
+    margin: 0;
+    letter-spacing: -0.01em;
+
+    @include respond-to('md') {
+      font-size: 1.5rem;
+    }
+  }
+
+  &__body {
+    padding: var(--spacing-lg) var(--spacing-md);
+
+    @include respond-to('md') {
+      padding: var(--spacing-xl);
+    }
+  }
+}
+
+// =============================================================================
+// Profile info (read-only fields)
+// =============================================================================
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #78716c;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__value {
+    font-size: 15px;
+    color: #1c1917;
+    font-weight: 500;
+  }
+}
+
+// =============================================================================
+// Divider
+// =============================================================================
+
+.config-divider {
+  height: 1px;
+  background-color: #e7e5e4;
+  margin: var(--spacing-lg) 0;
+}
+
+// =============================================================================
+// Section (email / password)
+// =============================================================================
+
+.config-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+
+  &__title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #44403c;
+    margin: 0 0 var(--spacing-xs);
+  }
+}
+
+// =============================================================================
+// Actions
+// =============================================================================
+
+.config-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--spacing-sm);
+}
+
+// =============================================================================
+// Inline error
+// =============================================================================
+
+.config-error {
+  font-size: 12px;
+  color: #dc2626;
+  margin: 2px 0 0;
+}

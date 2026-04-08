@@ -1,20 +1,45 @@
 /**
  * Configuracion Page Component
- * Smart Component - Configuración del sistema
+ * Smart Component - Configuración del sistema y perfil del usuario
  */
 
-import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
+import {
+  FormBuilder,
+  FormControl,
+  ReactiveFormsModule,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 
-import { FormContainerComponent } from '../../../../shared/components/form/form-container/form-container.component';
 import { FormFieldComponent } from '../../../../shared/components/form/form-field/form-field.component';
 import { NumberFieldComponent } from '../../../../shared/components/form/number-field/number-field.component';
-import { FormActionsComponent } from '../../../../shared/components/form/form-actions/form-actions.component';
+import { EmailFieldComponent } from '../../../../shared/components/form/email-field/email-field.component';
+import { PasswordInputComponent } from '../../../../shared/components/form/password-input/password-input.component';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { ConfiguracionService } from '../../../../shared/services';
 import { NotificationService } from '../../../../shared/services';
-import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { AuthStateService } from '../../../auth/services/auth-state.service';
+
+function passwordMatchValidator(
+  control: AbstractControl,
+): ValidationErrors | null {
+  const newPassword = control.get('newPassword')?.value;
+  const confirmPassword = control.get('confirmPassword')?.value;
+  if (newPassword && confirmPassword && newPassword !== confirmPassword) {
+    return { passwordMismatch: true };
+  }
+  return null;
+}
 
 @Component({
   selector: 'app-configuracion-page',
@@ -22,20 +47,24 @@ import { ButtonComponent } from '../../../../shared/components/button/button.com
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatButtonModule,
-    FormContainerComponent,
+    MatIconModule,
     FormFieldComponent,
     NumberFieldComponent,
-    FormActionsComponent,
+    EmailFieldComponent,
+    PasswordInputComponent,
     ButtonComponent,
   ],
   templateUrl: './configuracion-page.component.html',
+  styleUrl: './configuracion-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfiguracionPageComponent implements OnInit {
+  private readonly fb = inject(FormBuilder);
   private readonly configService = inject(ConfiguracionService);
   private readonly notificationService = inject(NotificationService);
+  readonly authState = inject(AuthStateService);
 
+  // ── Inscripciones ────────────────────────────────────────────
   readonly montoScoutArgentinaCtrl = new FormControl<number>(0, {
     nonNullable: true,
     validators: [Validators.min(0)],
@@ -46,13 +75,37 @@ export class ConfiguracionPageComponent implements OnInit {
     validators: [Validators.min(0)],
   });
 
+  // ── Email ────────────────────────────────────────────────────
+  readonly emailForm = this.fb.group({
+    newEmail: ['', [Validators.required, Validators.email]],
+    currentPasswordForEmail: ['', [Validators.required, Validators.minLength(8)]],
+  });
+
+  readonly savingEmail = signal(false);
+
+  // ── Password ─────────────────────────────────────────────────
+  readonly passwordForm = this.fb.group(
+    {
+      currentPassword: ['', [Validators.required, Validators.minLength(8)]],
+      newPassword: ['', [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ['', [Validators.required]],
+    },
+    { validators: passwordMatchValidator },
+  );
+
+  readonly savingPassword = signal(false);
+
   ngOnInit(): void {
-    // Load current values from service
     this.montoScoutArgentinaCtrl.setValue(this.configService.montoScoutArgentina());
     this.montoGrupoCtrl.setValue(this.configService.montoGrupo());
+
+    const user = this.authState.currentUser();
+    if (user) {
+      this.emailForm.patchValue({ newEmail: user.email });
+    }
   }
 
-  guardar(): void {
+  guardarInscripciones(): void {
     if (this.montoScoutArgentinaCtrl.invalid || this.montoGrupoCtrl.invalid) {
       this.notificationService.showError('Por favor, ingrese valores válidos');
       return;
@@ -64,5 +117,69 @@ export class ConfiguracionPageComponent implements OnInit {
     });
 
     this.notificationService.showSuccess('Configuración guardada exitosamente');
+  }
+
+  guardarEmail(): void {
+    if (this.emailForm.invalid) {
+      this.emailForm.markAllAsTouched();
+      return;
+    }
+
+    const { newEmail, currentPasswordForEmail } = this.emailForm.value;
+    this.savingEmail.set(true);
+
+    this.authState
+      .changeEmail({
+        newEmail: newEmail!,
+        currentPassword: currentPasswordForEmail!,
+      })
+      .subscribe({
+        next: () => {
+          this.notificationService.showSuccess('Email actualizado exitosamente');
+          this.emailForm.get('currentPasswordForEmail')?.reset();
+          this.savingEmail.set(false);
+        },
+        error: (err: { error?: { message?: string } }) => {
+          const msg = err?.error?.message ?? 'Error al actualizar el email';
+          this.notificationService.showError(msg);
+          this.savingEmail.set(false);
+        },
+      });
+  }
+
+  guardarPassword(): void {
+    if (this.passwordForm.invalid) {
+      this.passwordForm.markAllAsTouched();
+      return;
+    }
+
+    const { currentPassword, newPassword } = this.passwordForm.value;
+    this.savingPassword.set(true);
+
+    this.authState
+      .changePassword({
+        currentPassword: currentPassword!,
+        newPassword: newPassword!,
+      })
+      .subscribe({
+        next: () => {
+          this.notificationService.showSuccess(
+            'Contraseña actualizada. Por favor inicia sesión nuevamente.',
+          );
+          this.savingPassword.set(false);
+        },
+        error: (err: { error?: { message?: string } }) => {
+          const msg = err?.error?.message ?? 'Error al actualizar la contraseña';
+          this.notificationService.showError(msg);
+          this.savingPassword.set(false);
+        },
+      });
+  }
+
+  get passwordMismatch(): boolean {
+    return (
+      !!this.passwordForm.errors?.['passwordMismatch'] &&
+      !!this.passwordForm.get('confirmPassword')?.touched
+    );
   }
 }

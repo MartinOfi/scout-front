@@ -10,6 +10,7 @@ import {
   RefreshTokenDto,
   LogoutDto,
   ChangePasswordDto,
+  ChangeEmailDto,
 } from '../models';
 
 /**
@@ -33,7 +34,7 @@ export class AuthApiService {
   login(credentials: LoginDto): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(
       `${this.baseUrl}/${API_CONFIG.ENDPOINTS.AUTH_LOGIN}`,
-      credentials
+      credentials,
     );
   }
 
@@ -47,7 +48,7 @@ export class AuthApiService {
   register(data: RegisterDto): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(
       `${this.baseUrl}/${API_CONFIG.ENDPOINTS.AUTH_REGISTER}`,
-      data
+      data,
     );
   }
 
@@ -64,7 +65,7 @@ export class AuthApiService {
   refreshToken(data: RefreshTokenDto): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(
       `${this.baseUrl}/${API_CONFIG.ENDPOINTS.AUTH_REFRESH}`,
-      data
+      data,
     );
   }
 
@@ -78,10 +79,7 @@ export class AuthApiService {
    * @returns void (204 No Content)
    */
   logout(data?: LogoutDto): Observable<void> {
-    return this.http.post<void>(
-      `${this.baseUrl}/${API_CONFIG.ENDPOINTS.AUTH_LOGOUT}`,
-      data ?? {}
-    );
+    return this.http.post<void>(`${this.baseUrl}/${API_CONFIG.ENDPOINTS.AUTH_LOGOUT}`, data ?? {});
   }
 
   /**
@@ -91,9 +89,7 @@ export class AuthApiService {
    * @returns Current authenticated user info
    */
   getMe(): Observable<AuthUser> {
-    return this.http.get<AuthUser>(
-      `${this.baseUrl}/${API_CONFIG.ENDPOINTS.AUTH_ME}`
-    );
+    return this.http.get<AuthUser>(`${this.baseUrl}/${API_CONFIG.ENDPOINTS.AUTH_ME}`);
   }
 
   /**
@@ -107,9 +103,17 @@ export class AuthApiService {
    * @returns void (204 No Content)
    */
   changePassword(data: ChangePasswordDto): Observable<void> {
-    return this.http.patch<void>(
-      `${this.baseUrl}/${API_CONFIG.ENDPOINTS.AUTH_PASSWORD}`,
-      data
-    );
+    return this.http.patch<void>(`${this.baseUrl}/${API_CONFIG.ENDPOINTS.AUTH_PASSWORD}`, data);
+  }
+
+  /**
+   * Change email
+   * PATCH /auth/email
+   *
+   * @param data New email and current password for verification
+   * @returns void (204 No Content)
+   */
+  changeEmail(data: ChangeEmailDto): Observable<void> {
+    return this.http.patch<void>(`${this.baseUrl}/${API_CONFIG.ENDPOINTS.AUTH_EMAIL}`, data);
   }
 }

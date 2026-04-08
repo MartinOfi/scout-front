@@ -4,7 +4,14 @@ import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { tap, map, catchError, finalize, switchMap } from 'rxjs/operators';
 import { TokenService } from './token.service';
 import { AuthApiService } from './auth-api.service';
-import { AuthUser, AuthResponse, LoginDto, RegisterDto, ChangePasswordDto } from '../models';
+import {
+  AuthUser,
+  AuthResponse,
+  LoginDto,
+  RegisterDto,
+  ChangePasswordDto,
+  ChangeEmailDto,
+} from '../models';
 
 /**
  * Authentication state management service
@@ -37,7 +44,7 @@ export class AuthStateService {
   readonly isAuthenticated = computed(() => this.currentUser() !== null);
 
   /** Observable version of isAuthenticated for guards and interceptors */
-  readonly isAuthenticated$ = this.currentUser$.pipe(map(user => user !== null));
+  readonly isAuthenticated$ = this.currentUser$.pipe(map((user) => user !== null));
 
   // ============================================================
   // Refresh Token Management
@@ -75,7 +82,7 @@ export class AuthStateService {
         catchError(() => {
           this.clearAuthState();
           return of(null);
-        })
+        }),
       );
     }
 
@@ -89,11 +96,11 @@ export class AuthStateService {
    */
   private fetchAndSetUser(): Observable<AuthUser> {
     return this.authApi.getMe().pipe(
-      tap(user => this.setUser(user)),
-      catchError(error => {
+      tap((user) => this.setUser(user)),
+      catchError((error) => {
         this.clearAuthState();
         return throwError(() => error);
-      })
+      }),
     );
   }
 
@@ -108,9 +115,9 @@ export class AuthStateService {
     this.isLoading.set(true);
 
     return this.authApi.login(credentials).pipe(
-      tap(response => this.handleAuthResponse(response)),
-      map(response => response.user),
-      finalize(() => this.isLoading.set(false))
+      tap((response) => this.handleAuthResponse(response)),
+      map((response) => response.user),
+      finalize(() => this.isLoading.set(false)),
     );
   }
 
@@ -121,9 +128,9 @@ export class AuthStateService {
     this.isLoading.set(true);
 
     return this.authApi.register(data).pipe(
-      tap(response => this.handleAuthResponse(response)),
-      map(response => response.user),
-      finalize(() => this.isLoading.set(false))
+      tap((response) => this.handleAuthResponse(response)),
+      map((response) => response.user),
+      finalize(() => this.isLoading.set(false)),
     );
   }
 
@@ -135,11 +142,12 @@ export class AuthStateService {
     const refreshToken = this.tokenService.getRefreshToken();
 
     // Call logout API (fire and forget - we clear state regardless)
-    this.authApi.logout(
-      revokeAllSessions ? undefined : { refreshToken: refreshToken ?? undefined }
-    ).pipe(
-      catchError(() => of(void 0)) // Ignore errors - clear state anyway
-    ).subscribe();
+    this.authApi
+      .logout(revokeAllSessions ? undefined : { refreshToken: refreshToken ?? undefined })
+      .pipe(
+        catchError(() => of(void 0)), // Ignore errors - clear state anyway
+      )
+      .subscribe();
 
     // Clear local state and redirect
     this.clearAuthState();
@@ -159,7 +167,24 @@ export class AuthStateService {
         this.clearAuthState();
         this.router.navigate(['/login']);
       }),
-      finalize(() => this.isLoading.set(false))
+      finalize(() => this.isLoading.set(false)),
+    );
+  }
+
+  /**
+   * Change email (updates user state after success)
+   */
+  changeEmail(data: ChangeEmailDto): Observable<void> {
+    this.isLoading.set(true);
+
+    return this.authApi.changeEmail(data).pipe(
+      tap(() => {
+        const current = this.currentUser();
+        if (current) {
+          this.setUser({ ...current, email: data.newEmail });
+        }
+      }),
+      finalize(() => this.isLoading.set(false)),
     );
   }
 
@@ -176,13 +201,11 @@ export class AuthStateService {
   refreshSession(): Observable<AuthResponse> {
     // If already refreshing, return existing promise as observable
     if (this.isRefreshing && this.refreshPromise) {
-      return new Observable(subscriber => {
-        this.refreshPromise!
-          .then(response => {
-            subscriber.next(response);
-            subscriber.complete();
-          })
-          .catch(error => subscriber.error(error));
+      return new Observable((subscriber) => {
+        this.refreshPromise!.then((response) => {
+          subscriber.next(response);
+          subscriber.complete();
+        }).catch((error) => subscriber.error(error));
       });
     }
 
@@ -195,28 +218,29 @@ export class AuthStateService {
 
     // Create promise for queuing
     this.refreshPromise = new Promise((resolve, reject) => {
-      this.authApi.refreshToken({ refreshToken }).pipe(
-        tap(response => this.handleAuthResponse(response)),
-        finalize(() => {
-          this.isRefreshing = false;
-          this.refreshPromise = null;
-        })
-      ).subscribe({
-        next: response => resolve(response),
-        error: error => {
-          this.clearAuthState();
-          reject(error);
-        }
-      });
+      this.authApi
+        .refreshToken({ refreshToken })
+        .pipe(
+          tap((response) => this.handleAuthResponse(response)),
+          finalize(() => {
+            this.isRefreshing = false;
+            this.refreshPromise = null;
+          }),
+        )
+        .subscribe({
+          next: (response) => resolve(response),
+          error: (error) => {
+            this.clearAuthState();
+            reject(error);
+          },
+        });
     });
 
-    return new Observable(subscriber => {
-      this.refreshPromise!
-        .then(response => {
-          subscriber.next(response);
-          subscriber.complete();
-        })
-        .catch(error => subscriber.error(error));
+    return new Observable((subscriber) => {
+      this.refreshPromise!.then((response) => {
+        subscriber.next(response);
+        subscriber.complete();
+      }).catch((error) => subscriber.error(error));
     });
   }
 

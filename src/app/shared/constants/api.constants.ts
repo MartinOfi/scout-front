@@ -16,6 +16,7 @@ export const API_CONFIG = {
     AUTH_LOGOUT: 'auth/logout',
     AUTH_ME: 'auth/me',
     AUTH_PASSWORD: 'auth/password',
+    AUTH_EMAIL: 'auth/email',
 
     // Personas
     PERSONAS: 'personas',
