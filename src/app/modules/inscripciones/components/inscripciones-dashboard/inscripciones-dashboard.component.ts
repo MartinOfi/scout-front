@@ -3,7 +3,7 @@
  * Dedicated page for comprehensive KPI dashboard
  */
 
-import { Component, OnInit, ChangeDetectionStrategy, inject, signal, effect } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -55,12 +55,8 @@ export class InscripcionesDashboardComponent implements OnInit {
   /** Current year for default filter */
   private readonly currentYear = new Date().getFullYear();
 
-  /** Current filter values */
-  readonly currentFilters = signal<DashboardFilters>({
-    ano: String(this.currentYear),
-    tipoDeuda: '',
-    rama: '',
-  });
+  /** Current filter values - initialized from query params */
+  readonly currentFilters = signal<DashboardFilters>(this.buildInitialFilters());
 
   /** Tab configurations */
   readonly tabs: TabConfig[] = [
@@ -119,43 +115,50 @@ export class InscripcionesDashboardComponent implements OnInit {
     },
   ];
 
-  constructor() {
-    // Reload consolidado when tab or filters change
-    effect(() => {
-      const tipo = this.activeTab();
-      const filters = this.currentFilters();
-      const ano = filters.ano ? parseInt(filters.ano, 10) : undefined;
-      const tipoDeuda = filters.tipoDeuda || undefined;
-      const rama = filters.rama || undefined;
-
-      this.state.loadConsolidado({ tipo, ano, tipoDeuda, rama });
-    });
+  ngOnInit(): void {
+    // Initial load is triggered by GenericFiltersComponent emitting default values (autoApply=true)
   }
 
-  ngOnInit(): void {
-    // Read query params to initialize filters
-    const tipoDeudaParam = this.route.snapshot.queryParamMap.get('tipoDeuda');
-    if (tipoDeudaParam && ['dinero', 'documentacion', 'ambos'].includes(tipoDeudaParam)) {
-      this.currentFilters.update((f) => ({ ...f, tipoDeuda: tipoDeudaParam as TipoDeuda }));
-    }
+  /** Load consolidado based on current tab and filters */
+  private loadData(): void {
+    const tipo = this.activeTab();
+    const filters = this.currentFilters();
+    const ano = filters.ano ? parseInt(filters.ano, 10) : undefined;
+    const tipoDeuda = filters.tipoDeuda || undefined;
+    const rama = filters.rama || undefined;
 
-    const ramaParam = this.route.snapshot.queryParamMap.get('rama');
-    if (
-      ramaParam &&
-      [
-        RamaEnum.MANADA,
-        RamaEnum.UNIDAD,
-        RamaEnum.CAMINANTES,
-        RamaEnum.ROVERS,
-        PersonaType.EDUCADOR,
-      ].includes(ramaParam as RamaFilter)
-    ) {
-      this.currentFilters.update((f) => ({ ...f, rama: ramaParam as RamaFilter }));
-    }
+    this.state.loadConsolidado({ tipo, ano, tipoDeuda, rama });
+  }
+
+  /** Build initial filters from query params */
+  private buildInitialFilters(): DashboardFilters {
+    const queryParams = this.route.snapshot.queryParamMap;
+    const tipoDeudaParam = queryParams.get('tipoDeuda');
+    const ramaParam = queryParams.get('rama');
+    const validRamaValues = [
+      RamaEnum.MANADA,
+      RamaEnum.UNIDAD,
+      RamaEnum.CAMINANTES,
+      RamaEnum.ROVERS,
+      PersonaType.EDUCADOR,
+    ];
+
+    return {
+      ano: String(this.currentYear),
+      tipoDeuda:
+        tipoDeudaParam && ['dinero', 'documentacion', 'ambos'].includes(tipoDeudaParam)
+          ? (tipoDeudaParam as TipoDeuda)
+          : '',
+      rama:
+        ramaParam && validRamaValues.includes(ramaParam as RamaFilter)
+          ? (ramaParam as RamaFilter)
+          : '',
+    };
   }
 
   onTabChange(tabKey: string): void {
     this.activeTab.set(tabKey as TipoInscripcion);
+    this.loadData();
   }
 
   onFilterChange(filters: Record<string, unknown>): void {
@@ -175,6 +178,7 @@ export class InscripcionesDashboardComponent implements OnInit {
       },
       queryParamsHandling: 'merge',
     });
+    this.loadData();
   }
 
   goToList(): void {

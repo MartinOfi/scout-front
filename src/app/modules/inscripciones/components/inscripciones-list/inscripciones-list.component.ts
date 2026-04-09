@@ -6,12 +6,10 @@
 
 import {
   Component,
-  OnInit,
   ChangeDetectionStrategy,
   inject,
   computed,
   signal,
-  effect,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -77,7 +75,7 @@ interface InscripcionTableRow {
   styleUrl: './inscripciones-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InscripcionesListComponent implements OnInit {
+export class InscripcionesListComponent {
   readonly state: InscripcionesStateService = inject(InscripcionesStateService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -120,13 +118,8 @@ export class InscripcionesListComponent implements OnInit {
   /** Current year for default filter */
   private readonly currentYear = new Date().getFullYear();
 
-  /** Current filter values - defaults to current year */
-  readonly currentFilters = signal<InscripcionFilters>({
-    search: '',
-    ano: String(this.currentYear),
-    tipoDeuda: '',
-    rama: '',
-  });
+  /** Current filter values - initialized from query params */
+  readonly currentFilters = signal<InscripcionFilters>(this.buildInitialFilters());
 
   /** Filtered inscripciones by search (other filters handled by backend) */
   readonly filteredInscripciones = computed((): Inscripcion[] => {
@@ -261,21 +254,6 @@ export class InscripcionesListComponent implements OnInit {
       : [...this.baseColumns, this.actionColumn];
   });
 
-  constructor() {
-    // Reload inscripciones and consolidado when tab or filters change
-    effect(() => {
-      const tipo = this.activeTab();
-      const filters = this.currentFilters();
-      const ano = filters.ano ? parseInt(filters.ano, 10) : undefined;
-      const tipoDeuda = filters.tipoDeuda || undefined;
-      const rama = filters.rama || undefined;
-
-      // Load both inscripciones list and consolidado stats
-      this.state.load({ tipo, ano, tipoDeuda, rama });
-      this.state.loadConsolidado({ tipo, ano, tipoDeuda, rama });
-    });
-  }
-
   private getTableActions(): TableAction[] {
     return [
       { key: 'view', label: 'Ver', icon: 'visibility', tooltip: 'Ver detalle' },
@@ -284,22 +262,42 @@ export class InscripcionesListComponent implements OnInit {
     ];
   }
 
-  ngOnInit(): void {
-    // Read query params to initialize filters
-    const tipoDeudaParam = this.route.snapshot.queryParamMap.get('tipoDeuda');
-    if (tipoDeudaParam && ['dinero', 'documentacion', 'ambos'].includes(tipoDeudaParam)) {
-      this.currentFilters.update((f) => ({ ...f, tipoDeuda: tipoDeudaParam as TipoDeuda }));
-    }
+  /** Load inscripciones and consolidado based on current tab and filters */
+  private loadData(): void {
+    const tipo = this.activeTab();
+    const filters = this.currentFilters();
+    const ano = filters.ano ? parseInt(filters.ano, 10) : undefined;
+    const tipoDeuda = filters.tipoDeuda || undefined;
+    const rama = filters.rama || undefined;
 
-    const ramaParam = this.route.snapshot.queryParamMap.get('rama');
+    this.state.load({ tipo, ano, tipoDeuda, rama });
+    this.state.loadConsolidado({ tipo, ano, tipoDeuda, rama });
+  }
+
+  /** Build initial filters from query params */
+  private buildInitialFilters(): InscripcionFilters {
+    const queryParams = this.route.snapshot.queryParamMap;
+    const tipoDeudaParam = queryParams.get('tipoDeuda');
+    const ramaParam = queryParams.get('rama');
     const validRamaValues = [...Object.values(RamaEnum), PersonaType.EDUCADOR];
-    if (ramaParam && validRamaValues.includes(ramaParam as RamaFilter)) {
-      this.currentFilters.update((f) => ({ ...f, rama: ramaParam as RamaFilter }));
-    }
+
+    return {
+      search: '',
+      ano: String(this.currentYear),
+      tipoDeuda:
+        tipoDeudaParam && ['dinero', 'documentacion', 'ambos'].includes(tipoDeudaParam)
+          ? (tipoDeudaParam as TipoDeuda)
+          : '',
+      rama:
+        ramaParam && validRamaValues.includes(ramaParam as RamaFilter)
+          ? (ramaParam as RamaFilter)
+          : '',
+    };
   }
 
   onTabChange(tabKey: string): void {
     this.activeTab.set(tabKey as TipoInscripcion);
+    this.loadData();
   }
 
   onFilterChange(filters: Record<string, unknown>): void {
@@ -320,6 +318,7 @@ export class InscripcionesListComponent implements OnInit {
       },
       queryParamsHandling: 'merge',
     });
+    this.loadData();
   }
 
   onCreate(): void {
@@ -349,14 +348,7 @@ export class InscripcionesListComponent implements OnInit {
       .delete('inscripción', () => this.state.deleteAsync(id))
       .subscribe((result) => {
         if (result.confirmed) {
-          // Reload the list and consolidado after successful deletion
-          const tipo = this.activeTab();
-          const filters = this.currentFilters();
-          const ano = filters.ano ? parseInt(filters.ano, 10) : undefined;
-          const tipoDeuda = filters.tipoDeuda || undefined;
-          const rama = filters.rama || undefined;
-          this.state.load({ tipo, ano, tipoDeuda, rama });
-          this.state.loadConsolidado({ tipo, ano, tipoDeuda, rama });
+          this.loadData();
         }
       });
   }
