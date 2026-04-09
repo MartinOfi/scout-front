@@ -11,7 +11,12 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { firstValueFrom } from 'rxjs';
 
 import { routes } from './app.routes';
-import { authInterceptor, errorInterceptor } from './core/interceptors';
+import {
+  authInterceptor,
+  errorInterceptor,
+  keepAliveInterceptor,
+  retryInterceptor,
+} from './core/interceptors';
 import { AuthStateService } from './modules/auth/services';
 
 /**
@@ -39,7 +44,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(
       withInterceptors([
-        authInterceptor, // Must be first - adds auth token
+        keepAliveInterceptor, // Resets keep-alive timer on every request
+        authInterceptor, // Must be first auth-wise - adds auth token
         errorInterceptor, // Handles errors globally
       ]),
     ),
