@@ -86,12 +86,9 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
-            "stylePreprocessorOptions": {
-              "includePaths": ["src"]
-            },
             "include": [
+              "src/app/core/interceptors/retry.interceptor.spec.ts",
               "src/app/modules/cajas/components/caja-grupo/caja-grupo.component.spec.ts",
-              "src/app/modules/cajas/components/fondos-rama/fondos-rama.component.spec.ts",
               "src/app/modules/cajas/components/cuentas-personales/cuentas-personales.component.spec.ts"
             ]
           }

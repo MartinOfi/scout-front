@@ -46,7 +46,8 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([
         keepAliveInterceptor, // Resets keep-alive timer on every request
         authInterceptor, // Must be first auth-wise - adds auth token
-        errorInterceptor, // Handles errors globally
+        retryInterceptor, // Retries transient errors (502/503/504) with exponential backoff
+        errorInterceptor, // Handles errors globally (only after retries exhausted)
       ]),
     ),
     provideAnimationsAsync(),
