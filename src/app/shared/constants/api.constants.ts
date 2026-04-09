@@ -35,6 +35,7 @@ export const API_CONFIG = {
     MOVIMIENTOS: 'movimientos',
     MOVIMIENTOS_SALDO: 'movimientos/saldo',
     MOVIMIENTOS_CAJA: 'movimientos/caja',
+    MOVIMIENTOS_RECIENTES: 'movimientos/recientes',
     MOVIMIENTOS_REEMBOLSOS_PENDIENTES: 'movimientos/reembolsos-pendientes',
 
     // Inscripciones

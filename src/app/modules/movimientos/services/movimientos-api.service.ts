@@ -95,6 +95,13 @@ export class MovimientosApiService {
   }
 
   /**
+   * Get the last 10 registered movements across all cajas
+   */
+  getRecientes(): Observable<Movimiento[]> {
+    return this.http.get<Movimiento[]>(API_CONFIG.ENDPOINTS.MOVIMIENTOS_RECIENTES);
+  }
+
+  /**
    * Get pending reimbursements grouped by person
    * PRD F7: Deudas a personas externas
    */

@@ -15,7 +15,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { forkJoin, map, catchError, of } from 'rxjs';
+import { forkJoin, catchError, of } from 'rxjs';
 
 import {
   StatCardComponent,
@@ -30,9 +30,9 @@ import {
 } from '../../shared';
 
 import { CajasStateService } from '../cajas/services/cajas-state.service';
-import { CajasApiService } from '../cajas/services/cajas-api.service';
 import { EventosApiService } from '../eventos/services/eventos-api.service';
 import { PersonasApiService } from '../personas/services/personas-api.service';
+import { MovimientosApiService } from '../movimientos/services/movimientos-api.service';
 
 import { Movimiento, Evento, PersonaUnion } from '../../shared/models';
 import { TipoMovimientoEnum, RamaEnum, TipoEvento } from '../../shared/enums';
@@ -126,9 +126,9 @@ export class DashboardComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly cajasState = inject(CajasStateService);
-  private readonly cajasApi = inject(CajasApiService);
   private readonly eventosApi = inject(EventosApiService);
   private readonly personasApi = inject(PersonasApiService);
+  private readonly movimientosApi = inject(MovimientosApiService);
 
   // ============================================================================
   // State Signals
@@ -300,30 +300,14 @@ export class DashboardComponent implements OnInit {
   }
 
   private loadMovimientosRecientes(): void {
-    // First ensure caja grupo is loaded, then get movimientos
-    this.cajasApi
-      .getCajaGrupo()
+    this.movimientosApi
+      .getRecientes()
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        map((caja) => caja.id),
-        catchError(() => of(null)),
+        catchError(() => of([])),
       )
-      .subscribe((cajaId) => {
-        if (cajaId) {
-          this.cajasApi
-            .getMovimientos(cajaId)
-            .pipe(
-              takeUntilDestroyed(this.destroyRef),
-              catchError(() => of([])),
-            )
-            .subscribe((movimientos) => {
-              // Sort by date descending and take first 5
-              const sorted = [...movimientos].sort(
-                (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime(),
-              );
-              this._movimientosRecientes.set(sorted);
-            });
-        }
+      .subscribe((movimientos) => {
+        this._movimientosRecientes.set(movimientos);
       });
   }
 
