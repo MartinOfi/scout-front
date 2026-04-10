@@ -200,7 +200,11 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
     if (this.isEditing && this.inscripcionId) {
       this.loadInscripcion(this.inscripcionId);
     } else {
-      // Set initial monto based on default tipo for new inscriptions
+      const tipoParam = this.route.snapshot.queryParamMap.get('tipo');
+      if (tipoParam === 'scout_argentina' || tipoParam === 'grupo') {
+        this.inscripcionForm.get('tipo')?.setValue(tipoParam);
+        this.currentTipo.set(tipoParam);
+      }
       this.setMontoFromConfig();
     }
   }
@@ -346,7 +350,9 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
         certificadoAptitudFisica: formValue.certificadoAptitudFisica || undefined,
       };
       this.state.create(dto).subscribe(() => {
-        this.router.navigate(['/inscripciones']);
+        this.router.navigate(['/inscripciones'], {
+          queryParams: { tipo: formValue.tipo },
+        });
       });
     }
   }

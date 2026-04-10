@@ -14,20 +14,16 @@
   <div class="divider-wrapper">
     <hr class="divider" />
     @if (!isMobileDrawer()) {
-      <button class="toggle-btn btn-icon" type="button" (click)="toggle()"
-        [attr.aria-label]="isCollapsed() ? 'Expandir menú' : 'Colapsar menú'">
-        <mat-icon>{{ toggleIcon() }}</mat-icon>
-      </button>
+    <button class="toggle-btn btn-icon" type="button" (click)="toggle()"
+      [attr.aria-label]="isCollapsed() ? 'Expandir menú' : 'Colapsar menú'">
+      <mat-icon>{{ toggleIcon() }}</mat-icon>
+    </button>
     }
   </div>
 
   <nav class="sidebar-nav">
     @for (item of menuItems; track item.route) {
-    <app-sidebar-item
-      [item]="item"
-      [isCollapsed]="isCollapsed() && !isMobileDrawer()"
-      (click)="itemClicked.emit()"
-    />
+    <app-sidebar-item [item]="item" [isCollapsed]="isCollapsed() && !isMobileDrawer()" (click)="itemClicked.emit()" />
     }
   </nav>
 
@@ -36,32 +32,17 @@
   <div class="sidebar-footer">
     <mat-icon class="user-avatar">account_circle</mat-icon>
     @if (!isCollapsed()) {
-      <div class="user-info">
-        <span class="user-name">{{ displayName() }}</span>
-        <span class="user-email">{{ userEmail() }}</span>
-        @if (userRole()) {
-          <span class="user-role">{{ userRole() }}</span>
-        }
-      </div>
-      <button
-        type="button"
-        class="logout-btn"
-        (click)="logout()"
-        matTooltip="Cerrar sesión"
-        aria-label="Cerrar sesión"
-      >
-        <mat-icon>logout</mat-icon>
-      </button>
-    } @else {
-      <button
-        type="button"
-        class="logout-btn logout-btn-collapsed"
-        (click)="logout()"
-        matTooltip="Cerrar sesión"
-        aria-label="Cerrar sesión"
-      >
-        <mat-icon>logout</mat-icon>
-      </button>
+    <div class="user-info">
+      <span class="user-name">{{ displayName() }}</span>
+      <span class="user-email">{{ userEmail() }}</span>
+      @if (userRole()) {
+      <span class="user-role">{{ userRole() }}</span>
+      }
+    </div>
+    <button type="button" class="logout-btn unstyled" (click)="logout()" matTooltip="Cerrar sesión"
+      aria-label="Cerrar sesión">
+      <mat-icon>logout</mat-icon>
+    </button>
     }
   </div>
 </aside>

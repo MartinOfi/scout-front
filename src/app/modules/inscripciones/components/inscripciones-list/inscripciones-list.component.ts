@@ -108,7 +108,7 @@ export class InscripcionesListComponent {
   });
 
   /** Currently active tab (tipo) */
-  readonly activeTab = signal<TipoInscripcion>('scout_argentina');
+  readonly activeTab = signal<TipoInscripcion>(this.getInitialTab());
 
   /** Current year for default filter */
   private readonly currentYear = new Date().getFullYear();
@@ -269,6 +269,12 @@ export class InscripcionesListComponent {
     this.state.loadConsolidado({ tipo, ano, tipoDeuda, rama });
   }
 
+  /** Resolve initial active tab from query params */
+  private getInitialTab(): TipoInscripcion {
+    const tipoParam = this.route.snapshot.queryParamMap.get('tipo');
+    return tipoParam === 'grupo' || tipoParam === 'scout_argentina' ? tipoParam : 'scout_argentina';
+  }
+
   /** Build initial filters from query params */
   private buildInitialFilters(): InscripcionFilters {
     const queryParams = this.route.snapshot.queryParamMap;
@@ -317,7 +323,9 @@ export class InscripcionesListComponent {
   }
 
   onCreate(): void {
-    this.router.navigate(['/inscripciones/crear']);
+    this.router.navigate(['/inscripciones/crear'], {
+      queryParams: { tipo: this.activeTab() },
+    });
   }
 
   goToDashboard(): void {
