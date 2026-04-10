@@ -3,7 +3,7 @@
   <div class="detail-loading">
     <app-loading-spinner message="Cargando inscripción..." />
   </div>
-  } @else if (error()) {
+  } @else if (error() && !detail()) {
   <div class="detail-error">
     <app-empty-state icon="error_outline" [message]="error() ?? 'Error al cargar'" actionLabel="Volver"
       (onAction)="onBack()" />

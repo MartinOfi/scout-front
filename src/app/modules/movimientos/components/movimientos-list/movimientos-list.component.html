@@ -31,7 +31,7 @@
           <mat-spinner diameter="40"></mat-spinner>
           <span>Cargando movimientos...</span>
         </div>
-      } @else if (error()) {
+      } @else if (error() && tableData().length === 0) {
         <div class="error-state">
           <mat-icon color="warn">error</mat-icon>
           <span>{{ error() }}</span>

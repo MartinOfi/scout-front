@@ -6,7 +6,7 @@
 
   @if (loading()) {
     <app-loading-spinner message="Cargando..." />
-  } @else if (error()) {
+  } @else if (error() && !educador()) {
     <app-empty-state
       icon="error_outline"
       [message]="error() ?? 'Error al cargar'"

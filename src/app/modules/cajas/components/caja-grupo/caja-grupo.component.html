@@ -6,7 +6,7 @@
     </div>
   }
 
-  @if (error()) {
+  @if (error() && !cajaGrupo()) {
     <div class="error-state">
       <mat-icon color="warn">error</mat-icon>
       <span>{{ error() }}</span>

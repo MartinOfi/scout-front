@@ -19,7 +19,6 @@ import { filter, take } from 'rxjs';
 
 import { EducadoresStateService } from '../../../services';
 import { PersonasFormBuilder } from '../../../services/personas-form.builder';
-import { EmptyStateComponent } from '../../../../../shared';
 import { Educador, CreateEducadorDto, UpdatePersonaDto } from '../../../../../shared/models';
 import { RAMAS, CARGOS_EDUCADOR } from '../../../../../shared/enums';
 
@@ -34,7 +33,6 @@ import { SelectFieldComponent } from '../../../../../shared/components/form/sele
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    EmptyStateComponent,
     FormFieldComponent,
     TextFieldComponent,
     SelectFieldComponent,

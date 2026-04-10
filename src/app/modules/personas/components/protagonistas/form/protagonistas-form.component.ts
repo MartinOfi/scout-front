@@ -4,7 +4,14 @@
  * SIN any - tipado estricto
  */
 
-import { Component, OnInit, ChangeDetectionStrategy, inject, Signal, computed } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  inject,
+  Signal,
+  computed,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -12,8 +19,11 @@ import { filter, take } from 'rxjs';
 
 import { PersonasStateService } from '../../../services';
 import { PersonasFormBuilder } from '../../../services/personas-form.builder';
-import { EmptyStateComponent } from '../../../../../shared';
-import { Protagonista, CreateProtagonistaDto, UpdatePersonaDto } from '../../../../../shared/models';
+import {
+  Protagonista,
+  CreateProtagonistaDto,
+  UpdatePersonaDto,
+} from '../../../../../shared/models';
 import { Rama, RAMAS } from '../../../../../shared/enums';
 
 // Shared Form Components
@@ -28,15 +38,14 @@ import { CheckboxFieldComponent } from '../../../../../shared/components/form/ch
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    EmptyStateComponent,
     FormFieldComponent,
     TextFieldComponent,
     SelectFieldComponent,
-    CheckboxFieldComponent
+    CheckboxFieldComponent,
   ],
   templateUrl: './protagonistas-form.component.html',
   styleUrls: ['./protagonistas-form.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProtagonistasFormComponent implements OnInit {
   private readonly state = inject(PersonasStateService);
@@ -53,23 +62,25 @@ export class ProtagonistasFormComponent implements OnInit {
   readonly error: Signal<string | null> = this.state.error;
   readonly selected: Signal<Protagonista | null> = computed(() => {
     const s = this.state.selected();
-    return s && s.tipo === 'protagonista' ? s as Protagonista : null;
+    return s && s.tipo === 'protagonista' ? (s as Protagonista) : null;
   });
 
   ngOnInit(): void {
-    this.route.params.pipe(
-      take(1),
-      filter(params => !!params['id'])
-    ).subscribe(params => {
-      this.isEditing = true;
-      this.editId = params['id'];
-      this.loadProtagonista(this.editId);
-    });
+    this.route.params
+      .pipe(
+        take(1),
+        filter((params) => !!params['id']),
+      )
+      .subscribe((params) => {
+        this.isEditing = true;
+        this.editId = params['id'];
+        this.loadProtagonista(this.editId);
+      });
   }
 
   private loadProtagonista(id: string | null): void {
     if (!id) return;
-    const protagonista = this.state.protagonistas().find(p => p.id === id);
+    const protagonista = this.state.protagonistas().find((p) => p.id === id);
     if (protagonista) {
       this.form = this.formBuilder.buildEditProtagonistaForm(protagonista);
     }
@@ -81,12 +92,12 @@ export class ProtagonistasFormComponent implements OnInit {
     if (this.isEditing && this.editId) {
       const dto: UpdatePersonaDto = this.formBuilder.extractUpdateProtagonistaDto(this.form);
       this.state.update(this.editId, dto).subscribe({
-        next: () => this.router.navigate(['/personas'])
+        next: () => this.router.navigate(['/personas']),
       });
     } else {
       const dto: CreateProtagonistaDto = this.formBuilder.extractCreateProtagonistaDto(this.form);
       this.state.createProtagonista(dto).subscribe({
-        next: () => this.router.navigate(['/personas'])
+        next: () => this.router.navigate(['/personas']),
       });
     }
   }

@@ -10,7 +10,7 @@
     <div class="loading-state">
       <mat-spinner diameter="50"></mat-spinner>
     </div>
-  } @else if (error()) {
+  } @else if (error() && tableData().length === 0) {
     <div class="error-state">
       <mat-icon color="warn">error</mat-icon>
       <p>{{ error() }}</p>

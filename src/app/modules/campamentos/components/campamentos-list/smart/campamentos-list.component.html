@@ -7,16 +7,16 @@
       </div>
     }
 
-    <!-- Error State -->
-    @if (error()) {
+    <!-- Error State (only when no data loaded yet) -->
+    @if (error() && campamentos().length === 0) {
       <div class="camps-error">
         <mat-icon color="warn">error_outline</mat-icon>
         <span>{{ error() }}</span>
       </div>
     }
 
-    <!-- Content (Stats + Grid) -->
-    @if (!loading() && !error()) {
+    <!-- Content (Stats + Grid) - keeps showing even if a refetch errors -->
+    @if (!loading() && !(error() && campamentos().length === 0)) {
       @if (campamentos().length === 0) {
         <!-- Empty State -->
         <div class="camps-empty">

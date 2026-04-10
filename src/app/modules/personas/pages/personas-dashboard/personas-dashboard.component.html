@@ -18,7 +18,7 @@
       <mat-spinner diameter="50"></mat-spinner>
       <p>Cargando personas...</p>
     </div>
-    } @else if (error()) {
+    } @else if (error() && filteredPersonas().length === 0) {
     <div class="error-state">
       <mat-icon>error_outline</mat-icon>
       <p>{{ error() }}</p>

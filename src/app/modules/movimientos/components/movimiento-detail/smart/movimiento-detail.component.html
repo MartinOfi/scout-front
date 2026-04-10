@@ -20,8 +20,8 @@
     <p>Cargando movimiento...</p>
   </div>
 
-  <!-- Error State -->
-  <div *ngIf="error() && !loading()" class="error-container">
+  <!-- Error State (only when no data loaded yet) -->
+  <div *ngIf="error() && !loading() && !movimiento()" class="error-container">
     <mat-icon color="warn">error</mat-icon>
     <p>{{ error() }}</p>
     <app-button variant="secondary" (clicked)="onBack()">Volver</app-button>

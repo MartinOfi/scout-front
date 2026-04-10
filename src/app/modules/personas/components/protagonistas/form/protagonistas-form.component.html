@@ -19,13 +19,6 @@
             <div class="loading-spinner"></div>
             <p class="loading-text">Guardando...</p>
           </div>
-        } @else if (error()) {
-          <app-empty-state
-            icon="error_outline"
-            [message]="error() ?? 'Error al guardar'"
-            actionLabel="Reintentar"
-            (onAction)="onSubmit()"
-          />
         } @else {
           <form [formGroup]="form" (ngSubmit)="onSubmit()">
             <!-- Nombre -->

@@ -8,16 +8,16 @@
       </div>
     }
 
-    <!-- Error State -->
-    @if (error()) {
+    <!-- Error State (only when no data loaded yet) -->
+    @if (error() && eventos().length === 0) {
       <div class="eventos-error">
         <mat-icon color="warn">error_outline</mat-icon>
         <span>{{ error() }}</span>
       </div>
     }
 
-    <!-- Content (Stats + Filters + Grid) -->
-    @if (!loading() && !error()) {
+    <!-- Content (Stats + Filters + Grid) - keeps showing even if a refetch errors -->
+    @if (!loading() && !(error() && eventos().length === 0)) {
 
       @if (eventos().length === 0) {
         <!-- Empty State (no events at all) -->

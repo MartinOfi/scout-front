@@ -3,7 +3,7 @@
   <div class="dashboard-loading">
     <app-loading-spinner message="Cargando datos..." />
   </div>
-  } @else if (error()) {
+  } @else if (error() && !dashboard()) {
   <div class="dashboard-error">
     <app-empty-state
       icon="error_outline"
