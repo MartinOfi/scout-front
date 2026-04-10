@@ -58,7 +58,7 @@
     } @else {
     @for (fondo of fondosRama(); track fondo.nombre) {
     <app-data-list-item [icon]="fondo.icon" [iconVariant]="fondo.iconVariant" [primaryText]="fondo.nombre"
-      [secondaryText]="fondo.protagonistas + ' protagonistas'" [value]="fondo.saldo" valueVariant="neutral" />
+      [value]="fondo.saldo" valueVariant="neutral" />
     }
     }
   </app-data-list-card>

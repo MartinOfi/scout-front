@@ -15,7 +15,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { forkJoin, catchError, of } from 'rxjs';
+import { catchError, of } from 'rxjs';
 
 import {
   StatCardComponent,
@@ -31,10 +31,9 @@ import {
 
 import { CajasStateService } from '../cajas/services/cajas-state.service';
 import { EventosApiService } from '../eventos/services/eventos-api.service';
-import { PersonasApiService } from '../personas/services/personas-api.service';
 import { MovimientosApiService } from '../movimientos/services/movimientos-api.service';
 
-import { Movimiento, Evento, PersonaUnion } from '../../shared/models';
+import { Movimiento, Evento } from '../../shared/models';
 import { TipoMovimientoEnum, RamaEnum, TipoEvento } from '../../shared/enums';
 import { humanize } from '../../shared/pipes';
 import type { Rama } from '../../shared/enums';
@@ -62,7 +61,6 @@ interface FondoRamaConfig {
   readonly icon: string;
   readonly iconVariant: IconVariant;
   readonly nombre: string;
-  readonly protagonistas: number;
   readonly saldo: number;
 }
 
@@ -127,7 +125,6 @@ export class DashboardComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly cajasState = inject(CajasStateService);
   private readonly eventosApi = inject(EventosApiService);
-  private readonly personasApi = inject(PersonasApiService);
   private readonly movimientosApi = inject(MovimientosApiService);
 
   // ============================================================================
@@ -136,12 +133,6 @@ export class DashboardComponent implements OnInit {
 
   private readonly _movimientosRecientes = signal<Movimiento[]>([]);
   private readonly _proximosEventos = signal<Evento[]>([]);
-  private readonly _protagonistasPorRama = signal<Record<Rama, number>>({
-    [RamaEnum.MANADA]: 0,
-    [RamaEnum.UNIDAD]: 0,
-    [RamaEnum.CAMINANTES]: 0,
-    [RamaEnum.ROVERS]: 0,
-  });
   private readonly _isLoading = signal<boolean>(true);
 
   // ============================================================================
@@ -186,7 +177,6 @@ export class DashboardComponent implements OnInit {
 
   readonly fondosRama = computed<readonly FondoRamaConfig[]>(() => {
     const cajasRama = this.cajasState.cajasRama();
-    const protagonistasPorRama = this._protagonistasPorRama();
 
     return (Object.values(RamaEnum) as Rama[])
       .filter((rama) => cajasRama[rama])
@@ -197,7 +187,6 @@ export class DashboardComponent implements OnInit {
           icon: config.icon,
           iconVariant: config.iconVariant,
           nombre: rama,
-          protagonistas: protagonistasPorRama[rama] ?? 0,
           saldo: caja?.saldoActual ?? 0,
         };
       });
@@ -274,20 +263,15 @@ export class DashboardComponent implements OnInit {
     // Load consolidated cajas data (replaces multiple individual API calls)
     this.cajasState.loadConsolidado();
 
-    // Load eventos and personas in parallel (not part of consolidado endpoint)
-    forkJoin({
-      eventos: this.eventosApi.getAll().pipe(catchError(() => of([]))),
-      personas: this.personasApi.getAll().pipe(catchError(() => of([]))),
-    })
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    this.eventosApi
+      .getAll()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        catchError(() => of([])),
+      )
       .subscribe({
-        next: ({ eventos, personas }) => {
-          // Set eventos
+        next: (eventos) => {
           this._proximosEventos.set(eventos);
-
-          // Count protagonistas per rama
-          this.countProtagonistasPerRama(personas);
-
           this._isLoading.set(false);
         },
         error: () => {
@@ -295,7 +279,6 @@ export class DashboardComponent implements OnInit {
         },
       });
 
-    // Load movimientos for grupo caja
     this.loadMovimientosRecientes();
   }
 
@@ -309,26 +292,6 @@ export class DashboardComponent implements OnInit {
       .subscribe((movimientos) => {
         this._movimientosRecientes.set(movimientos);
       });
-  }
-
-  private countProtagonistasPerRama(personas: PersonaUnion[]): void {
-    const counts: Record<Rama, number> = {
-      [RamaEnum.MANADA]: 0,
-      [RamaEnum.UNIDAD]: 0,
-      [RamaEnum.CAMINANTES]: 0,
-      [RamaEnum.ROVERS]: 0,
-    };
-
-    personas.forEach((persona) => {
-      if (persona.tipo === 'protagonista' && 'rama' in persona && persona.rama) {
-        const rama = persona.rama as Rama;
-        if (counts[rama] !== undefined) {
-          counts[rama]++;
-        }
-      }
-    });
-
-    this._protagonistasPorRama.set(counts);
   }
 
   // ============================================================================
