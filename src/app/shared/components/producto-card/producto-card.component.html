@@ -13,18 +13,18 @@
   </div>
 
   <div class="producto-card__price">
-    <span class="producto-card__price-value">{{ format(producto().precioVenta) }}</span>
+    <span class="producto-card__price-value">{{ producto().precioVenta | money }}</span>
     <span class="producto-card__price-label">precio de venta</span>
   </div>
 
   <div class="producto-card__stats">
     <div class="producto-card__stat">
       <span class="producto-card__stat-label">costo</span>
-      <span class="producto-card__stat-value">{{ format(producto().precioCosto) }}</span>
+      <span class="producto-card__stat-value">{{ producto().precioCosto | money }}</span>
     </div>
     <div class="producto-card__stat" [ngClass]="gananciaClass()">
       <span class="producto-card__stat-label">ganancia</span>
-      <span class="producto-card__stat-value">{{ format(ganancia()) }}</span>
+      <span class="producto-card__stat-value">{{ ganancia() | money }}</span>
     </div>
   </div>
 

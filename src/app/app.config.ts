@@ -1,5 +1,6 @@
 import {
   ApplicationConfig,
+  LOCALE_ID,
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
   APP_INITIALIZER,
@@ -51,6 +52,7 @@ export const appConfig: ApplicationConfig = {
       ]),
     ),
     provideAnimationsAsync(),
+    { provide: LOCALE_ID, useValue: 'es-AR' },
     // Initialize auth state on app startup
     {
       provide: APP_INITIALIZER,

@@ -12,7 +12,7 @@ import {
   signal,
   computed,
 } from '@angular/core';
-import { CommonModule, CurrencyPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import {
   FormBuilder,
@@ -32,6 +32,7 @@ import { MedioPagoEnum, MEDIO_PAGO_LABELS } from '../../../../shared/enums/movim
 import { SelectFieldComponent } from '../../../../shared/components/form/select-field/select-field.component';
 import { FormFieldComponent } from '../../../../shared/components/form/form-field/form-field.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
+import { MoneyPipe } from '../../../../shared/pipes';
 
 @Component({
   selector: 'app-ventas-lote',
@@ -40,7 +41,7 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
     CommonModule,
     ReactiveFormsModule,
     MatIconModule,
-    CurrencyPipe,
+    MoneyPipe,
     SelectFieldComponent,
     FormFieldComponent,
     LoadingSpinnerComponent,

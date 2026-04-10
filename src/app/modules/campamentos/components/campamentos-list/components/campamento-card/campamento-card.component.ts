@@ -12,17 +12,18 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 
 import { Campamento } from '../../../../../../shared/models';
+import { MoneyPipe } from '../../../../../../shared/pipes/money.pipe';
 
 type CampStatus = 'upcoming' | 'active' | 'past';
 
 @Component({
   selector: 'app-campamento-card',
   standalone: true,
-  imports: [CommonModule, MatIconModule, CurrencyPipe, DatePipe],
+  imports: [CommonModule, MatIconModule, MoneyPipe, DatePipe],
   templateUrl: './campamento-card.component.html',
   styleUrl: './campamento-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -18,7 +18,7 @@ import {
   CONCEPTO_MOVIMIENTO_LABELS,
   ESTADO_PAGO_LABELS,
 } from '../../../../../../shared/enums';
-import { HumanizePipe } from '../../../../../../shared/pipes';
+import { HumanizePipe, MoneyPipe } from '../../../../../../shared/pipes';
 
 @Component({
   selector: 'app-movimiento-row',
@@ -30,6 +30,7 @@ import { HumanizePipe } from '../../../../../../shared/pipes';
     MatChipsModule,
     MatMenuModule,
     HumanizePipe,
+    MoneyPipe,
   ],
   templateUrl: './movimiento-row.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

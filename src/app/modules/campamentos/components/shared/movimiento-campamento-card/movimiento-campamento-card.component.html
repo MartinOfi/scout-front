@@ -22,9 +22,9 @@
     [class.movimiento-card__amount--positive]="movimiento.tipo === 'ingreso'"
     [class.movimiento-card__amount--negative]="movimiento.tipo === 'egreso'">
     @if (movimiento.tipo === 'ingreso') {
-      +{{ movimiento.monto | currency:'ARS':'symbol':'1.0-0' }}
+      +{{ movimiento.monto | money }}
     } @else {
-      -{{ movimiento.monto | currency:'ARS':'symbol':'1.0-0' }}
+      -{{ movimiento.monto | money }}
     }
   </div>
 

@@ -10,7 +10,7 @@
         <mat-icon color="primary">trending_up</mat-icon>
         <div class="content">
           <span class="label">Total Ingresos</span>
-          <span class="value">${{ totalRecaudado | number:'1.2-2' }}</span>
+          <span class="value">{{ totalRecaudado | money:2 }}</span>
         </div>
       </div>
 
@@ -19,7 +19,7 @@
         <mat-icon color="warn">trending_down</mat-icon>
         <div class="content">
           <span class="label">Total Egresos</span>
-          <span class="value">${{ totalEgresos | number:'1.2-2' }}</span>
+          <span class="value">{{ totalEgresos | money:2 }}</span>
         </div>
       </div>
 
@@ -30,7 +30,7 @@
         </mat-icon>
         <div class="content">
           <span class="label">Resultado Neto</span>
-          <span class="value">${{ resultadoNeto | number:'1.2-2' }}</span>
+          <span class="value">{{ resultadoNeto | money:2 }}</span>
         </div>
       </div>
     </div>

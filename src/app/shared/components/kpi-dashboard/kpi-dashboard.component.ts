@@ -4,10 +4,11 @@
  */
 
 import { Component, ChangeDetectionStrategy, input, computed } from '@angular/core';
-import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { InscripcionesConsolidado, DistribucionPorRama, ResumenFinanciero } from '../../models';
+import { MoneyPipe } from '../../pipes/money.pipe';
 
 /** Rama configuration for display */
 interface RamaConfig {
@@ -37,7 +38,7 @@ interface DebtorCategory {
 @Component({
   selector: 'app-kpi-dashboard',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatTooltipModule, CurrencyPipe, DecimalPipe],
+  imports: [CommonModule, MatIconModule, MatTooltipModule, MoneyPipe, DecimalPipe],
   templateUrl: './kpi-dashboard.component.html',
   styleUrl: './kpi-dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

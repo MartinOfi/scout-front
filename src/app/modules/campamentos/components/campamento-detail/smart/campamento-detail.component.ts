@@ -12,7 +12,7 @@ import {
   signal,
   computed,
 } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -59,6 +59,7 @@ import {
   PersonaSelectorDialogResult,
 } from '../../../../../shared/components/persona-selector-dialog/persona-selector-dialog.component';
 import { AddParticipanteDto } from '../../../../../shared/models';
+import { formatMoney, MoneyPipe } from '../../../../../shared/pipes/money.pipe';
 import { EstadoPago, PersonaType, FiltroMovimientosCampamento } from '../../../../../shared/enums';
 
 interface KpiConfig {
@@ -83,7 +84,7 @@ interface KpiConfig {
     StatCardComponent,
     ButtonTabsComponent,
     MovimientoCampamentoCardComponent,
-    CurrencyPipe,
+    MoneyPipe,
     DatePipe,
   ],
   templateUrl: './campamento-detail.component.html',
@@ -317,7 +318,7 @@ export class CampamentoDetailComponent implements OnInit {
           confirmText: 'Pagar',
           cancelText: 'Cancelar',
           details: [
-            { label: 'Monto', value: `$${movimiento.monto.toLocaleString('es-AR')}` },
+            { label: 'Monto', value: formatMoney(movimiento.monto) },
             { label: 'Descripción', value: movimiento.descripcion ?? 'Sin descripción' },
             { label: 'Responsable', value: movimiento.responsableNombre },
           ],

@@ -10,18 +10,15 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 
 import { EstadoInscripcion, ESTADO_INSCRIPCION_LABELS } from '../../../../../shared/enums';
+import { MoneyPipe } from '../../../../../shared/pipes';
 
 @Component({
   selector: 'app-bonificacion-badge',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatChipsModule,
-    MatIconModule
-  ],
+  imports: [CommonModule, MatChipsModule, MatIconModule, MoneyPipe],
   templateUrl: './bonificacion-badge.component.html',
   styleUrl: './bonificacion-badge.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BonificacionBadgeComponent {
   @Input({ required: true }) estado!: EstadoInscripcion;

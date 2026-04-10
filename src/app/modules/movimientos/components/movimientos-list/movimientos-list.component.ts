@@ -45,6 +45,7 @@ import { FilterConfig } from '../../../../shared/components/filters/generic-filt
 import { FilterType } from '../../../../shared/components/filters/generic-filters/filter-type.enum';
 import { ConfirmDialogService } from '../../../../shared/services/confirm-dialog.service';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { formatMoney } from '../../../../shared/pipes/money.pipe';
 
 type TabKey = 'todos' | 'ingreso' | 'egreso';
 
@@ -194,8 +195,7 @@ export class MovimientosListComponent implements OnInit {
         header: 'Monto',
         type: 'number',
         sortable: true,
-        formatter: (value: unknown) =>
-          `$${(value as number).toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
+        formatter: (value: unknown) => formatMoney(value as number, 2),
       },
       { key: 'medioPago', header: 'Medio de Pago', type: 'text' },
       { key: 'estadoPago', header: 'Estado', type: 'status' },

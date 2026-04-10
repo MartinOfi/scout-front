@@ -9,6 +9,6 @@
     }
   </div>
   <span class="data-list-item__value" [class]="valueColorClass()">
-    {{ value() | currency:'$':'symbol':'1.0-0':'es-AR' }}
+    {{ value() | money }}
   </span>
 </article>

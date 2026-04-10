@@ -64,11 +64,11 @@
     <div class="summary">
       <div class="summary-item">
         <span class="label">Total Venta:</span>
-        <span class="value primary">${{ totalVenta | number:'1.2-2' }}</span>
+        <span class="value primary">{{ totalVenta | money:2 }}</span>
       </div>
       <div class="summary-item">
         <span class="label">Ganancia:</span>
-        <span class="value success">${{ ganancia | number:'1.2-2' }}</span>
+        <span class="value success">{{ ganancia | money:2 }}</span>
       </div>
     </div>
   }

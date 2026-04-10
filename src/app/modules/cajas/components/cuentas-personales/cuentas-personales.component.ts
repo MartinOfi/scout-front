@@ -23,6 +23,7 @@ import { CajasStateService } from '../../services/cajas-state.service';
 import { CajaConSaldo } from '../../../../shared/models';
 import { DataTableComponent } from '../../../../shared/components/tables/data-table.component';
 import { TableColumn, TableData, ActionEvent } from '../../../../shared/models/table.model';
+import { formatMoney } from '../../../../shared/pipes/money.pipe';
 import { GenericFiltersComponent } from '../../../../shared/components/filters/generic-filters/generic-filters.component';
 import { FilterConfig } from '../../../../shared/components/filters/generic-filters/filter-config.interface';
 import { FilterType } from '../../../../shared/components/filters/generic-filters/filter-type.enum';
@@ -112,8 +113,7 @@ export class CuentasPersonalesComponent implements OnInit {
       header: 'Saldo',
       type: 'number',
       sortable: true,
-      formatter: (value: unknown) =>
-        `$${(value as number).toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
+      formatter: (value: unknown) => formatMoney(value as number, 2),
     },
     {
       key: 'actions',

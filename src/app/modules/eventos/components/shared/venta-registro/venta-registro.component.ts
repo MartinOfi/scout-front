@@ -22,6 +22,7 @@ import { MedioPagoEnum, MEDIO_PAGO_LABELS } from '../../../../../shared/enums/mo
 import { FormFieldComponent } from '../../../../../shared/components/form/form-field/form-field.component';
 import { NumberFieldComponent } from '../../../../../shared/components/form/number-field/number-field.component';
 import { SelectFieldComponent } from '../../../../../shared/components/form/select-field/select-field.component';
+import { MoneyPipe } from '../../../../../shared/pipes';
 
 @Component({
   selector: 'app-venta-registro',
@@ -32,6 +33,7 @@ import { SelectFieldComponent } from '../../../../../shared/components/form/sele
     FormFieldComponent,
     NumberFieldComponent,
     SelectFieldComponent,
+    MoneyPipe,
   ],
   templateUrl: './venta-registro.component.html',
   styleUrl: './venta-registro.component.scss',

@@ -14,13 +14,14 @@ import { MatChipsModule } from '@angular/material/chips';
 
 import { PersonaUnion, Protagonista, Educador } from '../../../../../../shared/models';
 import { RAMA_LABELS, Rama } from '../../../../../../shared/enums';
+import { MoneyPipe } from '../../../../../../shared/pipes';
 
 @Component({
   selector: 'app-cuenta-personal-row',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatListModule, MatChipsModule],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatListModule, MatChipsModule, MoneyPipe],
   templateUrl: './cuenta-personal-row.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CuentaPersonalRowComponent {
   readonly persona = input.required<PersonaUnion>();

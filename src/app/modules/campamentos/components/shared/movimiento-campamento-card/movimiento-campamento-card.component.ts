@@ -5,16 +5,17 @@
  */
 
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 
 import { MovimientoCampamentoDto } from '../../../../../shared/models';
 import { EstadoPago, ESTADO_PAGO_LABELS, MEDIO_PAGO_LABELS } from '../../../../../shared/enums';
+import { MoneyPipe } from '../../../../../shared/pipes';
 
 @Component({
   selector: 'app-movimiento-campamento-card',
   standalone: true,
-  imports: [CommonModule, MatIconModule, CurrencyPipe, DatePipe],
+  imports: [CommonModule, MatIconModule, MoneyPipe, DatePipe],
   templateUrl: './movimiento-campamento-card.component.html',
   styleUrl: './movimiento-campamento-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -12,7 +12,7 @@ import {
   Signal,
   computed,
 } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
@@ -22,6 +22,7 @@ import { InscripcionesStateService } from '../../services/inscripciones-state.se
 import { CajasApiService } from '../../../cajas/services/cajas-api.service';
 import { ConfirmDialogService } from '../../../../shared/services';
 import { LoadingSpinnerComponent, EmptyStateComponent } from '../../../../shared';
+import { MoneyPipe } from '../../../../shared/pipes';
 import {
   InscripcionConEstado,
   MovimientoInscripcion,
@@ -55,7 +56,7 @@ const MEDIO_PAGO_LABELS: Record<string, string> = {
   standalone: true,
   imports: [
     CommonModule,
-    CurrencyPipe,
+    MoneyPipe,
     DatePipe,
     MatIconModule,
     LoadingSpinnerComponent,

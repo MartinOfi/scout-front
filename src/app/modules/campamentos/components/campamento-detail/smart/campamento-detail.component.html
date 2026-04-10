@@ -53,7 +53,7 @@
       <div class="info-card__details">
         <div class="info-card__item">
           <span class="info-card__label">Costo por persona</span>
-          <span class="info-card__value">{{ campamentoInfo.costoPorPersona | currency:'ARS':'symbol':'1.0-0' }}</span>
+          <span class="info-card__value">{{ campamentoInfo.costoPorPersona | money}}</span>
         </div>
         @if (campamentoInfo.cuotasBase) {
         <div class="info-card__item">
@@ -130,11 +130,9 @@
               <div class="participante-card__info">
                 <h3 class="participante-card__name">{{ participante.nombre }}</h3>
                 <div class="participante-card__progress">
-                  <span class="participante-card__paid">{{ participante.totalPagado | currency:'ARS':'symbol':'1.0-0'
-                    }}</span>
+                  <span class="participante-card__paid">{{ participante.totalPagado | money }}</span>
                   <span class="participante-card__separator">/</span>
-                  <span class="participante-card__total">{{ participante.costoPorPersona |
-                    currency:'ARS':'symbol':'1.0-0' }}</span>
+                  <span class="participante-card__total">{{ participante.costoPorPersona | money }}</span>
                 </div>
               </div>
               <div class="participante-card__status"
@@ -144,8 +142,7 @@
                 <mat-icon>check_circle</mat-icon>
                 <span>Al día</span>
                 } @else {
-                <span class="participante-card__pending">{{ participante.saldoPendiente |
-                  currency:'ARS':'symbol':'1.0-0' }}</span>
+                <span class="participante-card__pending">{{ participante.saldoPendiente | money }}</span>
                 <span>pendiente</span>
                 }
               </div>
@@ -157,7 +154,7 @@
               @for (pago of participante.pagos; track pago.movimientoId) {
               <div class="payment-row">
                 <span class="payment-row__date">{{ pago.fecha | date:'d/M' }}</span>
-                <span class="payment-row__amount">{{ pago.monto | currency:'ARS':'symbol':'1.0-0' }}</span>
+                <span class="payment-row__amount">{{ pago.monto | money}}</span>
                 <span class="payment-row__method">{{ pago.medioPago }}</span>
                 <button class="payment-row__edit unstyled" (click)="onEditPago(participante, pago)"
                   aria-label="Editar pago">

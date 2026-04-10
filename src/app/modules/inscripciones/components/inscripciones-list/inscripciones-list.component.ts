@@ -4,13 +4,7 @@
  * SIN any - tipado estricto
  */
 
-import {
-  Component,
-  ChangeDetectionStrategy,
-  inject,
-  computed,
-  signal,
-} from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -32,6 +26,7 @@ import { TipoInscripcion, RamaEnum, PersonaType, RAMA_LABELS } from '../../../..
 import { Inscripcion, TipoDeuda } from '../../../../shared/models';
 import { ConfirmDialogService } from '../../../../shared/services';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { formatMoney } from '../../../../shared/pipes/money.pipe';
 
 interface InscripcionFilters {
   search: string;
@@ -144,10 +139,10 @@ export class InscripcionesListComponent {
       id: i.id,
       persona: i.persona?.nombre ?? i.personaId,
       ano: i.ano,
-      montoTotal: `$${i.montoTotal.toLocaleString()}`,
-      montoBonificado: i.montoBonificado > 0 ? `$${i.montoBonificado.toLocaleString()}` : '-',
-      montoPagado: `$${(i.montoPagado ?? 0).toLocaleString()}`,
-      saldoPendiente: `$${(i.saldoPendiente ?? 0).toLocaleString()}`,
+      montoTotal: formatMoney(i.montoTotal),
+      montoBonificado: i.montoBonificado > 0 ? formatMoney(i.montoBonificado) : '-',
+      montoPagado: formatMoney(i.montoPagado ?? 0),
+      saldoPendiente: formatMoney(i.saldoPendiente ?? 0),
       estado: i.estado ?? 'pendiente',
       declaracionDeSalud: i.declaracionDeSalud,
       autorizacionDeImagen: i.autorizacionDeImagen,

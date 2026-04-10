@@ -20,12 +20,12 @@
       <div class="summary">
         <div class="summary-item">
           <span class="label">Costo por persona:</span>
-          <span class="value">${{ data.costoPorPersona | number:'1.0-0' }}</span>
+          <span class="value">{{ data.costoPorPersona | money }}</span>
         </div>
         @if (isEditMode && data.existingPago) {
         <div class="summary-item">
           <span class="label">Pago Original:</span>
-          <span class="value">${{ data.existingPago.monto | number:'1.0-0' }}</span>
+          <span class="value">{{ data.existingPago.monto | money }}</span>
         </div>
         <div class="summary-item">
           <span class="label">Fecha:</span>
@@ -34,11 +34,11 @@
         }
         <div class="summary-item">
           <span class="label">Total Pagado:</span>
-          <span class="value success">${{ data.totalPagado | number:'1.0-0' }}</span>
+          <span class="value success">{{ data.totalPagado | money }}</span>
         </div>
         <div class="summary-item">
           <span class="label">{{ isEditMode ? 'Saldo Pendiente Actual:' : 'Saldo Pendiente:' }}</span>
-          <span class="value" [class.danger]="montoPendiente > 0">${{ montoPendiente | number:'1.0-0' }}</span>
+          <span class="value" [class.danger]="montoPendiente > 0">{{ montoPendiente | money }}</span>
         </div>
         @if (saldoCuentaPersonal > 0) {
         <div class="summary-item highlight">
@@ -46,7 +46,7 @@
             <mat-icon class="inline-icon">account_balance_wallet</mat-icon>
             Saldo Cuenta Personal:
           </span>
-          <span class="value success">${{ saldoCuentaPersonal | number:'1.0-0' }}</span>
+          <span class="value success">{{ saldoCuentaPersonal | money }}</span>
         </div>
         }
 
@@ -64,14 +64,14 @@
       <div class="form-fields">
         <!-- Monto del Pago -->
         <app-form-field label="Monto del Pago" [forId]="'monto'" [required]="true"
-          [hint]="'Máximo: $' + (maxAllowedMonto | number:'1.0-0')"
+          [hint]="'Máximo: ' + (maxAllowedMonto | money)"
           [invalid]="!!(form.get('monto')?.invalid && form.get('monto')?.touched)">
           <div class="input-with-prefix">
             <span class="input-prefix">$</span>
             <app-number-field id="monto" formControlName="monto" [min]="1" placeholder="0" />
           </div>
           @if (form.get('monto')?.hasError('max')) {
-          <span error>No puede exceder ${{ maxAllowedMonto | number:'1.0-0' }}</span>
+          <span error>No puede exceder {{ maxAllowedMonto | money }}</span>
           }
           @if (form.get('monto')?.hasError('min')) {
           <span error>Debe ser mayor a 0</span>
@@ -97,7 +97,7 @@
       @if (montoPendiente > 0) {
       <div class="quick-actions">
         <app-button variant="outline" icon="payments" (clicked)="pagarTodo()">
-          Pagar Todo (${{ maxAllowedMonto | number:'1.0-0' }})
+          Pagar Todo ({{ maxAllowedMonto | money }})
         </app-button>
       </div>
       }
@@ -109,7 +109,7 @@
         <!-- Saldo Personal Field (if available) -->
         @if (saldoCuentaPersonal > 0) {
         <app-form-field label="Usar Saldo Personal" [forId]="'montoConSaldoPersonal'"
-          [hint]="'Disponible: $' + (saldoCuentaPersonal | number:'1.0-0')">
+          [hint]="'Disponible: ' + (saldoCuentaPersonal | money)">
           <div class="input-with-prefix">
             <span class="input-prefix">$</span>
             <app-number-field id="montoConSaldoPersonal" formControlName="montoConSaldoPersonal" [min]="0"
@@ -154,16 +154,16 @@
         <div class="breakdown-item">
           <mat-icon>account_balance_wallet</mat-icon>
           <span>Saldo Personal:</span>
-          <span class="amount">${{ montoConSaldoPersonal | number:'1.0-0' }}</span>
+          <span class="amount">{{ montoConSaldoPersonal | money }}</span>
         </div>
         <div class="breakdown-item">
           <mat-icon>payments</mat-icon>
           <span>{{ form.get('medioPago')?.value === 'efectivo' ? 'Efectivo' : 'Transferencia' }}:</span>
-          <span class="amount">${{ montoPagado | number:'1.0-0' }}</span>
+          <span class="amount">{{ montoPagado | money }}</span>
         </div>
         <div class="breakdown-total">
           <span>Total:</span>
-          <span class="amount">${{ montoTotalPago | number:'1.0-0' }}</span>
+          <span class="amount">{{ montoTotalPago | money }}</span>
         </div>
       </div>
       }
@@ -173,7 +173,7 @@
       <div class="remaining-info">
         <span class="label">{{ isEditMode ? 'Nuevo Saldo Pendiente:' : 'Saldo Restante:' }}</span>
         <span class="value" [class.success]="montoRestante === 0">
-          ${{ montoRestante | number:'1.0-0' }}
+          {{ montoRestante | money }}
         </span>
       </div>
 
@@ -185,11 +185,11 @@
           Pagar Todo (mixto)
         </app-button>
         <app-button variant="outline" icon="account_balance_wallet" (clicked)="usarSaldoDisponible()">
-          Solo Saldo (${{ maxSaldoPersonalUsable | number:'1.0-0' }})
+          Solo Saldo ({{ maxSaldoPersonalUsable | money }})
         </app-button>
         }
         <app-button variant="outline" icon="payments" (clicked)="pagarTodo()">
-          Solo Efectivo (${{ montoPendiente | number:'1.0-0' }})
+          Solo Efectivo ({{ montoPendiente | money }})
         </app-button>
       </div>
       }

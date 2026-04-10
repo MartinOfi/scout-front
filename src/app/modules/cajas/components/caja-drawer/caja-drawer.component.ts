@@ -5,7 +5,7 @@
  */
 
 import { Component, ChangeDetectionStrategy, inject, output } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -18,7 +18,7 @@ import {
   CONCEPTO_MOVIMIENTO_LABELS,
   ConceptoMovimiento,
 } from '../../../../shared/enums';
-import { humanize } from '../../../../shared/pipes';
+import { humanize, MoneyPipe } from '../../../../shared/pipes';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
 @Component({
@@ -26,7 +26,7 @@ import { ButtonComponent } from '../../../../shared/components/button/button.com
   standalone: true,
   imports: [
     CommonModule,
-    CurrencyPipe,
+    MoneyPipe,
     DatePipe,
     MatButtonModule,
     MatIconModule,

@@ -6,8 +6,7 @@
         <span class="tipo-text" [class]="tipoColor">{{ movimiento.tipo | uppercase }}</span>
       </div>
       <div class="monto">
-        <span class="currency">$</span>
-        <span class="amount">{{ movimiento.monto | number:'1.2-2' }}</span>
+        <span class="amount">{{ movimiento.monto | money:2 }}</span>
       </div>
     </div>
   </mat-card-header>

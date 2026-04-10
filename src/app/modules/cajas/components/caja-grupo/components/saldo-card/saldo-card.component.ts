@@ -10,11 +10,12 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
+import { MoneyPipe } from '../../../../../../shared/pipes';
 
 @Component({
   selector: 'app-saldo-card',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatIconModule, MatRippleModule],
+  imports: [CommonModule, MatCardModule, MatIconModule, MatRippleModule, MoneyPipe],
   templateUrl: './saldo-card.component.html',
   styleUrls: ['./saldo-card.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

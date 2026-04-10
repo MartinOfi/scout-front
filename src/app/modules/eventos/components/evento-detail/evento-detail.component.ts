@@ -13,7 +13,7 @@ import {
   signal,
   computed,
 } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -33,6 +33,7 @@ import {
   ResumenVentas,
 } from '../../../../shared/models';
 import { TableColumn, TableData } from '../../../../shared/models/table.model';
+import { formatMoney, MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import {
   StatCardComponent,
   StatCardVariant,
@@ -74,7 +75,7 @@ const TABS_GRUPO: TabConfig[] = [{ key: 'movimientos', label: 'Movimientos', ico
     FormsModule,
     MatIconModule,
     DatePipe,
-    CurrencyPipe,
+    MoneyPipe,
     StatCardComponent,
     ButtonTabsComponent,
     LoadingSpinnerComponent,
@@ -155,13 +156,7 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
       key: 'ganancia',
       header: 'Ganancia',
       type: 'text',
-      formatter: (value) =>
-        new Intl.NumberFormat('es-AR', {
-          style: 'currency',
-          currency: 'ARS',
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 0,
-        }).format(value as number),
+      formatter: (value) => formatMoney(value as number),
     },
   ];
 

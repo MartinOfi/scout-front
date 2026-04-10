@@ -9,11 +9,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
 import { Producto } from '../../models';
+import { MoneyPipe } from '../../pipes/money.pipe';
 
 @Component({
   selector: 'app-producto-card',
   standalone: true,
-  imports: [NgClass, MatIconModule, MatButtonModule],
+  imports: [NgClass, MatIconModule, MatButtonModule, MoneyPipe],
   templateUrl: './producto-card.component.html',
   styleUrl: './producto-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,14 +31,5 @@ export class ProductoCardComponent {
 
   onRemove(): void {
     this.remove.emit(this.producto().id);
-  }
-
-  format(value: number): string {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
   }
 }

@@ -6,6 +6,6 @@
   <span class="label">{{ estadoLabels[estado] }}</span>
 
   <span *ngIf="montoBonificado && montoBonificado > 0" class="bonificacion">
-    (Bonif: ${{ montoBonificado | number:'1.2-2' }})
+    (Bonif: {{ montoBonificado | money:2 }})
   </span>
 </mat-chip>

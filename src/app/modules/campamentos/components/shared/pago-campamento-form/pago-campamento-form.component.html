@@ -2,18 +2,18 @@
   <div class="summary">
     <div class="summary-item">
       <span class="label">Monto Total:</span>
-      <span class="value">${{ montoTotal | number:'1.2-2' }}</span>
+      <span class="value">{{ montoTotal | money:2 }}</span>
     </div>
     @if (saldoCuentaPersonal > 0) {
       <div class="summary-item">
         <span class="label">Saldo Cuenta Personal:</span>
-        <span class="value success">${{ saldoCuentaPersonal | number:'1.2-2' }}</span>
+        <span class="value success">{{ saldoCuentaPersonal | money:2 }}</span>
       </div>
     }
     <div class="summary-item">
       <span class="label">Monto Restante:</span>
       <span class="value" [class.success]="montoRestante === 0">
-        ${{ montoRestante | number:'1.2-2' }}
+        {{ montoRestante | money:2 }}
       </span>
     </div>
   </div>
@@ -68,7 +68,7 @@
     <div class="quick-actions">
       <button type="button" class="btn-outline" (click)="usarSaldoDisponible()">
         <i class="fas fa-wallet"></i>
-        Usar Saldo Disponible (${{ saldoCuentaPersonal | number:'1.2-2' }})
+        Usar Saldo Disponible ({{ saldoCuentaPersonal | money:2 }})
       </button>
     </div>
   }

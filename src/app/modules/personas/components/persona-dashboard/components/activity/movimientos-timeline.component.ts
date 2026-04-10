@@ -5,10 +5,11 @@
  */
 
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 
 import { MovimientoDashboard } from '../../../../models';
+import { MoneyPipe } from '../../../../../../shared/pipes';
 import {
   ConceptoMovimiento,
   MedioPago,
@@ -19,7 +20,7 @@ import {
 @Component({
   selector: 'app-movimientos-timeline',
   standalone: true,
-  imports: [CommonModule, MatIconModule, CurrencyPipe, DatePipe],
+  imports: [CommonModule, MatIconModule, MoneyPipe, DatePipe],
   templateUrl: './movimientos-timeline.component.html',
   styleUrl: './movimientos-timeline.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

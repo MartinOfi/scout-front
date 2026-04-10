@@ -4,8 +4,9 @@
  */
 
 import { Component, ChangeDetectionStrategy, input } from '@angular/core';
-import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
+import { DecimalPipe, PercentPipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { MoneyPipe } from '../../pipes/money.pipe';
 
 export type StatCardVariant = 'success' | 'info' | 'warning' | 'danger' | 'primary';
 export type StatCardFormat = 'currency' | 'number' | 'percent';
@@ -13,7 +14,7 @@ export type StatCardFormat = 'currency' | 'number' | 'percent';
 @Component({
   selector: 'app-stat-card',
   standalone: true,
-  imports: [MatIconModule, CurrencyPipe, DecimalPipe, PercentPipe],
+  imports: [MatIconModule, MoneyPipe, DecimalPipe, PercentPipe],
   templateUrl: './stat-card.component.html',
   styleUrl: './stat-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

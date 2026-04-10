@@ -18,20 +18,20 @@
     <div class="summary">
       <div class="summary-item">
         <span class="label">Monto Total:</span>
-        <span class="value">${{ data.montoTotal | number:'1.0-0' }}</span>
+        <span class="value">{{ data.montoTotal | money }}</span>
       </div>
       <div class="summary-item">
         <span class="label">Total Pagado:</span>
-        <span class="value success">${{ data.montoPagado | number:'1.0-0' }}</span>
+        <span class="value success">{{ data.montoPagado | money }}</span>
       </div>
       <div class="summary-item">
         <span class="label">Saldo Pendiente:</span>
-        <span class="value" [class.danger]="montoPendiente > 0">${{ montoPendiente | number:'1.0-0' }}</span>
+        <span class="value" [class.danger]="montoPendiente > 0">{{ montoPendiente | money }}</span>
       </div>
       @if (puedeUsarSaldo) {
         <div class="summary-item">
           <span class="label">Saldo Cuenta Personal:</span>
-          <span class="value success">${{ saldoCuentaPersonal | number:'1.0-0' }}</span>
+          <span class="value success">{{ saldoCuentaPersonal | money }}</span>
         </div>
       }
 
@@ -107,7 +107,7 @@
     <div class="remaining-info">
       <span class="label">Saldo Restante:</span>
       <span class="value" [class.success]="montoRestante === 0">
-        ${{ montoRestante | number:'1.0-0' }}
+        {{ montoRestante | money }}
       </span>
     </div>
 
@@ -115,12 +115,12 @@
     <div class="quick-actions">
       @if (puedeUsarSaldo) {
         <app-button variant="outline" icon="account_balance_wallet" (clicked)="usarSaldoDisponible()">
-          Usar Saldo (${{ saldoCuentaPersonal | number:'1.0-0' }})
+          Usar Saldo ({{ saldoCuentaPersonal | money }})
         </app-button>
       }
       @if (montoPendiente > 0) {
         <app-button variant="outline" icon="bolt" (clicked)="pagarTodo()">
-          Pagar Todo (${{ montoPendiente | number:'1.0-0' }})
+          Pagar Todo ({{ montoPendiente | money }})
         </app-button>
       }
     </div>

@@ -4,14 +4,14 @@
  */
 
 import { Component, ChangeDetectionStrategy, input, computed } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { IconVariant, ValueColorVariant } from '../data-list/data-list.models';
+import { MoneyPipe } from '../../pipes/money.pipe';
 
 @Component({
   selector: 'app-data-list-item',
   standalone: true,
-  imports: [MatIconModule, CurrencyPipe],
+  imports: [MatIconModule, MoneyPipe],
   templateUrl: './data-list-item.component.html',
   styleUrl: './data-list-item.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

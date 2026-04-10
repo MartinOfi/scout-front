@@ -17,7 +17,7 @@
 
     <div class="saldo-display">
       <span class="saldo-amount" [class.negativo]="saldo() < 0">
-        {{ saldo() | currency:'ARS':'symbol':'1.2-2' }}
+        {{ saldo() | money:2 }}
       </span>
     </div>
   </mat-card-content>

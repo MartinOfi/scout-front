@@ -31,7 +31,7 @@
             <div class="timeline__content">
               <div class="timeline__main">
                 <span class="timeline__amount">
-                  {{ mov.monto | currency:'ARS':'symbol':'1.0-0' }}
+                  {{ mov.monto | money }}
                 </span>
                 <span class="timeline__date">
                   {{ mov.fecha | date:'d MMM yyyy' }}

@@ -6,7 +6,7 @@
         <div class="drawer-header__info">
           <h2 class="caja-name">{{ caja.nombre || 'Caja de Grupo' }}</h2>
           <p class="caja-saldo" [class.negative]="caja.saldoActual < 0">
-            {{ caja.saldoActual | currency:'ARS':'symbol':'1.0-0' }}
+            {{ caja.saldoActual | money }}
           </p>
         </div>
       }
@@ -70,7 +70,7 @@
                 <span class="movimiento-fecha">{{ mov.fecha | date:'dd/MM/yyyy' }}</span>
               </div>
               <div class="movimiento-item__monto" [class.positive]="mov.tipo === TipoMovimiento.INGRESO" [class.negative]="mov.tipo === TipoMovimiento.EGRESO">
-                {{ mov.tipo === TipoMovimiento.INGRESO ? '+' : '-' }}{{ mov.monto | currency:'ARS':'symbol':'1.0-0' }}
+                {{ mov.tipo === TipoMovimiento.INGRESO ? '+' : '-' }}{{ mov.monto | money }}
               </div>
             </li>
           }

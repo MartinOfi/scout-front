@@ -16,7 +16,7 @@ import {
   MEDIO_PAGO_LABELS,
   ESTADO_PAGO_LABELS,
 } from '../../../../../shared/enums';
-import { HumanizePipe } from '../../../../../shared/pipes';
+import { HumanizePipe, MoneyPipe } from '../../../../../shared/pipes';
 
 @Component({
   selector: 'app-movimiento-info-card',
@@ -28,6 +28,7 @@ import { HumanizePipe } from '../../../../../shared/pipes';
     MatIconModule,
     MatDividerModule,
     HumanizePipe,
+    MoneyPipe,
   ],
   templateUrl: './movimiento-info-card.component.html',
   styleUrl: './movimiento-info-card.component.scss',

@@ -12,7 +12,7 @@
         @if (isEditMode && data.existingPago) {
         <div class="summary-item">
           <span class="label">Pago Original:</span>
-          <span class="value">${{ data.existingPago.monto | number:'1.0-0' }}</span>
+          <span class="value">{{ data.existingPago.monto | money }}</span>
         </div>
         <div class="summary-item">
           <span class="label">Fecha:</span>
@@ -21,7 +21,7 @@
         }
         <div class="summary-item summary-item--highlight">
           <span class="label">{{ isEditMode ? 'Saldo Pendiente Actual:' : 'Saldo Pendiente:' }}</span>
-          <span class="value value--pending">${{ montoPendiente | number:'1.0-0' }}</span>
+          <span class="value value--pending">{{ montoPendiente | money }}</span>
         </div>
       </div>
 
@@ -84,14 +84,14 @@
                 [max]="saldoCuentaPersonal" placeholder="0" />
             </div>
             @if (saldoExcedeDisponible) {
-            <span error>Excede el saldo disponible (${{ saldoCuentaPersonal | number:'1.0-0' }})</span>
+            <span error>Excede el saldo disponible ({{ saldoCuentaPersonal | money }})</span>
             }
           </app-form-field>
           @if (puedeUsarSaldo) {
           <div class="saldo-info">
             <span class="saldo-disponible">
               <mat-icon>account_balance_wallet</mat-icon>
-              Disponible: ${{ saldoCuentaPersonal | number:'1.0-0' }}
+              Disponible: {{ saldoCuentaPersonal | money }}
             </span>
             <button type="button" class="btn-use-saldo" (click)="usarSaldoDisponible()">
               Usar todo
@@ -119,30 +119,30 @@
         @if (montosExcedenPendiente()) {
         <div class="validation-error">
           <mat-icon>error_outline</mat-icon>
-          <span>El monto total no puede superar el saldo pendiente (${{ montoPendiente | number:'1.0-0' }})</span>
+          <span>El monto total no puede superar el saldo pendiente ({{ montoPendiente | money }})</span>
         </div>
         } @else {
         <div class="summary-row">
           <div class="summary-calc">
             <span class="calc-item">
               <span class="calc-label">Efectivo:</span>
-              <span class="calc-value">${{ form.get('montoPagado')?.value || 0 | number:'1.0-0' }}</span>
+              <span class="calc-value">{{ (form.get('montoPagado')?.value || 0) | money }}</span>
             </span>
             <span class="calc-operator">+</span>
             <span class="calc-item">
               <span class="calc-label">Saldo:</span>
-              <span class="calc-value">${{ form.get('montoConSaldoPersonal')?.value || 0 | number:'1.0-0' }}</span>
+              <span class="calc-value">{{ (form.get('montoConSaldoPersonal')?.value || 0) | money }}</span>
             </span>
             <span class="calc-operator">=</span>
             <span class="calc-item calc-item--total">
               <span class="calc-label">Total:</span>
-              <span class="calc-value">${{ montoTotalPago | number:'1.0-0' }}</span>
+              <span class="calc-value">{{ montoTotalPago | money }}</span>
             </span>
           </div>
           <div class="summary-result">
             <span class="result-label">Restante:</span>
             <span class="result-value" [class.result-value--zero]="montoRestante === 0">
-              ${{ montoRestante | number:'1.0-0' }}
+              {{ montoRestante | money }}
             </span>
           </div>
         </div>

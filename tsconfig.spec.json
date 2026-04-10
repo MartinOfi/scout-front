@@ -13,6 +13,7 @@
     "src/app/core/interceptors/retry.interceptor.spec.ts",
     "src/app/modules/cajas/components/caja-grupo/caja-grupo.component.spec.ts",
     "src/app/modules/cajas/components/cuentas-personales/cuentas-personales.component.spec.ts",
+    "src/app/shared/pipes/money.pipe.spec.ts",
     "src/app/modules/cajas/testing/**/*.ts",
     "src/app/shared/testing/**/*.ts"
   ]

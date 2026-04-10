@@ -2,11 +2,11 @@
   <div class="info">
     <div class="name">{{ participante.participanteNombre }}</div>
     <div class="details">
-      <span class="cuota">Cuota: ${{ participante.costoPorPersona | number:'1.2-2' }}</span>
+      <span class="cuota">Cuota: {{ participante.costoPorPersona | money:2 }}</span>
       <span class="separator">•</span>
-      <span class="pagado">Pagado: ${{ participante.totalPagado | number:'1.2-2' }}</span>
+      <span class="pagado">Pagado: {{ participante.totalPagado | money:2 }}</span>
       <span class="separator">•</span>
-      <span class="adeudado">Adeuda: ${{ participante.saldoPendiente | number:'1.2-2' }}</span>
+      <span class="adeudado">Adeuda: {{ participante.saldoPendiente | money:2 }}</span>
     </div>
   </div>
 

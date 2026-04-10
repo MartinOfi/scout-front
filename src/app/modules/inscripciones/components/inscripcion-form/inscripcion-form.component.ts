@@ -50,6 +50,7 @@ import { FormActionsComponent } from '../../../../shared/components/form/form-ac
 import { SelectFieldComponent } from '../../../../shared/components/form/select-field/select-field.component';
 import { NumberFieldComponent } from '../../../../shared/components/form/number-field/number-field.component';
 import { CheckboxFieldComponent } from '../../../../shared/components/form/checkbox-field/checkbox-field.component';
+import { MoneyPipe } from '../../../../shared/pipes';
 
 interface TipoOption {
   value: TipoInscripcion;
@@ -72,6 +73,7 @@ interface MedioPagoOption {
     SelectFieldComponent,
     NumberFieldComponent,
     CheckboxFieldComponent,
+    MoneyPipe,
   ],
   templateUrl: './inscripcion-form.component.html',
   styleUrls: ['./inscripcion-form.component.scss'],

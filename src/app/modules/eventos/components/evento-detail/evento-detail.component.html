@@ -27,7 +27,7 @@
           <div class="detail-header__meta">
             <span class="detail-header__dates">
               <mat-icon>calendar_today</mat-icon>
-              {{ evento()!.fecha | date:'mediumDate':'':'es-AR' }}
+              {{ evento()!.fecha | date:'mediumDate' }}
             </span>
             @if (evento()!.tipoEvento) {
             <span class="detail-header__dates">
@@ -142,7 +142,7 @@
 
             <div class="movimiento-row__amount" [class.movimiento-row__amount--positive]="mov.tipo === 'ingreso'"
               [class.movimiento-row__amount--negative]="mov.tipo === 'egreso'">
-              {{ (mov.tipo === 'ingreso' ? '+' : '-') + (mov.monto | currency:'ARS':'symbol':'1.0-0') }}
+              {{ (mov.tipo === 'ingreso' ? '+' : '-') }}{{ mov.monto | money }}
             </div>
 
           </article>

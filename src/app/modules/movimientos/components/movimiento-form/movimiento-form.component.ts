@@ -36,6 +36,7 @@ import { DateFieldComponent } from '../../../../shared/components/form/date-fiel
 
 // Dumb Component
 import { ConceptoSelectorComponent } from './components/concepto-selector/concepto-selector.component';
+import { MoneyPipe } from '../../../../shared/pipes';
 
 interface SelectOption {
   value: string;
@@ -68,6 +69,7 @@ interface PersonaOption {
     SelectFieldComponent,
     DateFieldComponent,
     ConceptoSelectorComponent,
+    MoneyPipe,
   ],
   templateUrl: './movimiento-form.component.html',
   styleUrls: ['./movimiento-form.component.scss'],

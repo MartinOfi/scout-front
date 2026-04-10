@@ -15,6 +15,7 @@ import { ESTADO_CUOTA_LABELS } from '../../../../shared/enums';
 import { DataTableComponent } from '../../../../shared/components/tables/data-table.component';
 import { TableColumn, TableData, ActionEvent } from '../../../../shared/models/table.model';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { formatMoney } from '../../../../shared/pipes/money.pipe';
 
 @Component({
   selector: 'app-cuotas-list',
@@ -58,7 +59,7 @@ export class CuotasListComponent implements OnInit {
       header: 'Monto',
       type: 'number',
       sortable: true,
-      formatter: (value: unknown) => `$${(value as number).toLocaleString('es-AR')}`,
+      formatter: (value: unknown) => formatMoney(value as number),
     },
     { key: 'estado', header: 'Estado', type: 'status', sortable: true },
     {

@@ -14,6 +14,7 @@ import { MatRippleModule } from '@angular/material/core';
 import { ButtonComponent } from '../../../../../../shared/components/button/button.component';
 
 import { Rama } from '../../../../../../shared/enums';
+import { MoneyPipe } from '../../../../../../shared/pipes';
 
 @Component({
   selector: 'app-fondo-card',
@@ -25,6 +26,7 @@ import { Rama } from '../../../../../../shared/enums';
     MatIconModule,
     MatRippleModule,
     ButtonComponent,
+    MoneyPipe,
   ],
   templateUrl: './fondo-card.component.html',
   styleUrls: ['./fondo-card.component.scss'],

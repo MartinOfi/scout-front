@@ -4,17 +4,28 @@
  * SIN any - tipado estricto
  */
 
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy,
+  OnInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { MEDIOS_PAGO, MedioPago, MedioPagoEnum } from '../../../../../shared/enums';
-import { positiveNumberValidator, decimalValidator } from '../../../../../shared/validators/custom-validators';
+import {
+  positiveNumberValidator,
+  decimalValidator,
+} from '../../../../../shared/validators/custom-validators';
 
 // Shared Form Components
 import { FormFieldComponent } from '../../../../../shared/components/form/form-field/form-field.component';
 import { NumberFieldComponent } from '../../../../../shared/components/form/number-field/number-field.component';
 import { SelectFieldComponent } from '../../../../../shared/components/form/select-field/select-field.component';
+import { MoneyPipe } from '../../../../../shared/pipes';
 
 @Component({
   selector: 'app-pago-campamento-form',
@@ -24,11 +35,12 @@ import { SelectFieldComponent } from '../../../../../shared/components/form/sele
     ReactiveFormsModule,
     FormFieldComponent,
     NumberFieldComponent,
-    SelectFieldComponent
+    SelectFieldComponent,
+    MoneyPipe,
   ],
   templateUrl: './pago-campamento-form.component.html',
   styleUrl: './pago-campamento-form.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PagoCampamentoFormComponent implements OnInit {
   @Input({ required: true }) montoTotal!: number;
@@ -53,10 +65,10 @@ export class PagoCampamentoFormComponent implements OnInit {
           Validators.required,
           positiveNumberValidator(),
           decimalValidator(2),
-          Validators.max(this.montoTotal)
-        ]
+          Validators.max(this.montoTotal),
+        ],
       ],
-      medioPago: ['', [Validators.required]]
+      medioPago: ['', [Validators.required]],
     });
   }
 
@@ -73,7 +85,7 @@ export class PagoCampamentoFormComponent implements OnInit {
     const montoAUsar = Math.min(this.saldoCuentaPersonal, this.montoTotal);
     this.form.patchValue({
       monto: montoAUsar,
-      medioPago: MedioPagoEnum.EFECTIVO
+      medioPago: MedioPagoEnum.EFECTIVO,
     });
   }
 
@@ -85,7 +97,7 @@ export class PagoCampamentoFormComponent implements OnInit {
 
     this.submit.emit({
       monto: Number(this.form.value.monto),
-      medioPago: this.form.value.medioPago as MedioPago
+      medioPago: this.form.value.medioPago as MedioPago,
     });
   }
 

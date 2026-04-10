@@ -12,6 +12,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { PagoParticipante } from '../../../../../shared/models';
+import { MoneyPipe } from '../../../../../shared/pipes';
 
 @Component({
   selector: 'app-participante-row',
@@ -21,11 +22,12 @@ import { PagoParticipante } from '../../../../../shared/models';
     MatButtonModule,
     MatIconModule,
     MatChipsModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MoneyPipe,
   ],
   templateUrl: './participante-row.component.html',
   styleUrl: './participante-row.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ParticipanteRowComponent {
   @Input({ required: true }) participante!: PagoParticipante;
@@ -39,7 +41,7 @@ export class ParticipanteRowComponent {
 
   get porcentajePagado(): number {
     const total = this.participante.costoPorPersona;
-    return total > 0 ? ((this.participante.totalPagado / total) * 100) : 0;
+    return total > 0 ? (this.participante.totalPagado / total) * 100 : 0;
   }
 
   get estadoPago(): 'completo' | 'parcial' | 'pendiente' {

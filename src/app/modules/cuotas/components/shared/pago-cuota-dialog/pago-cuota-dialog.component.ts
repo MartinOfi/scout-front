@@ -17,6 +17,7 @@ import { NumberFieldComponent } from '../../../../../shared/components/form/numb
 import { SelectFieldComponent } from '../../../../../shared/components/form/select-field/select-field.component';
 import { TextareaFieldComponent } from '../../../../../shared/components/form/textarea-field/textarea-field.component';
 import { ButtonComponent } from '../../../../../shared/components/button/button.component';
+import { MoneyPipe } from '../../../../../shared/pipes';
 
 /**
  * Data passed to the dialog
@@ -69,6 +70,7 @@ interface MedioPagoOption {
     SelectFieldComponent,
     TextareaFieldComponent,
     ButtonComponent,
+    MoneyPipe,
   ],
   templateUrl: './pago-cuota-dialog.component.html',
   styleUrl: './pago-cuota-dialog.component.scss',

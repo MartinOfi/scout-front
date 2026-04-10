@@ -52,15 +52,15 @@
             </span>
             <span class="payment-summary__amount" [class.payment-summary__amount--success]="d.saldoPendiente === 0">
               @if (d.saldoPendiente > 0) {
-              {{ d.saldoPendiente | currency:'ARS':'symbol':'1.0-0' }}
+              {{ d.saldoPendiente | money }}
               } @else {
               Al día
               }
             </span>
           </div>
           <div class="payment-summary__context">
-            <strong>{{ d.montoPagado | currency:'ARS':'symbol':'1.0-0' }}</strong> pagado
-            de {{ montoAPagar() | currency:'ARS':'symbol':'1.0-0' }}
+            <strong>{{ d.montoPagado | money }}</strong> pagado
+            de {{ montoAPagar() | money }}
           </div>
         </div>
 
@@ -84,24 +84,23 @@
       <div class="payment-breakdown">
         <div class="payment-breakdown__item">
           <span class="payment-breakdown__label">Inscripción</span>
-          <span class="payment-breakdown__value">{{ d.montoTotal | currency:'ARS':'symbol':'1.0-0' }}</span>
+          <span class="payment-breakdown__value">{{ d.montoTotal | money }}</span>
         </div>
         @if (d.montoBonificado > 0) {
         <div class="payment-breakdown__item">
           <span class="payment-breakdown__label">Bonificación</span>
           <span class="payment-breakdown__value payment-breakdown__value--discount">
-            -{{ d.montoBonificado | currency:'ARS':'symbol':'1.0-0' }}
+            -{{ d.montoBonificado | money }}
           </span>
         </div>
         }
         <div class="payment-breakdown__item">
           <span class="payment-breakdown__label">Total</span>
-          <span class="payment-breakdown__value">{{ montoAPagar() | currency:'ARS':'symbol':'1.0-0' }}</span>
+          <span class="payment-breakdown__value">{{ montoAPagar() | money }}</span>
         </div>
         <div class="payment-breakdown__item">
           <span class="payment-breakdown__label">Pagado</span>
-          <span class="payment-breakdown__value payment-breakdown__value--success">{{ d.montoPagado |
-            currency:'ARS':'symbol':'1.0-0' }}</span>
+          <span class="payment-breakdown__value payment-breakdown__value--success">{{ d.montoPagado | money }}</span>
         </div>
       </div>
     </section>
@@ -134,7 +133,7 @@
               <div class="timeline-item__main">
                 <span class="timeline-item__amount"
                   [class.timeline-item__amount--egreso]="mov.tipo === 'egreso'">
-                  @if (mov.tipo === 'egreso') { - }{{ mov.monto | currency:'ARS':'symbol':'1.0-0' }}
+                  @if (mov.tipo === 'egreso') { - }{{ mov.monto | money }}
                 </span>
                 <span class="timeline-item__date">{{ mov.fecha | date:'d MMM' }}</span>
               </div>
@@ -143,7 +142,7 @@
               </div>
             </div>
             <button type="button" class="timeline-item__edit unstyled" (click)="onEditPayment(mov)"
-              aria-label="Editar pago de {{ mov.monto | currency:'ARS':'symbol':'1.0-0' }}">
+              aria-label="Editar pago de {{ mov.monto | money }}">
               <mat-icon>edit</mat-icon>
             </button>
           </article>

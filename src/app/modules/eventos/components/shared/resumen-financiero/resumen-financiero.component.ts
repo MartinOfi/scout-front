@@ -7,11 +7,12 @@ import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { MoneyPipe } from '../../../../../shared/pipes';
 
 @Component({
   selector: 'app-resumen-financiero',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatIconModule],
+  imports: [CommonModule, MatCardModule, MatIconModule, MoneyPipe],
   templateUrl: './resumen-financiero.component.html',
   styleUrl: './resumen-financiero.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

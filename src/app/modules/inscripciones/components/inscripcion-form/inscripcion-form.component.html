@@ -191,7 +191,7 @@
                   <div class="balance-display">
                     <span class="balance-label">Saldo disponible</span>
                     <span class="balance-value" [class.balance-value--positive]="saldoCuentaPersonal() > 0">
-                      ${{ saldoCuentaPersonal() | number:'1.0-0' }}
+                      {{ saldoCuentaPersonal() | money }}
                     </span>
                     @if (saldoCuentaPersonal() > 0) {
                       <button
@@ -240,25 +240,25 @@
           <div class="summary-strip" [class.summary-strip--error]="montosExcedenTotal()">
             <div class="summary-item">
               <span class="summary-label">Total</span>
-              <span class="summary-value">${{ inscripcionForm.get('montoTotal')?.value | number:'1.0-0' }}</span>
+              <span class="summary-value">{{ inscripcionForm.get('montoTotal')?.value | money }}</span>
             </div>
             <span class="summary-operator">−</span>
             <div class="summary-item">
               <span class="summary-label">Bonificación</span>
-              <span class="summary-value">${{ inscripcionForm.get('montoBonificado')?.value || 0 | number:'1.0-0' }}</span>
+              <span class="summary-value">{{ (inscripcionForm.get('montoBonificado')?.value || 0) | money }}</span>
             </div>
             @if (!isEditing && (inscripcionForm.get('montoConSaldoPersonal')?.value || 0) > 0) {
               <span class="summary-operator">−</span>
               <div class="summary-item">
                 <span class="summary-label">Saldo Personal</span>
-                <span class="summary-value">${{ inscripcionForm.get('montoConSaldoPersonal')?.value || 0 | number:'1.0-0' }}</span>
+                <span class="summary-value">{{ (inscripcionForm.get('montoConSaldoPersonal')?.value || 0) | money }}</span>
               </div>
             }
             <span class="summary-operator">=</span>
             <div class="summary-item summary-item--result">
               <span class="summary-label">A pagar</span>
               <span class="summary-value">
-                ${{ (inscripcionForm.get('montoTotal')?.value || 0) - (inscripcionForm.get('montoBonificado')?.value || 0) - (inscripcionForm.get('montoConSaldoPersonal')?.value || 0) | number:'1.0-0' }}
+                {{ ((inscripcionForm.get('montoTotal')?.value || 0) - (inscripcionForm.get('montoBonificado')?.value || 0) - (inscripcionForm.get('montoConSaldoPersonal')?.value || 0)) | money }}
               </span>
             </div>
           </div>

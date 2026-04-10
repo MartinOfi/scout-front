@@ -10,7 +10,7 @@
     <p class="stat-card__value">
       @switch (format()) {
       @case ('currency') {
-      {{ value() | currency:'$':'symbol':'1.0-0':'es-AR' }}
+      {{ value() | money }}
       }
       @case ('percent') {
       {{ value() | percent:'1.0-1' }}

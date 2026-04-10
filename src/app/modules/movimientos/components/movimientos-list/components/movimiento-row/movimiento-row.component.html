@@ -24,7 +24,7 @@
   </div>
 
   <div class="monto" [class.ingreso]="movimiento().tipo === tipoEnum.INGRESO">
-    {{ movimiento().monto | currency:'ARS':'symbol':'1.2-2' }}
+    {{ movimiento().monto | money:2 }}
   </div>
 
   <button mat-icon-button [matMenuTriggerFor]="menu">

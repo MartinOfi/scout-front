@@ -58,7 +58,7 @@
           <span class="financial-card__label">{{ metric.label }}</span>
         </div>
         <div class="financial-card__value">
-          {{ metric.value | currency:'$':'symbol':'1.0-0':'es-AR' }}
+          {{ metric.value | money }}
         </div>
         @if (metric.key !== 'montoEsperado') {
         <div class="financial-card__progress">
@@ -87,15 +87,15 @@
       <div class="payment-progress__details">
         <div class="payment-progress__detail">
           <span class="payment-progress__detail-label">Esperado</span>
-          <span class="payment-progress__detail-value">{{ consolidado()?.financiero?.montoEsperado | currency:'$':'symbol':'1.0-0':'es-AR' }}</span>
+          <span class="payment-progress__detail-value">{{ consolidado()?.financiero?.montoEsperado | money }}</span>
         </div>
         <div class="payment-progress__detail">
           <span class="payment-progress__detail-label">Cobrado</span>
-          <span class="payment-progress__detail-value payment-progress__detail-value--success">{{ consolidado()?.financiero?.montoPagado | currency:'$':'symbol':'1.0-0':'es-AR' }}</span>
+          <span class="payment-progress__detail-value payment-progress__detail-value--success">{{ consolidado()?.financiero?.montoPagado | money }}</span>
         </div>
         <div class="payment-progress__detail">
           <span class="payment-progress__detail-label">Pendiente</span>
-          <span class="payment-progress__detail-value payment-progress__detail-value--warning">{{ consolidado()?.financiero?.montoAdeudado | currency:'$':'symbol':'1.0-0':'es-AR' }}</span>
+          <span class="payment-progress__detail-value payment-progress__detail-value--warning">{{ consolidado()?.financiero?.montoAdeudado | money }}</span>
         </div>
       </div>
     </div>
@@ -129,7 +129,7 @@
           @if (category.monto) {
           <div class="debtor-card__amount">
             <span class="debtor-card__amount-label">Monto total</span>
-            <span class="debtor-card__amount-value">{{ category.monto | currency:'$':'symbol':'1.0-0':'es-AR' }}</span>
+            <span class="debtor-card__amount-value">{{ category.monto | money }}</span>
           </div>
           }
         </div>

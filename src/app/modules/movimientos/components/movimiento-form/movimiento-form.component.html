@@ -135,7 +135,7 @@
               <div class="readonly-field">
                 <span class="readonly-field__label">Monto</span>
                 <span class="readonly-field__value readonly-field__value--amount">
-                  {{ currentMovimiento.monto | currency:'ARS':'symbol':'1.2-2' }}
+                  {{ currentMovimiento.monto | money:2 }}
                 </span>
               </div>
               <div class="readonly-field">

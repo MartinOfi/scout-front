@@ -97,7 +97,7 @@
                 @for (prod of productos(); track prod.id) {
                   <tr class="product-row" [class.product-row--active]="getCantidad(prod.id) > 0">
                     <td class="col-nombre">{{ prod.nombre }}</td>
-                    <td class="col-precio">{{ prod.precioVenta | currency:'ARS':'symbol':'1.0-0':'es-AR' }}</td>
+                    <td class="col-precio">{{ prod.precioVenta | money }}</td>
                     <td class="col-cantidad">
                       <input
                         type="number"
@@ -109,7 +109,7 @@
                       />
                     </td>
                     <td class="col-subtotal">
-                      {{ getSubtotal(prod) | currency:'ARS':'symbol':'1.0-0':'es-AR' }}
+                      {{ getSubtotal(prod) | money }}
                     </td>
                   </tr>
                 }
@@ -117,7 +117,7 @@
               <tfoot>
                 <tr class="total-row">
                   <td colspan="3" class="total-label">Total General</td>
-                  <td class="total-value">{{ totalGeneral | currency:'ARS':'symbol':'1.0-0':'es-AR' }}</td>
+                  <td class="total-value">{{ totalGeneral | money }}</td>
                 </tr>
               </tfoot>
             </table>
