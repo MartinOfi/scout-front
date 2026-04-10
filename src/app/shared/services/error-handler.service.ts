@@ -19,12 +19,19 @@ export class ErrorHandlerService {
   private readonly notification = inject(NotificationService);
 
   /**
-   * Get user-friendly error message from HttpErrorResponse
+   * Get user-friendly error message from HttpErrorResponse.
+   * Handles NestJS error shape: { message: string | string[], error, statusCode }.
+   * When class-validator produces multiple messages, joins them.
    */
   getErrorMessage(error: HttpErrorResponse): string {
-    // Backend error message
-    if (error.error?.message) {
-      return error.error.message;
+    const backendMessage: unknown = error.error?.message;
+
+    if (Array.isArray(backendMessage) && backendMessage.length > 0) {
+      return backendMessage.filter((m): m is string => typeof m === 'string').join('. ');
+    }
+
+    if (typeof backendMessage === 'string' && backendMessage.length > 0) {
+      return backendMessage;
     }
 
     // Status code based messages
@@ -50,6 +57,22 @@ export class ErrorHandlerService {
       default:
         return 'Ocurrió un error inesperado.';
     }
+  }
+
+  /**
+   * Extract a user-friendly message from any thrown value.
+   * Use this in state services' catchError blocks instead of the
+   * `err instanceof Error` check, which fails for HttpErrorResponse
+   * (HttpErrorResponse does NOT extend Error).
+   */
+  extractMessage(err: unknown, fallback: string): string {
+    if (err instanceof HttpErrorResponse) {
+      return this.getErrorMessage(err);
+    }
+    if (err instanceof Error) {
+      return err.message;
+    }
+    return fallback;
   }
 
   /**

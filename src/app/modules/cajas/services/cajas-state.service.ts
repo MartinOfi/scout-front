@@ -27,7 +27,7 @@ import { Rama, RamaEnum, CajaType, TipoMovimientoEnum } from '../../../shared/en
 /** Filter type for drawer movimientos */
 export type MovimientoFilterType = 'todos' | 'ingresos' | 'egresos';
 import { CajasApiService } from './cajas-api.service';
-import { NotificationService } from '../../../shared/services';
+import { ErrorHandlerService, NotificationService } from '../../../shared/services';
 
 /** Map Rama enum to CajaType for fondo de rama */
 const RAMA_TO_CAJA_TYPE: Record<Rama, CajaType> = {
@@ -43,6 +43,7 @@ const RAMA_TO_CAJA_TYPE: Record<Rama, CajaType> = {
 export class CajasStateService {
   private readonly apiService = inject(CajasApiService);
   private readonly notificationService = inject(NotificationService);
+  private readonly errorHandler = inject(ErrorHandlerService);
 
   // ============================================================================
   // State Signals (private - writable)
@@ -197,10 +198,8 @@ export class CajasStateService {
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar caja de grupo';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al cargar caja de grupo'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }
@@ -245,10 +244,10 @@ export class CajasStateService {
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar datos consolidados';
-        this._error.set(errorMsg);
+        this._error.set(
+          this.errorHandler.extractMessage(err, 'Error al cargar datos consolidados'),
+        );
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }
@@ -290,10 +289,8 @@ export class CajasStateService {
           this._loading.set(false);
         },
         error: (err: unknown) => {
-          const errorMsg = err instanceof Error ? err.message : `Error al cargar caja de ${rama}`;
-          this._error.set(errorMsg);
+          this._error.set(this.errorHandler.extractMessage(err, `Error al cargar caja de ${rama}`));
           this._loading.set(false);
-          this.notificationService.showError(errorMsg);
         },
       });
   }
@@ -326,10 +323,8 @@ export class CajasStateService {
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar cajas de rama';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al cargar cajas de rama'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }
@@ -348,10 +343,10 @@ export class CajasStateService {
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar cuentas personales';
-        this._error.set(errorMsg);
+        this._error.set(
+          this.errorHandler.extractMessage(err, 'Error al cargar cuentas personales'),
+        );
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }
@@ -373,10 +368,8 @@ export class CajasStateService {
           this._loading.set(false);
         },
         error: (err: unknown) => {
-          const errorMsg = err instanceof Error ? err.message : 'Error al cargar movimientos';
-          this._error.set(errorMsg);
+          this._error.set(this.errorHandler.extractMessage(err, 'Error al cargar movimientos'));
           this._loading.set(false);
-          this.notificationService.showError(errorMsg);
         },
       });
     } else {
@@ -395,10 +388,8 @@ export class CajasStateService {
             this._loading.set(false);
           },
           error: (err: unknown) => {
-            const errorMsg = err instanceof Error ? err.message : 'Error al cargar movimientos';
-            this._error.set(errorMsg);
+            this._error.set(this.errorHandler.extractMessage(err, 'Error al cargar movimientos'));
             this._loading.set(false);
-            this.notificationService.showError(errorMsg);
           },
         });
     }
@@ -424,11 +415,10 @@ export class CajasStateService {
           this._loading.set(false);
         },
         error: (err: unknown) => {
-          const errorMsg =
-            err instanceof Error ? err.message : `Error al cargar movimientos de ${rama}`;
-          this._error.set(errorMsg);
+          this._error.set(
+            this.errorHandler.extractMessage(err, `Error al cargar movimientos de ${rama}`),
+          );
           this._loading.set(false);
-          this.notificationService.showError(errorMsg);
         },
       });
     } else {
@@ -458,11 +448,10 @@ export class CajasStateService {
             this._loading.set(false);
           },
           error: (err: unknown) => {
-            const errorMsg =
-              err instanceof Error ? err.message : `Error al cargar movimientos de ${rama}`;
-            this._error.set(errorMsg);
+            this._error.set(
+              this.errorHandler.extractMessage(err, `Error al cargar movimientos de ${rama}`),
+            );
             this._loading.set(false);
-            this.notificationService.showError(errorMsg);
           },
         });
     }
@@ -484,11 +473,10 @@ export class CajasStateService {
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg =
-          err instanceof Error ? err.message : 'Error al cargar movimientos personales';
-        this._error.set(errorMsg);
+        this._error.set(
+          this.errorHandler.extractMessage(err, 'Error al cargar movimientos personales'),
+        );
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }
@@ -509,10 +497,8 @@ export class CajasStateService {
           subscriber.complete();
         },
         error: (err: unknown) => {
-          const errorMsg = err instanceof Error ? err.message : 'Error al crear caja';
-          this._error.set(errorMsg);
+          this._error.set(this.errorHandler.extractMessage(err, 'Error al crear caja'));
           this._loading.set(false);
-          this.notificationService.showError(errorMsg);
           subscriber.error(err);
         },
       });
@@ -588,11 +574,10 @@ export class CajasStateService {
         this._selectedCajaLoading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg =
-          err instanceof Error ? err.message : 'Error al cargar movimientos de la caja';
-        this._error.set(errorMsg);
+        this._error.set(
+          this.errorHandler.extractMessage(err, 'Error al cargar movimientos de la caja'),
+        );
         this._selectedCajaLoading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }

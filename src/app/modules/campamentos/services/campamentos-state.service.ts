@@ -5,12 +5,10 @@
  */
 
 import { Injectable, Signal, WritableSignal, computed, signal, inject } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { tap, catchError, finalize } from 'rxjs/operators';
 
 import {
-  ApiErrorResponse,
   Campamento,
   CampamentoDetalleDto,
   CampamentoInfoDto,
@@ -29,7 +27,7 @@ import {
 import { FiltroMovimientosCampamento } from '../../../shared/enums';
 
 import { CampamentosApiService } from './campamentos-api.service';
-import { NotificationService } from '../../../shared/services';
+import { ErrorHandlerService, NotificationService } from '../../../shared/services';
 
 @Injectable({
   providedIn: 'root',
@@ -37,6 +35,7 @@ import { NotificationService } from '../../../shared/services';
 export class CampamentosStateService {
   private readonly apiService = inject(CampamentosApiService);
   private readonly notificationService = inject(NotificationService);
+  private readonly errorHandler = inject(ErrorHandlerService);
 
   // ============================================================================
   // State Signals (private - writable)
@@ -108,10 +107,8 @@ export class CampamentosStateService {
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar campamentos';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al cargar campamentos'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }
@@ -135,11 +132,10 @@ export class CampamentosStateService {
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg =
-          err instanceof Error ? err.message : 'Error al cargar detalle del campamento';
-        this._error.set(errorMsg);
+        this._error.set(
+          this.errorHandler.extractMessage(err, 'Error al cargar detalle del campamento'),
+        );
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }
@@ -157,9 +153,7 @@ export class CampamentosStateService {
         this.notificationService.showSuccess('Campamento creado exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al crear campamento';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al crear campamento'));
         return throwError(() => err);
       }),
       finalize(() => this._loading.set(false)),
@@ -179,9 +173,7 @@ export class CampamentosStateService {
         this.notificationService.showSuccess('Campamento actualizado exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al actualizar campamento';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al actualizar campamento'));
         return throwError(() => err);
       }),
       finalize(() => this._loading.set(false)),
@@ -203,9 +195,7 @@ export class CampamentosStateService {
         this.notificationService.showSuccess('Participante agregado exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al agregar participante';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al agregar participante'));
         return throwError(() => err);
       }),
       finalize(() => this._loading.set(false)),
@@ -227,9 +217,7 @@ export class CampamentosStateService {
         this.notificationService.showSuccess('Participante removido exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al remover participante';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al remover participante'));
         return throwError(() => err);
       }),
       finalize(() => this._loading.set(false)),
@@ -255,9 +243,7 @@ export class CampamentosStateService {
         this.notificationService.showSuccess('Pago registrado exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al registrar pago';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al registrar pago'));
         return throwError(() => err);
       }),
       finalize(() => this._loading.set(false)),
@@ -277,9 +263,7 @@ export class CampamentosStateService {
         this.notificationService.showSuccess('Gasto registrado exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al registrar gasto';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al registrar gasto'));
         return throwError(() => err);
       }),
       finalize(() => this._loading.set(false)),
@@ -300,9 +284,7 @@ export class CampamentosStateService {
         this.notificationService.showSuccess('Pago actualizado exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al actualizar pago';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al actualizar pago'));
         return throwError(() => err);
       }),
       finalize(() => this._loading.set(false)),
@@ -323,9 +305,7 @@ export class CampamentosStateService {
         this.notificationService.showSuccess('Pago eliminado exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al eliminar pago';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al eliminar pago'));
         return throwError(() => err);
       }),
       finalize(() => this._loading.set(false)),
@@ -343,25 +323,10 @@ export class CampamentosStateService {
         this.notificationService.showSuccess('Campamento eliminado exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = this.extractErrorMessage(err, 'Error al eliminar campamento');
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al eliminar campamento'));
         return throwError(() => err);
       }),
     );
-  }
-
-  /**
-   * Extract error message from HttpErrorResponse or Error
-   */
-  private extractErrorMessage(err: unknown, fallback: string): string {
-    if (err instanceof HttpErrorResponse) {
-      const apiError = err.error as ApiErrorResponse;
-      return apiError?.message || fallback;
-    }
-    if (err instanceof Error) {
-      return err.message;
-    }
-    return fallback;
   }
 
   /**
@@ -380,10 +345,8 @@ export class CampamentosStateService {
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar pagos';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al cargar pagos'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }
@@ -410,10 +373,8 @@ export class CampamentosStateService {
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar campamento';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al cargar campamento'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }

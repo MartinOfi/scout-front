@@ -20,7 +20,7 @@ import {
 import { TipoInscripcion } from '../../../shared/enums';
 
 import { InscripcionesApiService, InscripcionesQueryParams } from './inscripciones-api.service';
-import { NotificationService } from '../../../shared/services';
+import { ErrorHandlerService, NotificationService } from '../../../shared/services';
 
 @Injectable({
   providedIn: 'root',
@@ -28,6 +28,7 @@ import { NotificationService } from '../../../shared/services';
 export class InscripcionesStateService {
   private readonly apiService = inject(InscripcionesApiService);
   private readonly notificationService = inject(NotificationService);
+  private readonly errorHandler = inject(ErrorHandlerService);
 
   // ============================================================================
   // State Signals (private - writable)
@@ -100,10 +101,8 @@ export class InscripcionesStateService {
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar inscripciones';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al cargar inscripciones'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }
@@ -135,10 +134,10 @@ export class InscripcionesStateService {
         this._consolidadoLoading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar consolidado';
-        this._consolidadoError.set(errorMsg);
+        this._consolidadoError.set(
+          this.errorHandler.extractMessage(err, 'Error al cargar consolidado'),
+        );
         this._consolidadoLoading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }
@@ -157,10 +156,8 @@ export class InscripcionesStateService {
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar detalle';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al cargar detalle'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }
@@ -178,10 +175,8 @@ export class InscripcionesStateService {
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar inscripciones';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al cargar inscripciones'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }
@@ -199,9 +194,7 @@ export class InscripcionesStateService {
         this.notificationService.showSuccess('Inscripción creada exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al crear inscripción';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al crear inscripción'));
         return throwError(() => err);
       }),
       finalize(() => this._loading.set(false)),
@@ -222,9 +215,7 @@ export class InscripcionesStateService {
         this.notificationService.showSuccess('Inscripción actualizada exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al actualizar inscripción';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al actualizar inscripción'));
         return throwError(() => err);
       }),
       finalize(() => this._loading.set(false)),
@@ -244,9 +235,7 @@ export class InscripcionesStateService {
         this.notificationService.showSuccess('Inscripción eliminada exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al eliminar inscripción';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al eliminar inscripción'));
         return throwError(() => err);
       }),
       finalize(() => this._loading.set(false)),
@@ -284,9 +273,7 @@ export class InscripcionesStateService {
         this.notificationService.showSuccess('Pago registrado exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al registrar pago';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al registrar pago'));
         return throwError(() => err);
       }),
       finalize(() => this._loading.set(false)),
@@ -316,9 +303,7 @@ export class InscripcionesStateService {
         this.notificationService.showSuccess('Pago actualizado exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al actualizar pago';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al actualizar pago'));
         return throwError(() => err);
       }),
       finalize(() => this._loading.set(false)),
@@ -344,9 +329,7 @@ export class InscripcionesStateService {
         this.notificationService.showSuccess('Pago eliminado exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al eliminar pago';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al eliminar pago'));
         return throwError(() => err);
       }),
       finalize(() => this._loading.set(false)),

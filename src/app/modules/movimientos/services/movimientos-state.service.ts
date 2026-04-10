@@ -18,7 +18,7 @@ import {
 } from '../../../shared/models';
 
 import { MovimientosApiService } from './movimientos-api.service';
-import { NotificationService } from '../../../shared/services';
+import { ErrorHandlerService, NotificationService } from '../../../shared/services';
 import { MedioPago, EstadoPago, TipoMovimientoEnum } from '../../../shared/enums';
 
 @Injectable({
@@ -27,6 +27,7 @@ import { MedioPago, EstadoPago, TipoMovimientoEnum } from '../../../shared/enums
 export class MovimientosStateService {
   private readonly apiService = inject(MovimientosApiService);
   private readonly notificationService = inject(NotificationService);
+  private readonly errorHandler = inject(ErrorHandlerService);
 
   // ============================================================================
   // State Signals (private - writable)
@@ -144,10 +145,8 @@ export class MovimientosStateService {
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar movimientos';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al cargar movimientos'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }
@@ -165,9 +164,7 @@ export class MovimientosStateService {
         this.notificationService.showSuccess('Movimiento registrado exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al crear movimiento';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al crear movimiento'));
         return throwError(() => err);
       }),
       finalize(() => this._loading.set(false)),
@@ -187,9 +184,7 @@ export class MovimientosStateService {
         this.notificationService.showSuccess('Movimiento actualizado exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al actualizar movimiento';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al actualizar movimiento'));
         return throwError(() => err);
       }),
       finalize(() => this._loading.set(false)),
@@ -209,9 +204,7 @@ export class MovimientosStateService {
         this.notificationService.showSuccess('Movimiento eliminado exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al eliminar movimiento';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al eliminar movimiento'));
         return throwError(() => err);
       }),
       finalize(() => this._loading.set(false)),
@@ -231,10 +224,8 @@ export class MovimientosStateService {
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar reembolsos';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al cargar reembolsos'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }
@@ -261,9 +252,7 @@ export class MovimientosStateService {
           this.notificationService.showSuccess('Gasto general registrado exitosamente');
         }),
         catchError((err: unknown) => {
-          const errorMsg = err instanceof Error ? err.message : 'Error al registrar gasto';
-          this._error.set(errorMsg);
-          this.notificationService.showError(errorMsg);
+          this._error.set(this.errorHandler.extractMessage(err, 'Error al registrar gasto'));
           return throwError(() => err);
         }),
         finalize(() => this._loading.set(false)),
@@ -313,10 +302,8 @@ export class MovimientosStateService {
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar movimientos';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al cargar movimientos'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }

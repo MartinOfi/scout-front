@@ -8,10 +8,16 @@ import { Injectable, Signal, WritableSignal, computed, signal, inject } from '@a
 import { Observable } from 'rxjs';
 import { tap, catchError, throwError } from 'rxjs';
 
-import { Persona, PersonaExterna, CreatePersonaExternaDto, UpdatePersonaDto, ReembolsoPendiente } from '../../../shared/models';
+import {
+  Persona,
+  PersonaExterna,
+  CreatePersonaExternaDto,
+  UpdatePersonaDto,
+  ReembolsoPendiente,
+} from '../../../shared/models';
 import { PersonaType } from '../../../shared/enums';
 import { PersonasApiService } from './personas-api.service';
-import { NotificationService } from '../../../shared/services';
+import { ErrorHandlerService, NotificationService } from '../../../shared/services';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +25,7 @@ import { NotificationService } from '../../../shared/services';
 export class PersonasExternasStateService {
   private readonly apiService = inject(PersonasApiService);
   private readonly notificationService = inject(NotificationService);
+  private readonly errorHandler = inject(ErrorHandlerService);
 
   // ============================================================================
   // State Signals (private - writable)
@@ -35,7 +42,8 @@ export class PersonasExternasStateService {
   // ============================================================================
 
   readonly personasExternas: Signal<PersonaExterna[]> = this._personasExternas.asReadonly();
-  readonly reembolsosPendientes: Signal<ReembolsoPendiente[]> = this._reembolsosPendientes.asReadonly();
+  readonly reembolsosPendientes: Signal<ReembolsoPendiente[]> =
+    this._reembolsosPendientes.asReadonly();
   readonly loading: Signal<boolean> = this._loading.asReadonly();
   readonly error: Signal<string | null> = this._error.asReadonly();
 
@@ -58,8 +66,8 @@ export class PersonasExternasStateService {
   });
 
   readonly personasConDeuda = computed((): PersonaExterna[] => {
-    const idsConDeuda = new Set(this._reembolsosPendientes().map(r => r.personaId));
-    return this._personasExternas().filter(pe => idsConDeuda.has(pe.id));
+    const idsConDeuda = new Set(this._reembolsosPendientes().map((r) => r.personaId));
+    return this._personasExternas().filter((pe) => idsConDeuda.has(pe.id));
   });
 
   // ============================================================================
@@ -75,15 +83,15 @@ export class PersonasExternasStateService {
 
     this.apiService.getAll().subscribe({
       next: (personas) => {
-        const personasExternas = personas.filter((p) => p.tipo === PersonaType.EXTERNA) as PersonaExterna[];
+        const personasExternas = personas.filter(
+          (p) => p.tipo === PersonaType.EXTERNA,
+        ) as PersonaExterna[];
         this._personasExternas.set(personasExternas);
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar personas externas';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al cargar personas externas'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }
@@ -93,7 +101,7 @@ export class PersonasExternasStateService {
    */
   loadReembolsosPendientes(): void {
     this._loading.set(true);
-    
+
     // TODO: Implementar endpoint específico en el backend
     // Por ahora, simulamos con movimientos pendientes
     this._loading.set(false);
@@ -113,12 +121,10 @@ export class PersonasExternasStateService {
         this.notificationService.showSuccess('Persona externa creada exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al crear persona externa';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al crear persona externa'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
         return throwError(() => err);
-      })
+      }),
     );
   }
 
@@ -132,18 +138,18 @@ export class PersonasExternasStateService {
     return this.apiService.update(id, dto).pipe(
       tap((persona: Persona) => {
         this._personasExternas.update((prev) =>
-          prev.map((pe) => (pe.id === id ? (persona as PersonaExterna) : pe))
+          prev.map((pe) => (pe.id === id ? (persona as PersonaExterna) : pe)),
         );
         this._loading.set(false);
         this.notificationService.showSuccess('Persona externa actualizada exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al actualizar persona externa';
-        this._error.set(errorMsg);
+        this._error.set(
+          this.errorHandler.extractMessage(err, 'Error al actualizar persona externa'),
+        );
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
         return throwError(() => err);
-      })
+      }),
     );
   }
 
@@ -164,12 +170,10 @@ export class PersonasExternasStateService {
         this.notificationService.showSuccess('Persona externa eliminada exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al eliminar persona externa';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al eliminar persona externa'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
         return throwError(() => err);
-      })
+      }),
     );
   }
 

@@ -22,7 +22,7 @@ import {
 import { PersonaDashboardDto } from '../models';
 
 import { PersonasApiService } from './personas-api.service';
-import { NotificationService } from '../../../shared/services';
+import { ErrorHandlerService, NotificationService } from '../../../shared/services';
 import { PersonaType } from '../../../shared/enums';
 
 @Injectable({
@@ -31,6 +31,7 @@ import { PersonaType } from '../../../shared/enums';
 export class PersonasStateService {
   private readonly apiService = inject(PersonasApiService);
   private readonly notificationService = inject(NotificationService);
+  private readonly errorHandler = inject(ErrorHandlerService);
 
   // ============================================================================
   // State Signals (private - writable)
@@ -149,10 +150,8 @@ export class PersonasStateService {
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar personas';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al cargar personas'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }
@@ -171,10 +170,8 @@ export class PersonasStateService {
         this.notificationService.showSuccess('Protagonista creado exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al crear protagonista';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al crear protagonista'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
     );
@@ -194,10 +191,8 @@ export class PersonasStateService {
         this.notificationService.showSuccess('Educador creado exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al crear educador';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al crear educador'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
     );
@@ -217,10 +212,8 @@ export class PersonasStateService {
         this.notificationService.showSuccess('Persona externa creada exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al crear persona externa';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al crear persona externa'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
     );
@@ -240,10 +233,8 @@ export class PersonasStateService {
         this.notificationService.showSuccess('Persona actualizada exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al actualizar persona';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al actualizar persona'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
     );
@@ -263,10 +254,8 @@ export class PersonasStateService {
         this.notificationService.showSuccess('Persona eliminada exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al eliminar persona';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al eliminar persona'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
     );
@@ -288,10 +277,8 @@ export class PersonasStateService {
         );
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al dar de baja';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al dar de baja'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
     );
@@ -311,10 +298,10 @@ export class PersonasStateService {
         this._dashboardLoading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar dashboard';
-        this._dashboardError.set(errorMsg);
+        this._dashboardError.set(
+          this.errorHandler.extractMessage(err, 'Error al cargar dashboard'),
+        );
         this._dashboardLoading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }

@@ -26,7 +26,7 @@ import {
 } from '../../../shared/models';
 
 import { EventosApiService } from './eventos-api.service';
-import { NotificationService } from '../../../shared/services';
+import { ErrorHandlerService, NotificationService } from '../../../shared/services';
 
 @Injectable({
   providedIn: 'root',
@@ -34,6 +34,7 @@ import { NotificationService } from '../../../shared/services';
 export class EventosStateService {
   private readonly apiService = inject(EventosApiService);
   private readonly notificationService = inject(NotificationService);
+  private readonly errorHandler = inject(ErrorHandlerService);
 
   // ============================================================================
   // State Signals (private — writable)
@@ -360,16 +361,12 @@ export class EventosStateService {
   }
 
   private _handleError(err: unknown, fallback: string): void {
-    const msg = err instanceof Error ? err.message : fallback;
-    this._error.set(msg);
+    this._error.set(this.errorHandler.extractMessage(err, fallback));
     this._loading.set(false);
-    this.notificationService.showError(msg);
   }
 
   private _catchError(err: unknown, fallback: string): Observable<never> {
-    const msg = err instanceof Error ? err.message : fallback;
-    this._error.set(msg);
-    this.notificationService.showError(msg);
+    this._error.set(this.errorHandler.extractMessage(err, fallback));
     return throwError(() => err);
   }
 }

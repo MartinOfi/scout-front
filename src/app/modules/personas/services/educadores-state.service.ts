@@ -10,7 +10,7 @@ import { tap, catchError, throwError, map } from 'rxjs';
 
 import { Persona, Educador, CreateEducadorDto, UpdatePersonaDto } from '../../../shared/models';
 import { PersonasApiService } from './personas-api.service';
-import { NotificationService } from '../../../shared/services';
+import { ErrorHandlerService, NotificationService } from '../../../shared/services';
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +18,7 @@ import { NotificationService } from '../../../shared/services';
 export class EducadoresStateService {
   private readonly apiService = inject(PersonasApiService);
   private readonly notificationService = inject(NotificationService);
+  private readonly errorHandler = inject(ErrorHandlerService);
 
   // ============================================================================
   // State Signals (private - writable)
@@ -72,10 +73,8 @@ export class EducadoresStateService {
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar educadores';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al cargar educadores'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }
@@ -94,10 +93,8 @@ export class EducadoresStateService {
         this.notificationService.showSuccess('Educador creado exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al crear educador';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al crear educador'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
     );
@@ -119,10 +116,8 @@ export class EducadoresStateService {
         this.notificationService.showSuccess('Educador actualizado exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al actualizar educador';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al actualizar educador'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
     );
@@ -145,10 +140,8 @@ export class EducadoresStateService {
         this.notificationService.showSuccess('Educador eliminado exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al eliminar educador';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al eliminar educador'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
     );
@@ -174,10 +167,8 @@ export class EducadoresStateService {
         this._loading.set(false);
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar educador';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al cargar educador'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
         return throwError(() => err);
       }),
     );

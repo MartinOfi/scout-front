@@ -8,15 +8,11 @@ import { Injectable, Signal, WritableSignal, computed, signal, inject } from '@a
 import { Observable, throwError } from 'rxjs';
 import { tap, catchError, finalize } from 'rxjs/operators';
 
-import {
-  Cuota,
-  CreateCuotaDto,
-  UpdateCuotaDto,
-} from '../../../shared/models';
+import { Cuota, CreateCuotaDto, UpdateCuotaDto } from '../../../shared/models';
 import { EstadoCuota } from '../../../shared/enums';
 
 import { CuotasApiService } from './cuotas-api.service';
-import { NotificationService } from '../../../shared/services';
+import { ErrorHandlerService, NotificationService } from '../../../shared/services';
 
 @Injectable({
   providedIn: 'root',
@@ -24,6 +20,7 @@ import { NotificationService } from '../../../shared/services';
 export class CuotasStateService {
   private readonly apiService = inject(CuotasApiService);
   private readonly notificationService = inject(NotificationService);
+  private readonly errorHandler = inject(ErrorHandlerService);
 
   // ============================================================================
   // State Signals (private - writable)
@@ -82,10 +79,8 @@ export class CuotasStateService {
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar cuotas';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al cargar cuotas'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }
@@ -103,10 +98,8 @@ export class CuotasStateService {
         this._loading.set(false);
       },
       error: (err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al cargar cuotas';
-        this._error.set(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al cargar cuotas'));
         this._loading.set(false);
-        this.notificationService.showError(errorMsg);
       },
     });
   }
@@ -124,12 +117,10 @@ export class CuotasStateService {
         this.notificationService.showSuccess('Cuota creada exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al crear cuota';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al crear cuota'));
         return throwError(() => err);
       }),
-      finalize(() => this._loading.set(false))
+      finalize(() => this._loading.set(false)),
     );
   }
 
@@ -142,18 +133,14 @@ export class CuotasStateService {
 
     return this.apiService.update(id, dto).pipe(
       tap((cuota: Cuota) => {
-        this._cuotas.update((prev) =>
-          prev.map((c) => (c.id === id ? cuota : c))
-        );
+        this._cuotas.update((prev) => prev.map((c) => (c.id === id ? cuota : c)));
         this.notificationService.showSuccess('Cuota actualizada exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al actualizar cuota';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al actualizar cuota'));
         return throwError(() => err);
       }),
-      finalize(() => this._loading.set(false))
+      finalize(() => this._loading.set(false)),
     );
   }
 
@@ -165,25 +152,21 @@ export class CuotasStateService {
     cuotaId: string,
     monto: number,
     medioPago: string,
-    responsableId: string
+    responsableId: string,
   ): Observable<{ cuota: Cuota; movimiento: unknown }> {
     this._loading.set(true);
     this._error.set(null);
 
     return this.apiService.registrarPago(cuotaId, monto, medioPago, responsableId).pipe(
       tap((response: { cuota: Cuota; movimiento: unknown }) => {
-        this._cuotas.update((prev) =>
-          prev.map((c) => (c.id === cuotaId ? response.cuota : c))
-        );
+        this._cuotas.update((prev) => prev.map((c) => (c.id === cuotaId ? response.cuota : c)));
         this.notificationService.showSuccess('Pago registrado exitosamente');
       }),
       catchError((err: unknown) => {
-        const errorMsg = err instanceof Error ? err.message : 'Error al registrar pago';
-        this._error.set(errorMsg);
-        this.notificationService.showError(errorMsg);
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al registrar pago'));
         return throwError(() => err);
       }),
-      finalize(() => this._loading.set(false))
+      finalize(() => this._loading.set(false)),
     );
   }
 
