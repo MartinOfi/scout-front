@@ -71,8 +71,15 @@
   background-color: #e3e3e379;
 }
 
-// Ensure sidenav has no border and proper background
+// Ensure sidenav has no border and proper background.
+// overflow: visible is required so the sidebar collapse toggle button
+// (positioned at right: -12px) is not clipped by the drawer container.
 ::ng-deep .mat-drawer {
   border-right: none !important;
   background: transparent;
+  overflow: visible !important;
+}
+
+::ng-deep .mat-drawer .mat-drawer-inner-container {
+  overflow: visible !important;
 }
