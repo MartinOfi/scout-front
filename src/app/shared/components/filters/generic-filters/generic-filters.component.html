@@ -1,164 +1,31 @@
-<!-- 
-  Template del componente de filtros genérico
-  
-  Basado en las especificaciones del todo.md líneas 69-74
-  Template dinámico que renderiza filtros según FilterType
-  Usa control flow moderno Angular 17+ (@if, @for)
-  Implementa track functions para optimización
-  Grid responsivo configurable
--->
+<div class="generic-filters">
+  @for (filter of activeFilters(); track filter.key) {
+    <app-active-filter-chip [filter]="filter" (removed)="onChipRemoved(filter.key)" />
+  }
 
-<div class="generic-filters" [ngClass]="{ 'generic-filters--inline': inline() }">
-  <!-- Header de filtros (oculto en modo inline) -->
-  @if (!inline()) {
-  <div class="filters-header">
-    <div class="filters-header-title">
-      <div class="filters-title-row" (click)="toggleExpanded()">
-        <h3>Filtros</h3>
-      </div>
-    </div>
-    <!-- Botones de acción -->
-    <div class="filters-actions">
-      @if (showClearButton()) {
-      <app-button variant="secondary" (clicked)="onClearFilters()" [disabled]="!hasActiveFilters()">
-        Limpiar
-      </app-button>
-      } @if (showApplyButton()) {
-      <app-button variant="primary" (clicked)="onApplyFilters()">
-        Aplicar Filtros
-      </app-button>
-      }
-      <button type="button" class="btn-toggle unstyled" (click)="toggleExpanded()"
-        [attr.aria-label]="isExpanded() ? 'Ocultar filtros' : 'Mostrar filtros'" [attr.aria-expanded]="isExpanded()"
-        [title]="isExpanded() ? 'Ocultar filtros' : 'Mostrar filtros'">
-        <mat-icon [ngClass]="{'toggle-icon': true, 'collapsed': !isExpanded()}">
-          {{ isExpanded() ? 'expand_less' : 'expand_more' }}
-        </mat-icon>
-      </button>
-    </div>
+  <div class="generic-filters__trigger" cdkOverlayOrigin #triggerOrigin="cdkOverlayOrigin">
+    <app-filter-trigger-button [activeCount]="activeCount()" (clicked)="onTriggerClick()" />
   </div>
-  }
 
-  <!-- Formulario de filtros (colapsable, siempre visible en modo inline) -->
-  @if (isExpanded() || inline()) {
-  <form [formGroup]="filtersForm" class="filters-form" [ngClass]="{ 'filters-form--inline': inline() }">
-    <!-- Filtros tipo CHIPS en fila completa separada -->
-    @for (config of filterConfigs; track config.key) {
-    @if (config.type === FilterType.CHIPS) {
-    <div class="chips-filter-row">
-      <label [for]="config.key" class="chips-filter-label">{{ config.label }}</label>
-      <app-chips-filter [chips]="config.chips || []"
-        [selectedValue]="(config.allowMultiple ? null : filtersForm.get(config.key)?.value) || null"
-        [selectedValues]="(config.allowMultiple ? (filtersForm.get(config.key)?.value || []) : [])"
-        [allowMultiple]="config.allowMultiple || false"
-        [chipConfigService]="getChipConfigService(config.chipConfigService)" [allLabel]="config.placeholder || 'Todos'"
-        (chipSelected)="onChipSelected(config.key, $event)"
-        (chipsSelected)="onChipsSelected(config.key, $event)"></app-chips-filter>
-    </div>
-    }
-    }
-
-    <!-- Resto de filtros en grid -->
-    <div class="filters-grid" [ngClass]="{ 'filters-grid--inline': inline() }">
-      @for (config of filterConfigs; track config.key) {
-      @if (config.type !== FilterType.CHIPS) {
-      <div class="filter-group">
-        <label [for]="config.key">{{ config.label }}</label>
-
-        <!-- SELECT -->
-        @if (config.type === FilterType.SELECT) {
-        <app-select-field [id]="config.key" [formControlName]="config.key" [options]="config.options || []"
-          optionLabel="label" optionValue="value" [placeholder]="config.placeholder || 'Seleccionar...'"
-          [disabled]="config.disabled || false"></app-select-field>
-        }
-
-        <!-- MULTI_SELECT -->
-        @if (config.type === FilterType.MULTI_SELECT) {
-        <div class="multi-select-container">
-          @for (option of config.options; track option.value) {
-          <label class="checkbox-label">
-            <input type="checkbox" [value]="option.value" [disabled]="config.disabled || option.disabled"
-              (change)="onMultiSelectChange(config.key, $event)" />
-            {{ option.label }}
-          </label>
-          }
-        </div>
-        }
-
-        <!-- TEXT -->
-        @if (config.type === FilterType.TEXT) {
-        <app-text-field [id]="config.key" [formControlName]="config.key"
-          [placeholder]="config.placeholder || 'Ingrese texto...'"
-          [disabled]="config.disabled || false"></app-text-field>
-        }
-
-        <!-- NUMBER -->
-        @if (config.type === FilterType.NUMBER) {
-        <app-number-field [id]="config.key" [formControlName]="config.key"
-          [placeholder]="config.placeholder || 'Ingrese número...'"
-          [disabled]="config.disabled || false"></app-number-field>
-        }
-
-        <!-- DATE -->
-        @if (config.type === FilterType.DATE) {
-        <app-date-field [id]="config.key" [formControlName]="config.key"
-          [disabled]="config.disabled || false"></app-date-field>
-        }
-
-        <!-- DATE_RANGE -->
-        @if (config.type === FilterType.DATE_RANGE) {
-        <div class="date-range-container">
-          <app-date-field [id]="config.key + 'Start'" [formControlName]="config.key + 'Start'"
-            [placeholder]="'Fecha inicio'" [disabled]="config.disabled || false"></app-date-field>
-          <app-date-field [id]="config.key + 'End'" [formControlName]="config.key + 'End'" [placeholder]="'Fecha fin'"
-            [disabled]="config.disabled || false"></app-date-field>
-        </div>
-        }
-
-        <!-- BOOLEAN -->
-        @if (config.type === FilterType.BOOLEAN) {
-        <label class="checkbox-label">
-          <app-checkbox-field [id]="config.key" [formControlName]="config.key"
-            [disabled]="config.disabled || false"></app-checkbox-field>
-          {{ config.label }}
-        </label>
-        }
-
-        <!-- SEARCH -->
-        @if (config.type === FilterType.SEARCH) {
-        <app-text-field [id]="config.key" [formControlName]="config.key"
-          [placeholder]="config.placeholder || 'Buscar...'" [disabled]="config.disabled || false "></app-text-field>
-        }
-
-        <!-- CUSTOM -->
-        @if (config.type === FilterType.CUSTOM) {
-        <div class="custom-component">
-          <!-- Aquí se renderizaría el componente personalizado -->
-          <p class="text-muted">
-            Componente personalizado: {{ config.customComponent }}
-          </p>
-        </div>
-        }
-      </div>
-      }
-      }
-    </div>
-  </form>
-
-  <!-- Indicador de filtros activos (oculto en modo inline) -->
-  @if (hasActiveFilters() && !inline()) {
-  <div class="active-filters">
-    <p class="text-muted">
-      <strong>{{ filterConfigs.length }}</strong> filtros configurados
-    </p>
-  </div>
-  }
-
-  <!-- Botón limpiar en modo inline -->
-  @if (inline() && showClearButton() && hasActiveFilters()) {
-  <app-button variant="ghost" size="sm" (clicked)="onClearFilters()">
-    Limpiar filtros
-  </app-button>
-  }
+  @if (showClearButton() && hasActiveFilters()) {
+    <button type="button" class="generic-filters__clear unstyled" (click)="onClearFilters()">
+      {{ labels.clearAll }}
+    </button>
   }
 </div>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="triggerOrigin"
+  [cdkConnectedOverlayOpen]="popoverOpen()"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+  (backdropClick)="onOverlayBackdropClick()"
+  (detach)="onOverlayBackdropClick()"
+>
+  <app-filter-form-panel
+    [configs]="filterConfigs"
+    [initialValues]="currentValueMap()"
+    (valuesSubmitted)="onFormSubmitted($event)"
+  />
+</ng-template>

@@ -1,0 +1,11 @@
+<div class="chip" [attr.aria-label]="'Filtro ' + filter().label">
+  <span class="chip__text">{{ displayText() }}</span>
+  <button
+    type="button"
+    class="chip__remove unstyled"
+    [attr.aria-label]="'Eliminar filtro ' + filter().label"
+    (click)="onRemove($event)"
+  >
+    <mat-icon class="chip__remove-icon">close</mat-icon>
+  </button>
+</div>

@@ -1,0 +1,12 @@
+<button
+  type="button"
+  class="trigger unstyled"
+  [class.trigger--icon-only]="activeCount() > 0"
+  [attr.aria-label]="ariaLabel"
+  (click)="onClick()"
+>
+  <mat-icon class="trigger__icon">filter_list</mat-icon>
+  @if (label()) {
+    <span class="trigger__label">{{ label() }}</span>
+  }
+</button>

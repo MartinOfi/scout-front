@@ -1,0 +1,79 @@
+<form
+  class="form-panel"
+  [formGroup]="form"
+  role="dialog"
+  [attr.aria-label]="labels.openFiltersAria"
+  (submit)="$event.preventDefault()"
+>
+  @if (configs().length === 0) {
+    <p class="form-panel__empty">{{ labels.noResults }}</p>
+  } @else {
+    <div class="form-panel__fields">
+      @for (config of configs(); track config.key) {
+        <div class="form-panel__row">
+          <label class="form-panel__label" [attr.for]="config.key">{{ config.label }}</label>
+          <div class="form-panel__control">
+            @switch (config.type) {
+              @case (filterType.SELECT) {
+                <app-select-field
+                  [id]="config.key"
+                  [formControlName]="config.key"
+                  [options]="config.options || []"
+                  optionLabel="label"
+                  optionValue="value"
+                  [placeholder]="config.placeholder || labels.valuePlaceholder"
+                />
+              }
+              @case (filterType.TEXT) {
+                <app-text-field
+                  [id]="config.key"
+                  [formControlName]="config.key"
+                  [placeholder]="config.placeholder || labels.valuePlaceholder"
+                />
+              }
+              @case (filterType.SEARCH) {
+                <app-text-field
+                  [id]="config.key"
+                  [formControlName]="config.key"
+                  [placeholder]="config.placeholder || labels.valuePlaceholder"
+                />
+              }
+              @case (filterType.NUMBER) {
+                <app-number-field
+                  [id]="config.key"
+                  [formControlName]="config.key"
+                  [placeholder]="config.placeholder || labels.valuePlaceholder"
+                />
+              }
+              @case (filterType.DATE) {
+                <app-date-field [id]="config.key" [formControlName]="config.key" />
+              }
+              @case (filterType.DATE_RANGE) {
+                <div class="form-panel__range">
+                  <app-date-field
+                    [id]="config.key + 'Start'"
+                    [formControlName]="config.key + 'Start'"
+                    [placeholder]="labels.dateRangeStartPlaceholder"
+                  />
+                  <app-date-field
+                    [id]="config.key + 'End'"
+                    [formControlName]="config.key + 'End'"
+                    [placeholder]="labels.dateRangeEndPlaceholder"
+                  />
+                </div>
+              }
+              @case (filterType.BOOLEAN) {
+                <app-checkbox-field [id]="config.key" [formControlName]="config.key" />
+              }
+              @default {
+                <p class="form-panel__unsupported">
+                  {{ labels.unsupportedType }} ({{ config.type }})
+                </p>
+              }
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</form>
