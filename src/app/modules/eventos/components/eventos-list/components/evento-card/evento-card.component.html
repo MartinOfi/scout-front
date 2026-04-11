@@ -1,4 +1,4 @@
-<article class="evento-card" (click)="onSelect()">
+<article class="evento-card" [class.evento-card--deleting]="deleting" (click)="onSelect()">
 
   <!-- Tipo Badge -->
   <div
@@ -63,6 +63,19 @@
         (click)="onEdit(); $event.stopPropagation()"
         aria-label="Editar evento">
         <mat-icon>edit</mat-icon>
+      </button>
+      <button
+        type="button"
+        class="evento-card__action-icon evento-card__action-icon--danger unstyled"
+        data-testid="delete-btn"
+        [disabled]="deleting"
+        (click)="onDelete(); $event.stopPropagation()"
+        aria-label="Eliminar evento">
+        @if (deleting) {
+          <mat-spinner diameter="16" />
+        } @else {
+          <mat-icon>delete_outline</mat-icon>
+        }
       </button>
     </div>
   </footer>

@@ -14,6 +14,7 @@ import {
   RegisterVentasLoteDto,
   RegistrarIngresoEventoDto,
   RegistrarGastoEventoDto,
+  DeleteVentaResponse,
 } from '../../../shared/models';
 import { Movimiento } from '../../../shared/models';
 import { HttpService } from '../../../shared/services';
@@ -100,8 +101,10 @@ export class EventosApiService {
   // VENTAS
   // ============================================================================
 
-  getVentas(eventoId: string): Observable<VentaProducto[]> {
-    return this.http.get<VentaProducto[]>(`${this.endpoint}/${eventoId}/ventas`);
+  getVentas(eventoId: string, vendedor?: string): Observable<VentaProducto[]> {
+    const params: Record<string, string> = {};
+    if (vendedor) params['vendedor'] = vendedor;
+    return this.http.get<VentaProducto[]>(`${this.endpoint}/${eventoId}/ventas`, params);
   }
 
   registrarVenta(eventoId: string, dto: CreateVentaProductoDto): Observable<VentaProducto> {
@@ -118,8 +121,8 @@ export class EventosApiService {
     );
   }
 
-  deleteVenta(eventoId: string, ventaId: string): Observable<void> {
-    return this.http.delete<void>(`${this.endpoint}/${eventoId}/ventas/${ventaId}`);
+  deleteVenta(eventoId: string, ventaId: string): Observable<DeleteVentaResponse> {
+    return this.http.delete<DeleteVentaResponse>(`${this.endpoint}/${eventoId}/ventas/${ventaId}`);
   }
 
   // ============================================================================

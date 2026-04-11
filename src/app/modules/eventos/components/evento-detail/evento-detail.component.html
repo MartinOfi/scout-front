@@ -91,20 +91,70 @@
             (ngModelChange)="onVendedorSearchChange($event)" />
           <app-button icon="add_shopping_cart" (clicked)="navigateToVentasLote()">Registrar Ventas en Lote</app-button>
         </div>
-        <div class="table-container">
-          @if (vendedorSearching()) {
-          <app-loading-spinner message="Filtrando..." />
-          } @else if (ventasTableData().length === 0) {
-          <div class="tab-empty">
-            <div class="tab-empty__icon"><mat-icon>point_of_sale</mat-icon></div>
-            <p class="tab-empty__text">Sin ventas registradas</p>
-            <p class="tab-empty__hint">Usá el botón de arriba para registrar ventas en lote.</p>
-          </div>
-          } @else {
-          <app-data-table [data]="ventasTableData()" [columns]="ventasColumns"
-            [config]="{ showHeader: true, hoverable: true }" />
-          }
+
+        @if (eventoVentas().length === 0) {
+        <div class="tab-empty">
+          <div class="tab-empty__icon"><mat-icon>point_of_sale</mat-icon></div>
+          <p class="tab-empty__text">Sin ventas registradas</p>
+          <p class="tab-empty__hint">Usá el botón de arriba para registrar ventas en lote.</p>
         </div>
+        } @else if (ventaGroups().length === 0) {
+        <div class="tab-empty">
+          <div class="tab-empty__icon"><mat-icon>search_off</mat-icon></div>
+          <p class="tab-empty__text">Sin resultados</p>
+          <p class="tab-empty__hint">Ningún vendedor coincide con "{{ vendedorSearch() }}".</p>
+        </div>
+        } @else {
+        <div class="ventas-individuales">
+          <h3 class="ventas-individuales__title">
+            <mat-icon>list_alt</mat-icon>
+            Ventas registradas
+          </h3>
+          <div class="ventas-individuales__grid">
+            @for (group of ventaGroups(); track group.key) {
+            <article class="venta-card"
+              [class.venta-card--singleton]="group.isSingleton"
+              [class.venta-card--deleting]="isGroupDeleting(group)">
+
+              <header class="venta-card__header">
+                <div class="venta-card__identity">
+                  <span class="venta-card__vendedor">{{ group.vendedorNombre }}</span>
+                  <span class="venta-card__date">{{ group.fecha | date:'d MMM' }}</span>
+                </div>
+                <button type="button" class="venta-card__delete unstyled"
+                  [disabled]="isGroupDeleting(group)"
+                  (click)="onDeleteVenta(group.primaryVentaId)"
+                  aria-label="Eliminar venta">
+                  @if (isGroupDeleting(group)) {
+                  <mat-spinner diameter="14" />
+                  } @else {
+                  <mat-icon>close</mat-icon>
+                  }
+                </button>
+              </header>
+
+              <ul class="venta-card__items">
+                @for (item of group.items; track item.ventaId) {
+                <li class="venta-card__item">
+                  <span class="venta-card__item-name" [title]="item.productoNombre">{{ item.productoNombre }}</span>
+                  <span class="venta-card__item-cantidad">×{{ item.cantidad }}</span>
+                  <span class="venta-card__item-ganancia">{{ item.ganancia | money }}</span>
+                </li>
+                }
+              </ul>
+
+              @if (!group.isSingleton) {
+              <footer class="venta-card__footer">
+                <span class="venta-card__footer-label">Total</span>
+                <span class="venta-card__footer-units">{{ group.totalUnidades }} u</span>
+                <span class="venta-card__footer-total">{{ group.gananciaTotal | money }}</span>
+              </footer>
+              }
+            </article>
+            }
+          </div>
+        </div>
+        }
         }
 
         <!-- MOVIMIENTOS tab -->
@@ -126,7 +176,8 @@
         <div class="movimientos-list">
           @for (mov of eventoMovimientos(); track mov.id) {
           <article class="movimiento-row" [class.movimiento-row--ingreso]="mov.tipo === 'ingreso'"
-            [class.movimiento-row--egreso]="mov.tipo === 'egreso'">
+            [class.movimiento-row--egreso]="mov.tipo === 'egreso'"
+            [class.movimiento-row--deleting]="isDeleting(mov.id)">
 
             <div class="movimiento-row__icon">
               <mat-icon>{{ mov.tipo === 'ingreso' ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
@@ -144,6 +195,17 @@
               [class.movimiento-row__amount--negative]="mov.tipo === 'egreso'">
               {{ (mov.tipo === 'ingreso' ? '+' : '-') }}{{ mov.monto | money }}
             </div>
+
+            <button type="button" class="movimiento-row__delete unstyled"
+              [disabled]="isDeleting(mov.id)"
+              (click)="onDeleteMovimiento(mov.id)"
+              aria-label="Eliminar movimiento">
+              @if (isDeleting(mov.id)) {
+              <mat-spinner diameter="16" />
+              } @else {
+              <mat-icon>delete_outline</mat-icon>
+              }
+            </button>
 
           </article>
           }

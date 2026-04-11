@@ -19,7 +19,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { EventosStateService } from '../../services/eventos-state.service';
 import { Evento } from '../../../../shared/models';
 import { TipoEvento, TIPO_EVENTO_LABELS } from '../../../../shared/enums';
-import { ButtonComponent, LoadingSpinnerComponent } from '../../../../shared';
+import { ButtonComponent, ConfirmDialogService, LoadingSpinnerComponent } from '../../../../shared';
 import { EventoCardComponent } from './components/evento-card/evento-card.component';
 import { GenericFiltersComponent } from '../../../../shared/components/filters/generic-filters/generic-filters.component';
 import { FilterConfig } from '../../../../shared/components/filters/generic-filters/filter-config.interface';
@@ -49,6 +49,7 @@ interface EventoStats {
 export class EventosListComponent implements OnInit {
   readonly state: EventosStateService = inject(EventosStateService);
   private readonly router = inject(Router);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   readonly eventos = this.state.eventos;
   readonly loading = this.state.loading;
@@ -122,5 +123,13 @@ export class EventosListComponent implements OnInit {
 
   onEdit(id: string): void {
     this.router.navigate(['/eventos', id, 'editar']);
+  }
+
+  onDelete(id: string): void {
+    this.confirmDialog.confirmDelete('evento').subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.state.delete(id).subscribe();
+      }
+    });
   }
 }

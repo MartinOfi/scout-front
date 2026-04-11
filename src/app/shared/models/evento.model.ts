@@ -65,6 +65,12 @@ export interface VentaProducto {
   productoId: string;
   vendedorId: string;
   cantidad: number;
+  /**
+   * ID of the income Movimiento generated when this venta was registered.
+   * Many ventas (a lote) can share the same movimientoId.
+   * Null only for legacy ventas created before the link was introduced.
+   */
+  movimientoId: string | null;
   producto?: Producto;
   vendedor?: {
     id: string;
@@ -72,6 +78,16 @@ export interface VentaProducto {
   };
   createdAt: string;
   updatedAt: string;
+}
+
+/**
+ * Response payload for DELETE /eventos/:eventoId/ventas/:ventaId
+ * Mirrors the backend `DeleteVentaResponseDto`.
+ */
+export interface DeleteVentaResponse {
+  ventaId: string;
+  movimientoIdEliminado: string | null;
+  hermanasEliminadas: number;
 }
 
 // ─── KPIs & Resúmenes ────────────────────────────────────────────────────────

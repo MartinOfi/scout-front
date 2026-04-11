@@ -83,8 +83,10 @@
             @for (evento of eventosFiltrados(); track evento.id) {
               <app-evento-card
                 [evento]="evento"
+                [deleting]="state.isDeleting(evento.id)"
                 (select)="onSelect($event)"
-                (edit)="onEdit($event)">
+                (edit)="onEdit($event)"
+                (delete)="onDelete($event)">
               </app-evento-card>
             }
           </section>

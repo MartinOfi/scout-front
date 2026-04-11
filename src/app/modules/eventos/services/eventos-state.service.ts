@@ -23,9 +23,11 @@ import {
   RegisterVentasLoteDto,
   RegistrarIngresoEventoDto,
   RegistrarGastoEventoDto,
+  DeleteVentaResponse,
 } from '../../../shared/models';
 
 import { EventosApiService } from './eventos-api.service';
+import { MovimientosApiService } from '../../movimientos/services/movimientos-api.service';
 import { ErrorHandlerService, NotificationService } from '../../../shared/services';
 
 @Injectable({
@@ -33,6 +35,7 @@ import { ErrorHandlerService, NotificationService } from '../../../shared/servic
 })
 export class EventosStateService {
   private readonly apiService = inject(EventosApiService);
+  private readonly movimientosApi = inject(MovimientosApiService);
   private readonly notificationService = inject(NotificationService);
   private readonly errorHandler = inject(ErrorHandlerService);
 
@@ -43,12 +46,19 @@ export class EventosStateService {
   private readonly _eventos: WritableSignal<Evento[]> = signal([]);
   private readonly _productos: WritableSignal<Record<string, Producto[]>> = signal({});
   private readonly _ventas: WritableSignal<Record<string, VentaProducto[]>> = signal({});
+  /**
+   * Active vendedor filter per evento. Persisted in state so cascade
+   * refreshes (after a delete) can re-apply the user's current search
+   * instead of clobbering it back to the unfiltered list.
+   */
+  private readonly _ventasFilter: WritableSignal<Record<string, string | undefined>> = signal({});
   private readonly _kpis: WritableSignal<Record<string, EventoKpis>> = signal({});
   private readonly _resumenVentas: WritableSignal<Record<string, ResumenVentas>> = signal({});
   private readonly _movimientos: WritableSignal<Record<string, Movimiento[]>> = signal({});
   private readonly _loading: WritableSignal<boolean> = signal(false);
   private readonly _error: WritableSignal<string | null> = signal(null);
   private readonly _selectedId: WritableSignal<string | null> = signal(null);
+  private readonly _deletingIds: WritableSignal<ReadonlySet<string>> = signal(new Set());
 
   // ============================================================================
   // Public Readonly Signals
@@ -62,6 +72,11 @@ export class EventosStateService {
   readonly movimientos: Signal<Record<string, Movimiento[]>> = this._movimientos.asReadonly();
   readonly loading: Signal<boolean> = this._loading.asReadonly();
   readonly error: Signal<string | null> = this._error.asReadonly();
+  readonly deletingIds: Signal<ReadonlySet<string>> = this._deletingIds.asReadonly();
+
+  isDeleting(id: string): boolean {
+    return this._deletingIds().has(id);
+  }
 
   // ============================================================================
   // Computed Signals
@@ -138,6 +153,106 @@ export class EventosStateService {
       catchError((err: unknown) => this._catchError(err, 'Error al actualizar evento')),
       finalize(() => this._loading.set(false)),
     );
+  }
+
+  delete(id: string): Observable<void> {
+    this._markDeleting(id);
+    return this.apiService.delete(id).pipe(
+      tap(() => {
+        this._eventos.update((prev) => prev.filter((e) => e.id !== id));
+        if (this._selectedId() === id) {
+          this._selectedId.set(null);
+        }
+        this.notificationService.showSuccess('Evento eliminado exitosamente');
+      }),
+      catchError((err: unknown) => {
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al eliminar evento'));
+        return throwError(() => err);
+      }),
+      finalize(() => this._unmarkDeleting(id)),
+    );
+  }
+
+  /**
+   * Borra una venta. Cuando la venta forma parte de un lote, el backend
+   * cascadea: borra todas las hermanas del mismo movimientoId y el movimiento
+   * agregado. Por eso después del éxito refrescamos ventas + movimientos +
+   * KPIs + resumen contra el backend en lugar de hacer un patch optimista
+   * (que solo conoce la venta clickeada y dejaría a las hermanas zombi en
+   * el state local).
+   */
+  deleteVenta(eventoId: string, ventaId: string): Observable<DeleteVentaResponse> {
+    this._markDeleting(ventaId);
+    return this.apiService.deleteVenta(eventoId, ventaId).pipe(
+      tap((response) => {
+        this._notifyVentaDeleted(response);
+        this._refreshEventoAfterMutation(eventoId);
+      }),
+      catchError((err: unknown) => {
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al eliminar venta'));
+        return throwError(() => err);
+      }),
+      finalize(() => this._unmarkDeleting(ventaId)),
+    );
+  }
+
+  /**
+   * Recarga las colecciones del evento que pueden haber cambiado tras un
+   * borrado en cascada (ventas, movimientos, KPIs). Re-aplica el filtro
+   * de vendedor activo para no clobberar el contexto de búsqueda del
+   * usuario.
+   */
+  private _refreshEventoAfterMutation(eventoId: string): void {
+    const activeFilter = this._ventasFilter()[eventoId];
+    this.loadVentas(eventoId, activeFilter).subscribe();
+    this.loadMovimientos(eventoId);
+    this.loadKpis(eventoId);
+  }
+
+  private _notifyVentaDeleted(response: DeleteVentaResponse): void {
+    if (response.hermanasEliminadas > 0) {
+      const total = response.hermanasEliminadas + 1;
+      this.notificationService.showSuccess(
+        `Se eliminó la venta junto con ${response.hermanasEliminadas} venta(s) más del mismo lote (${total} en total)`,
+      );
+      return;
+    }
+    this.notificationService.showSuccess('Venta eliminada exitosamente');
+  }
+
+  deleteMovimiento(eventoId: string, movimientoId: string): Observable<void> {
+    this._markDeleting(movimientoId);
+    return this.movimientosApi.delete(movimientoId).pipe(
+      tap(() => {
+        this._movimientos.update((prev) => ({
+          ...prev,
+          [eventoId]: (prev[eventoId] ?? []).filter((m) => m.id !== movimientoId),
+        }));
+        this.notificationService.showSuccess('Movimiento eliminado exitosamente');
+        this.loadKpis(eventoId);
+      }),
+      catchError((err: unknown) => {
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al eliminar movimiento'));
+        return throwError(() => err);
+      }),
+      finalize(() => this._unmarkDeleting(movimientoId)),
+    );
+  }
+
+  private _markDeleting(id: string): void {
+    this._deletingIds.update((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  }
+
+  private _unmarkDeleting(id: string): void {
+    this._deletingIds.update((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
   }
 
   select(id: string | null): void {
@@ -269,18 +384,29 @@ export class EventosStateService {
   // Venta Actions
   // ============================================================================
 
-  loadVentas(eventoId: string): void {
+  /**
+   * Loads ventas for an evento, optionally filtered by vendedor name.
+   * Returns a cold Observable so callers (e.g. a debounced search input)
+   * can compose it with `switchMap` and auto-cancel stale in-flight
+   * requests when a newer query arrives.
+   *
+   * The active filter is persisted in `_ventasFilter` so post-mutation
+   * refreshes can re-apply it transparently.
+   */
+  loadVentas(eventoId: string, vendedor?: string): Observable<VentaProducto[]> {
     this._loading.set(true);
+    this._ventasFilter.update((prev) => ({ ...prev, [eventoId]: vendedor }));
 
-    this.apiService.getVentas(eventoId).subscribe({
-      next: (ventas) => {
+    return this.apiService.getVentas(eventoId, vendedor).pipe(
+      tap((ventas) => {
         this._ventas.update((prev) => ({ ...prev, [eventoId]: ventas }));
         this._loading.set(false);
-      },
-      error: (err: unknown) => {
+      }),
+      catchError((err: unknown) => {
         this._handleError(err, 'Error al cargar ventas');
-      },
-    });
+        return EMPTY;
+      }),
+    );
   }
 
   registrarVenta(eventoId: string, dto: CreateVentaProductoDto): Observable<VentaProducto> {
@@ -358,6 +484,7 @@ export class EventosStateService {
     this._loading.set(false);
     this._error.set(null);
     this._selectedId.set(null);
+    this._deletingIds.set(new Set());
   }
 
   private _handleError(err: unknown, fallback: string): void {

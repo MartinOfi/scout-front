@@ -8,17 +8,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { of } from 'rxjs';
 
 import { EventoDetailComponent } from './evento-detail.component';
 import { EventosStateService } from '../../services/eventos-state.service';
 import { TipoEvento } from '../../../../shared/enums';
-import {
-  Evento,
-  EventoKpis,
-  Producto,
-  VentaProducto,
-  ResumenVentas,
-} from '../../../../shared/models';
+import { Evento, EventoKpis, Producto, VentaProducto } from '../../../../shared/models';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -51,14 +46,6 @@ function makeKpis(overrides: Partial<EventoKpis> = {}): EventoKpis {
   };
 }
 
-function makeResumenVentas(): ResumenVentas {
-  return {
-    productos: [],
-    ventasPorVendedor: [],
-    gananciaTotal: 3000,
-  };
-}
-
 // ---------------------------------------------------------------------------
 // Mock state factory
 // ---------------------------------------------------------------------------
@@ -71,12 +58,17 @@ function createMockState() {
     kpis: signal<Record<string, EventoKpis>>({}),
     productos: signal<Record<string, Producto[]>>({}),
     ventas: signal<Record<string, VentaProducto[]>>({}),
-    resumenVentas: signal<Record<string, ResumenVentas>>({}),
+    movimientos: signal<Record<string, unknown[]>>({}),
     loadById: jasmine.createSpy('loadById'),
     loadKpis: jasmine.createSpy('loadKpis'),
     loadProductos: jasmine.createSpy('loadProductos'),
-    loadVentas: jasmine.createSpy('loadVentas'),
-    loadResumenVentas: jasmine.createSpy('loadResumenVentas'),
+    /**
+     * loadVentas now returns a cold Observable (the component pipes it
+     * through switchMap), so the spy must return an observable too —
+     * a bare jasmine spy returns undefined and would crash on .subscribe().
+     */
+    loadVentas: jasmine.createSpy('loadVentas').and.returnValue(of([])),
+    loadMovimientos: jasmine.createSpy('loadMovimientos'),
   };
 }
 
@@ -140,11 +132,9 @@ describe('EventoDetailComponent', () => {
     });
 
     it('should call loadProductos and loadVentas for VENTA evento', () => {
-      // setUp: evento is VENTA type (default mockState.selected is null during init,
-      // but loadProductos/loadVentas are called unconditionally by the component)
       expect(mockState.loadProductos).toHaveBeenCalledWith('evt-1');
       expect(mockState.loadVentas).toHaveBeenCalledWith('evt-1');
-      expect(mockState.loadResumenVentas).toHaveBeenCalledWith('evt-1');
+      expect(mockState.loadMovimientos).toHaveBeenCalledWith('evt-1');
     });
   });
 
@@ -187,12 +177,6 @@ describe('EventoDetailComponent', () => {
     it('should return empty array when no productos', () => {
       mockState.productos.set({});
       expect(component.eventoProductos()).toEqual([]);
-    });
-
-    it('should derive eventoResumenVentas from state.resumenVentas', () => {
-      const resumen = makeResumenVentas();
-      mockState.resumenVentas.set({ 'evt-1': resumen });
-      expect(component.eventoResumenVentas()).toBe(resumen);
     });
   });
 

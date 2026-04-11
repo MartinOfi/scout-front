@@ -3,15 +3,10 @@
  * Dumb Component — expedition-inspired design, mirrors CampamentoCardComponent
  */
 
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { Evento } from '../../../../../../shared/models';
 import { TipoEvento, TIPO_EVENTO_LABELS } from '../../../../../../shared/enums';
@@ -19,16 +14,18 @@ import { TipoEvento, TIPO_EVENTO_LABELS } from '../../../../../../shared/enums';
 @Component({
   selector: 'app-evento-card',
   standalone: true,
-  imports: [CommonModule, MatIconModule, DatePipe],
+  imports: [CommonModule, MatIconModule, MatProgressSpinnerModule, DatePipe],
   templateUrl: './evento-card.component.html',
   styleUrl: './evento-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EventoCardComponent {
   @Input({ required: true }) evento!: Evento;
+  @Input() deleting = false;
 
   @Output() select = new EventEmitter<string>();
   @Output() edit = new EventEmitter<string>();
+  @Output() delete = new EventEmitter<string>();
 
   get tipoLabel(): string {
     return TIPO_EVENTO_LABELS[this.evento.tipo] ?? this.evento.tipo;
@@ -48,5 +45,9 @@ export class EventoCardComponent {
 
   onEdit(): void {
     this.edit.emit(this.evento.id);
+  }
+
+  onDelete(): void {
+    this.delete.emit(this.evento.id);
   }
 }

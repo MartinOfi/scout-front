@@ -397,6 +397,271 @@ $section-gap: 20px;
     &--positive { color: t.$color-success; }
     &--negative { color: t.$color-error; }
   }
+
+  &__delete {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    color: t.$stone-400;
+    cursor: pointer;
+    transition: background-color 150ms ease, color 150ms ease;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &:hover:not(:disabled) {
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  &--deleting {
+    opacity: 0.55;
+    pointer-events: none;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// VENTAS INDIVIDUALES
+// -----------------------------------------------------------------------------
+
+.ventas-individuales {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: t.$stone-700;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      color: t.$stone-500;
+    }
+  }
+
+  /**
+   * Auto-fill grid: 1 column on narrow viewports, 2-4 columns as space
+   * grows. minmax floor of 260px keeps each card readable on mobile while
+   * still allowing dense packing on desktop. The 8px gap matches the
+   * 8pt spacing rhythm used elsewhere in the page.
+   */
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 8px;
+  }
+}
+
+// =============================================================================
+// VENTA CARD — COMPACT BENTO STYLE
+// Data-dense, info-first, minimal chrome. Tabular numerics for clean alignment.
+// =============================================================================
+
+.venta-card {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: white;
+  border: 1px solid t.$stone-200;
+  transition: opacity 200ms ease, border-color 150ms ease;
+  font-variant-numeric: tabular-nums;
+
+  &:hover {
+    border-color: t.$stone-300;
+  }
+
+  &--deleting {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  // ----- Singleton (1 producto): zero internal chrome -----
+  // Header keeps the vendedor + close, items collapses to a single inline
+  // row, footer is hidden. The whole card stays under ~70px tall.
+  &--singleton {
+    .venta-card__items {
+      background: transparent;
+      padding: 4px 0 0;
+      border-top: 1px dashed t.$stone-200;
+      margin-top: 6px;
+    }
+  }
+
+  // ===== HEADER =====
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  &__identity {
+    flex: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  &__vendedor {
+    font-size: 13px;
+    font-weight: 600;
+    color: t.$stone-800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__date {
+    flex-shrink: 0;
+    font-size: 11px;
+    color: t.$stone-500;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  &__delete {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: transparent;
+    border: none;
+    color: t.$stone-400;
+    cursor: pointer;
+    transition: background-color 150ms ease, color 150ms ease;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover:not(:disabled) {
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  // ===== ITEMS LIST =====
+
+  &__items {
+    list-style: none;
+    margin: 6px 0 0;
+    padding: 6px 8px;
+    border-radius: 6px;
+    background-color: t.$stone-50;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  /**
+   * Each item is a single row with three slots:
+   *   [ producto name (flex-1) ] [ ×qty (auto) ] [ ganancia (auto, right) ]
+   *
+   * The producto name truncates if too long; the qty and ganancia are
+   * tabular-aligned so multiple rows form clean visual columns.
+   */
+  &__item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 2px 0;
+  }
+
+  &__item-name {
+    flex: 1;
+    font-size: 12px;
+    color: t.$stone-700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+
+  &__item-cantidad {
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 600;
+    color: t.$stone-500;
+  }
+
+  &__item-ganancia {
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: t.$color-success;
+    min-width: 60px;
+    text-align: right;
+  }
+
+  // ===== FOOTER (only for lotes) =====
+
+  &__footer {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed t.$stone-200;
+  }
+
+  &__footer-label {
+    flex: 1;
+    font-size: 10px;
+    color: t.$stone-500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+  }
+
+  &__footer-units {
+    font-size: 11px;
+    color: t.$stone-500;
+    font-weight: 500;
+  }
+
+  &__footer-total {
+    font-size: 13px;
+    font-weight: 700;
+    color: t.$color-success;
+    min-width: 60px;
+    text-align: right;
+  }
 }
 
 // -----------------------------------------------------------------------------

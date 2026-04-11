@@ -18,7 +18,8 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
-import { from, Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
 
 import { EventosStateService } from '../../services/eventos-state.service';
 import { PersonasApiService } from '../../../personas/services/personas-api.service';
@@ -30,16 +31,13 @@ import {
   Persona,
   Producto,
   VentaProducto,
-  ResumenVentas,
 } from '../../../../shared/models';
-import { TableColumn, TableData } from '../../../../shared/models/table.model';
-import { formatMoney, MoneyPipe } from '../../../../shared/pipes/money.pipe';
+import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
 import {
   StatCardComponent,
   StatCardVariant,
 } from '../../../../shared/components/stat-card/stat-card.component';
 import { ProductoCardComponent } from '../../../../shared/components/producto-card/producto-card.component';
-import { DataTableComponent } from '../../../../shared/components/tables/data-table.component';
 import {
   ButtonTabsComponent,
   TabConfig,
@@ -48,6 +46,50 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { TextFieldComponent } from '../../../../shared/components/form/text-field/text-field.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ConfirmDialogService } from '../../../../shared/services/confirm-dialog.service';
+
+/**
+ * One row inside a VentaGroup, pre-augmented with the computed ganancia
+ * so the template stays free of arithmetic.
+ */
+interface VentaItemView {
+  ventaId: string;
+  productoNombre: string;
+  cantidad: number;
+  ganancia: number;
+}
+
+/**
+ * Visual grouping of ventas that share the same backend movimientoId.
+ *
+ * The backend cascade-deletes a whole lote when any of its ventas is removed,
+ * so the UI must also represent the lote as a single unit. Each VentaGroup
+ * is rendered as one card with all its products inside and ONE delete button.
+ *
+ * Ungrouped ventas (movimientoId === null, i.e. legacy rows) become a group
+ * of size 1 with a synthetic key derived from the venta id.
+ */
+interface VentaGroup {
+  /** Stable key for *ngFor / @for tracking. */
+  key: string;
+  /** Movimiento that backs the lote, or null for legacy individual ventas. */
+  movimientoId: string | null;
+  /** First venta of the group — used as the id passed to the delete endpoint. */
+  primaryVentaId: string;
+  /** Display name of the vendedor (taken from the first venta). */
+  vendedorNombre: string;
+  /** Total units across all ventas in this group. */
+  totalUnidades: number;
+  /** Sum of ganancia across every venta in the group. */
+  gananciaTotal: number;
+  /** Item rows pre-computed with ganancia per venta. */
+  items: VentaItemView[];
+  /** Snapshot timestamp of the first venta — used as the lote date. */
+  fecha: string;
+  /** True when the group is a singleton (1 venta) — enables condensed UI. */
+  isSingleton: boolean;
+}
 
 interface KpiConfig {
   readonly icon: string;
@@ -81,9 +123,9 @@ const TABS_GRUPO: TabConfig[] = [{ key: 'movimientos', label: 'Movimientos', ico
     LoadingSpinnerComponent,
     EmptyStateComponent,
     ProductoCardComponent,
-    DataTableComponent,
     ButtonComponent,
     TextFieldComponent,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './evento-detail.component.html',
   styleUrls: ['./evento-detail.component.scss'],
@@ -93,15 +135,16 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly dialog = inject(MatDialog);
+  private readonly confirmDialog = inject(ConfirmDialogService);
   readonly state = inject(EventosStateService);
   private readonly personasApi = inject(PersonasApiService);
 
   private eventoId = '';
+  private destroyed = false;
   private readonly destroy$ = new Subject<void>();
   private readonly vendedorSearch$ = new Subject<string>();
 
   readonly vendedorSearch = signal('');
-  readonly vendedorSearching = signal(false);
 
   readonly loading = this.state.loading;
   readonly personas = signal<Persona[]>([]);
@@ -121,9 +164,15 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
     this.eventoId ? (this.state.ventas()[this.eventoId] ?? []) : [],
   );
 
-  readonly eventoResumenVentas = computed((): ResumenVentas | null =>
-    this.eventoId ? (this.state.resumenVentas()[this.eventoId] ?? null) : null,
-  );
+  /**
+   * Groups eventoVentas() by movimientoId so the UI mirrors the backend
+   * cascade semantics. The vendor filter is applied server-side via
+   * loadVentas(eventoId, vendedor); this computed only groups what the
+   * state already holds.
+   */
+  readonly ventaGroups = computed((): VentaGroup[] => {
+    return this._groupVentasByLote(this.eventoVentas());
+  });
 
   readonly eventoMovimientos = computed((): Movimiento[] =>
     this.eventoId ? (this.state.movimientos()[this.eventoId] ?? []) : [],
@@ -148,31 +197,6 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
     { icon: 'savings', title: 'Balance', key: 'balance', variant: 'primary' },
   ];
 
-  readonly ventasColumns: TableColumn[] = [
-    { key: 'vendedor', header: 'Vendedor', type: 'text', sortable: true },
-    { key: 'producto', header: 'Producto', type: 'text', sortable: true },
-    { key: 'cantidad', header: 'Cantidad', type: 'number', sortable: true },
-    {
-      key: 'ganancia',
-      header: 'Ganancia',
-      type: 'text',
-      formatter: (value) => formatMoney(value as number),
-    },
-  ];
-
-  readonly ventasTableData = computed((): TableData[] => {
-    const resumen = this.eventoResumenVentas();
-    if (!resumen) return [];
-    return resumen.ventasPorVendedor.flatMap((v) =>
-      v.desglose.map((d) => ({
-        vendedor: v.vendedorNombre,
-        producto: d.nombreProducto,
-        cantidad: d.cantidad,
-        ganancia: d.ganancia,
-      })),
-    );
-  });
-
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) return;
@@ -181,31 +205,35 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
     this.state.loadById(id);
     this.state.loadKpis(id);
     this.state.loadProductos(id);
-    this.state.loadVentas(id);
-    this.state.loadResumenVentas(id);
+    this.state.loadVentas(id).subscribe();
     this.state.loadMovimientos(id);
     this.activeTab.set('productos');
 
     this.personasApi.getAll().subscribe((ps) => this.personas.set(ps));
 
+    /**
+     * switchMap auto-cancels the previous in-flight request when a newer
+     * query arrives, preventing a stale "mar" response from clobbering a
+     * fresher "mario" response in the state signal.
+     */
     this.vendedorSearch$
-      .pipe(debounceTime(400), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe((query) => {
-        this.state.loadResumenVentas(this.eventoId, query || undefined).subscribe({
-          next: () => this.vendedorSearching.set(false),
-          error: () => this.vendedorSearching.set(false),
-        });
-      });
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((query) => this.state.loadVentas(this.eventoId, query.trim() || undefined)),
+        takeUntil(this.destroy$),
+      )
+      .subscribe();
   }
 
   ngOnDestroy(): void {
+    this.destroyed = true;
     this.destroy$.next();
     this.destroy$.complete();
   }
 
   onVendedorSearchChange(value: string): void {
     this.vendedorSearch.set(value);
-    this.vendedorSearching.set(true);
     this.vendedorSearch$.next(value);
   }
 
@@ -226,59 +254,142 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   }
 
   openProductoDialog(): void {
-    from(
-      import('../shared/producto-dialog/producto-dialog.component').then(
-        ({ ProductoDialogComponent }) => {
-          this.dialog.open(ProductoDialogComponent, {
-            width: '420px',
-            maxWidth: '95vw',
-            data: { eventoId: this.eventoId },
-            disableClose: false,
-          });
-        },
-      ),
-    ).subscribe();
+    void import('../shared/producto-dialog/producto-dialog.component').then(
+      ({ ProductoDialogComponent }) => {
+        if (this.destroyed) return;
+        this.dialog.open(ProductoDialogComponent, {
+          width: '420px',
+          maxWidth: '95vw',
+          data: { eventoId: this.eventoId },
+          disableClose: false,
+        });
+      },
+    );
   }
 
   openIngresoDialog(): void {
-    from(
-      import('../shared/ingreso-evento-dialog/ingreso-evento-dialog.component').then(
-        ({ IngresoEventoDialogComponent }) => {
-          const ref = this.dialog.open(IngresoEventoDialogComponent, {
-            width: '480px',
-            maxWidth: '95vw',
-            data: { responsables: this.personas() },
-          });
-          ref.afterClosed().subscribe((result) => {
-            if (result?.dto) {
-              this.state.registrarIngreso(this.eventoId, result.dto).subscribe();
-            }
-          });
-        },
-      ),
-    ).subscribe();
+    void import('../shared/ingreso-evento-dialog/ingreso-evento-dialog.component').then(
+      ({ IngresoEventoDialogComponent }) => {
+        if (this.destroyed) return;
+        const ref = this.dialog.open(IngresoEventoDialogComponent, {
+          width: '480px',
+          maxWidth: '95vw',
+          data: { responsables: this.personas() },
+        });
+        ref.afterClosed().subscribe((result) => {
+          if (result?.dto) {
+            this.state.registrarIngreso(this.eventoId, result.dto).subscribe();
+          }
+        });
+      },
+    );
   }
 
   openGastoDialog(): void {
-    from(
-      import('../shared/gasto-evento-dialog/gasto-evento-dialog.component').then(
-        ({ GastoEventoDialogComponent }) => {
-          this.dialog.open(GastoEventoDialogComponent, {
-            width: '480px',
-            maxWidth: '95vw',
-            data: { eventoId: this.eventoId, responsables: this.personas() },
-            disableClose: false,
-          });
-        },
-      ),
-    ).subscribe();
+    void import('../shared/gasto-evento-dialog/gasto-evento-dialog.component').then(
+      ({ GastoEventoDialogComponent }) => {
+        if (this.destroyed) return;
+        this.dialog.open(GastoEventoDialogComponent, {
+          width: '480px',
+          maxWidth: '95vw',
+          data: { eventoId: this.eventoId, responsables: this.personas() },
+          disableClose: false,
+        });
+      },
+    );
   }
 
   onRemoveProducto(productoId: string): void {
     this.state.deleteProducto(this.eventoId, productoId).subscribe();
   }
 
+  onDeleteVenta(ventaId: string): void {
+    this.confirmDialog.confirmDelete('venta').subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.state.deleteVenta(this.eventoId, ventaId).subscribe();
+      }
+    });
+  }
+
+  onDeleteMovimiento(movimientoId: string): void {
+    this.confirmDialog.confirmDelete('movimiento').subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.state.deleteMovimiento(this.eventoId, movimientoId).subscribe();
+      }
+    });
+  }
+
+  isDeleting(id: string): boolean {
+    return this.state.isDeleting(id);
+  }
+
+  /**
+   * A lote group is "deleting" if its primary venta id is in the deletingIds
+   * set. We pass that primary id to the backend; the backend cascades to the
+   * siblings, and the loader shows on the whole card while the request runs.
+   */
+  isGroupDeleting(group: VentaGroup): boolean {
+    return this.state.isDeleting(group.primaryVentaId);
+  }
+
   navigateToVentasLote(): void {
     this.router.navigate(['/eventos', this.eventoId, 'ventas', 'registrar']);
+  }
+
+  /**
+   * Pure helper that buckets ventas by their movimientoId.
+   * Ventas with movimientoId === null become singleton groups keyed by the
+   * venta id, so the rendering code can treat both shapes uniformly.
+   *
+   * Each item is pre-computed with its individual ganancia so the template
+   * never does arithmetic — keeps the view a "thin projection".
+   */
+  private _groupVentasByLote(ventas: VentaProducto[]): VentaGroup[] {
+    const groups = new Map<string, VentaGroup>();
+    for (const venta of ventas) {
+      const key = venta.movimientoId ?? `solo:${venta.id}`;
+      const item = this._buildVentaItemView(venta);
+      const existing = groups.get(key);
+      if (existing) {
+        groups.set(key, {
+          ...existing,
+          items: [...existing.items, item],
+          totalUnidades: existing.totalUnidades + item.cantidad,
+          gananciaTotal: existing.gananciaTotal + item.ganancia,
+          isSingleton: false,
+        });
+        continue;
+      }
+      groups.set(key, {
+        key,
+        movimientoId: venta.movimientoId,
+        primaryVentaId: venta.id,
+        vendedorNombre: venta.vendedor?.nombre ?? 'Sin vendedor',
+        totalUnidades: item.cantidad,
+        gananciaTotal: item.ganancia,
+        items: [item],
+        fecha: venta.createdAt,
+        isSingleton: true,
+      });
+    }
+    return Array.from(groups.values());
+  }
+
+  /**
+   * Builds the per-row view object with ganancia computed from the nested
+   * producto. Falls back to 0 if precios are missing (shouldn't happen,
+   * but the UI must not crash on stale data).
+   */
+  private _buildVentaItemView(venta: VentaProducto): VentaItemView {
+    const producto = venta.producto;
+    const precioVenta = Number(producto?.precioVenta ?? 0);
+    const precioCosto = Number(producto?.precioCosto ?? 0);
+    const ganancia = (precioVenta - precioCosto) * venta.cantidad;
+    return {
+      ventaId: venta.id,
+      productoNombre: producto?.nombre ?? 'Producto',
+      cantidad: venta.cantidad,
+      ganancia,
+    };
   }
 }

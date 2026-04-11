@@ -18,8 +18,14 @@
   overflow: hidden;
   transition:
     transform 200ms ease-out,
-    box-shadow 200ms ease-out;
+    box-shadow 200ms ease-out,
+    opacity 200ms ease-out;
   cursor: pointer;
+
+  &--deleting {
+    opacity: 0.55;
+    pointer-events: none;
+  }
 
   &:hover {
     transform: translateY(-2px);
@@ -261,5 +267,10 @@
   &:hover {
     background-color: t.$stone-200;
     color: t.$stone-700;
+  }
+
+  &--danger:hover {
+    background-color: #fee2e2;
+    color: #b91c1c;
   }
 }
