@@ -43,6 +43,7 @@ import {
   PERSONA_TYPE_ROUTES,
 } from '../../../../shared/constants/persona.constants';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { ConfirmDialogService } from '../../../../shared/services/confirm-dialog.service';
 
 interface StatConfig {
   readonly icon: string;
@@ -91,6 +92,7 @@ type TabKey = RamaTabKey | PersonaTabKey | SpecialTabKey;
 export class PersonasDashboardComponent implements OnInit {
   private readonly state = inject(PersonasStateService);
   private readonly router = inject(Router);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   readonly loading = this.state.loading;
   readonly error = this.state.error;
@@ -226,6 +228,9 @@ export class PersonasDashboardComponent implements OnInit {
       case 'edit':
         this.navigateToEdit(row.id, tipo);
         break;
+      case 'delete':
+        this.confirmDelete(row);
+        break;
     }
   }
 
@@ -233,7 +238,28 @@ export class PersonasDashboardComponent implements OnInit {
     return [
       { key: 'view', label: 'Ver', icon: 'visibility', tooltip: 'Ver detalle' },
       { key: 'edit', label: 'Editar', icon: 'edit', tooltip: 'Editar persona' },
+      { key: 'delete', label: 'Eliminar', icon: 'delete', tooltip: 'Eliminar persona' },
     ];
+  }
+
+  private confirmDelete(row: PersonaTableRow): void {
+    const entityName = this.getEntityName(row.tipo);
+    this.confirmDialog.confirmDelete(entityName).subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.state.delete(row.id).subscribe();
+      }
+    });
+  }
+
+  private getEntityName(tipo: PersonaType): string {
+    switch (tipo) {
+      case PersonaType.PROTAGONISTA:
+        return 'protagonista';
+      case PersonaType.EDUCADOR:
+        return 'educador';
+      case PersonaType.EXTERNA:
+        return 'persona externa';
+    }
   }
 
   private getProtagonistasbyRama(rama: Rama): Protagonista[] {
