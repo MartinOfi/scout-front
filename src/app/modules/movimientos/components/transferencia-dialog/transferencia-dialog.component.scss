@@ -1,0 +1,70 @@
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  min-width: 480px;
+  max-width: 560px;
+  padding: 1rem;
+}
+
+.dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.dialog-content {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.dialog-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 2rem 0;
+}
+
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 1rem 0;
+}
+
+.input-with-prefix {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  .input-prefix {
+    font-weight: 600;
+    color: #475569;
+  }
+}
+
+.dialog-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #b91c1c;
+  font-size: 0.9rem;
+
+  mat-icon {
+    color: #dc2626;
+  }
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 1rem 0 0;
+}

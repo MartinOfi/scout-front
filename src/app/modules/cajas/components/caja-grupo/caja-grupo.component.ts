@@ -11,6 +11,9 @@ import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog } from '@angular/material/dialog';
+
+import { TransferenciaDialogComponent } from '../../../movimientos/components/transferencia-dialog/transferencia-dialog.component';
 
 import { CajasStateService } from '../../services/cajas-state.service';
 import { CajaConSaldo, Movimiento } from '../../../../shared/models';
@@ -51,6 +54,7 @@ import { RAMA_LABELS, RamaEnum } from '../../../../shared/enums/persona.enum';
 export class CajaGrupoComponent implements OnInit {
   private readonly state = inject(CajasStateService);
   private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
 
   // Signals del estado
   readonly cajaGrupo = this.state.cajaGrupo;
@@ -138,6 +142,22 @@ export class CajaGrupoComponent implements OnInit {
         queryParams: { cajaId: caja.id },
       });
     }
+  }
+
+  onTransferir(): void {
+    const caja = this.cajaGrupo();
+    if (!caja) return;
+    const ref = this.dialog.open(TransferenciaDialogComponent, {
+      data: { cajaGrupo: caja },
+      autoFocus: false,
+      restoreFocus: false,
+    });
+    ref.afterClosed().subscribe((ok) => {
+      if (ok) {
+        this.state.loadCajaGrupo();
+        this.state.loadMovimientosGrupo();
+      }
+    });
   }
 
   onVerMovimiento(id: string): void {

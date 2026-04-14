@@ -1,0 +1,16 @@
+<div class="readonly-card">
+  @if (label()) {
+    <span class="readonly-card__label">{{ label() }}</span>
+  }
+  <div class="readonly-card__row">
+    @if (icon()) {
+      <mat-icon class="readonly-card__icon">{{ icon() }}</mat-icon>
+    }
+    <div class="readonly-card__text">
+      <p class="readonly-card__title">{{ title() }}</p>
+      @if (meta()) {
+        <p class="readonly-card__meta">{{ meta() }}</p>
+      }
+    </div>
+  </div>
+</div>

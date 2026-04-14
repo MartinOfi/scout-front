@@ -8,6 +8,8 @@ import {
   ReembolsoPendiente,
   PaginatedResponse,
   PaginationParams,
+  CreateTransferenciaDto,
+  TransferenciaResult,
 } from '../../../shared/models';
 import { HttpService } from '../../../shared/services';
 import { API_CONFIG } from '../../../shared/constants';
@@ -78,6 +80,17 @@ export class MovimientosApiService {
    */
   create(dto: CreateMovimientoDto): Observable<Movimiento> {
     return this.http.post<Movimiento, CreateMovimientoDto>(this.endpoint, dto);
+  }
+
+  /**
+   * Transfer funds between two cajas.
+   * Backend creates egreso + ingreso atomically and links them.
+   */
+  crearTransferencia(dto: CreateTransferenciaDto): Observable<TransferenciaResult> {
+    return this.http.post<TransferenciaResult, CreateTransferenciaDto>(
+      `${this.endpoint}/transferencia`,
+      dto,
+    );
   }
 
   /**

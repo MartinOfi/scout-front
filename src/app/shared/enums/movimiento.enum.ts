@@ -53,6 +53,7 @@ export enum ConceptoMovimiento {
 
   // Transferencias internas
   TRANSFERENCIA_BAJA = 'transferencia_baja',
+  TRANSFERENCIA_ENTRE_CAJAS = 'transferencia_entre_cajas',
 
   // Uso de saldo personal (egreso de cuenta personal)
   USO_SALDO_PERSONAL = 'uso_saldo_personal',
@@ -77,6 +78,7 @@ export const CONCEPTO_MOVIMIENTO_LABELS: Record<ConceptoMovimiento, string> = {
   [ConceptoMovimiento.AJUSTE_INICIAL]: 'Ajuste Inicial',
   [ConceptoMovimiento.ASIGNACION_FONDO_RAMA]: 'Asignación a Fondo de Rama',
   [ConceptoMovimiento.TRANSFERENCIA_BAJA]: 'Transferencia por Baja',
+  [ConceptoMovimiento.TRANSFERENCIA_ENTRE_CAJAS]: 'Transferencia entre Cajas',
   [ConceptoMovimiento.USO_SALDO_PERSONAL]: 'Uso de Saldo Personal',
 } as const;
 
@@ -117,4 +119,38 @@ export enum EstadoPago {
 export const ESTADO_PAGO_LABELS: Record<EstadoPago, string> = {
   [EstadoPago.PAGADO]: 'Pagado',
   [EstadoPago.PENDIENTE_REEMBOLSO]: 'Pendiente de Reembolso',
+} as const;
+
+/**
+ * Whitelist of concepts that can be created manually via the individual form.
+ * All other concepts are system-generated from events/camps/inscripciones/cuotas.
+ */
+export const CONCEPTOS_CREABLES_MANUALMENTE: readonly ConceptoMovimiento[] = [
+  ConceptoMovimiento.GASTO_GENERAL,
+  ConceptoMovimiento.AJUSTE_INICIAL,
+] as const;
+
+/**
+ * Category of movement — orthogonal axis to concepto, used for reports.
+ */
+export enum CategoriaMovimiento {
+  INSUMOS = 'insumos',
+  COMIDA = 'comida',
+  TRANSPORTE = 'transporte',
+  ALQUILER = 'alquiler',
+  SERVICIOS = 'servicios',
+  MATERIAL_DIDACTICO = 'material_didactico',
+  MANTENIMIENTO = 'mantenimiento',
+  OTROS = 'otros',
+}
+
+export const CATEGORIA_MOVIMIENTO_LABELS: Record<CategoriaMovimiento, string> = {
+  [CategoriaMovimiento.INSUMOS]: 'Insumos',
+  [CategoriaMovimiento.COMIDA]: 'Comida',
+  [CategoriaMovimiento.TRANSPORTE]: 'Transporte',
+  [CategoriaMovimiento.ALQUILER]: 'Alquiler',
+  [CategoriaMovimiento.SERVICIOS]: 'Servicios',
+  [CategoriaMovimiento.MATERIAL_DIDACTICO]: 'Material Didáctico',
+  [CategoriaMovimiento.MANTENIMIENTO]: 'Mantenimiento',
+  [CategoriaMovimiento.OTROS]: 'Otros',
 } as const;

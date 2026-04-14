@@ -24,7 +24,14 @@ import { MovimientosApiService } from '../../services/movimientos-api.service';
 import { MovimientosFormBuilder } from '../../services/movimientos-form.builder';
 import { CajasApiService } from '../../../cajas/services/cajas-api.service';
 import { PersonasApiService } from '../../../personas/services/personas-api.service';
-import { TipoMovimientoEnum, MedioPagoEnum, EstadoPago, CajaType } from '../../../../shared/enums';
+import {
+  TipoMovimientoEnum,
+  MedioPagoEnum,
+  EstadoPago,
+  CajaType,
+  CategoriaMovimiento,
+  CATEGORIA_MOVIMIENTO_LABELS,
+} from '../../../../shared/enums';
 import { CajaConSaldo, PersonaUnion, Movimiento } from '../../../../shared/models';
 
 // Shared Form Components
@@ -116,6 +123,11 @@ export class MovimientoFormComponent implements OnInit {
     { value: EstadoPago.PAGADO, label: 'Pagado' },
     { value: EstadoPago.PENDIENTE_REEMBOLSO, label: 'Pendiente de Reembolso' },
   ];
+
+  readonly categoriaOptions: SelectOption[] = Object.values(CategoriaMovimiento).map((value) => ({
+    value,
+    label: CATEGORIA_MOVIMIENTO_LABELS[value],
+  }));
 
   ngOnInit(): void {
     this.loadingData.set(true);

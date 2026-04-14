@@ -1,0 +1,118 @@
+<div class="dialog-container">
+
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon>compare_arrows</mat-icon>
+    Transferir entre Cajas
+  </h2>
+
+  <mat-dialog-content class="dialog-content">
+
+    @if (loading()) {
+      <div class="dialog-state">
+        <mat-spinner diameter="40" />
+        <p>Cargando cajas y responsables...</p>
+      </div>
+    } @else if (saving()) {
+      <div class="dialog-state">
+        <mat-spinner diameter="40" />
+        <p>Registrando transferencia...</p>
+      </div>
+    } @else {
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="dialog-form">
+
+        <!-- Caja origen: FIJA (caja de grupo) -->
+        <app-readonly-card
+          label="Origen"
+          icon="account_balance"
+          title="Caja de Grupo"
+          [meta]="saldoOrigenLabel()" />
+
+        <!-- Caja destino -->
+        <app-form-field
+          label="Destino"
+          [forId]="'transfer-destino'"
+          [required]="true"
+          [invalid]="!!(form.get('cajaDestinoId')?.invalid && form.get('cajaDestinoId')?.touched)">
+          <app-select-field
+            id="transfer-destino"
+            formControlName="cajaDestinoId"
+            placeholder="Seleccionar caja destino"
+            [options]="destinos()"
+            optionValue="value"
+            optionLabel="label"
+            [searchable]="true" />
+          <span error>Debe seleccionar una caja destino</span>
+        </app-form-field>
+
+        <!-- Monto -->
+        <app-form-field
+          label="Monto"
+          [forId]="'transfer-monto'"
+          [required]="true"
+          [invalid]="!!(form.get('monto')?.invalid && form.get('monto')?.touched)">
+          <div class="input-with-prefix">
+            <span class="input-prefix">$</span>
+            <app-number-field
+              id="transfer-monto"
+              formControlName="monto"
+              [min]="0"
+              [step]="0.01"
+              placeholder="0.00" />
+          </div>
+          <span error>Ingresá un monto válido mayor a cero</span>
+        </app-form-field>
+
+        <!-- Responsable: tomado del usuario autenticado -->
+        <app-readonly-card
+          label="Responsable"
+          icon="person"
+          [title]="responsableLabel()"
+          meta="Se registra automáticamente con tu usuario" />
+
+        <!-- Fecha -->
+        <app-form-field
+          label="Fecha"
+          [forId]="'transfer-fecha'"
+          [required]="true">
+          <app-date-field id="transfer-fecha" formControlName="fecha" />
+        </app-form-field>
+
+        <!-- Descripción -->
+        <app-form-field label="Descripción" [forId]="'transfer-descripcion'">
+          <app-textarea-field
+            id="transfer-descripcion"
+            formControlName="descripcion"
+            [rows]="2"
+            placeholder="Motivo de la transferencia (opcional)" />
+        </app-form-field>
+
+        @if (errorMessage()) {
+          <div class="dialog-error">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ errorMessage() }}</span>
+          </div>
+        }
+
+      </form>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions">
+    <app-button
+      variant="secondary"
+      [disabled]="saving()"
+      (clicked)="onCancel()">
+      Cancelar
+    </app-button>
+    <app-button
+      variant="primary"
+      icon="compare_arrows"
+      [disabled]="form.invalid || loading() || saving()"
+      [loading]="saving()"
+      (clicked)="onSubmit()">
+      Transferir
+    </app-button>
+  </mat-dialog-actions>
+
+</div>

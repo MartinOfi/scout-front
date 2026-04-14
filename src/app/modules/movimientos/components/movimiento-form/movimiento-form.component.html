@@ -68,6 +68,12 @@
             (conceptoChange)="onConceptoChange($event)">
           </app-concepto-selector>
 
+          <!-- Categoría (opcional, eje ortogonal al concepto) -->
+          <app-form-field label="Categoría" [forId]="'categoria-select'">
+            <app-select-field id="categoria-select" formControlName="categoria" placeholder="Seleccionar categoría"
+              [options]="categoriaOptions" optionValue="value" optionLabel="label" />
+          </app-form-field>
+
           <!-- Responsable Selector (CRITICAL - was missing!) -->
           <app-form-field label="Responsable" [forId]="'responsable-select'" [required]="true"
             [invalid]="!!(form.get('responsableId')?.invalid && form.get('responsableId')?.touched)">

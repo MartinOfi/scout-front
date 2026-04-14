@@ -3,7 +3,13 @@
  * Typed interfaces - NO any
  */
 
-import { TipoMovimientoEnum, ConceptoMovimiento, MedioPago, EstadoPago } from '../enums';
+import {
+  TipoMovimientoEnum,
+  ConceptoMovimiento,
+  MedioPago,
+  EstadoPago,
+  CategoriaMovimiento,
+} from '../enums';
 import { Persona } from './persona.model';
 import { Caja } from './caja.model';
 
@@ -17,6 +23,7 @@ export interface Movimiento {
   tipo: TipoMovimientoEnum;
   monto: number;
   concepto: ConceptoMovimiento;
+  categoria?: CategoriaMovimiento;
   descripcion?: string;
   responsableId: string;
   responsable?: Persona;
@@ -43,6 +50,7 @@ export interface CreateMovimientoDto {
   tipo: TipoMovimientoEnum;
   monto: number;
   concepto: ConceptoMovimiento;
+  categoria?: CategoriaMovimiento;
   descripcion?: string;
   responsableId: string;
   medioPago: MedioPago;
@@ -80,10 +88,32 @@ export interface MovimientosFilters {
   tipoCaja?: string;
   tipo?: TipoMovimientoEnum;
   concepto?: ConceptoMovimiento;
+  categoria?: CategoriaMovimiento;
   responsableId?: string;
   estadoPago?: EstadoPago;
   fechaInicio?: string;
   fechaFin?: string;
+}
+
+/**
+ * DTO for creating a transferencia between two cajas.
+ * Creates two linked movimientos (egreso in origen, ingreso in destino).
+ */
+export interface CreateTransferenciaDto {
+  cajaOrigenId: string;
+  cajaDestinoId: string;
+  monto: number;
+  responsableId: string;
+  descripcion?: string;
+  fecha?: string;
+}
+
+/**
+ * Response of a transferencia creation — the two linked movimientos.
+ */
+export interface TransferenciaResult {
+  egreso: Movimiento;
+  ingreso: Movimiento;
 }
 
 /**
