@@ -1,19 +1,11 @@
-// =============================================================================
-// TOKENS INDEX
-// =============================================================================
-// Single entry point for all design tokens.
-// Import this file to access all primitive tokens in your components.
-//
-// Usage:
-//   @use 'app/shared/styles/tokens' as t;
-//   .my-element {
-//     background: t.$brand-burgundy;
-//     border-radius: t.$radius-lg;
-//     box-shadow: t.$shadow-card;
-//   }
+// Aggregator — consumers import this single file to get all token layers.
 
-@forward 'colors';
-@forward 'radius';
-@forward 'shadows';
-@forward 'transitions';
-@forward 'spacing';
+@forward 'primitive';
+@forward 'brand';
+@forward 'surface';
+@forward 'text';
+@forward 'border';
+@forward 'shadow';
+@forward 'interactive';
+@forward 'rama';
+@forward 'status';

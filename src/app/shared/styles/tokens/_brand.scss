@@ -1,0 +1,43 @@
+// Scout brand palettes — derived from #812128 (burgundy) and #242167 (indigo).
+// Exposed as CSS custom properties for consumers that need raw brand colors.
+// Material theme creation is in material-theme.scss.
+
+:root {
+  --brand-burgundy-50:  #fdf2f3;
+  --brand-burgundy-100: #fbe5e6;
+  --brand-burgundy-200: #f7cfd2;
+  --brand-burgundy-300: #f0adb2;
+  --brand-burgundy-400: #e57f88;
+  --brand-burgundy-500: #d75462;
+  --brand-burgundy-600: #c23344;
+  --brand-burgundy-700: #a32738;
+  --brand-burgundy-800: #812128;
+  --brand-burgundy-900: #722025;
+  --brand-burgundy-950: #3f0d11;
+
+  --brand-indigo-50:  #f0f0ff;
+  --brand-indigo-100: #e4e4ff;
+  --brand-indigo-200: #cdcdff;
+  --brand-indigo-300: #a7a5ff;
+  --brand-indigo-400: #7c71ff;
+  --brand-indigo-500: #5840ff;
+  --brand-indigo-600: #461fff;
+  --brand-indigo-700: #3815eb;
+  --brand-indigo-800: #242167;
+  --brand-indigo-900: #1a184d;
+  --brand-indigo-950: #120f33;
+}
+
+[data-theme='light'] {
+  --brand-primary:        var(--brand-burgundy-800);
+  --brand-primary-hover:  var(--brand-burgundy-700);
+  --brand-primary-active: var(--brand-burgundy-900);
+  --brand-secondary:      var(--brand-indigo-800);
+}
+
+[data-theme='dark'] {
+  --brand-primary:        var(--brand-burgundy-400);
+  --brand-primary-hover:  var(--brand-burgundy-300);
+  --brand-primary-active: var(--brand-burgundy-500);
+  --brand-secondary:      var(--brand-indigo-300);
+}
