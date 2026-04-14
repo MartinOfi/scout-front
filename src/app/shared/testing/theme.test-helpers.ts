@@ -1,8 +1,6 @@
 import { signal } from '@angular/core';
-import {
-  DEFAULT_THEME,
-  type ThemeMode,
-} from '../constants/theme.constants';
+import { vi } from 'vitest';
+import { DEFAULT_THEME, type ThemeMode } from '../constants/theme.constants';
 
 export interface MockThemeStorageOptions {
   readonly initial?: ThemeMode | null;
@@ -10,9 +8,9 @@ export interface MockThemeStorageOptions {
 }
 
 export interface MockThemeStorage {
-  read: jasmine.Spy<() => ThemeMode | null>;
-  write: jasmine.Spy<(mode: ThemeMode) => void>;
-  clear: jasmine.Spy<() => void>;
+  read: ReturnType<typeof vi.fn>;
+  write: ReturnType<typeof vi.fn>;
+  clear: ReturnType<typeof vi.fn>;
 }
 
 export const createMockThemeStorage = (
@@ -21,19 +19,19 @@ export const createMockThemeStorage = (
   const state = signal<ThemeMode | null>(options.initial ?? null);
 
   return {
-    read: jasmine.createSpy('read').and.callFake(() => state()),
-    write: jasmine.createSpy('write').and.callFake((mode: ThemeMode) => {
+    read: vi.fn(() => state()),
+    write: vi.fn((mode: ThemeMode) => {
       if (options.throwOnWrite) {
         throw new Error('mock write failure');
       }
       state.set(mode);
     }),
-    clear: jasmine.createSpy('clear').and.callFake(() => state.set(null)),
+    clear: vi.fn(() => state.set(null)),
   };
 };
 
 export interface MockThemeDom {
-  applyTheme: jasmine.Spy<(mode: ThemeMode) => void>;
+  applyTheme: ReturnType<typeof vi.fn>;
   appliedModes: ThemeMode[];
 }
 
@@ -41,7 +39,7 @@ export const createMockThemeDom = (): MockThemeDom => {
   const appliedModes: ThemeMode[] = [];
   return {
     appliedModes,
-    applyTheme: jasmine.createSpy('applyTheme').and.callFake((mode: ThemeMode) => {
+    applyTheme: vi.fn((mode: ThemeMode) => {
       appliedModes.push(mode);
     }),
   };
