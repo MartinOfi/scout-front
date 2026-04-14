@@ -6,9 +6,13 @@
 // 1. SCSS MODULES (must be first)
 // -----------------------------------------------------------------------------
 
-// Design Token System (OKLCH-based)
+// Design Token System (theme-aware CSS custom properties + legacy SCSS variables)
+@use 'app/shared/styles/tokens';
 @use 'app/shared/styles/color-tokens';
 @use 'app/shared/styles/typography-scale';
+
+// Material 3 theme (replaces the prebuilt indigo-pink.css)
+@use 'app/shared/styles/material-theme';
 
 // Responsive System (breakpoints, mixins, CSS custom properties)
 @use 'app/shared/styles/responsive';
@@ -23,9 +27,6 @@
 
 // Google Fonts - Inter & Inter Tight
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@400;500;600&display=swap');
-
-// Material Theme - Indigo Pink (prebuilt)
-@import '@angular/material/prebuilt-themes/indigo-pink.css';
 
 // -----------------------------------------------------------------------------
 // 3. CSS CUSTOM PROPERTIES (DESIGN TOKENS)
@@ -147,8 +148,9 @@ body {
   font-family: var(--font-family-base);
   font-size: 16px;
   line-height: 1.5;
-  color: var(--gray-900);
-  background-color: #fafafa;
+  color: var(--text-primary);
+  background-color: var(--surface-page);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 // -----------------------------------------------------------------------------
@@ -165,7 +167,7 @@ h6 {
   font-family: var(--font-family-headings);
   font-weight: 500;
   line-height: 1.2;
-  color: var(--gray-900);
+  color: var(--text-primary);
 }
 
 h1 {
@@ -202,7 +204,7 @@ h6 {
 
 p {
   margin: 0 0 1rem;
-  color: var(--gray-700);
+  color: var(--text-secondary);
 }
 
 a {

@@ -1,6 +1,7 @@
 // Material 3 theme setup. Replaces the prebuilt indigo-pink theme.
-// Uses Material's built-in red (closest to scout burgundy) and indigo palettes
-// as a risk-minimizing starting point. Custom brand palettes are a follow-up.
+// Uses Material's built-in red (closest to scout burgundy) and violet (closest
+// to scout indigo #242167) palettes as a risk-minimizing starting point.
+// Custom brand palettes are a follow-up task in a later phase.
 
 @use '@angular/material' as mat;
 
@@ -8,7 +9,7 @@ html {
   @include mat.theme((
     color: (
       primary: mat.$red-palette,
-      tertiary: mat.$indigo-palette,
+      tertiary: mat.$violet-palette,
       theme-type: light,
     ),
     typography: (
@@ -23,7 +24,7 @@ html {
   @include mat.theme((
     color: (
       primary: mat.$red-palette,
-      tertiary: mat.$indigo-palette,
+      tertiary: mat.$violet-palette,
       theme-type: dark,
     ),
   ));
