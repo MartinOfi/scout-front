@@ -2,6 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <script>
+    // FOUC guard — set data-theme before Angular bootstrap so the first paint
+    // already matches the stored preference. Duplicates the storage key from
+    // src/app/shared/constants/theme.constants.ts intentionally (runs before
+    // the bundle loads). Keep both in sync.
+    (function () {
+      try {
+        var stored = localStorage.getItem('scout-theme-preference');
+        var mode = stored === 'dark' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', mode);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
   <title>Frontend</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
