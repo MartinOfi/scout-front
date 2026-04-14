@@ -1,28 +1,17 @@
-// Aggregator — consumers import this single file to get all token layers.
+// Legacy SCSS variable tokens — consumed by component stylesheets as
+// `@use '.../tokens' as t` → `t.$brand-burgundy`, `t.$radius-lg`, etc.
 //
-// Two systems coexist here:
-// - Legacy SCSS variable tokens (colors, radius, shadows, transitions, spacing),
-//   consumed by components as `t.$brand-burgundy`, `t.$radius-lg`, etc.
-// - New CSS custom property tokens (primitive/brand/surface/text/border/shadow/
-//   interactive/rama/status), theme-aware via `[data-theme='...']`.
+// IMPORTANT: do not add @forwards that emit top-level CSS rules here.
+// Components @use this module, and any emitted CSS rules get duplicated
+// inside every component's scoped chunk, producing nonsensical selectors
+// like `[_ngcontent-%COMP%]:root { ... }`.
 //
-// New components should prefer CSS custom properties so they respect dark mode.
-// Existing components will migrate in later phases of the dark mode rollout.
+// Theme-aware CSS custom property tokens (`:root`, `[data-theme='dark']`)
+// live in tokens/_dark-mode.scss, which is loaded ONCE globally from
+// src/styles.scss.
 
-// Legacy SCSS variable tokens (keep functional for existing components)
 @forward 'colors';
 @forward 'radius';
 @forward 'shadows';
 @forward 'transitions';
 @forward 'spacing';
-
-// Theme-aware CSS custom properties (dark mode ready)
-@forward 'primitive';
-@forward 'brand';
-@forward 'surface';
-@forward 'text';
-@forward 'border';
-@forward 'shadow';
-@forward 'interactive';
-@forward 'rama';
-@forward 'status';

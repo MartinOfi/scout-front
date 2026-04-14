@@ -1,0 +1,20 @@
+// Dark mode aggregator — loaded ONCE globally from src/styles.scss.
+//
+// These files emit CSS rules (`:root` and `[data-theme='light'|'dark']`) that
+// must apply document-wide. They are NOT part of tokens/_index.scss because
+// components `@use 'app/shared/styles/tokens'` — and every consumer would
+// otherwise re-emit the rules inside its own `[_ngcontent-*]` scope, bloating
+// chunks and producing nonsensical selectors like
+// `[_ngcontent-%COMP%]:root { --palette-neutral-0: ... }`.
+//
+// Keep this file global-only. Never import it from a component stylesheet.
+
+@forward 'primitive';
+@forward 'brand';
+@forward 'surface';
+@forward 'text';
+@forward 'border';
+@forward 'shadow';
+@forward 'interactive';
+@forward 'rama';
+@forward 'status';

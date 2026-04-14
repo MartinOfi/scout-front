@@ -6,8 +6,10 @@
 // 1. SCSS MODULES (must be first)
 // -----------------------------------------------------------------------------
 
-// Design Token System (theme-aware CSS custom properties + legacy SCSS variables)
+// Legacy SCSS variable tokens (for existing component stylesheets)
 @use 'app/shared/styles/tokens';
+// Theme-aware CSS custom properties (global rules; dark mode ready)
+@use 'app/shared/styles/tokens/dark-mode';
 @use 'app/shared/styles/typography-scale';
 
 // Material 3 theme (replaces the prebuilt indigo-pink.css)
