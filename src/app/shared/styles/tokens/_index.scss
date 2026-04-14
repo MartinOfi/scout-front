@@ -1,5 +1,22 @@
 // Aggregator — consumers import this single file to get all token layers.
+//
+// Two systems coexist here:
+// - Legacy SCSS variable tokens (colors, radius, shadows, transitions, spacing),
+//   consumed by components as `t.$brand-burgundy`, `t.$radius-lg`, etc.
+// - New CSS custom property tokens (primitive/brand/surface/text/border/shadow/
+//   interactive/rama/status), theme-aware via `[data-theme='...']`.
+//
+// New components should prefer CSS custom properties so they respect dark mode.
+// Existing components will migrate in later phases of the dark mode rollout.
 
+// Legacy SCSS variable tokens (keep functional for existing components)
+@forward 'colors';
+@forward 'radius';
+@forward 'shadows';
+@forward 'transitions';
+@forward 'spacing';
+
+// Theme-aware CSS custom properties (dark mode ready)
 @forward 'primitive';
 @forward 'brand';
 @forward 'surface';
