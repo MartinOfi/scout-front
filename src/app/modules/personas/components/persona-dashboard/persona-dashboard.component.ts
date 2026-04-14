@@ -97,25 +97,28 @@ export class PersonaDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  onDarDeBaja(): void {
+  onTransferirSaldoAGrupo(): void {
     if (!this.personaId) return;
+
+    const saldo = this.cuentaPersonal()?.saldo ?? 0;
+    if (saldo <= 0) return;
 
     const nombre = this.persona()?.nombre ?? 'esta persona';
 
     this.confirmDialog
       .confirm(
-        'Dar de baja',
-        `¿Estás seguro de dar de baja a ${nombre}? El saldo de su cuenta personal será transferido a la caja del grupo.`,
+        `Transferir $${saldo} a caja grupo`,
+        `Se transferirá el saldo de $${saldo} de la cuenta personal de ${nombre} a la caja del grupo. ¿Confirmás?`,
         {
-          icon: 'person_off',
-          confirmText: 'Dar de baja',
+          icon: 'swap_horiz',
+          confirmText: 'Transferir',
           cancelText: 'Cancelar',
-          isDestructive: true,
+          isDestructive: false,
         },
       )
       .subscribe((confirmed) => {
         if (confirmed && this.personaId) {
-          this.stateService.darDeBaja(this.personaId).subscribe({
+          this.stateService.transferirSaldoAGrupo(this.personaId).subscribe({
             next: () => {
               this.router.navigate(['/personas']);
             },

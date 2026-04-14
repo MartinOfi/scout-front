@@ -83,12 +83,11 @@ export class PersonasApiService {
   }
 
   /**
-   * Deactivate a persona (dar de baja)
-   * Transfers personal account balance to group account
+   * Transfer the full personal account balance of a persona to the group caja.
    */
-  darDeBaja(id: string): Observable<{ saldoTransferido: number }> {
+  transferirSaldoAGrupo(id: string): Observable<{ saldoTransferido: number }> {
     return this.http.post<{ saldoTransferido: number }, null>(
-      `${this.endpoint}/${id}/dar-de-baja`,
+      `${this.endpoint}/${id}/transferir-saldo-a-grupo`,
       null,
     );
   }

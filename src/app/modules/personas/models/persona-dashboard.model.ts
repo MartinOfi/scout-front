@@ -14,6 +14,7 @@ import {
   EstadoCuota,
   MedioPago,
   ConceptoMovimiento,
+  TipoMovimiento,
 } from '../../../shared/enums';
 
 // =============================================================================
@@ -155,6 +156,7 @@ export interface DeudaTotal {
 export interface MovimientoDashboard {
   id: string;
   fecha: string;
+  tipo: TipoMovimiento;
   monto: number;
   concepto: ConceptoMovimiento;
   medioPago: MedioPago;

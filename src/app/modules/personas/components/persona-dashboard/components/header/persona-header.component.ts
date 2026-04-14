@@ -15,21 +15,23 @@ import {
   RAMA_LABELS,
   CARGO_EDUCADOR_LABELS,
 } from '../../../../../../shared/enums';
+import { ButtonComponent } from '../../../../../../shared/components/button/button.component';
 
 @Component({
   selector: 'app-persona-header',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, MatIconModule, ButtonComponent],
   templateUrl: './persona-header.component.html',
   styleUrl: './persona-header.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PersonaHeaderComponent {
   readonly persona = input.required<PersonaDashboardPersona>();
+  readonly puedeTransferir = input<boolean>(false);
 
   readonly back = output<void>();
   readonly edit = output<void>();
-  readonly darDeBaja = output<void>();
+  readonly transferirSaldoAGrupo = output<void>();
 
   readonly tipoLabels: Record<PersonaType, string> = {
     [PersonaType.PROTAGONISTA]: 'Protagonista',

@@ -57,7 +57,7 @@ describe('ConceptoSelectorComponent', () => {
         ConceptoMovimiento.EVENTO_GRUPO_GASTO,
         ConceptoMovimiento.REEMBOLSO,
         ConceptoMovimiento.ASIGNACION_FONDO_RAMA,
-        ConceptoMovimiento.TRANSFERENCIA_BAJA,
+        ConceptoMovimiento.TRANSFERENCIA_SALDO_PERSONAL,
         ConceptoMovimiento.USO_SALDO_PERSONAL,
       ];
 

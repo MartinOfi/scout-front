@@ -17,9 +17,10 @@
     <!-- Header: Identity + Status + Navigation -->
     <app-persona-header
       [persona]="persona()!"
+      [puedeTransferir]="(cuentaPersonal()?.saldo ?? 0) > 0"
       (back)="onBack()"
       (edit)="onEdit()"
-      (darDeBaja)="onDarDeBaja()"
+      (transferirSaldoAGrupo)="onTransferirSaldoAGrupo()"
     />
 
     <!-- Financial Summary Cards -->

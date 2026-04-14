@@ -262,22 +262,21 @@ export class PersonasStateService {
   }
 
   /**
-   * Dar de baja una persona (transferir saldo a caja de grupo)
+   * Transferir todo el saldo de la caja personal de una persona a la caja del grupo.
    */
-  darDeBaja(id: string): Observable<{ saldoTransferido: number }> {
+  transferirSaldoAGrupo(id: string): Observable<{ saldoTransferido: number }> {
     this._loading.set(true);
     this._error.set(null);
 
-    return this.apiService.darDeBaja(id).pipe(
+    return this.apiService.transferirSaldoAGrupo(id).pipe(
       tap((result: { saldoTransferido: number }) => {
-        this._removeFromState(id);
         this._loading.set(false);
         this.notificationService.showSuccess(
-          `Persona dada de baja. Saldo transferido: $${result.saldoTransferido}`,
+          `Se transfirieron $${result.saldoTransferido} a la caja del grupo`,
         );
       }),
       catchError((err: unknown) => {
-        this._error.set(this.errorHandler.extractMessage(err, 'Error al dar de baja'));
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al transferir saldo'));
         this._loading.set(false);
         return throwError(() => err);
       }),

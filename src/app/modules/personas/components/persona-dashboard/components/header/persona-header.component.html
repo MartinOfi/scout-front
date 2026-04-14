@@ -25,6 +25,17 @@
       {{ estadoLabels[persona().estado] }}
     </span>
 
+    @if (puedeTransferir()) {
+      <app-button
+        variant="primary"
+        size="md"
+        icon="swap_horiz"
+        (clicked)="transferirSaldoAGrupo.emit()"
+      >
+        Transferir a caja grupo
+      </app-button>
+    }
+
     <button
       class="persona-header__back"
       (click)="back.emit()"
