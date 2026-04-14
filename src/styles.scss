@@ -8,7 +8,6 @@
 
 // Design Token System (theme-aware CSS custom properties + legacy SCSS variables)
 @use 'app/shared/styles/tokens';
-@use 'app/shared/styles/color-tokens';
 @use 'app/shared/styles/typography-scale';
 
 // Material 3 theme (replaces the prebuilt indigo-pink.css)
