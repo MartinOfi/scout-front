@@ -1,0 +1,11 @@
+[data-theme='light'] {
+  --hover-overlay:  oklch(0% 0 0 / 0.04);
+  --active-overlay: oklch(0% 0 0 / 0.08);
+  --focus-ring:     oklch(60% 0.2 250 / 0.4);
+}
+
+[data-theme='dark'] {
+  --hover-overlay:  oklch(100% 0 0 / 0.06);
+  --active-overlay: oklch(100% 0 0 / 0.1);
+  --focus-ring:     oklch(70% 0.2 250 / 0.5);
+}
