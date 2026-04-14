@@ -19,6 +19,7 @@ import {
   retryInterceptor,
 } from './core/interceptors';
 import { AuthStateService } from './modules/auth/services';
+import { ThemeService } from './core/services/theme.service';
 
 /**
  * Initialize authentication state on app startup
@@ -36,6 +37,17 @@ function initializeAuth(): () => Promise<void> {
         // Auth initialization failed - user will need to login
         // This is expected when tokens are invalid/expired
       });
+}
+
+/**
+ * Force ThemeService construction before first render so the data-theme
+ * attribute is synced with the stored preference.
+ */
+function initializeTheme(): () => void {
+  const theme = inject(ThemeService);
+  return () => {
+    theme.mode();
+  };
 }
 
 export const appConfig: ApplicationConfig = {
@@ -57,6 +69,12 @@ export const appConfig: ApplicationConfig = {
     {
       provide: APP_INITIALIZER,
       useFactory: initializeAuth,
+      multi: true,
+    },
+    // Initialize theme state on app startup (applies [data-theme] before first render)
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeTheme,
       multi: true,
     },
   ],
