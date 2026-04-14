@@ -119,7 +119,6 @@ $dialog-transition: t.$transition-fast;
   @include respond-to('md') {
     padding: 24px 28px;
     min-width: $min-width;
-    max-width: $max-width;
     width: auto;
   }
 }
@@ -360,6 +359,7 @@ $dialog-transition: t.$transition-fast;
 // ============================================================================
 
 @mixin dialog-fullscreen-mobile {
+
   // Mobile: Full viewport width with slight margins
   @media (max-width: 767px) {
     .mat-mdc-dialog-container {
