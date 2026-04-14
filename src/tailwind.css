@@ -11,6 +11,12 @@
 @source "./index.html";
 
 /* -----------------------------------------------------------------------------
+   DARK MODE VARIANT
+   Target [data-theme='dark'] on <html> instead of the default .dark class.
+   ----------------------------------------------------------------------------- */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* -----------------------------------------------------------------------------
    CUSTOM THEME - SCOUT DESIGN SYSTEM
    ----------------------------------------------------------------------------- */
 
@@ -131,6 +137,27 @@
      ------------------------------------------------------------------------- */
   --sidebar-expanded: 260px;
   --sidebar-collapsed: 72px;
+
+  /* -------------------------------------------------------------------------
+     SEMANTIC COLORS — theme-aware
+     Values come from CSS custom properties defined in shared/styles/tokens/*.
+     These enable utilities like `bg-surface-primary` and `text-text-primary`
+     that adapt automatically to [data-theme='dark'].
+     ------------------------------------------------------------------------- */
+  --color-surface-page: var(--surface-page);
+  --color-surface-primary: var(--surface-primary);
+  --color-surface-secondary: var(--surface-secondary);
+  --color-surface-tertiary: var(--surface-tertiary);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-on-primary: var(--text-on-primary);
+  --color-border-light: var(--border-light);
+  --color-border-default: var(--border-default);
+  --color-border-strong: var(--border-strong);
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
 }
 
 /* -----------------------------------------------------------------------------
