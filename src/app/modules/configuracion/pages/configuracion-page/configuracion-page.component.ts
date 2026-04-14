@@ -3,13 +3,7 @@
  * Smart Component - Configuración del sistema y perfil del usuario
  */
 
-import {
-  Component,
-  ChangeDetectionStrategy,
-  inject,
-  OnInit,
-  signal,
-} from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -29,10 +23,9 @@ import { ButtonComponent } from '../../../../shared/components/button/button.com
 import { ConfiguracionService } from '../../../../shared/services';
 import { NotificationService } from '../../../../shared/services';
 import { AuthStateService } from '../../../auth/services/auth-state.service';
+import { BackupsService } from '../../services/backups.service';
 
-function passwordMatchValidator(
-  control: AbstractControl,
-): ValidationErrors | null {
+function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
   const newPassword = control.get('newPassword')?.value;
   const confirmPassword = control.get('confirmPassword')?.value;
   if (newPassword && confirmPassword && newPassword !== confirmPassword) {
@@ -62,6 +55,7 @@ export class ConfiguracionPageComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly configService = inject(ConfiguracionService);
   private readonly notificationService = inject(NotificationService);
+  private readonly backupsService = inject(BackupsService);
   readonly authState = inject(AuthStateService);
 
   // ── Inscripciones ────────────────────────────────────────────
@@ -94,6 +88,10 @@ export class ConfiguracionPageComponent implements OnInit {
   );
 
   readonly savingPassword = signal(false);
+
+  // ── Backups & Export ─────────────────────────────────────────
+  readonly downloadingXlsx = signal(false);
+  readonly downloadingBackup = signal(false);
 
   ngOnInit(): void {
     this.montoScoutArgentinaCtrl.setValue(this.configService.montoScoutArgentina());
@@ -181,5 +179,41 @@ export class ConfiguracionPageComponent implements OnInit {
       !!this.passwordForm.errors?.['passwordMismatch'] &&
       !!this.passwordForm.get('confirmPassword')?.touched
     );
+  }
+
+  descargarExportXlsx(): void {
+    if (this.downloadingXlsx()) {
+      return;
+    }
+    this.downloadingXlsx.set(true);
+    this.backupsService.downloadXlsxExport().subscribe({
+      next: () => {
+        this.notificationService.showSuccess('Exportación descargada');
+        this.downloadingXlsx.set(false);
+      },
+      error: (err: { error?: { message?: string } }) => {
+        const msg = err?.error?.message ?? 'Error al exportar a Excel';
+        this.notificationService.showError(msg);
+        this.downloadingXlsx.set(false);
+      },
+    });
+  }
+
+  descargarBackupSql(): void {
+    if (this.downloadingBackup()) {
+      return;
+    }
+    this.downloadingBackup.set(true);
+    this.backupsService.downloadSqlBackup().subscribe({
+      next: () => {
+        this.notificationService.showSuccess('Backup descargado');
+        this.downloadingBackup.set(false);
+      },
+      error: (err: { error?: { message?: string } }) => {
+        const msg = err?.error?.message ?? 'Error al generar el backup';
+        this.notificationService.showError(msg);
+        this.downloadingBackup.set(false);
+      },
+    });
   }
 }

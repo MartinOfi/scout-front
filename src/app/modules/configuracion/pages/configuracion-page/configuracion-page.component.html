@@ -33,25 +33,18 @@
         <h2 class="config-section__title">Cambiar email</h2>
 
         <app-form-field label="Nuevo email" [required]="true">
-          <app-email-field
-            formControlName="newEmail"
-            placeholder="nuevo@email.com">
+          <app-email-field formControlName="newEmail" placeholder="nuevo@email.com">
           </app-email-field>
         </app-form-field>
 
         <app-form-field label="Contraseña actual" [required]="true">
-          <app-password-input
-            formControlName="currentPasswordForEmail"
-            [icon]="'lock'"
+          <app-password-input formControlName="currentPasswordForEmail" [icon]="'lock'"
             [errorMessages]="{ required: 'Requerida', minlength: 'Mínimo 8 caracteres' }">
           </app-password-input>
         </app-form-field>
 
         <div class="config-actions">
-          <app-button
-            type="submit"
-            variant="primary"
-            [disabled]="emailForm.invalid || savingEmail()">
+          <app-button type="submit" variant="primary" [disabled]="emailForm.invalid || savingEmail()">
             {{ savingEmail() ? 'Guardando...' : 'Guardar email' }}
           </app-button>
         </div>
@@ -65,28 +58,19 @@
         <h2 class="config-section__title">Cambiar contraseña</h2>
 
         <app-form-field label="Contraseña actual" [required]="true">
-          <app-password-input
-            formControlName="currentPassword"
-            [icon]="'lock'"
+          <app-password-input formControlName="currentPassword" [icon]="'lock'"
             [errorMessages]="{ required: 'Requerida', minlength: 'Mínimo 8 caracteres' }">
           </app-password-input>
         </app-form-field>
 
         <app-form-field label="Nueva contraseña" [required]="true">
-          <app-password-input
-            formControlName="newPassword"
-            [icon]="'lock_open'"
+          <app-password-input formControlName="newPassword" [icon]="'lock_open'"
             [errorMessages]="{ required: 'Requerida', minlength: 'Mínimo 8 caracteres' }">
           </app-password-input>
         </app-form-field>
 
-        <app-form-field
-          label="Confirmar nueva contraseña"
-          [required]="true"
-          [invalid]="passwordMismatch">
-          <app-password-input
-            formControlName="confirmPassword"
-            [icon]="'lock_open'"
+        <app-form-field label="Confirmar nueva contraseña" [required]="true" [invalid]="passwordMismatch">
+          <app-password-input formControlName="confirmPassword" [icon]="'lock_open'"
             [errorMessages]="{ required: 'Requerida' }">
           </app-password-input>
           @if (passwordMismatch) {
@@ -95,10 +79,7 @@
         </app-form-field>
 
         <div class="config-actions">
-          <app-button
-            type="submit"
-            variant="primary"
-            [disabled]="passwordForm.invalid || savingPassword()">
+          <app-button type="submit" variant="primary" [disabled]="passwordForm.invalid || savingPassword()">
             {{ savingPassword() ? 'Guardando...' : 'Cambiar contraseña' }}
           </app-button>
         </div>
@@ -107,7 +88,53 @@
     </div>
   </section>
 
-  <!-- ── Card 2: Configuración de Inscripciones ─────────────── -->
+  <!-- ── Card: Backup y Exportación ─────────────────────────── -->
+  <section class="config-card">
+    <header class="config-card__header">
+      <div class="config-card__title-row">
+        <mat-icon class="config-card__icon">cloud_download</mat-icon>
+        <h1 class="config-card__title">Backup y Exportación</h1>
+      </div>
+    </header>
+
+    <div class="config-card__body">
+      <p class="backup-description">
+        Descargá un respaldo de tus datos. Elegí el formato según lo que necesites.
+      </p>
+
+      <div class="backup-actions">
+        <!-- Exportar a Excel -->
+        <button type="button" class="backup-action unstyled" (click)="descargarExportXlsx()"
+          [disabled]="downloadingXlsx()">
+          <mat-icon class="backup-action__icon backup-action__icon--xlsx">table_chart</mat-icon>
+          <div class="backup-action__text">
+            <span class="backup-action__title">
+              {{ downloadingXlsx() ? 'Descargando...' : 'Exportar a Excel' }}
+            </span>
+            <span class="backup-action__subtitle">
+              Archivo .xlsx con una hoja por tabla para abrir en Excel o Google Sheets
+            </span>
+          </div>
+        </button>
+
+        <!-- Backup de base de datos -->
+        <button type="button" class="backup-action unstyled" (click)="descargarBackupSql()"
+          [disabled]="downloadingBackup()">
+          <mat-icon class="backup-action__icon backup-action__icon--sql">storage</mat-icon>
+          <div class="backup-action__text">
+            <span class="backup-action__title">
+              {{ downloadingBackup() ? 'Descargando...' : 'Backup de base de datos' }}
+            </span>
+            <span class="backup-action__subtitle">
+              Archivo .sql.gz restaurable en PostgreSQL para recuperar los datos
+            </span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Card: Configuración de Inscripciones ─────────────── -->
   <section class="config-card">
     <header class="config-card__header">
       <div class="config-card__title-row">
@@ -120,18 +147,12 @@
       <div class="config-section">
 
         <app-form-field label="Monto Inscripción Scout Argentina">
-          <app-number-field
-            [formControl]="montoScoutArgentinaCtrl"
-            [min]="0"
-            placeholder="0">
+          <app-number-field [formControl]="montoScoutArgentinaCtrl" [min]="0" placeholder="0">
           </app-number-field>
         </app-form-field>
 
         <app-form-field label="Monto Inscripción de Grupo">
-          <app-number-field
-            [formControl]="montoGrupoCtrl"
-            [min]="0"
-            placeholder="0">
+          <app-number-field [formControl]="montoGrupoCtrl" [min]="0" placeholder="0">
           </app-number-field>
         </app-form-field>
 
