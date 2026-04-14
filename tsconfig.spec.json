@@ -14,6 +14,8 @@
     "src/app/core/services/theme-logger.service.ts",
     "src/app/core/services/theme-storage.service.ts",
     "src/app/core/services/theme-storage.service.spec.ts",
+    "src/app/core/services/theme-dom.service.ts",
+    "src/app/core/services/theme-dom.service.spec.ts",
     "src/app/shared/constants/theme.constants.ts",
     "src/app/shared/constants/theme-log-messages.ts",
     "src/app/modules/cajas/components/caja-grupo/caja-grupo.component.spec.ts",

@@ -89,6 +89,7 @@
             "include": [
               "src/app/core/interceptors/retry.interceptor.spec.ts",
               "src/app/core/services/theme-storage.service.spec.ts",
+              "src/app/core/services/theme-dom.service.spec.ts",
               "src/app/modules/cajas/components/caja-grupo/caja-grupo.component.spec.ts",
               "src/app/modules/cajas/components/cuentas-personales/cuentas-personales.component.spec.ts",
               "src/app/shared/pipes/money.pipe.spec.ts",
