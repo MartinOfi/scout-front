@@ -1,0 +1,15 @@
+[data-theme='light'] {
+  --text-primary:    var(--palette-neutral-900);
+  --text-secondary:  var(--palette-neutral-700);
+  --text-muted:      var(--palette-neutral-500);
+  --text-on-dark:    var(--palette-neutral-0);
+  --text-on-primary: var(--palette-neutral-0);
+}
+
+[data-theme='dark'] {
+  --text-primary:    oklch(95% 0 0);
+  --text-secondary:  oklch(75% 0.005 250);
+  --text-muted:      oklch(60% 0.005 250);
+  --text-on-dark:    oklch(98% 0 0);
+  --text-on-primary: var(--palette-neutral-0);
+}

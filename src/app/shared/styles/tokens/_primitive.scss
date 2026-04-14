@@ -1,0 +1,17 @@
+// Layer 1 — primitive palette. These values never change by theme.
+
+:root {
+  // Neutral OKLCH scale
+  --palette-neutral-0:   oklch(100% 0 0);
+  --palette-neutral-50:  oklch(98% 0.002 250);
+  --palette-neutral-100: oklch(96% 0.004 250);
+  --palette-neutral-200: oklch(92% 0.004 250);
+  --palette-neutral-300: oklch(88% 0.006 250);
+  --palette-neutral-400: oklch(80% 0.01 250);
+  --palette-neutral-500: oklch(60% 0.01 250);
+  --palette-neutral-600: oklch(45% 0.01 250);
+  --palette-neutral-700: oklch(35% 0.01 250);
+  --palette-neutral-800: oklch(22% 0.01 250);
+  --palette-neutral-900: oklch(18% 0.01 250);
+  --palette-neutral-950: oklch(12% 0.01 250);
+}

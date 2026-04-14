@@ -1,0 +1,15 @@
+[data-theme='light'] {
+  --surface-page:      var(--palette-neutral-50);
+  --surface-primary:   var(--palette-neutral-0);
+  --surface-secondary: var(--palette-neutral-100);
+  --surface-tertiary:  var(--palette-neutral-200);
+  --surface-elevated:  var(--palette-neutral-0);
+}
+
+[data-theme='dark'] {
+  --surface-page:      var(--palette-neutral-950);
+  --surface-primary:   var(--palette-neutral-900);
+  --surface-secondary: var(--palette-neutral-800);
+  --surface-tertiary:  var(--palette-neutral-700);
+  --surface-elevated:  var(--palette-neutral-800);
+}

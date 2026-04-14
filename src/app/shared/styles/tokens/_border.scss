@@ -1,0 +1,11 @@
+[data-theme='light'] {
+  --border-light:   var(--palette-neutral-100);
+  --border-default: var(--palette-neutral-200);
+  --border-strong:  var(--palette-neutral-400);
+}
+
+[data-theme='dark'] {
+  --border-light:   oklch(30% 0.01 250);
+  --border-default: oklch(35% 0.01 250);
+  --border-strong:  oklch(45% 0.015 250);
+}
