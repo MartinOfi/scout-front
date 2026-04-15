@@ -4,7 +4,7 @@
 @use 'app/shared/styles/responsive' as *;
 
 .data-list-card {
-  background: white;
+  background: var(--surface-primary);
   border-radius: 8px;
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.04),
@@ -40,8 +40,8 @@
     justify-content: space-between;
     // Mobile-first: compact padding
     padding: var(--spacing-sm) var(--spacing-md);
-    background: linear-gradient(180deg, #fafafa 0%, white 100%);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    background: linear-gradient(180deg, var(--surface-secondary) 0%, var(--surface-primary) 100%);
+    border-bottom: 1px solid var(--border-light);
     position: relative;
 
     // Desktop: larger padding
@@ -72,7 +72,7 @@
     // Mobile-first: slightly smaller
     font-size: 13px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: var(--text-primary);
     margin: 0;
     letter-spacing: 0.01em;
     padding-left: var(--spacing-xs);

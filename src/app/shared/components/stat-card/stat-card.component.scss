@@ -4,7 +4,7 @@
 @use 'app/shared/styles/responsive' as *;
 
 .stat-card {
-  background: white;
+  background: var(--surface-primary);
   border-radius: 8px;
   // Mobile-first: smaller padding
   padding: var(--spacing-md);
@@ -150,7 +150,7 @@
     // Mobile-first: slightly smaller
     font-size: 11px;
     font-weight: 500;
-    color: #6b7280; // gray-500 with slight warmth
+    color: var(--text-secondary);
     letter-spacing: 0.01em;
     text-transform: uppercase;
 
@@ -168,7 +168,7 @@
     // Mobile-first: smaller value
     font-size: 22px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: var(--text-primary);
     margin: 0;
     font-family: var(--font-family-headings);
     font-feature-settings: 'tnum' 1, 'lnum' 1; // Tabular numbers for alignment

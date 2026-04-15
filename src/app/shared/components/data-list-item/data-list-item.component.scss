@@ -56,7 +56,7 @@
   }
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.02);
+    background-color: var(--surface-secondary);
 
     .data-list-item__icon mat-icon {
       transform: scale(1.1);
@@ -155,7 +155,7 @@
     // Mobile-first: compact, no wrap (parent scrolls)
     font-size: 13px;
     font-weight: 500;
-    color: var(--gray-900);
+    color: var(--text-primary);
     letter-spacing: 0.01em;
 
     // Desktop: truncate with ellipsis
@@ -170,7 +170,7 @@
   &__secondary {
     // Mobile-first: compact (parent scrolls)
     font-size: 11px;
-    color: #6b7280;
+    color: var(--text-secondary);
     letter-spacing: 0.01em;
 
     // Desktop: truncate with ellipsis
