@@ -5,7 +5,8 @@
 }
 
 [data-theme='dark'] {
-  --border-light:   oklch(30% 0.01 250);
-  --border-default: oklch(35% 0.01 250);
-  --border-strong:  oklch(45% 0.015 250);
+  // Pure grayscale borders to match the black surface layer.
+  --border-light:   oklch(20% 0 0);
+  --border-default: oklch(28% 0 0);
+  --border-strong:  oklch(40% 0 0);
 }

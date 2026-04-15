@@ -23,7 +23,7 @@
 .layout-content {
   display: flex;
   flex-direction: column;
-  background-color: #e3e3e379;
+  background-color: var(--surface-page);
 }
 
 // Mobile header with hamburger menu and page title
@@ -68,7 +68,7 @@
 
 // Override mat-sidenav-content background
 ::ng-deep .mat-drawer-content {
-  background-color: #e3e3e379;
+  background-color: var(--surface-page);
 }
 
 // Ensure sidenav has no border and proper background.

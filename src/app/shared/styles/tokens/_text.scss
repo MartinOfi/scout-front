@@ -7,9 +7,10 @@
 }
 
 [data-theme='dark'] {
-  --text-primary:    oklch(95% 0 0);
-  --text-secondary:  oklch(75% 0.005 250);
-  --text-muted:      oklch(60% 0.005 250);
+  // Pure grayscale text to match the black surface layer.
+  --text-primary:    oklch(98% 0 0);
+  --text-secondary:  oklch(78% 0 0);
+  --text-muted:      oklch(60% 0 0);
   --text-on-dark:    oklch(98% 0 0);
   --text-on-primary: var(--palette-neutral-0);
 }

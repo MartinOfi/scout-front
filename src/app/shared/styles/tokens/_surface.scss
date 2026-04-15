@@ -7,9 +7,11 @@
 }
 
 [data-theme='dark'] {
-  --surface-page:      var(--palette-neutral-950);
-  --surface-primary:   var(--palette-neutral-900);
-  --surface-secondary: var(--palette-neutral-800);
-  --surface-tertiary:  var(--palette-neutral-700);
-  --surface-elevated:  var(--palette-neutral-800);
+  // Pure grayscale — scout brand decision: dark mode uses black (not blue-tinted).
+  // Elevation is expressed through a subtle lightness ladder on top of black.
+  --surface-page:      oklch(0% 0 0);    // pure black — app background
+  --surface-primary:   oklch(10% 0 0);   // cards, panels
+  --surface-secondary: oklch(14% 0 0);   // inset / elevated panels
+  --surface-tertiary:  oklch(18% 0 0);   // popovers, menus
+  --surface-elevated:  oklch(12% 0 0);   // floating cards
 }
