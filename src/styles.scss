@@ -128,6 +128,16 @@
   --spacing-2xl: 48px;
 }
 
+// Dark-mode override for legacy --gray-* tokens so components that still
+// consume them (kpi-dashboard, stat-card, data-list-card, readonly-card,
+// etc.) inherit the correct text/surface values without per-file migration.
+[data-theme='dark'] {
+  --gray-900: var(--text-primary);
+  --gray-700: var(--text-secondary);
+  --gray-400: var(--text-muted);
+  --gray-200: var(--border-default);
+}
+
 // -----------------------------------------------------------------------------
 // 3. CSS RESET & BASE STYLES
 // -----------------------------------------------------------------------------
