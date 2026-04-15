@@ -17,16 +17,23 @@ $brand-amber: #f4a261;
 // -----------------------------------------------------------------------------
 // STONE SCALE (Warm grays for approachable UI)
 // -----------------------------------------------------------------------------
-$stone-50: #fafaf9;
-$stone-100: #f5f5f4;
-$stone-200: #e7e5e4;
-$stone-300: #d6d3d1;
-$stone-400: #a8a29e;
-$stone-500: #78716c;
-$stone-600: #57534e;
-$stone-700: #44403c;
-$stone-800: #292524;
-$stone-900: #1c1917;
+// Each $stone-N emits a CSS custom property string so that any existing
+// component stylesheet reading `t.$stone-800` (or similar) automatically
+// picks up the current theme's value via `[data-theme='dark']` overrides
+// defined in tokens/_surface.scss, _text.scss and _border.scss.
+//
+// Raw hex fallbacks are kept as the static literal fed into `var(--fallback)`
+// so rendering still works when a consumer disables custom-property support.
+$stone-50:  var(--surface-secondary, #fafaf9);
+$stone-100: var(--surface-secondary, #f5f5f4);
+$stone-200: var(--border-light,      #e7e5e4);
+$stone-300: var(--border-default,    #d6d3d1);
+$stone-400: var(--text-muted,        #a8a29e);
+$stone-500: var(--text-muted,        #78716c);
+$stone-600: var(--text-secondary,    #57534e);
+$stone-700: var(--text-secondary,    #44403c);
+$stone-800: var(--text-primary,      #292524);
+$stone-900: var(--text-primary,      #1c1917);
 
 // -----------------------------------------------------------------------------
 // SEMANTIC COLORS
