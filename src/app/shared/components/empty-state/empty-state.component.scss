@@ -11,7 +11,7 @@
   // Mobile-first: compact padding
   padding: var(--spacing-xl) var(--spacing-md);
   gap: var(--spacing-sm);
-  color: rgba(0, 0, 0, 0.54);
+  color: var(--text-secondary);
   // Mobile-first: smaller min-height
   min-height: 200px;
 
@@ -28,7 +28,7 @@
   font-size: 48px;
   width: 48px;
   height: 48px;
-  color: rgba(0, 0, 0, 0.26);
+  color: var(--text-muted);
 
   // Desktop: larger icon
   @include respond-to('md') {
