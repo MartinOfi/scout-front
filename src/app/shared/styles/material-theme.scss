@@ -1,7 +1,17 @@
 // Material 3 theme setup. Replaces the prebuilt indigo-pink theme.
-// Uses Material's built-in red (closest to scout burgundy) and violet (closest
-// to scout indigo #242167) palettes as a risk-minimizing starting point.
-// Custom brand palettes are a follow-up task in a later phase.
+//
+// Uses Material's built-in red and violet palettes as a risk-minimizing
+// starting point — custom brand palettes are a follow-up task. The built-in
+// palettes tint ALL Material system surface tokens (e.g. --mat-sys-surface,
+// --mat-sys-background, --mat-sys-surface-container*) with the primary hue,
+// which for $red-palette produces a pale pink that leaks into every Material
+// component that reads from those tokens (.mat-app-background, cards,
+// toolbars, dialogs, etc.).
+//
+// To keep the application visually neutral while still providing M3 support
+// for dark mode, we override the Material system tokens below so their values
+// come from the scout semantic token layer (shared/styles/tokens/_surface.scss,
+// _text.scss, _brand.scss) instead of the red palette's tonal surfaces.
 
 @use '@angular/material' as mat;
 
@@ -28,4 +38,31 @@ html {
       theme-type: dark,
     ),
   ));
+}
+
+// -----------------------------------------------------------------------------
+// Scout brand override of Material system tokens
+// -----------------------------------------------------------------------------
+// Applied AFTER mat.theme() so these declarations win. The selectors match the
+// same elements as the mat.theme() output (html + [data-theme='dark']) so
+// specificity is equal and source order decides — which is why this block must
+// stay below the mat.theme() includes.
+
+html {
+  --mat-sys-background: var(--surface-page);
+  --mat-sys-surface: var(--surface-primary);
+  --mat-sys-surface-dim: var(--surface-secondary);
+  --mat-sys-surface-bright: var(--surface-primary);
+  --mat-sys-surface-container-lowest: var(--surface-primary);
+  --mat-sys-surface-container-low: var(--surface-primary);
+  --mat-sys-surface-container: var(--surface-secondary);
+  --mat-sys-surface-container-high: var(--surface-tertiary);
+  --mat-sys-surface-container-highest: var(--surface-tertiary);
+  --mat-sys-on-background: var(--text-primary);
+  --mat-sys-on-surface: var(--text-primary);
+  --mat-sys-on-surface-variant: var(--text-secondary);
+  --mat-sys-outline: var(--border-strong);
+  --mat-sys-outline-variant: var(--border-default);
+  --mat-sys-primary: var(--brand-primary);
+  --mat-sys-on-primary: var(--text-on-primary);
 }
