@@ -37,6 +37,8 @@
     "src/app/shared/testing/**/*.ts",
     "src/app/core/services/theme.service.ts",
     "src/app/core/services/theme.service.spec.ts",
+    "src/app/layout/components/theme-toggle/theme-toggle.component.ts",
+    "src/app/layout/components/theme-toggle/theme-toggle.component.spec.ts",
     "src/app/shared/config/theme.config.ts",
     "src/app/shared/enums/movimiento.enum.ts",
     "src/app/shared/enums/movimiento.enum.spec.ts",

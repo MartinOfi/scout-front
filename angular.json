@@ -100,7 +100,8 @@
               "src/app/shared/components/filters/generic-filters/generic-filters.component.spec.ts",
               "src/app/shared/enums/movimiento.enum.spec.ts",
               "src/app/modules/movimientos/components/movimiento-form/components/concepto-selector/concepto-selector.component.spec.ts",
-              "src/app/core/services/theme.service.spec.ts"
+              "src/app/core/services/theme.service.spec.ts",
+              "src/app/layout/components/theme-toggle/theme-toggle.component.spec.ts"
             ]
           }
         }

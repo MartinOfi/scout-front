@@ -1,8 +1,11 @@
 @if (metadata()) {
 <header class="page-header">
-  <h1 class="page-title">{{ metadata()!.title }}</h1>
-  @if (metadata()!.subtitle) {
-  <p class="page-subtitle">{{ metadata()!.subtitle }}</p>
-  }
+  <div class="page-header__text">
+    <h1 class="page-title">{{ metadata()!.title }}</h1>
+    @if (metadata()!.subtitle) {
+    <p class="page-subtitle">{{ metadata()!.subtitle }}</p>
+    }
+  </div>
+  <app-theme-toggle class="page-header__toggle" />
 </header>
 }
