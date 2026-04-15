@@ -252,6 +252,19 @@
 // SUBMIT BUTTON (Shimmer Effect)
 // ============================================================
 .submit-button {
+  // Material 21 raised-button reads container/label color from the
+  // `--mat-button-protected-*` tokens (not the older `--mdc-*` names).
+  // The plain `background-color` declaration below loses specificity to those
+  // tokens, so override them explicitly to keep the scout burgundy brand.
+  --mat-button-protected-container-color: #{t.$brand-burgundy};
+  --mat-button-protected-label-text-color: #{t.$surface-white};
+  --mat-button-protected-state-layer-color: #{t.$surface-white};
+  --mat-button-protected-hover-state-layer-opacity: 0.08;
+  --mat-button-protected-focus-state-layer-opacity: 0.12;
+  --mat-button-protected-pressed-state-layer-opacity: 0.16;
+  --mat-button-protected-disabled-container-color: #{t.$stone-400};
+  --mat-button-protected-disabled-label-text-color: #{t.$surface-white};
+
   @include anim.shimmer-button(t.$brand-burgundy, rgba(t.$surface-white, 0.25), 2.5s);
 
   display: flex;
@@ -278,7 +291,6 @@
   }
 
   &:disabled {
-    background-color: t.$stone-400;
     cursor: not-allowed;
   }
 
