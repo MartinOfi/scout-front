@@ -91,9 +91,9 @@ $shadow-card-hover: t.$shadow-card-hover;
   width: 100%;
   font-family: var(--font-family-base);
   line-height: 1.5;
-  color: $stone-800;
-  background-color: $stone-50;
-  border: $input-border-width solid $stone-300;
+  color: var(--text-primary);
+  background-color: var(--surface-secondary);
+  border: $input-border-width solid var(--border-default);
   box-shadow: $shadow-input-inset;
   transition: border-color $transition-fast, box-shadow $transition-fast, background-color $transition-fast;
   box-sizing: border-box;
@@ -115,25 +115,25 @@ $shadow-card-hover: t.$shadow-card-hover;
   }
 
   &::placeholder {
-    color: $stone-400;
+    color: var(--text-muted);
   }
 
   &:hover:not(:disabled):not(:focus) {
-    border-color: $stone-400;
-    background-color: white;
+    border-color: var(--border-strong);
+    background-color: var(--surface-primary);
   }
 
   &:focus {
     outline: none;
     border-color: $brand-burgundy;
-    background-color: white;
+    background-color: var(--surface-primary);
     box-shadow: $shadow-focus;
   }
 
   &:disabled {
-    background-color: $stone-100;
-    border-color: $stone-200;
-    color: $stone-400;
+    background-color: var(--surface-tertiary);
+    border-color: var(--border-light);
+    color: var(--text-muted);
     cursor: not-allowed;
   }
 }

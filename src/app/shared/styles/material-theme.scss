@@ -48,7 +48,11 @@ html {
 // specificity is equal and source order decides — which is why this block must
 // stay below the mat.theme() includes.
 
-html {
+// Must apply under BOTH `html` and `[data-theme='dark']` because
+// mat.theme() with theme-type: dark re-declares --mat-sys-* tokens under
+// [data-theme='dark'] (attribute selector, specificity 0,1,0), which would
+// otherwise beat a plain `html` override (type selector, 0,0,1).
+%scout-mat-sys-overrides {
   --mat-sys-background: var(--surface-page);
   --mat-sys-surface: var(--surface-primary);
   --mat-sys-surface-dim: var(--surface-secondary);
@@ -65,4 +69,12 @@ html {
   --mat-sys-outline-variant: var(--border-default);
   --mat-sys-primary: var(--brand-primary);
   --mat-sys-on-primary: var(--text-on-primary);
+}
+
+html {
+  @extend %scout-mat-sys-overrides;
+}
+
+[data-theme='dark'] {
+  @extend %scout-mat-sys-overrides;
 }
