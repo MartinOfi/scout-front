@@ -111,7 +111,7 @@
     &--highlight {
       padding: t.$spacing-sm t.$spacing-md;
       margin: 4px -4px -2px;
-      background: white;
+      background: var(--surface-primary);
       border-radius: t.$radius-default;
       border: 1px solid rgba(t.$brand-burgundy, 0.15);
 
@@ -241,7 +241,7 @@
   text-transform: uppercase;
   letter-spacing: 0.02em;
   color: t.$color-success-dark;
-  background: white;
+  background: var(--surface-primary);
   border: 1px solid t.$color-success;
   border-radius: t.$radius-md;
   cursor: pointer;
@@ -347,7 +347,7 @@
   align-items: baseline;
   gap: 6px;
   padding: 6px 12px;
-  background: white;
+  background: var(--surface-primary);
   border-radius: t.$radius-md;
   border: 1px solid t.$stone-200;
 

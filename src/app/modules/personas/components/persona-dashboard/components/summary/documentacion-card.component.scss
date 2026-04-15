@@ -9,7 +9,7 @@
 $card-radius: 8px;
 
 .doc-card {
-  background: white;
+  background: var(--surface-primary);
   border-radius: $card-radius;
   box-shadow: t.$shadow-card;
   padding: 16px;

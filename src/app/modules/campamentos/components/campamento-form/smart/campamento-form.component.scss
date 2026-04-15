@@ -39,7 +39,7 @@
   align-items: center;
   justify-content: center;
   padding: 64px 24px;
-  background: white;
+  background: var(--surface-primary);
   border-radius: 16px;
   box-shadow: t.$shadow-card;
 
@@ -62,7 +62,7 @@
 // -----------------------------------------------------------------------------
 
 .form-card {
-  background: white;
+  background: var(--surface-primary);
   border-radius: 16px;
   box-shadow: t.$shadow-card;
   overflow: hidden;
@@ -200,7 +200,7 @@
 }
 
 .btn-secondary {
-  background-color: white;
+  background-color: var(--surface-primary);
   color: t.$stone-700;
   border: 1.5px solid t.$stone-300;
 

@@ -33,7 +33,7 @@
   }
 
   &-container {
-    background: white;
+    background: var(--surface-primary);
     border-radius: 8px;
     padding: var(--spacing-lg);
     box-shadow: t.$shadow-card;

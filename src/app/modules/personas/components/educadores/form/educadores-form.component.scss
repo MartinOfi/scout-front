@@ -30,7 +30,7 @@
 }
 
 .scout-form-card {
-  background-color: white;
+  background-color: var(--surface-primary);
   border-radius: 16px;
   box-shadow: $shadow-card;
   overflow: hidden;
@@ -125,7 +125,7 @@
 }
 
 .btn-secondary {
-  background-color: white;
+  background-color: var(--surface-primary);
   color: $stone-700;
   border: 1.5px solid $stone-300;
 

@@ -39,7 +39,7 @@ $section-gap: 20px;
   justify-content: space-between;
   gap: 16px;
   padding: 20px;
-  background: white;
+  background: var(--surface-primary);
   border-radius: $card-radius;
   box-shadow: t.$shadow-card;
 
@@ -207,7 +207,7 @@ $section-gap: 20px;
   align-items: center;
   justify-content: center;
   padding: 48px 24px;
-  background: white;
+  background: var(--surface-primary);
   border-radius: $card-radius;
   box-shadow: t.$shadow-card;
   text-align: center;
@@ -254,7 +254,7 @@ $section-gap: 20px;
 
 // White card wrapper around data tables (mirrors personas-tabs-container pattern)
 .table-container {
-  background: white;
+  background: var(--surface-primary);
   border-radius: 8px;
   padding: var(--spacing-lg);
   box-shadow: t.$shadow-card;
@@ -274,7 +274,7 @@ $section-gap: 20px;
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    background: white;
+    background: var(--surface-primary);
     border-radius: $card-radius;
     box-shadow: t.$shadow-card;
   }
@@ -323,7 +323,7 @@ $section-gap: 20px;
   gap: 12px;
   padding: 12px 16px;
   border-radius: 10px;
-  background: white;
+  background: var(--surface-primary);
   border: 1px solid t.$stone-200;
   border-left: 3px solid transparent;
 
@@ -486,7 +486,7 @@ $section-gap: 20px;
   flex-direction: column;
   padding: 10px 12px;
   border-radius: 8px;
-  background: white;
+  background: var(--surface-primary);
   border: 1px solid t.$stone-200;
   transition: opacity 200ms ease, border-color 150ms ease;
   font-variant-numeric: tabular-nums;

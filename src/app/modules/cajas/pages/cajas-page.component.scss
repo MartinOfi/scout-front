@@ -29,7 +29,7 @@
 // =============================================================================
 
 .cajas-tabs-container {
-  background: white;
+  background: var(--surface-primary);
   border-radius: 8px;
   // Mobile-first: compact padding
   padding: var(--spacing-md);

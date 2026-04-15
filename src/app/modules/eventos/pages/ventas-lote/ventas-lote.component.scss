@@ -23,7 +23,7 @@ $card-radius: 12px;
   flex-direction: column;
   gap: 12px;
   padding: 20px;
-  background: white;
+  background: var(--surface-primary);
   border-radius: $card-radius;
   box-shadow: t.$shadow-card;
 
@@ -85,7 +85,7 @@ $card-radius: 12px;
 
 .form-card {
   padding: 20px;
-  background: white;
+  background: var(--surface-primary);
   border-radius: $card-radius;
   box-shadow: t.$shadow-card;
 
@@ -187,7 +187,7 @@ $card-radius: 12px;
   &:focus {
     outline: none;
     border-color: t.$brand-burgundy;
-    background: white;
+    background: var(--surface-primary);
   }
 
   &::-webkit-outer-spin-button,
@@ -274,7 +274,7 @@ $card-radius: 12px;
   }
 
   &--secondary {
-    background-color: white;
+    background-color: var(--surface-primary);
     border: 1px solid t.$stone-200;
     color: t.$stone-700;
 

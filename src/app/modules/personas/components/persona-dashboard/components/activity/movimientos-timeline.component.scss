@@ -3,7 +3,7 @@
 $card-radius: 16px;
 
 .movimientos-card {
-  background: white;
+  background: var(--surface-primary);
   border-radius: $card-radius;
   box-shadow: t.$shadow-card;
   overflow: hidden;

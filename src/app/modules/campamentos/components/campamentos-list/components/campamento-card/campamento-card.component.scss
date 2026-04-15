@@ -12,7 +12,7 @@
 
 .camp-card {
   position: relative;
-  background: white;
+  background: var(--surface-primary);
   border-radius: 8px;
   box-shadow: t.$shadow-card;
   overflow: hidden;
