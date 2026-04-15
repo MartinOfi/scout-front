@@ -28,7 +28,7 @@
       scrollbar-width: thin;
       scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
       gap: var(--spacing-xs);
-      background: white;
+      background: var(--surface-primary);
       padding: var(--spacing-sm);
       padding-top: var(--spacing-sm); // Extra for transforms
 
@@ -78,8 +78,8 @@
       }
 
       &:hover:not(.chip-active):not([style*="cursor: not-allowed"]) {
-        background-color: #e5e7eb !important;
-        color: #374151 !important;
+        background-color: var(--surface-tertiary) !important;
+        color: var(--text-primary) !important;
         transform: translateY(-1px);
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
@@ -145,7 +145,7 @@
     right: 0;
     bottom: 0;
     width: 24px;
-    background: linear-gradient(90deg, transparent 0%, white 100%);
+    background: linear-gradient(90deg, transparent 0%, var(--surface-primary) 100%);
     pointer-events: none;
     opacity: 1;
     transition: opacity 0.2s ease;

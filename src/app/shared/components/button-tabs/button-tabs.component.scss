@@ -47,9 +47,9 @@
   // Mobile-first: compact padding
   gap: var(--spacing-xs);
   padding: var(--spacing-xs) var(--spacing-sm);
-  border: 1px solid #e5e7eb;
-  background: white;
-  color: var(--gray-700);
+  border: 1px solid var(--border-default);
+  background: var(--surface-primary);
+  color: var(--text-secondary);
   font-family: var(--font-family-base);
   font-weight: 500;
   // Mobile-first: smaller font
@@ -84,7 +84,7 @@
   }
 
   &:hover:not(.active) {
-    background: #f9fafb;
+    background: var(--surface-secondary);
   }
 
   &.active {
@@ -102,7 +102,7 @@
     font-size: 16px;
     width: 16px;
     height: 16px;
-    color: var(--gray-700);
+    color: var(--text-secondary);
 
     // Desktop: larger icon
     @include respond-to('md') {
