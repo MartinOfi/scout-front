@@ -86,7 +86,7 @@ $dialog-transition: t.$transition-fast;
   color: t.$stone-900;
   letter-spacing: -0.01em;
   border-bottom: 1px solid t.$stone-200;
-  background-color: white;
+  background-color: var(--surface-primary);
 
   // Mobile-first: compact padding
   padding: 16px 16px 12px;
@@ -107,7 +107,7 @@ $dialog-transition: t.$transition-fast;
 }
 
 @mixin dialog-content($min-width: 380px, $max-width: 480px) {
-  background-color: white;
+  background-color: var(--surface-primary);
 
   // Mobile-first: fluid width, compact padding
   padding: 16px;
@@ -168,17 +168,17 @@ $dialog-transition: t.$transition-fast;
 
 @mixin btn-secondary {
   @include btn-base;
-  background-color: white;
-  border: 1px solid t.$stone-300;
-  color: t.$stone-700;
+  background-color: var(--surface-primary);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
 
   &:hover {
-    background-color: t.$stone-50;
-    border-color: t.$stone-400;
+    background-color: var(--surface-secondary);
+    border-color: var(--border-strong);
   }
 
   &:active {
-    background-color: t.$stone-100;
+    background-color: var(--surface-tertiary);
   }
 }
 
@@ -209,9 +209,9 @@ $dialog-transition: t.$transition-fast;
 @mixin btn-outline {
   @include btn-base;
   padding: 10px 16px;
-  background-color: white;
-  border: 1px solid t.$stone-300;
-  color: t.$stone-700;
+  background-color: var(--surface-primary);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
 
   mat-icon {
     color: t.$brand-burgundy;
@@ -227,7 +227,7 @@ $dialog-transition: t.$transition-fast;
   }
 
   &:active {
-    background-color: t.$stone-100;
+    background-color: var(--surface-secondary);
   }
 }
 
@@ -235,7 +235,7 @@ $dialog-transition: t.$transition-fast;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background-color: white;
+  background-color: var(--surface-primary);
   border: 1px solid t.$color-error;
   color: t.$color-error-dark;
   border-radius: $dialog-radius-md;
@@ -321,17 +321,17 @@ $dialog-transition: t.$transition-fast;
   align-items: center;
   gap: 10px;
   padding: 16px;
-  background: linear-gradient(135deg, t.$stone-50 0%, t.$stone-100 100%);
-  border: 1px solid t.$stone-200;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-light);
   border-radius: $dialog-radius-md;
-  color: t.$stone-500;
+  color: var(--text-secondary);
   font-size: 0.875rem;
 
   mat-icon {
     font-size: 20px;
     width: 20px;
     height: 20px;
-    color: t.$stone-400;
+    color: var(--text-muted);
   }
 }
 

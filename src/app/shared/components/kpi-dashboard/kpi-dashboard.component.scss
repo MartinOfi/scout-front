@@ -49,6 +49,7 @@ $duration-slow: 500ms;
   padding: var(--spacing-lg);
   background: var(--surface-primary);
   border-radius: 16px;
+  border: 1px solid var(--border-default);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   border-left: 4px solid $color-burgundy;
 
@@ -209,6 +210,7 @@ $duration-slow: 500ms;
 .kpi-financial {
   background: var(--surface-primary);
   border-radius: 16px;
+  border: 1px solid var(--border-default);
   padding: var(--spacing-xl);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
@@ -234,7 +236,7 @@ $duration-slow: 500ms;
 .financial-card {
   padding: var(--spacing-md);
   border-radius: 12px;
-  background: #fafafa;
+  background: var(--surface-secondary);
   position: relative;
   overflow: hidden;
   transition: transform $duration-normal $ease-out-expo, box-shadow $duration-normal $ease-out-expo;
@@ -464,6 +466,7 @@ $duration-slow: 500ms;
 .kpi-debtors {
   background: var(--surface-primary);
   border-radius: 16px;
+  border: 1px solid var(--border-default);
   padding: var(--spacing-xl);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
@@ -483,7 +486,7 @@ $duration-slow: 500ms;
 .debtor-card {
   padding: var(--spacing-lg);
   border-radius: 12px;
-  background: #fafafa;
+  background: var(--surface-secondary);
   border-left: 3px solid transparent;
   transition: transform $duration-normal $ease-out-expo, box-shadow $duration-normal $ease-out-expo;
 
@@ -709,6 +712,6 @@ $duration-slow: 500ms;
   .skeleton-hero,
   .skeleton-card {
     animation: none;
-    background: #f0f0f0;
+    background: var(--surface-tertiary);
   }
 }

@@ -69,6 +69,37 @@ html {
   --mat-sys-outline-variant: var(--border-default);
   --mat-sys-primary: var(--brand-primary);
   --mat-sys-on-primary: var(--text-on-primary);
+
+  // Explicit Material component tokens that don't derive from --mat-sys-surface
+  --mdc-dialog-container-color: var(--surface-primary);
+  --mdc-dialog-subhead-color: var(--text-primary);
+  --mdc-dialog-supporting-text-color: var(--text-secondary);
+  --mdc-outlined-text-field-outline-color: var(--border-default);
+  --mdc-outlined-text-field-hover-outline-color: var(--border-strong);
+  --mdc-outlined-text-field-input-text-color: var(--text-primary);
+  --mdc-outlined-text-field-label-text-color: var(--text-secondary);
+  --mdc-filled-text-field-container-color: var(--surface-secondary);
+  --mdc-filled-text-field-input-text-color: var(--text-primary);
+  --mdc-filled-text-field-label-text-color: var(--text-secondary);
+  --mat-select-panel-background-color: var(--surface-tertiary);
+  --mat-select-enabled-trigger-text-color: var(--text-primary);
+  --mat-select-placeholder-text-color: var(--text-muted);
+  --mat-menu-container-color: var(--surface-tertiary);
+  --mat-menu-item-label-text-color: var(--text-primary);
+  --mat-menu-item-icon-color: var(--text-secondary);
+  --mat-option-label-text-color: var(--text-primary);
+  --mat-option-selected-state-label-text-color: var(--text-primary);
+  --mat-option-hover-state-layer-color: var(--surface-secondary);
+  --mat-option-focus-state-layer-color: var(--surface-secondary);
+  --mat-option-selected-state-layer-color: var(--surface-secondary);
+  --mat-autocomplete-background-color: var(--surface-tertiary);
+  --mat-datepicker-calendar-container-background-color: var(--surface-tertiary);
+  --mat-datepicker-calendar-container-text-color: var(--text-primary);
+  --mat-datepicker-calendar-date-text-color: var(--text-primary);
+  --mat-tab-header-label-text-color: var(--text-secondary);
+  --mat-tab-header-active-label-text-color: var(--text-primary);
+  --mat-checkbox-label-text-color: var(--text-primary);
+  --mat-form-field-subscript-text-color: var(--text-muted);
 }
 
 html {

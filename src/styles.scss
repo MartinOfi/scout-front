@@ -139,6 +139,73 @@
 }
 
 // -----------------------------------------------------------------------------
+// Tailwind utility dark-mode overrides
+// -----------------------------------------------------------------------------
+// Templates across the app use hardcoded Tailwind color utilities
+// (text-gray-*, text-blue-*, bg-blue-100, bg-green-100, etc.) inside HTML
+// and TypeScript class builders. Rather than touching every template, we
+// remap these utilities under [data-theme='dark'] so they produce readable
+// values on dark surfaces. Brand burgundy/indigo accents get brighter; all
+// gray text collapses onto the semantic text scale.
+
+[data-theme='dark'] {
+  // Grays → semantic text scale
+  .text-gray-900,
+  .text-gray-800 { color: var(--text-primary) !important; }
+  .text-gray-700,
+  .text-gray-600 { color: var(--text-secondary) !important; }
+  .text-gray-500,
+  .text-gray-400 { color: var(--text-muted) !important; }
+
+  // Gray backgrounds → semantic surfaces
+  .bg-gray-50       { background-color: var(--surface-secondary) !important; }
+  .bg-gray-100      { background-color: var(--surface-secondary) !important; }
+  .bg-gray-200      { background-color: var(--surface-tertiary)  !important; }
+  .hover\:bg-gray-100:hover { background-color: var(--surface-tertiary) !important; }
+
+  // Gray borders → semantic borders
+  .border-gray-100,
+  .border-gray-200 { border-color: var(--border-light) !important; }
+  .border-gray-300,
+  .border-gray-400 { border-color: var(--border-default) !important; }
+
+  // Action/info blue links → lighter tint for dark bg
+  .text-blue-600,
+  .text-blue-700,
+  .text-blue-800 { color: oklch(78% 0.14 240) !important; }
+  .hover\:text-blue-800:hover { color: oklch(86% 0.14 240) !important; }
+
+  // Semantic chip backgrounds — low-alpha tint versions of the accent color.
+  // Keeps the hue intact (green = success, red = danger) while letting the
+  // dark surface show through so chips don't look like bright stickers.
+  .bg-green-100  { background-color: oklch(30% 0.10 150 / 0.35) !important; }
+  .bg-green-50   { background-color: oklch(30% 0.10 150 / 0.25) !important; }
+  .bg-yellow-100 { background-color: oklch(38% 0.12  80 / 0.35) !important; }
+  .bg-yellow-50  { background-color: oklch(38% 0.12  80 / 0.25) !important; }
+  .bg-red-100    { background-color: oklch(32% 0.14  25 / 0.35) !important; }
+  .bg-red-50     { background-color: oklch(32% 0.14  25 / 0.25) !important; }
+  .bg-blue-100   { background-color: oklch(32% 0.12 240 / 0.35) !important; }
+  .bg-blue-50    { background-color: oklch(32% 0.12 240 / 0.25) !important; }
+  .bg-purple-100 { background-color: oklch(32% 0.14 300 / 0.35) !important; }
+  .bg-purple-50  { background-color: oklch(32% 0.14 300 / 0.25) !important; }
+
+  // Chip text colors — brighter versions for contrast on the tinted bg
+  .text-green-800,
+  .text-green-700 { color: oklch(82% 0.15 150) !important; }
+  .text-yellow-800,
+  .text-yellow-700 { color: oklch(82% 0.15  80) !important; }
+  .text-red-800,
+  .text-red-700 { color: oklch(80% 0.15  25) !important; }
+  .text-purple-800,
+  .text-purple-700 { color: oklch(82% 0.15 300) !important; }
+
+  // Boolean check/cross icons
+  .text-green-600 { color: oklch(76% 0.18 150) !important; }
+  .text-red-400,
+  .text-red-500   { color: oklch(72% 0.18  25) !important; }
+}
+
+// -----------------------------------------------------------------------------
 // 3. CSS RESET & BASE STYLES
 // -----------------------------------------------------------------------------
 
