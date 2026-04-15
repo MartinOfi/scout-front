@@ -5,8 +5,9 @@
 }
 
 [data-theme='dark'] {
-  // Pure grayscale borders to match the black surface layer.
-  --border-light:   oklch(20% 0 0);
-  --border-default: oklch(28% 0 0);
-  --border-strong:  oklch(40% 0 0);
+  // Borders need to be brighter than their adjacent surfaces to be visible.
+  // surface-primary is at 16%, so borders must exceed that lightness clearly.
+  --border-light:   oklch(26% 0 0);
+  --border-default: oklch(34% 0 0);
+  --border-strong:  oklch(46% 0 0);
 }
