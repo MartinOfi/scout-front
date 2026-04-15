@@ -166,7 +166,7 @@ $shadow-dialog: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     margin: 0 0 8px;
     font-size: 1.125rem;
     font-weight: 600;
-    color: t.$stone-800;
+    color: var(--text-primary);
 
     &--danger {
       color: $danger-600;
@@ -185,10 +185,10 @@ $shadow-dialog: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     margin: 0 0 24px;
     font-size: 0.9375rem;
     line-height: 1.5;
-    color: t.$stone-600;
+    color: var(--text-secondary);
 
     &--muted {
-      color: t.$stone-500;
+      color: var(--text-muted);
       font-style: italic;
     }
 
@@ -204,8 +204,8 @@ $shadow-dialog: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   &__details {
     margin: 0 0 24px;
     padding: 12px 16px;
-    background-color: t.$stone-50;
-    border: 1px solid t.$stone-200;
+    background-color: var(--surface-secondary);
+    border: 1px solid var(--border-default);
     border-radius: $radius-lg;
     text-align: left;
     display: flex;
@@ -221,14 +221,14 @@ $shadow-dialog: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 
     &:not(:last-child) {
       padding-bottom: 8px;
-      border-bottom: 1px solid t.$stone-100;
+      border-bottom: 1px solid var(--border-light);
     }
   }
 
   &__details-label {
     font-size: 0.75rem;
     font-weight: 500;
-    color: t.$stone-500;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.04em;
     white-space: nowrap;
@@ -237,7 +237,7 @@ $shadow-dialog: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   &__details-value {
     font-size: 0.875rem;
     font-weight: 600;
-    color: t.$stone-800;
+    color: var(--text-primary);
     text-align: right;
     margin: 0;
   }

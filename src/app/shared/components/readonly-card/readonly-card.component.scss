@@ -3,15 +3,15 @@
   flex-direction: column;
   gap: 6px;
   padding: 12px 16px;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-default);
   border-radius: 10px;
 
   &__label {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #64748b;
+    color: var(--text-muted);
     font-weight: 600;
   }
 
@@ -22,7 +22,7 @@
   }
 
   &__icon {
-    color: #2563eb;
+    color: var(--brand-primary);
     font-size: 32px;
     height: 32px;
     width: 32px;
@@ -39,12 +39,12 @@
   &__title {
     margin: 0;
     font-weight: 600;
-    color: #0f172a;
+    color: var(--text-primary);
   }
 
   &__meta {
     margin: 0;
     font-size: 0.85rem;
-    color: #475569;
+    color: var(--text-secondary);
   }
 }

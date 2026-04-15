@@ -47,7 +47,7 @@ $duration-slow: 500ms;
   grid-template-columns: 1fr;
   gap: var(--spacing-lg);
   padding: var(--spacing-lg);
-  background: white;
+  background: var(--surface-primary);
   border-radius: 16px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   border-left: 4px solid $color-burgundy;
@@ -91,7 +91,7 @@ $duration-slow: 500ms;
     font-size: 42px;
     font-weight: 600;
     line-height: 1;
-    color: var(--gray-900);
+    color: var(--text-primary);
     letter-spacing: -0.03em;
     font-feature-settings: 'tnum' 1, 'lnum' 1;
 
@@ -103,7 +103,7 @@ $duration-slow: 500ms;
 
   &__sublabel {
     font-size: 13px;
-    color: var(--gray-700);
+    color: var(--text-secondary);
     margin-top: var(--spacing-sm);
   }
 
@@ -116,7 +116,7 @@ $duration-slow: 500ms;
   &__distribution-title {
     font-size: 13px;
     font-weight: 500;
-    color: var(--gray-700);
+    color: var(--text-secondary);
     margin: 0 0 var(--spacing-md);
   }
 }
@@ -168,13 +168,13 @@ $duration-slow: 500ms;
 
   &__label {
     font-size: 12px;
-    color: var(--gray-700);
+    color: var(--text-secondary);
   }
 
   &__count {
     font-size: 12px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: var(--text-primary);
     font-feature-settings: 'tnum' 1;
   }
 }
@@ -191,7 +191,7 @@ $duration-slow: 500ms;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--gray-700);
+  color: var(--text-secondary);
   margin: 0 0 var(--spacing-md);
 
   mat-icon {
@@ -207,7 +207,7 @@ $duration-slow: 500ms;
 // =============================================================================
 
 .kpi-financial {
-  background: white;
+  background: var(--surface-primary);
   border-radius: 16px;
   padding: var(--spacing-xl);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
@@ -269,14 +269,14 @@ $duration-slow: 500ms;
   &__label {
     font-size: 12px;
     font-weight: 500;
-    color: var(--gray-700);
+    color: var(--text-secondary);
   }
 
   &__value {
     font-family: var(--font-family-headings);
     font-size: 24px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: var(--text-primary);
     font-feature-settings: 'tnum' 1, 'lnum' 1;
     letter-spacing: -0.02em;
     margin-bottom: var(--spacing-sm);
@@ -313,7 +313,7 @@ $duration-slow: 500ms;
 
   &__percentage {
     font-size: 11px;
-    color: var(--gray-700);
+    color: var(--text-secondary);
     margin-top: 4px;
     display: block;
   }
@@ -404,7 +404,7 @@ $duration-slow: 500ms;
     font-family: var(--font-family-headings);
     font-size: 28px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: var(--text-primary);
     line-height: 1;
     font-feature-settings: 'tnum' 1;
   }
@@ -412,7 +412,7 @@ $duration-slow: 500ms;
   &__label {
     display: block;
     font-size: 11px;
-    color: var(--gray-700);
+    color: var(--text-secondary);
     margin-top: 2px;
   }
 
@@ -437,14 +437,14 @@ $duration-slow: 500ms;
 
   &__detail-label {
     font-size: 13px;
-    color: var(--gray-700);
+    color: var(--text-secondary);
   }
 
   &__detail-value {
     font-family: var(--font-family-headings);
     font-size: 16px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: var(--text-primary);
     font-feature-settings: 'tnum' 1;
 
     &--success {
@@ -462,7 +462,7 @@ $duration-slow: 500ms;
 // =============================================================================
 
 .kpi-debtors {
-  background: white;
+  background: var(--surface-primary);
   border-radius: 16px;
   padding: var(--spacing-xl);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
@@ -550,12 +550,12 @@ $duration-slow: 500ms;
   &__label {
     font-size: 14px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: var(--text-primary);
   }
 
   &__description {
     font-size: 12px;
-    color: var(--gray-700);
+    color: var(--text-secondary);
     margin-top: 2px;
   }
 
@@ -576,14 +576,14 @@ $duration-slow: 500ms;
     font-family: var(--font-family-headings);
     font-size: 36px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: var(--text-primary);
     line-height: 1;
     font-feature-settings: 'tnum' 1;
   }
 
   &__count-label {
     font-size: 12px;
-    color: var(--gray-700);
+    color: var(--text-secondary);
   }
 
   &__amount {
@@ -593,7 +593,7 @@ $duration-slow: 500ms;
   &__amount-label {
     display: block;
     font-size: 11px;
-    color: var(--gray-700);
+    color: var(--text-secondary);
   }
 
   &__amount-value {
@@ -614,7 +614,7 @@ $duration-slow: 500ms;
 
   &__breakdown-item {
     font-size: 11px;
-    color: var(--gray-700);
+    color: var(--text-secondary);
     background: rgba(0, 0, 0, 0.04);
     padding: 2px 8px;
     border-radius: 4px;
@@ -630,7 +630,7 @@ $duration-slow: 500ms;
 
   &__text {
     font-size: 11px;
-    color: var(--gray-400);
+    color: var(--text-muted);
   }
 }
 
