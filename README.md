@@ -4,10 +4,10 @@
 
 <div align="center">
 
-![Header](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=0,2,2,5,30&height=220&section=header&text=Scout%20Frontend&fontSize=60&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Gesti%C3%B3n%20financiera%20para%20un%20grupo%20scout&descAlignY=58&descSize=18)
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=0,2,2,5,30&height=220&section=header&text=Scout%20Frontend&fontSize=60&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Gesti%C3%B3n%20financiera%20para%20un%20grupo%20scout&descAlignY=58&descSize=18" width="100%" alt="Scout Frontend — plataforma Angular de gestión financiera para grupos scout" />
 
-<a href="#-scout--frontend">
-  <img src="https://readme-typing-svg.demolab.com/?lines=Angular+21+%7C+Material+%7C+Tailwind+4;Dashboard+financiero+en+tiempo+real;Multi-rama+%2B+cuentas+personales;Dark+mode+nativo&center=true&width=700&height=50&color=DD0031&vCenter=true&size=22&pause=800" alt="Typing SVG" />
+<a href="#scout-frontend--gestión-financiera-para-grupos-scout-con-angular-21">
+  <img src="https://readme-typing-svg.demolab.com/?lines=Angular+21+%7C+Material+%7C+Tailwind+4;Dashboard+financiero+en+tiempo+real;Multi-rama+%2B+cuentas+personales;Dark+mode+nativo&center=true&width=700&height=50&color=DD0031&vCenter=true&size=22&pause=800" width="700" height="50" alt="Angular 21, Material y Tailwind 4 — dashboard financiero en tiempo real, multi-rama y modo oscuro" />
 </a>
 
 <br/>
@@ -32,13 +32,17 @@
 
 ---
 
-# 🎯 Scout — Frontend
+# Scout Frontend — Gestión financiera para grupos scout con Angular 21 🎯
+
+**Scout Frontend** es la aplicación web **Angular 21** de **gestión financiera para grupos scout**: una sola plataforma para administrar el padrón de socios, las cajas contables del grupo y las ramas, los movimientos de ingresos y egresos, las inscripciones anuales a **Scouts de Argentina**, las cuotas mensuales, los campamentos y los eventos de venta y del grupo. Soporta modo oscuro nativo, arquitectura modular con lazy loading y dashboards financieros en tiempo real.
+
+> 📦 **Parte del monorepo [Scout](../README.md)** · Ver también: [🚀 Backend (NestJS)](../backend/README.md) · [🤖 AGENTS.md](../AGENTS.md)
 
 > **Panel financiero y administrativo** para un grupo scout. Una sola app para gestionar socios, cajas, movimientos, inscripciones, cuotas, campamentos y eventos — con dashboards en tiempo real, modo oscuro nativo y arquitectura modular.
 
 <div align="center">
 
-<img src="../dark-mode-dashboard-contrast.png" alt="Dashboard" width="88%" />
+<img src="../dark-mode-dashboard-contrast.png" width="88%" alt="Dashboard financiero del grupo scout en modo oscuro — tarjetas de saldo por caja, gráficos de ingresos y egresos y lista de movimientos recientes" />
 
 <sub><i>Dashboard principal — modo oscuro con tarjetas de estado financiero</i></sub>
 
@@ -51,21 +55,21 @@
 <table>
   <tr>
     <td align="center" width="50%">
-      <img src="../dark-movimientos.png" alt="Movimientos" width="100%" /><br/>
+      <img src="../dark-movimientos.png" width="100%" alt="Listado de movimientos financieros del grupo scout con filtros por fecha, caja, persona y concepto en modo oscuro" /><br/>
       <sub><b>Listado de movimientos</b><br/>Filtros por fecha, caja, persona y concepto</sub>
     </td>
     <td align="center" width="50%">
-      <img src="../dark-movimiento-form.png" alt="Formulario" width="100%" /><br/>
+      <img src="../dark-movimiento-form.png" width="100%" alt="Formulario reactivo de alta de movimiento financiero scout con validación Angular Material y Tailwind" /><br/>
       <sub><b>Alta de movimiento</b><br/>Validación reactiva con Material + Tailwind</sub>
     </td>
   </tr>
   <tr>
     <td align="center" width="50%">
-      <img src="../dark-mode-inscripciones.png" alt="Inscripciones" width="100%" /><br/>
+      <img src="../dark-mode-inscripciones.png" width="100%" alt="Pantalla de inscripciones anuales a Scouts de Argentina con padrón de protagonistas y educadores en modo oscuro" /><br/>
       <sub><b>Inscripciones</b><br/>Padrón anual a Scouts de Argentina</sub>
     </td>
     <td align="center" width="50%">
-      <img src="../dark-mode-login-v3.png" alt="Login" width="100%" /><br/>
+      <img src="../dark-mode-login-v3.png" width="100%" alt="Pantalla de login de Scout Frontend con soporte de tema claro y oscuro" /><br/>
       <sub><b>Login</b><br/>Soporte de tema claro / oscuro</sub>
     </td>
   </tr>
