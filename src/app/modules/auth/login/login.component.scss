@@ -11,7 +11,7 @@
 .login-page {
   display: flex;
   min-height: 100vh;
-  background: t.$stone-50;
+  background: var(--surface-page);
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -160,7 +160,7 @@
   align-items: center;
   justify-content: center;
   padding: 3rem;
-  background: t.$surface-white;
+  background: var(--surface-page);
 
   @media (max-width: 768px) {
     padding: 2rem;
@@ -174,7 +174,7 @@
 
 .form-card {
   padding: 2.5rem;
-  background: t.$surface-white;
+  background: var(--surface-primary);
   border-radius: 16px;
   box-shadow:
     0 4px 6px rgba(0, 0, 0, 0.05),
@@ -191,14 +191,14 @@
 .form-title {
   font-size: 1.75rem;
   font-weight: 600;
-  color: t.$stone-800;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
   text-align: center;
 }
 
 .form-subtitle {
   font-size: 0.95rem;
-  color: t.$stone-600;
+  color: var(--text-secondary);
   margin-bottom: 2rem;
   text-align: center;
 }
@@ -236,7 +236,7 @@
   width: 100%;
 
   mat-icon[matPrefix] {
-    color: t.$stone-400;
+    color: var(--text-muted);
     margin-right: 0.5rem;
   }
 
@@ -336,7 +336,7 @@
   margin-top: 2rem;
   text-align: center;
   font-size: 0.85rem;
-  color: t.$stone-600;
+  color: var(--text-secondary);
 
   .separator {
     margin: 0 0.5rem;
