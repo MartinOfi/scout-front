@@ -154,6 +154,12 @@
                 <mat-icon>{{ participante.autorizacionEntregada ? 'assignment_turned_in' : 'assignment_late'
                   }}</mat-icon>
               </button>
+              <button class="participante-card__remove unstyled"
+                (click)="onRemoveParticipante(participante)"
+                title="Quitar participante"
+                type="button">
+                <mat-icon>person_remove</mat-icon>
+              </button>
             </div>
 
             <!-- Payment History -->

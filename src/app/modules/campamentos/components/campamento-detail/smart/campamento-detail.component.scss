@@ -615,6 +615,36 @@ $section-gap: 20px;
     }
   }
 
+  &__remove {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: 1px solid t.$stone-200;
+    border-radius: 8px;
+    color: t.$stone-400;
+    cursor: pointer;
+    transition:
+      background-color t.$transition-fast,
+      color t.$transition-fast,
+      border-color t.$transition-fast;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &:hover {
+      background-color: color-mix(in srgb, t.$color-error 10%, transparent);
+      border-color: color-mix(in srgb, t.$color-error 30%, transparent);
+      color: t.$color-error;
+    }
+  }
+
   &__payments {
     padding: 0 16px 12px;
     display: flex;
