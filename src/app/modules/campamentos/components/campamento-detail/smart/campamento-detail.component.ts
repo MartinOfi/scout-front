@@ -67,6 +67,8 @@ import {
   Rama,
   FiltroMovimientosCampamento,
 } from '../../../../../shared/enums';
+import { FilterValueMap } from '../../../../../shared/components/filters/generic-filters/filter-value.type';
+import { ParticipantesFiltrosComponent } from '../components/participantes-filtros/participantes-filtros.component';
 
 /** Participant filter options: all, a specific rama, or the educador role */
 type RamaParticipantesFilter = Rama | 'todos' | 'educador';
@@ -95,6 +97,7 @@ interface KpiConfig {
     MovimientoCampamentoCardComponent,
     MoneyPipe,
     DatePipe,
+    ParticipantesFiltrosComponent,
   ],
   templateUrl: './campamento-detail.component.html',
   styleUrl: './campamento-detail.component.scss',
@@ -205,14 +208,9 @@ export class CampamentoDetailComponent implements OnInit {
     this.activeTab.set(key);
   }
 
-  onFiltroNombreChange(event: Event): void {
-    this.filtroNombreParticipantes.set((event.target as HTMLInputElement).value);
-  }
-
-  onFiltroRamaChange(event: Event): void {
-    this.filtroRamaParticipantes.set(
-      (event.target as HTMLSelectElement).value as RamaParticipantesFilter,
-    );
+  onParticipantesFiltersChanged(filters: FilterValueMap): void {
+    this.filtroNombreParticipantes.set((filters['nombre'] as string) ?? '');
+    this.filtroRamaParticipantes.set((filters['rama'] as RamaParticipantesFilter) ?? 'todos');
   }
 
   onFiltroChange(key: string): void {
