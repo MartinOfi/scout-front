@@ -1,5 +1,5 @@
 <div class="detail-page">
-  @if (loading()) {
+  @if (initialLoading()) {
   <div class="detail-loading">
     <app-loading-spinner message="Cargando campamento..." />
   </div>
@@ -123,6 +123,9 @@
         <app-participantes-filtros
           (filtersChanged)="onParticipantesFiltersChanged($event)"
         />
+        @if (refreshing()) {
+        <app-loading-spinner message="Buscando participantes..." />
+        }
         @if (participantes().length > 0) {
         <div class="participantes-list">
           @for (participante of participantes(); track participante.id) {

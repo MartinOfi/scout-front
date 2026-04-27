@@ -112,6 +112,8 @@ export class CampamentoDetailComponent implements OnInit {
   readonly participantes = this.state.detalleParticipantes;
   readonly movimientos = this.state.detalleMovimientos;
   readonly loading = this.state.loading;
+  readonly initialLoading = this.state.initialLoading;
+  readonly refreshing = this.state.refreshing;
   readonly error = this.state.error;
 
   /** Active tab key */
@@ -186,6 +188,7 @@ export class CampamentoDetailComponent implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
+      this.state.clearDetalle();
       this.loadCampamento(id);
     }
   }
@@ -199,11 +202,18 @@ export class CampamentoDetailComponent implements OnInit {
   }
 
   onParticipantesFiltersChanged(filters: FilterValueMap): void {
-    const filter: { nombre?: string; rama?: string } = {};
     const nombre = filters['nombre'] as string | undefined;
     const rama = filters['rama'] as string | undefined;
+
+    if (nombre && nombre.length < 3) return;
+
+    const filter: { nombre?: string; rama?: string } = {};
     if (nombre) filter.nombre = nombre;
     if (rama) filter.rama = rama;
+
+    const current = this.participantesFilter();
+    if (filter.nombre === current.nombre && filter.rama === current.rama) return;
+
     this.participantesFilter.set(filter);
     this.filterSubject.next(filter);
   }

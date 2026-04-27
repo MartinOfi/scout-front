@@ -60,6 +60,10 @@ export class CampamentosStateService {
     this._pagosPorParticipante.asReadonly();
   readonly loading: Signal<boolean> = this._loading.asReadonly();
   readonly error: Signal<string | null> = this._error.asReadonly();
+  /** True only during the very first load (no data yet). Use for full-screen spinners. */
+  readonly initialLoading = computed((): boolean => this._loading() && this._detalle() === null);
+  /** True while refreshing existing data (filters, actions). Use for inline loaders. */
+  readonly refreshing = computed((): boolean => this._loading() && this._detalle() !== null);
 
   // ============================================================================
   // Computed Signals (derived state)
@@ -407,6 +411,14 @@ export class CampamentosStateService {
    */
   select(id: string | null): void {
     this._selectedId.set(id);
+  }
+
+  /**
+   * Limpiar solo el detalle del campamento actual (al navegar a uno nuevo)
+   */
+  clearDetalle(): void {
+    this._detalle.set(null);
+    this._selectedId.set(null);
   }
 
   /**
