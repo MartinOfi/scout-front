@@ -119,14 +119,13 @@
       <!-- Tab Content: Participantes -->
       @if (activeTab() === 'participantes') {
       <div class="tab-content">
-        @if (participantes().length > 0) {
-        <!-- Participant filters -->
+        <!-- Participant filters - always visible -->
         <app-participantes-filtros
           (filtersChanged)="onParticipantesFiltersChanged($event)"
         />
-        @if (participantesFiltrados().length > 0) {
+        @if (participantes().length > 0) {
         <div class="participantes-list">
-          @for (participante of participantesFiltrados(); track participante.id) {
+          @for (participante of participantes(); track participante.id) {
           <article class="participante-card">
             <div class="participante-card__header">
               <div class="participante-card__avatar">
@@ -194,7 +193,7 @@
           </article>
           }
         </div>
-        } @else {
+        } @else if (hasParticipantesFilter()) {
         <div class="tab-empty">
           <div class="tab-empty__icon">
             <mat-icon>search_off</mat-icon>
@@ -202,7 +201,6 @@
           <p class="tab-empty__text">Sin resultados</p>
           <p class="tab-empty__hint">No hay participantes que coincidan con los filtros</p>
         </div>
-        }
         } @else {
         <div class="tab-empty">
           <div class="tab-empty__icon">
