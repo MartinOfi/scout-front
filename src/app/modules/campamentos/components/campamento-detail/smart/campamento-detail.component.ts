@@ -45,6 +45,7 @@ import {
   PagoParticipanteDto,
   RegistrarPagoCampamentoDto,
   UpdatePagoDto,
+  UpdateParticipanteAutorizacionDto,
 } from '../../../../../shared/models';
 import {
   PagoCampamentoDialogData,
@@ -218,6 +219,7 @@ export class CampamentoDetailComponent implements OnInit {
       filterByTypes: [PersonaType.PROTAGONISTA, PersonaType.EDUCADOR],
       excludeIds: existingIds,
       showRamaFilter: true,
+      showAutorizacionField: true,
       confirmLabel: 'Agregar',
     };
 
@@ -225,10 +227,12 @@ export class CampamentoDetailComponent implements OnInit {
       .pipe(switchMap((dialogRef) => dialogRef.afterClosed()))
       .subscribe((result: PersonaSelectorDialogResult | undefined) => {
         if (!result) return;
-        const dto: AddParticipanteDto = { personaId: result.persona.id };
+        const dto: AddParticipanteDto = {
+          personaId: result.persona.id,
+          autorizacionEntregada: result.autorizacionEntregada ?? false,
+        };
         this.state.addParticipante(camp.id, dto).subscribe({
           next: () => {
-            // Reload detail to refresh all data (KPIs, participants list)
             this.loadCampamento(camp.id);
           },
         });
@@ -329,6 +333,16 @@ export class CampamentoDetailComponent implements OnInit {
           this.loadCampamento(camp.id);
         }
       });
+  }
+
+  onToggleAutorizacion(participante: ParticipantePagoDto): void {
+    const camp = this.campamento();
+    if (!camp) return;
+
+    const dto: UpdateParticipanteAutorizacionDto = {
+      autorizacionEntregada: !participante.autorizacionEntregada,
+    };
+    this.state.updateParticipanteAutorizacion(camp.id, participante.id, dto).subscribe();
   }
 
   onRegistrarGasto(): void {

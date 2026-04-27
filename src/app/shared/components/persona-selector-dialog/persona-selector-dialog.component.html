@@ -42,6 +42,15 @@
         <span error>Seleccione una persona</span>
       </app-form-field>
 
+      <!-- Autorización entregada (optional) -->
+      @if (data.showAutorizacionField) {
+      <div class="autorizacion-field">
+        <mat-checkbox formControlName="autorizacionEntregada" color="primary">
+          Autorización entregada
+        </mat-checkbox>
+      </div>
+      }
+
       <!-- Available count info -->
       @if (!loading() && filteredPersonas().length > 0) {
       <p class="available-count">

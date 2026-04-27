@@ -19,6 +19,7 @@ import {
   CreateCampamentoDto,
   UpdateCampamentoDto,
   AddParticipanteDto,
+  UpdateParticipanteAutorizacionDto,
   RegistrarPagoCampamentoDto,
   RegistrarGastoCampamentoDto,
   UpdatePagoDto,
@@ -218,6 +219,27 @@ export class CampamentosStateService {
       }),
       catchError((err: unknown) => {
         this._error.set(this.errorHandler.extractMessage(err, 'Error al remover participante'));
+        return throwError(() => err);
+      }),
+      finalize(() => this._loading.set(false)),
+    );
+  }
+
+  updateParticipanteAutorizacion(
+    campamentoId: string,
+    personaId: string,
+    dto: UpdateParticipanteAutorizacionDto,
+  ): Observable<void> {
+    this._loading.set(true);
+    this._error.set(null);
+
+    return this.apiService.updateParticipanteAutorizacion(campamentoId, personaId, dto).pipe(
+      tap(() => {
+        this.loadDetalle(campamentoId);
+        this.notificationService.showSuccess('Autorización actualizada exitosamente');
+      }),
+      catchError((err: unknown) => {
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al actualizar autorización'));
         return throwError(() => err);
       }),
       finalize(() => this._loading.set(false)),

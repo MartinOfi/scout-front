@@ -25,6 +25,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { finalize } from 'rxjs/operators';
 
 import { PersonaUnion } from '../../models';
@@ -54,6 +55,8 @@ export interface PersonaSelectorDialogData {
   excludeIds?: string[];
   /** Show rama filter dropdown (default: false) */
   showRamaFilter?: boolean;
+  /** Show autorización entregada checkbox (default: false) */
+  showAutorizacionField?: boolean;
   /** Custom confirm button label (default: 'Confirmar') */
   confirmLabel?: string;
 }
@@ -64,6 +67,8 @@ export interface PersonaSelectorDialogData {
 export interface PersonaSelectorDialogResult {
   /** Selected persona */
   persona: PersonaUnion;
+  /** Autorización entregada (present only when showAutorizacionField is true) */
+  autorizacionEntregada?: boolean;
 }
 
 // ============================================================================
@@ -78,6 +83,7 @@ export interface PersonaSelectorDialogResult {
     ReactiveFormsModule,
     MatDialogModule,
     MatIconModule,
+    MatCheckboxModule,
     FormFieldComponent,
     SelectFieldComponent,
     ButtonComponent,
@@ -102,6 +108,7 @@ export class PersonaSelectorDialogComponent implements OnInit {
   // Form
   readonly form: FormGroup = this.fb.group({
     personaId: ['', Validators.required],
+    autorizacionEntregada: [false],
   });
 
   // Rama options for filter (spread to mutable array for select component)
@@ -181,7 +188,12 @@ export class PersonaSelectorDialogComponent implements OnInit {
     const persona = this.filteredPersonas().find((p) => p.id === personaId);
 
     if (persona) {
-      const result: PersonaSelectorDialogResult = { persona };
+      const result: PersonaSelectorDialogResult = {
+        persona,
+        ...(this.data.showAutorizacionField && {
+          autorizacionEntregada: !!this.form.value.autorizacionEntregada,
+        }),
+      };
       this.dialogRef.close(result);
     }
   }

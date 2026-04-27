@@ -146,6 +146,14 @@
                 <span>pendiente</span>
                 }
               </div>
+              <button class="participante-card__autorizacion unstyled"
+                [class.participante-card__autorizacion--ok]="participante.autorizacionEntregada"
+                (click)="onToggleAutorizacion(participante)"
+                [title]="participante.autorizacionEntregada ? 'Autorización entregada' : 'Autorización pendiente'"
+                type="button">
+                <mat-icon>{{ participante.autorizacionEntregada ? 'assignment_turned_in' : 'assignment_late'
+                  }}</mat-icon>
+              </button>
             </div>
 
             <!-- Payment History -->
@@ -192,15 +200,12 @@
       <div class="tab-content">
         <!-- Movement filters -->
         <div class="movimientos-filtros">
-          <app-button-tabs [tabs]="filtroTabs" [activeTab]="filtroMovimientos()"
-            (tabChange)="onFiltroChange($event)" />
+          <app-button-tabs [tabs]="filtroTabs" [activeTab]="filtroMovimientos()" (tabChange)="onFiltroChange($event)" />
         </div>
         @if (movimientos().length > 0) {
         <div class="movimientos-list">
           @for (movimiento of movimientos(); track movimiento.id) {
-          <app-movimiento-campamento-card
-            [movimiento]="movimiento"
-            (pagarReembolso)="onPagarReembolso($event)" />
+          <app-movimiento-campamento-card [movimiento]="movimiento" (pagarReembolso)="onPagarReembolso($event)" />
           }
         </div>
         } @else {

@@ -6,6 +6,7 @@ import {
   CreateCampamentoDto,
   UpdateCampamentoDto,
   AddParticipanteDto,
+  UpdateParticipanteAutorizacionDto,
   RegistrarPagoCampamentoDto,
   RegistrarGastoCampamentoDto,
   UpdatePagoDto,
@@ -107,6 +108,17 @@ export class CampamentosApiService {
   removeParticipante(campamentoId: string, personaId: string): Observable<Campamento> {
     return this.http.delete<Campamento>(
       `${this.endpoint}/${campamentoId}/participantes/${personaId}`,
+    );
+  }
+
+  updateParticipanteAutorizacion(
+    campamentoId: string,
+    personaId: string,
+    dto: UpdateParticipanteAutorizacionDto,
+  ): Observable<void> {
+    return this.http.patch<void, UpdateParticipanteAutorizacionDto>(
+      `${this.endpoint}/${campamentoId}/participantes/${personaId}`,
+      dto,
     );
   }
 

@@ -575,6 +575,46 @@ $section-gap: 20px;
     color: t.$stone-800;
   }
 
+  &__autorizacion {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: 1px solid t.$stone-200;
+    border-radius: 8px;
+    color: t.$stone-400;
+    cursor: pointer;
+    transition:
+      background-color t.$transition-fast,
+      color t.$transition-fast,
+      border-color t.$transition-fast;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &:hover {
+      background-color: t.$stone-50;
+      color: t.$stone-600;
+      border-color: t.$stone-300;
+    }
+
+    &--ok {
+      background-color: color-mix(in srgb, t.$color-success 12%, transparent);
+      border-color: color-mix(in srgb, t.$color-success 30%, transparent);
+      color: t.$color-success;
+
+      &:hover {
+        background-color: color-mix(in srgb, t.$color-success 20%, transparent);
+      }
+    }
+  }
+
   &__payments {
     padding: 0 16px 12px;
     display: flex;

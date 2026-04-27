@@ -94,6 +94,14 @@ export interface UpdateCampamentoDto {
  */
 export interface AddParticipanteDto {
   personaId: string;
+  autorizacionEntregada?: boolean;
+}
+
+/**
+ * DTO for updating participant authorization
+ */
+export interface UpdateParticipanteAutorizacionDto {
+  autorizacionEntregada: boolean;
 }
 
 /**
@@ -187,6 +195,7 @@ export interface ParticipantePagoDto {
   estadoPago: EstadoPagoCampamento;
   /** Personal account balance available for mixed payments */
   saldoCuentaPersonal: number;
+  autorizacionEntregada: boolean;
   pagos: PagoParticipanteDto[];
 }
 
