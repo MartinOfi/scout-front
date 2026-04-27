@@ -335,6 +335,20 @@ export class CampamentoDetailComponent implements OnInit {
       });
   }
 
+  onRemoveParticipante(participante: ParticipantePagoDto): void {
+    const camp = this.campamento();
+    if (!camp) return;
+
+    this.confirmDialog
+      .confirmDelete(`participante "${participante.nombre}"`)
+      .subscribe((confirmed: boolean) => {
+        if (!confirmed) return;
+        this.state.removeParticipante(camp.id, participante.id).subscribe({
+          next: () => this.loadCampamento(camp.id),
+        });
+      });
+  }
+
   onToggleAutorizacion(participante: ParticipantePagoDto): void {
     const camp = this.campamento();
     if (!camp) return;
