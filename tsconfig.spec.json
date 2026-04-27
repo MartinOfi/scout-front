@@ -44,6 +44,9 @@
     "src/app/shared/enums/movimiento.enum.spec.ts",
     "src/app/modules/movimientos/components/movimiento-form/components/concepto-selector/concepto-selector.component.ts",
     "src/app/modules/movimientos/components/movimiento-form/components/concepto-selector/concepto-selector.component.spec.ts",
-    "src/app/shared/components/form/form-field/form-field.component.ts"
+    "src/app/shared/components/form/form-field/form-field.component.ts",
+    "src/app/modules/campamentos/components/campamento-detail/smart/campamento-detail.component.ts",
+    "src/app/modules/campamentos/components/campamento-detail/smart/campamento-detail.component.spec.ts",
+    "src/app/modules/campamentos/services/**/*.ts"
   ]
 }

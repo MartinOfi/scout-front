@@ -61,7 +61,15 @@ import {
 } from '../../../../../shared/components/persona-selector-dialog/persona-selector-dialog.component';
 import { AddParticipanteDto } from '../../../../../shared/models';
 import { formatMoney, MoneyPipe } from '../../../../../shared/pipes/money.pipe';
-import { EstadoPago, PersonaType, FiltroMovimientosCampamento } from '../../../../../shared/enums';
+import {
+  EstadoPago,
+  PersonaType,
+  Rama,
+  FiltroMovimientosCampamento,
+} from '../../../../../shared/enums';
+
+/** Participant filter options: all, a specific rama, or the educador role */
+type RamaParticipantesFilter = Rama | 'todos' | 'educador';
 
 interface KpiConfig {
   readonly icon: string;
@@ -117,6 +125,25 @@ export class CampamentoDetailComponent implements OnInit {
   readonly filtroMovimientos = signal<FiltroMovimientosCampamento>(
     FiltroMovimientosCampamento.TODOS,
   );
+
+  /** Participant name search filter (case-insensitive partial match) */
+  readonly filtroNombreParticipantes = signal<string>('');
+
+  /** Participant rama/role filter */
+  readonly filtroRamaParticipantes = signal<RamaParticipantesFilter>('todos');
+
+  /** Participants filtered client-side by nombre and rama */
+  readonly participantesFiltrados = computed((): ParticipantePagoDto[] => {
+    const nombre = this.filtroNombreParticipantes().toLowerCase().trim();
+    const rama = this.filtroRamaParticipantes();
+    return this.participantes().filter((p) => {
+      const matchesNombre = nombre === '' || p.nombre.toLowerCase().includes(nombre);
+      const matchesRama =
+        rama === 'todos' ||
+        (rama === 'educador' ? p.tipo === PersonaType.EDUCADOR : p.rama === rama);
+      return matchesNombre && matchesRama;
+    });
+  });
 
   /** Tab configurations */
   readonly tabs: TabConfig[] = [
@@ -176,6 +203,16 @@ export class CampamentoDetailComponent implements OnInit {
 
   onTabChange(key: string): void {
     this.activeTab.set(key);
+  }
+
+  onFiltroNombreChange(event: Event): void {
+    this.filtroNombreParticipantes.set((event.target as HTMLInputElement).value);
+  }
+
+  onFiltroRamaChange(event: Event): void {
+    this.filtroRamaParticipantes.set(
+      (event.target as HTMLSelectElement).value as RamaParticipantesFilter,
+    );
   }
 
   onFiltroChange(key: string): void {

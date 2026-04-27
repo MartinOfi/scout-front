@@ -470,6 +470,46 @@ $section-gap: 20px;
 }
 
 // -----------------------------------------------------------------------------
+// PARTICIPANTES FILTROS
+// -----------------------------------------------------------------------------
+
+.participantes-filtros {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+
+  &__search {
+    flex: 1;
+    min-width: 160px;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--surface-primary, #fff);
+    outline: none;
+
+    &:focus {
+      border-color: var(--color-primary, #5c6bc0);
+    }
+  }
+
+  &__rama {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--surface-primary, #fff);
+    cursor: pointer;
+    outline: none;
+
+    &:focus {
+      border-color: var(--color-primary, #5c6bc0);
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
 // PARTICIPANTES LIST
 // -----------------------------------------------------------------------------
 
