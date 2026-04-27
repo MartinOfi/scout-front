@@ -17,7 +17,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { from, firstValueFrom, switchMap } from 'rxjs';
+import { Subject, from, firstValueFrom, switchMap, debounceTime } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { CampamentosStateService } from '../../../services';
 import { CajasApiService } from '../../../../cajas/services/cajas-api.service';
@@ -61,17 +62,9 @@ import {
 } from '../../../../../shared/components/persona-selector-dialog/persona-selector-dialog.component';
 import { AddParticipanteDto } from '../../../../../shared/models';
 import { formatMoney, MoneyPipe } from '../../../../../shared/pipes/money.pipe';
-import {
-  EstadoPago,
-  PersonaType,
-  Rama,
-  FiltroMovimientosCampamento,
-} from '../../../../../shared/enums';
+import { EstadoPago, PersonaType, FiltroMovimientosCampamento } from '../../../../../shared/enums';
 import { FilterValueMap } from '../../../../../shared/components/filters/generic-filters/filter-value.type';
 import { ParticipantesFiltrosComponent } from '../components/participantes-filtros/participantes-filtros.component';
-
-/** Participant filter options: all, a specific rama, or the educador role */
-type RamaParticipantesFilter = Rama | 'todos' | 'educador';
 
 interface KpiConfig {
   readonly icon: string;
@@ -129,24 +122,21 @@ export class CampamentoDetailComponent implements OnInit {
     FiltroMovimientosCampamento.TODOS,
   );
 
-  /** Participant name search filter (case-insensitive partial match) */
-  readonly filtroNombreParticipantes = signal<string>('');
-
-  /** Participant rama/role filter */
-  readonly filtroRamaParticipantes = signal<RamaParticipantesFilter>('todos');
-
-  /** Participants filtered client-side by nombre and rama */
-  readonly participantesFiltrados = computed((): ParticipantePagoDto[] => {
-    const nombre = this.filtroNombreParticipantes().toLowerCase().trim();
-    const rama = this.filtroRamaParticipantes();
-    return this.participantes().filter((p) => {
-      const matchesNombre = nombre === '' || p.nombre.toLowerCase().includes(nombre);
-      const matchesRama =
-        rama === 'todos' ||
-        (rama === 'educador' ? p.tipo === PersonaType.EDUCADOR : p.rama === rama);
-      return matchesNombre && matchesRama;
-    });
+  private readonly participantesFilter = signal<{ nombre?: string; rama?: string }>({});
+  private readonly filterSubject = new Subject<{ nombre?: string; rama?: string }>();
+  readonly hasParticipantesFilter = computed((): boolean => {
+    const f = this.participantesFilter();
+    return !!(f.nombre || f.rama);
   });
+
+  constructor() {
+    this.filterSubject.pipe(debounceTime(300), takeUntilDestroyed()).subscribe((filter) => {
+      const id = this.route.snapshot.paramMap.get('id');
+      if (id) {
+        this.state.loadDetalle(id, this.filtroMovimientos(), filter);
+      }
+    });
+  }
 
   /** Tab configurations */
   readonly tabs: TabConfig[] = [
@@ -201,7 +191,7 @@ export class CampamentoDetailComponent implements OnInit {
   }
 
   loadCampamento(id: string): void {
-    this.state.loadDetalle(id, this.filtroMovimientos());
+    this.state.loadDetalle(id, this.filtroMovimientos(), this.participantesFilter());
   }
 
   onTabChange(key: string): void {
@@ -209,8 +199,13 @@ export class CampamentoDetailComponent implements OnInit {
   }
 
   onParticipantesFiltersChanged(filters: FilterValueMap): void {
-    this.filtroNombreParticipantes.set((filters['nombre'] as string) ?? '');
-    this.filtroRamaParticipantes.set((filters['rama'] as RamaParticipantesFilter) ?? 'todos');
+    const filter: { nombre?: string; rama?: string } = {};
+    const nombre = filters['nombre'] as string | undefined;
+    const rama = filters['rama'] as string | undefined;
+    if (nombre) filter.nombre = nombre;
+    if (rama) filter.rama = rama;
+    this.participantesFilter.set(filter);
+    this.filterSubject.next(filter);
   }
 
   onFiltroChange(key: string): void {
@@ -218,7 +213,7 @@ export class CampamentoDetailComponent implements OnInit {
     this.filtroMovimientos.set(filtro);
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.state.loadDetalle(id, filtro);
+      this.state.loadDetalle(id, filtro, this.participantesFilter());
     }
   }
 

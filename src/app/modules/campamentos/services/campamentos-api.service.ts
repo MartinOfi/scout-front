@@ -51,10 +51,12 @@ export class CampamentosApiService {
   getDetalle(
     id: string,
     filtro: FiltroMovimientosCampamento = FiltroMovimientosCampamento.TODOS,
+    participantesFilter?: { nombre?: string; rama?: string },
   ): Observable<CampamentoDetalleDto> {
-    return this.http.get<CampamentoDetalleDto>(`${this.endpoint}/${id}/detalle`, {
-      filtroMovimientos: filtro,
-    });
+    const params: Record<string, string> = { filtroMovimientos: filtro };
+    if (participantesFilter?.nombre) params['nombre'] = participantesFilter.nombre;
+    if (participantesFilter?.rama) params['rama'] = participantesFilter.rama;
+    return this.http.get<CampamentoDetalleDto>(`${this.endpoint}/${id}/detalle`, params);
   }
 
   /**

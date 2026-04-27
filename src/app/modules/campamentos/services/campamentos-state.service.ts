@@ -122,12 +122,13 @@ export class CampamentosStateService {
   loadDetalle(
     id: string,
     filtro: FiltroMovimientosCampamento = FiltroMovimientosCampamento.TODOS,
+    participantesFilter?: { nombre?: string; rama?: string },
   ): void {
     this._loading.set(true);
     this._error.set(null);
     this._selectedId.set(id);
 
-    this.apiService.getDetalle(id, filtro).subscribe({
+    this.apiService.getDetalle(id, filtro, participantesFilter).subscribe({
       next: (detalle: CampamentoDetalleDto) => {
         this._detalle.set(detalle);
         this._loading.set(false);
