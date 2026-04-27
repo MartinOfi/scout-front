@@ -39,4 +39,4 @@ __screenshots__/
 Thumbs.db
 .vercel
 .playwright-mcp
-.superpowers
+.superpowers.worktrees/
