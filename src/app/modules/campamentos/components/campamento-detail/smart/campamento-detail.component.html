@@ -120,8 +120,31 @@
       @if (activeTab() === 'participantes') {
       <div class="tab-content">
         @if (participantes().length > 0) {
+        <!-- Participant filters -->
+        <div class="participantes-filtros">
+          <input
+            class="participantes-filtros__search"
+            type="text"
+            placeholder="Buscar por nombre..."
+            [value]="filtroNombreParticipantes()"
+            (input)="onFiltroNombreChange($event)"
+          />
+          <select
+            class="participantes-filtros__rama"
+            [value]="filtroRamaParticipantes()"
+            (change)="onFiltroRamaChange($event)"
+          >
+            <option value="todos">Todos</option>
+            <option value="educador">Educadores</option>
+            <option value="Manada">Manada</option>
+            <option value="Unidad">Unidad</option>
+            <option value="Caminantes">Caminantes</option>
+            <option value="Rovers">Rovers</option>
+          </select>
+        </div>
+        @if (participantesFiltrados().length > 0) {
         <div class="participantes-list">
-          @for (participante of participantes(); track participante.id) {
+          @for (participante of participantesFiltrados(); track participante.id) {
           <article class="participante-card">
             <div class="participante-card__header">
               <div class="participante-card__avatar">
@@ -183,6 +206,15 @@
           </article>
           }
         </div>
+        } @else {
+        <div class="tab-empty">
+          <div class="tab-empty__icon">
+            <mat-icon>search_off</mat-icon>
+          </div>
+          <p class="tab-empty__text">Sin resultados</p>
+          <p class="tab-empty__hint">No hay participantes que coincidan con los filtros</p>
+        </div>
+        }
         } @else {
         <div class="tab-empty">
           <div class="tab-empty__icon">
