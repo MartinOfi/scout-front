@@ -100,6 +100,11 @@ html {
   --mat-tab-header-active-label-text-color: var(--text-primary);
   --mat-checkbox-label-text-color: var(--text-primary);
   --mat-form-field-subscript-text-color: var(--text-muted);
+  --mat-expansion-container-background-color: var(--surface-primary);
+  --mat-expansion-header-hover-state-layer-color: var(--surface-tertiary);
+  --mat-expansion-header-focus-state-layer-color: var(--surface-secondary);
+  --mat-expansion-header-text-color: var(--text-primary);
+  --mat-expansion-container-text-color: var(--text-primary);
 }
 
 html {

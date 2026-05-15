@@ -161,7 +161,8 @@
   .bg-gray-50       { background-color: var(--surface-secondary) !important; }
   .bg-gray-100      { background-color: var(--surface-secondary) !important; }
   .bg-gray-200      { background-color: var(--surface-tertiary)  !important; }
-  .hover\:bg-gray-100:hover { background-color: var(--surface-tertiary) !important; }
+  .hover\:bg-gray-50:hover  { background-color: var(--surface-secondary) !important; }
+  .hover\:bg-gray-100:hover { background-color: var(--surface-tertiary)  !important; }
 
   // Gray borders → semantic borders
   .border-gray-100,
@@ -203,6 +204,25 @@
   .text-green-600 { color: oklch(76% 0.18 150) !important; }
   .text-red-400,
   .text-red-500   { color: oklch(72% 0.18  25) !important; }
+
+  // Monetary debt (table rows, cuotas, etc.)
+  .text-red-600 { color: oklch(76% 0.18 25) !important; }
+
+  // White card backgrounds → dark surface
+  .bg-white { background-color: var(--surface-primary) !important; }
+
+  // Amber palette — docs-missing chips & warning badges
+  .bg-amber-50    { background-color: oklch(32% 0.12 60 / 0.25) !important; }
+  .bg-amber-100   { background-color: oklch(32% 0.12 60 / 0.35) !important; }
+  .border-amber-200,
+  .border-amber-300 { border-color: oklch(55% 0.15 60 / 0.60) !important; }
+  .text-amber-600,
+  .text-amber-700,
+  .text-amber-800 { color: oklch(82% 0.16 60) !important; }
+
+  // Doc pill borders (red = missing, green = present)
+  .border-red-200  { border-color: oklch(48% 0.18 25 / 0.55) !important; }
+  .border-green-200 { border-color: oklch(40% 0.15 150 / 0.55) !important; }
 }
 
 // -----------------------------------------------------------------------------

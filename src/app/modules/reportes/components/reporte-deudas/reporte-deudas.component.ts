@@ -9,7 +9,6 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatChipsModule } from '@angular/material/chips';
@@ -23,6 +22,13 @@ import { ButtonComponent } from '../../../../shared/components/button/button.com
 import { formatMoney } from '../../../../shared/pipes/money.pipe';
 import { RamaEnum } from '../../../../shared/enums/persona.enum';
 
+interface DebtCard {
+  label: string;
+  name: string;
+  ano: number;
+  saldo: number;
+}
+
 const CURRENT_YEAR = new Date().getFullYear();
 const YEAR_OPTIONS = Array.from({ length: CURRENT_YEAR - 2019 }, (_, i) => ({
   value: CURRENT_YEAR - i,
@@ -34,7 +40,6 @@ const YEAR_OPTIONS = Array.from({ length: CURRENT_YEAR - 2019 }, (_, i) => ({
   standalone: true,
   imports: [
     CommonModule,
-    MatExpansionModule,
     MatIconModule,
     MatProgressSpinnerModule,
     MatChipsModule,
@@ -51,35 +56,32 @@ export class ReporteDeudasComponent implements OnInit {
 
   readonly formatMoney = formatMoney;
 
-  // ============================================================================
-  // State
-  // ============================================================================
-
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly deudas = signal<PersonaDeuda[]>([]);
   readonly filters = signal<DeudaFilters>({});
+  readonly selectedPersonaId = signal<string | null>(null);
+  readonly selectedTipo = signal<string>('');
 
-  // ============================================================================
-  // Computed / Derived
-  // ============================================================================
+  readonly displayedDeudas = computed(() => {
+    const tipo = this.selectedTipo();
+    if (!tipo) return this.deudas();
+    return this.deudas().filter((p) => this.hasTipoDeuda(p, tipo));
+  });
 
   readonly summary = computed(() => {
-    const all = this.deudas();
+    const all = this.displayedDeudas();
     const totalDeuda = all.reduce((s, p) => s + p.deudaTotal, 0);
     const docsFaltantes = all.filter((p) => this.hasDocDeuda(p)).length;
     return { personas: all.length, totalDeuda, docsFaltantes };
   });
 
-  // ============================================================================
-  // Filters Configuration
-  // ============================================================================
-
   readonly filterConfigs: FilterConfig[] = [
     {
       key: 'rama',
-      type: FilterType.CHIPS,
+      type: FilterType.SELECT,
       label: 'Rama',
+      placeholder: 'Todas las ramas',
       options: [
         { value: '', label: 'Todas' },
         { value: RamaEnum.MANADA, label: 'Manada' },
@@ -93,37 +95,76 @@ export class ReporteDeudasComponent implements OnInit {
       type: FilterType.SELECT,
       label: 'Año',
       placeholder: 'Todos los años',
-      options: [{ value: '', label: 'Todos los años' }, ...YEAR_OPTIONS.map((o) => ({ value: o.value.toString(), label: o.label }))],
+      options: [
+        { value: '', label: 'Todos los años' },
+        ...YEAR_OPTIONS.map((o) => ({ value: o.value.toString(), label: o.label })),
+      ],
+    },
+    {
+      key: 'tipo',
+      type: FilterType.SELECT,
+      label: 'Tipo de deuda',
+      placeholder: 'Todos los tipos',
+      options: [
+        { value: '', label: 'Todos' },
+        { value: 'campamentos', label: 'Campamentos' },
+        { value: 'inscripcionesScout', label: 'Inscripciones Scout AR' },
+        { value: 'inscripcionesGrupo', label: 'Inscripciones Grupo' },
+        { value: 'documentacion', label: 'Documentación' },
+      ],
     },
   ];
-
-  // ============================================================================
-  // Lifecycle
-  // ============================================================================
 
   ngOnInit(): void {
     this.load();
   }
 
-  // ============================================================================
-  // Actions
-  // ============================================================================
-
   onFiltersChanged(raw: Record<string, unknown>): void {
+    this.selectedTipo.set((raw['tipo'] as string) ?? '');
+
     const next: DeudaFilters = {};
     if (raw['rama'] && raw['rama'] !== '') next.rama = raw['rama'] as string;
     if (raw['ano'] && raw['ano'] !== '') next.ano = Number(raw['ano']);
-    this.filters.set(next);
-    this.load();
+
+    const current = this.filters();
+    if (current.rama !== next.rama || current.ano !== next.ano) {
+      this.filters.set(next);
+      this.load();
+    }
   }
 
   retry(): void {
     this.load();
   }
 
-  // ============================================================================
-  // Helpers (used in template)
-  // ============================================================================
+  togglePersona(id: string): void {
+    this.selectedPersonaId.update((current) => (current === id ? null : id));
+  }
+
+  debtCards(p: PersonaDeuda): DebtCard[] {
+    return [
+      ...p.campamentos.map((c) => ({ label: 'Camp.', name: c.nombre, ano: c.ano, saldo: c.saldo })),
+      ...p.inscripcionesScout.map((i) => ({
+        label: 'Scout AR',
+        name: 'Inscripción',
+        ano: i.ano,
+        saldo: i.saldo,
+      })),
+      ...p.inscripcionesGrupo.map((i) => ({
+        label: 'Grupo',
+        name: 'Inscripción',
+        ano: i.ano,
+        saldo: i.saldo,
+      })),
+      ...p.cuotas.map((c) => ({ label: 'Cuota', name: c.nombre, ano: c.ano, saldo: c.saldo })),
+    ]
+      .filter((d) => d.saldo > 0)
+      .sort((a, b) => a.ano - b.ano || a.label.localeCompare(b.label));
+  }
+
+  hasMissingAutorizacion(p: PersonaDeuda): boolean {
+    return p.campamentos.some((c) => !c.autorizacionEntregada);
+  }
 
   hasDocDeuda(p: PersonaDeuda): boolean {
     return (
@@ -162,9 +203,22 @@ export class ReporteDeudasComponent implements OnInit {
     return personal + inscCount + campCount;
   }
 
-  // ============================================================================
-  // Private
-  // ============================================================================
+  private hasTipoDeuda(p: PersonaDeuda, tipo: string): boolean {
+    switch (tipo) {
+      case 'campamentos':
+        return p.campamentos.some((c) => c.saldo > 0);
+      case 'inscripcionesScout':
+        return p.inscripcionesScout.some((i) => i.saldo > 0);
+      case 'inscripcionesGrupo':
+        return p.inscripcionesGrupo.some((i) => i.saldo > 0);
+      case 'cuotas':
+        return p.cuotas.some((c) => c.saldo > 0);
+      case 'documentacion':
+        return this.hasDocDeuda(p);
+      default:
+        return true;
+    }
+  }
 
   private load(): void {
     this.loading.set(true);

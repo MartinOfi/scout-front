@@ -1,31 +1,56 @@
-<div class="flex flex-col gap-6 p-6">
+<div class="flex flex-col gap-4 p-6">
 
   <!-- Filters -->
   <app-generic-filters
     [filterConfigs]="filterConfigs"
-    [autoApply]="false"
+    [autoApply]="true"
     [showClearButton]="true"
     (filtersChanged)="onFiltersChanged($event)" />
 
   <!-- KPI Cards -->
   @if (!loading() && !error()) {
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <div class="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-1 shadow-sm">
-        <span class="text-sm font-medium text-gray-500 uppercase tracking-wide">Personas con deuda</span>
-        <span class="text-3xl font-bold text-gray-900">{{ summary().personas }}</span>
+
+      <!-- Personas con deuda -->
+      <div class="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3 shadow-sm overflow-hidden relative">
+        <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-l-xl"></div>
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-blue-50 shrink-0 ml-1">
+          <mat-icon class="text-blue-600" style="font-size:18px;height:18px;width:18px">people</mat-icon>
+        </div>
+        <div class="flex flex-col gap-0.5 min-w-0">
+          <span class="text-xs font-medium text-gray-500 uppercase tracking-wide leading-none">Personas con deuda</span>
+          <span class="text-2xl font-bold text-gray-900 leading-tight tabular-nums">{{ summary().personas }}</span>
+        </div>
       </div>
-      <div class="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-1 shadow-sm">
-        <span class="text-sm font-medium text-gray-500 uppercase tracking-wide">Deuda total</span>
-        <span class="text-3xl font-bold text-red-600">{{ formatMoney(summary().totalDeuda, 0) }}</span>
+
+      <!-- Deuda total -->
+      <div class="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3 shadow-sm overflow-hidden relative">
+        <div class="absolute left-0 top-0 bottom-0 w-1 bg-red-500 rounded-l-xl"></div>
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-red-50 shrink-0 ml-1">
+          <mat-icon class="text-red-600" style="font-size:18px;height:18px;width:18px">payments</mat-icon>
+        </div>
+        <div class="flex flex-col gap-0.5 min-w-0">
+          <span class="text-xs font-medium text-gray-500 uppercase tracking-wide leading-none">Deuda total</span>
+          <span class="text-2xl font-bold text-red-600 leading-tight tabular-nums">{{ formatMoney(summary().totalDeuda, 0) }}</span>
+        </div>
       </div>
-      <div class="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-1 shadow-sm">
-        <span class="text-sm font-medium text-gray-500 uppercase tracking-wide">Con docs faltantes</span>
-        <span class="text-3xl font-bold text-amber-600">{{ summary().docsFaltantes }}</span>
+
+      <!-- Docs faltantes -->
+      <div class="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3 shadow-sm overflow-hidden relative">
+        <div class="absolute left-0 top-0 bottom-0 w-1 bg-amber-500 rounded-l-xl"></div>
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-amber-50 shrink-0 ml-1">
+          <mat-icon class="text-amber-700" style="font-size:18px;height:18px;width:18px">description</mat-icon>
+        </div>
+        <div class="flex flex-col gap-0.5 min-w-0">
+          <span class="text-xs font-medium text-gray-500 uppercase tracking-wide leading-none">Con docs faltantes</span>
+          <span class="text-2xl font-bold text-amber-700 leading-tight tabular-nums">{{ summary().docsFaltantes }}</span>
+        </div>
       </div>
+
     </div>
   }
 
-  <!-- States -->
+  <!-- Loading -->
   @if (loading()) {
     <div class="flex flex-col items-center justify-center gap-3 py-16 text-gray-500">
       <mat-spinner diameter="40" />
@@ -37,197 +62,167 @@
       <span>{{ error() }}</span>
       <app-button variant="secondary" (clicked)="retry()">Reintentar</app-button>
     </div>
-  } @else if (deudas().length === 0) {
+  } @else if (displayedDeudas().length === 0) {
     <div class="flex flex-col items-center justify-center gap-3 py-16 text-gray-500">
       <mat-icon>check_circle_outline</mat-icon>
       <span>No hay deudas pendientes con los filtros seleccionados</span>
     </div>
   } @else {
 
-    <!-- Debt Table -->
+    <!-- Table -->
     <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
 
-      <!-- Column headers -->
-      <div class="grid grid-cols-[1fr_120px_140px_100px] gap-4 px-4 py-3 bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+      <!-- Header -->
+      <div class="grid grid-cols-[160px_90px_1fr_96px] gap-3 px-4 py-2.5 bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wider">
         <span>Nombre</span>
         <span>Rama</span>
-        <span class="text-right">Deuda total</span>
-        <span class="text-right">Docs falt.</span>
+        <span>Deudas</span>
+        <span class="text-right">Total</span>
       </div>
 
-      <!-- Expandable rows -->
-      <mat-accordion [multi]="false">
-        @for (persona of deudas(); track persona.personaId) {
-          <mat-expansion-panel class="persona-panel">
+      @for (persona of displayedDeudas(); track persona.personaId) {
 
-            <!-- Row summary -->
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                <span class="font-medium text-gray-900 text-sm">{{ persona.nombre }}</span>
-                <span class="text-sm text-gray-600">{{ persona.rama }}</span>
-                <span class="text-sm font-semibold text-right" [class.text-red-600]="persona.deudaTotal > 0" [class.text-gray-400]="persona.deudaTotal <= 0">
-                  {{ persona.deudaTotal > 0 ? formatMoney(persona.deudaTotal, 0) : '—' }}
+        <!-- Row -->
+        <div
+          class="border-b border-gray-100 last:border-b-0 cursor-pointer hover:bg-gray-50 transition-colors duration-150"
+          [class.bg-gray-50]="selectedPersonaId() === persona.personaId"
+          (click)="togglePersona(persona.personaId)">
+
+          <div class="grid grid-cols-[160px_90px_1fr_96px] gap-3 px-4 py-3 items-start">
+
+            <!-- Name -->
+            <div class="flex flex-col justify-center">
+              <span class="text-sm font-semibold text-gray-900 leading-snug">{{ persona.nombre }}</span>
+            </div>
+
+            <!-- Rama -->
+            <span class="text-sm text-gray-900 leading-snug self-center">{{ persona.rama }}</span>
+
+            <!-- Inline debt chips + doc badge -->
+            <div class="flex flex-wrap gap-1.5 items-center self-center">
+              @for (card of debtCards(persona); track card.label + card.ano + card.name) {
+                <span class="inline-flex items-baseline gap-1 text-xs px-2 py-0.5 rounded-md bg-red-50 border border-red-200 text-red-700 whitespace-nowrap font-medium">
+                  {{ card.label }} {{ card.ano }}
+                  <span class="font-bold">{{ formatMoney(card.saldo, 0) }}</span>
                 </span>
-                @if (countDocsFaltantes(persona) > 0) {
-                  <span class="text-sm text-right text-amber-600 font-medium">
-                    {{ countDocsFaltantes(persona) }} falt.
-                  </span>
-                } @else {
-                  <span class="text-sm text-right text-green-600">OK</span>
-                }
-              </mat-panel-title>
-            </mat-expansion-panel-header>
+              }
+              @if (countDocsFaltantes(persona) > 0) {
+                <span class="inline-flex items-center gap-0.5 text-xs px-2 py-0.5 rounded-md bg-amber-50 border border-amber-200 text-amber-700 whitespace-nowrap font-medium">
+                  <mat-icon style="font-size:11px;height:11px;width:11px">description</mat-icon>
+                  {{ countDocsFaltantes(persona) }} docs
+                </span>
+              }
+            </div>
 
-            <!-- Detail content -->
+            <!-- Total + chevron -->
+            <div class="flex items-center justify-end gap-1 self-center">
+              @if (persona.deudaTotal > 0) {
+                <span class="text-sm font-bold text-red-600 tabular-nums">{{ formatMoney(persona.deudaTotal, 0) }}</span>
+              }
+              <mat-icon class="text-gray-400 shrink-0 transition-transform duration-200"
+                [class.rotate-180]="selectedPersonaId() === persona.personaId"
+                style="font-size:18px;height:18px;width:18px">
+                expand_more
+              </mat-icon>
+            </div>
 
-            <!-- Campamentos -->
-            @if (persona.campamentos.length > 0) {
-              <div class="px-6 py-4 border-t border-gray-100">
-                <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Campamentos</div>
-                @for (camp of persona.campamentos; track camp.campamentoId) {
-                  <div class="flex items-center py-2 border-b border-gray-50 last:border-b-0 text-sm">
-                    <span class="text-gray-700 flex-1">{{ camp.nombre }}</span>
-                    <span class="text-gray-400 text-xs mx-2">{{ camp.ano }}</span>
-                    <span class="font-medium text-right" [class.text-red-600]="camp.saldo > 0" [class.text-green-600]="camp.saldo <= 0">
-                      {{ camp.saldo > 0 ? formatMoney(camp.saldo, 0) : 'Pagado' }}
-                    </span>
-                  </div>
-                  @if (!camp.autorizacionEntregada) {
-                    <div class="flex flex-wrap gap-2 mt-1 mb-2">
-                      <span class="flex items-center gap-1 text-xs px-2 py-1 rounded-full border border-amber-200 bg-amber-50 text-amber-700">
-                        <mat-icon style="font-size:14px;height:14px;width:14px">close</mat-icon>
-                        Autorización no entregada
-                      </span>
-                    </div>
-                  }
-                }
-              </div>
-            }
+          </div>
 
-            <!-- Inscripciones Scout Argentina -->
-            @if (persona.inscripcionesScout.length > 0) {
-              <div class="px-6 py-4 border-t border-gray-100">
-                <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Inscripciones Scout Argentina</div>
-                @for (insc of persona.inscripcionesScout; track insc.inscripcionId) {
-                  <div class="flex items-center py-2 border-b border-gray-50 last:border-b-0 text-sm">
-                    <span class="text-gray-700 flex-1">Inscripción</span>
-                    <span class="text-gray-400 text-xs mx-2">{{ insc.ano }}</span>
-                    <span class="font-medium text-right" [class.text-red-600]="insc.saldo > 0" [class.text-green-600]="insc.saldo <= 0">
-                      {{ insc.saldo > 0 ? formatMoney(insc.saldo, 0) : 'Pagado' }}
-                    </span>
-                  </div>
-                }
-              </div>
-            }
+          <!-- Expanded detail -->
+          @if (selectedPersonaId() === persona.personaId) {
+            <div class="px-4 pb-4 pt-3 border-t border-gray-200 bg-white" (click)="$event.stopPropagation()">
 
-            <!-- Inscripciones Grupo -->
-            @if (persona.inscripcionesGrupo.length > 0) {
-              <div class="px-6 py-4 border-t border-gray-100">
-                <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Inscripciones Grupo</div>
-                @for (insc of persona.inscripcionesGrupo; track insc.inscripcionId) {
-                  <div class="flex items-center py-2 border-b border-gray-50 last:border-b-0 text-sm">
-                    <span class="text-gray-700 flex-1">Inscripción</span>
-                    <span class="text-gray-400 text-xs mx-2">{{ insc.ano }}</span>
-                    <span class="font-medium text-right" [class.text-red-600]="insc.saldo > 0" [class.text-green-600]="insc.saldo <= 0">
-                      {{ insc.saldo > 0 ? formatMoney(insc.saldo, 0) : 'Pagado' }}
-                    </span>
-                  </div>
-                }
-              </div>
-            }
-
-            <!-- Cuotas -->
-            @if (persona.cuotas.length > 0) {
-              <div class="px-6 py-4 border-t border-gray-100">
-                <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Cuotas</div>
-                @for (cuota of persona.cuotas; track cuota.cuotaId) {
-                  <div class="flex items-center py-2 border-b border-gray-50 last:border-b-0 text-sm">
-                    <span class="text-gray-700 flex-1">{{ cuota.nombre }}</span>
-                    <span class="text-gray-400 text-xs mx-2">{{ cuota.ano }}</span>
-                    <span class="font-medium text-right text-red-600">{{ formatMoney(cuota.saldo, 0) }}</span>
-                  </div>
-                }
-              </div>
-            }
-
-            <!-- Documentación -->
-            @if (hasDocDeuda(persona)) {
-              <div class="px-6 py-4 border-t border-gray-100">
-                <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Documentación personal</div>
-
-                <div class="flex flex-wrap gap-2">
-                  <span class="flex items-center gap-1 text-xs px-2 py-1 rounded-full border"
-                    [class.border-green-200]="persona.documentacionPersonal.dni"
-                    [class.bg-green-50]="persona.documentacionPersonal.dni"
-                    [class.text-green-700]="persona.documentacionPersonal.dni"
-                    [class.border-amber-200]="!persona.documentacionPersonal.dni"
-                    [class.bg-amber-50]="!persona.documentacionPersonal.dni"
-                    [class.text-amber-700]="!persona.documentacionPersonal.dni">
-                    <mat-icon style="font-size:14px;height:14px;width:14px">{{ persona.documentacionPersonal.dni ? 'check' : 'close' }}</mat-icon>
-                    DNI
-                  </span>
-                  <span class="flex items-center gap-1 text-xs px-2 py-1 rounded-full border"
-                    [class.border-green-200]="persona.documentacionPersonal.partidaNacimiento"
-                    [class.bg-green-50]="persona.documentacionPersonal.partidaNacimiento"
-                    [class.text-green-700]="persona.documentacionPersonal.partidaNacimiento"
-                    [class.border-amber-200]="!persona.documentacionPersonal.partidaNacimiento"
-                    [class.bg-amber-50]="!persona.documentacionPersonal.partidaNacimiento"
-                    [class.text-amber-700]="!persona.documentacionPersonal.partidaNacimiento">
-                    <mat-icon style="font-size:14px;height:14px;width:14px">{{ persona.documentacionPersonal.partidaNacimiento ? 'check' : 'close' }}</mat-icon>
-                    Partida nacimiento
-                  </span>
-                  <span class="flex items-center gap-1 text-xs px-2 py-1 rounded-full border"
-                    [class.border-green-200]="persona.documentacionPersonal.dniPadres"
-                    [class.bg-green-50]="persona.documentacionPersonal.dniPadres"
-                    [class.text-green-700]="persona.documentacionPersonal.dniPadres"
-                    [class.border-amber-200]="!persona.documentacionPersonal.dniPadres"
-                    [class.bg-amber-50]="!persona.documentacionPersonal.dniPadres"
-                    [class.text-amber-700]="!persona.documentacionPersonal.dniPadres">
-                    <mat-icon style="font-size:14px;height:14px;width:14px">{{ persona.documentacionPersonal.dniPadres ? 'check' : 'close' }}</mat-icon>
-                    DNI padres
-                  </span>
-                  <span class="flex items-center gap-1 text-xs px-2 py-1 rounded-full border"
-                    [class.border-green-200]="persona.documentacionPersonal.carnetObraSocial"
-                    [class.bg-green-50]="persona.documentacionPersonal.carnetObraSocial"
-                    [class.text-green-700]="persona.documentacionPersonal.carnetObraSocial"
-                    [class.border-amber-200]="!persona.documentacionPersonal.carnetObraSocial"
-                    [class.bg-amber-50]="!persona.documentacionPersonal.carnetObraSocial"
-                    [class.text-amber-700]="!persona.documentacionPersonal.carnetObraSocial">
-                    <mat-icon style="font-size:14px;height:14px;width:14px">{{ persona.documentacionPersonal.carnetObraSocial ? 'check' : 'close' }}</mat-icon>
-                    Carnet obra social
-                  </span>
-                </div>
-
-                @for (doc of persona.documentacionInscripcion; track doc.inscripcionId) {
-                  <div class="text-xs text-gray-500 mt-3 mb-1">Inscripción Scout AR {{ doc.ano }}</div>
+              <!-- Monetary debt cards -->
+              @if (debtCards(persona).length > 0) {
+                <div class="mb-3">
+                  <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Deudas monetarias</p>
                   <div class="flex flex-wrap gap-2">
+                    @for (card of debtCards(persona); track card.label + card.ano + card.name) {
+                      <div class="flex flex-col gap-1 px-3 py-2.5 rounded-lg border border-red-200 bg-red-50 min-w-[110px]">
+                        <div class="flex items-center gap-1.5">
+                          <span class="text-xs font-bold uppercase tracking-wide text-red-700 leading-none">{{ card.label }}</span>
+                          <span class="text-xs text-red-600 leading-none font-medium">{{ card.ano }}</span>
+                        </div>
+                        <span class="text-xs text-gray-600 leading-tight truncate max-w-[140px]">{{ card.name }}</span>
+                        <span class="text-sm font-bold text-red-700 leading-none tabular-nums">{{ formatMoney(card.saldo, 0) }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+
+              <!-- Camp authorizations missing -->
+              @if (hasMissingAutorizacion(persona)) {
+                <div class="mb-3">
+                  <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Autorizaciones faltantes</p>
+                  <div class="flex flex-wrap gap-1.5">
+                    @for (camp of persona.campamentos; track camp.campamentoId) {
+                      @if (!camp.autorizacionEntregada) {
+                        <span class="flex items-center gap-0.5 text-xs px-2 py-1 rounded-md border border-amber-300 bg-amber-50 text-amber-800 font-medium">
+                          <mat-icon style="font-size:12px;height:12px;width:12px">warning_amber</mat-icon>
+                          Aut. {{ camp.nombre }} {{ camp.ano }}
+                        </span>
+                      }
+                    }
+                  </div>
+                </div>
+              }
+
+              <!-- Personal docs -->
+              @if (hasDocDeuda(persona)) {
+                <div>
+                  <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Documentación</p>
+                  <div class="flex flex-wrap gap-1.5">
                     @for (item of [
-                      { ok: doc.declaracionDeSalud, label: 'Decl. salud' },
-                      { ok: doc.autorizacionDeImagen, label: 'Aut. imagen' },
-                      { ok: doc.salidasCercanas, label: 'Salidas cercanas' },
-                      { ok: doc.autorizacionIngreso, label: 'Aut. ingreso' },
-                      { ok: doc.certificadoAptitudFisica, label: 'Cert. aptitud física' }
+                      { ok: persona.documentacionPersonal.dni, label: 'DNI' },
+                      { ok: persona.documentacionPersonal.partidaNacimiento, label: 'Partida nac.' },
+                      { ok: persona.documentacionPersonal.dniPadres, label: 'DNI padres' },
+                      { ok: persona.documentacionPersonal.carnetObraSocial, label: 'Obra social' }
                     ]; track item.label) {
-                      <span class="flex items-center gap-1 text-xs px-2 py-1 rounded-full border"
+                      <span class="flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded-full border font-medium"
                         [class.border-green-200]="item.ok"
                         [class.bg-green-50]="item.ok"
-                        [class.text-green-700]="item.ok"
-                        [class.border-amber-200]="!item.ok"
-                        [class.bg-amber-50]="!item.ok"
-                        [class.text-amber-700]="!item.ok">
-                        <mat-icon style="font-size:14px;height:14px;width:14px">{{ item.ok ? 'check' : 'close' }}</mat-icon>
+                        [class.text-green-800]="item.ok"
+                        [class.border-red-200]="!item.ok"
+                        [class.bg-red-50]="!item.ok"
+                        [class.text-red-700]="!item.ok">
+                        <mat-icon style="font-size:11px;height:11px;width:11px">{{ item.ok ? 'check' : 'close' }}</mat-icon>
                         {{ item.label }}
                       </span>
                     }
-                  </div>
-                }
-              </div>
-            }
 
-          </mat-expansion-panel>
-        }
-      </mat-accordion>
+                    @for (doc of persona.documentacionInscripcion; track doc.inscripcionId) {
+                      @for (item of [
+                        { ok: doc.declaracionDeSalud, label: 'Decl. salud ' + doc.ano },
+                        { ok: doc.autorizacionDeImagen, label: 'Aut. imagen ' + doc.ano },
+                        { ok: doc.salidasCercanas, label: 'Salidas ' + doc.ano },
+                        { ok: doc.autorizacionIngreso, label: 'Aut. ingreso ' + doc.ano },
+                        { ok: doc.certificadoAptitudFisica, label: 'Apt. física ' + doc.ano }
+                      ]; track item.label) {
+                        <span class="flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded-full border font-medium"
+                          [class.border-green-200]="item.ok"
+                          [class.bg-green-50]="item.ok"
+                          [class.text-green-800]="item.ok"
+                          [class.border-red-200]="!item.ok"
+                          [class.bg-red-50]="!item.ok"
+                          [class.text-red-700]="!item.ok">
+                          <mat-icon style="font-size:11px;height:11px;width:11px">{{ item.ok ? 'check' : 'close' }}</mat-icon>
+                          {{ item.label }}
+                        </span>
+                      }
+                    }
+                  </div>
+                </div>
+              }
+
+            </div>
+          }
+
+        </div>
+      }
+
     </div>
+
   }
 
 </div>

@@ -1,5 +1,5 @@
 // =============================================================================
-// PRODUCTO CARD — clean hierarchy, MagicUI glare-hover sweep
+// PRODUCTO CARD — clean hierarchy, subtle hover elevation
 // =============================================================================
 
 @use 'app/shared/styles/tokens' as t;
@@ -24,31 +24,9 @@
     pointer-events: none;
   }
 
-  // ─── Glare sweep on hover (MagicUI glare-hover pattern, pure CSS) ─────────
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    background-image: linear-gradient(
-      -45deg,
-      transparent 40%,
-      rgba(255, 255, 255, 0.45) 50%,
-      transparent 62%
-    );
-    background-size: 300% 300%;
-    background-position: -100% -100%;
-    transition: background-position 600ms ease-in-out;
-  }
-
   &:hover {
     box-shadow: t.$shadow-lg;
     transform: translateY(-2px);
-
-    &::before {
-      background-position: 200% 200%;
-    }
 
     .producto-card__delete {
       opacity: 1;
