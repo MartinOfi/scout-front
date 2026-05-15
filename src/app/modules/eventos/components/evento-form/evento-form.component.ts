@@ -84,6 +84,12 @@ export class EventoFormComponent implements OnInit {
     label: DESTINO_GANANCIA_LABELS[d],
   }));
 
+  readonly destinoGananciaLabel = computed(() => {
+    const evento = this.state.selected();
+    if (!evento?.destinoGanancia) return null;
+    return DESTINO_GANANCIA_LABELS[evento.destinoGanancia as DestinoGanancia] ?? null;
+  });
+
   private formPopulated = false;
 
   constructor() {

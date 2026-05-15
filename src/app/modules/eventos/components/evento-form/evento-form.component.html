@@ -11,6 +11,12 @@
         <p class="scout-form-subtitle">
           {{ isEditing() ? 'Modifica los datos del evento' : 'Registra un nuevo evento o venta' }}
         </p>
+        @if (isEditing() && destinoGananciaLabel()) {
+          <p class="scout-form-meta">
+            <span class="scout-form-meta-label">Destino de ganancia:</span>
+            <span class="scout-form-meta-value">{{ destinoGananciaLabel() }}</span>
+          </p>
+        }
       </header>
 
       <!-- Content -->
@@ -93,8 +99,8 @@
               </app-form-field>
             }
 
-            <!-- Destino Ganancia (solo para VENTA) -->
-            @if (form.get('tipo')?.value === tipoEvento.VENTA) {
+            <!-- Destino Ganancia (solo en creación para VENTA) -->
+            @if (!isEditing() && form.get('tipo')?.value === tipoEvento.VENTA) {
               <app-form-field
                 label="Destino de ganancia"
                 [forId]="'destino-select'"

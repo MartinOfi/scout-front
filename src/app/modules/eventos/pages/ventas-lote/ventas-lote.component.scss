@@ -126,7 +126,6 @@ $card-radius: 12px;
 
   th {
     padding: 8px 12px;
-    text-align: left;
     font-size: 12px;
     font-weight: 600;
     color: t.$stone-500;
@@ -143,7 +142,7 @@ $card-radius: 12px;
 }
 
 .col-nombre {
-  flex: 1;
+  text-align: left;
   color: t.$stone-800;
   font-weight: 500;
 }

@@ -91,6 +91,28 @@
   color: $stone-500;
 }
 
+.scout-form-meta {
+  margin: 10px 0 0;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.scout-form-meta-label {
+  color: $stone-500;
+  font-weight: 500;
+}
+
+.scout-form-meta-value {
+  color: $stone-800;
+  font-weight: 600;
+  background-color: $stone-100;
+  border: 1px solid $stone-200;
+  border-radius: 6px;
+  padding: 2px 10px;
+}
+
 .scout-form-body {
   padding: 28px;
 }
