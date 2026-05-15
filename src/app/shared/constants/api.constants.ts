@@ -49,6 +49,9 @@ export const API_CONFIG = {
 
     // Eventos
     EVENTOS: 'eventos',
+
+    // Reportes
+    REPORTES_DEUDAS: 'reportes/deudas',
   },
 } as const;
 
