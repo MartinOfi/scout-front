@@ -12,7 +12,7 @@
  */
 
 import { Injectable, Signal, WritableSignal, computed, signal, inject } from '@angular/core';
-import { Observable, forkJoin, map, switchMap, of } from 'rxjs';
+import { Observable, Subscription, forkJoin, map, switchMap, of } from 'rxjs';
 
 import {
   Caja,
@@ -59,6 +59,7 @@ export class CajasStateService {
   private readonly _loading: WritableSignal<boolean> = signal(false);
   private readonly _error: WritableSignal<string | null> = signal(null);
   private readonly _selectedRama: WritableSignal<Rama | null> = signal(null);
+  private _cajasPersonalesSub: Subscription | null = null;
 
   // Drawer state signals
   private readonly _selectedCaja: WritableSignal<CajaConSaldo | null> = signal(null);
@@ -330,16 +331,17 @@ export class CajasStateService {
   }
 
   /**
-   * Cargar todas las cajas personales
-   * Uses GET /cajas?tipo=personal
+   * Cargar cajas personales con filtro opcional por rama
+   * Uses GET /cajas?tipo=personal[&rama=X]
    */
-  loadCajasPersonales(): void {
+  loadCajasPersonales(rama?: string): void {
+    this._cajasPersonalesSub?.unsubscribe();
     this._loading.set(true);
     this._error.set(null);
 
-    this.apiService.getByType(CajaType.PERSONAL).subscribe({
+    this._cajasPersonalesSub = this.apiService.getPersonales(rama).subscribe({
       next: (cajas) => {
-        this._cajasPersonales.set(cajas as CajaConSaldo[]);
+        this._cajasPersonales.set(cajas);
         this._loading.set(false);
       },
       error: (err: unknown) => {

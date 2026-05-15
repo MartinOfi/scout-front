@@ -11,6 +11,7 @@ import { CajaType } from '../enums';
 export interface CajaPropietario {
   id: string;
   nombre: string;
+  rama?: string | null;
 }
 
 /**

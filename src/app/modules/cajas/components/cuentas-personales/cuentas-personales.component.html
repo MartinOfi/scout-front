@@ -1,31 +1,29 @@
 <div class="cuentas-personales-container">
-  @if (loading()) {
-    <div class="loading-state">
-      <mat-spinner diameter="40"></mat-spinner>
-      <span>Cargando cuentas...</span>
-    </div>
-  } @else {
-    <section class="cuentas-section">
-      <app-generic-filters
-        [filterConfigs]="filterConfigs"
-        [autoApply]="true"
-        [showClearButton]="true"
-        (filtersChanged)="onFiltersChanged($event)"
-      />
+  <section class="cuentas-section">
+    <app-generic-filters
+      [filterConfigs]="filterConfigs"
+      [autoApply]="true"
+      [showClearButton]="true"
+      (filtersChanged)="onFiltersChanged($event)"
+    />
 
-      @if (tableData().length === 0) {
-        <div class="empty-state">
-          <mat-icon>person_off</mat-icon>
-          <span>No hay personas con cuentas personales</span>
-        </div>
-      } @else {
-        <app-data-table
-          [data]="tableData()"
-          [columns]="tableColumns"
-          [config]="{ showHeader: true, hoverable: true }"
-          (actionClick)="onActionClick($event)"
-          (rowClick)="onRowClick($event)" />
-      }
-    </section>
-  }
+    @if (loading()) {
+      <div class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner>
+        <span>Cargando cuentas...</span>
+      </div>
+    } @else if (tableData().length === 0) {
+      <div class="empty-state">
+        <mat-icon>person_off</mat-icon>
+        <span>No hay personas con cuentas personales</span>
+      </div>
+    } @else {
+      <app-data-table
+        [data]="tableData()"
+        [columns]="tableColumns"
+        [config]="{ showHeader: true, hoverable: true }"
+        (actionClick)="onActionClick($event)"
+        (rowClick)="onRowClick($event)" />
+    }
+  </section>
 </div>

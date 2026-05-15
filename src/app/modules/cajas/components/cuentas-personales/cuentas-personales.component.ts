@@ -50,11 +50,11 @@ export class CuentasPersonalesComponent implements OnInit {
 
   readonly loading = this.cajasState.loading;
 
-  // Filter state
-  private readonly activeFilters = signal<Record<string, unknown>>({});
+  private readonly activeSearch = signal<string>('');
+  private readonly activeRama = signal<string>('');
 
   readonly tableData = computed((): TableData[] => {
-    const allData = this.cajasState.cajasPersonales().map((caja) => ({
+    const rows = this.cajasState.cajasPersonales().map((caja) => ({
       id: caja.id,
       nombre: this.getNombrePropietario(caja),
       rama: this.getRamaPropietario(caja),
@@ -62,23 +62,9 @@ export class CuentasPersonalesComponent implements OnInit {
       propietarioId: caja.propietarioId,
     }));
 
-    const filters = this.activeFilters();
-    return allData.filter((row) => {
-      // Text search filter
-      if (filters['search'] && typeof filters['search'] === 'string') {
-        const searchTerm = filters['search'].toLowerCase();
-        if (!row.nombre.toLowerCase().includes(searchTerm)) {
-          return false;
-        }
-      }
-      // Rama filter
-      if (filters['rama'] && typeof filters['rama'] === 'string') {
-        if (row.rama !== filters['rama']) {
-          return false;
-        }
-      }
-      return true;
-    });
+    const search = this.activeSearch().toLowerCase();
+    if (!search) return rows;
+    return rows.filter((row) => row.nombre.toLowerCase().includes(search));
   });
 
   // Filter configuration
@@ -143,11 +129,7 @@ export class CuentasPersonalesComponent implements OnInit {
   }
 
   private getRamaPropietario(caja: CajaConSaldo): string {
-    const propietario = caja.propietario;
-    if (propietario && 'rama' in propietario && propietario.rama) {
-      return propietario.rama as string;
-    }
-    return '-';
+    return caja.propietario?.rama ?? '-';
   }
 
   onActionClick(event: ActionEvent): void {
@@ -174,6 +156,14 @@ export class CuentasPersonalesComponent implements OnInit {
   }
 
   onFiltersChanged(filters: Record<string, unknown>): void {
-    this.activeFilters.set(filters);
+    const search = typeof filters['search'] === 'string' ? filters['search'] : '';
+    const rama = typeof filters['rama'] === 'string' ? filters['rama'] : '';
+
+    this.activeSearch.set(search);
+
+    if (rama !== this.activeRama()) {
+      this.activeRama.set(rama);
+      this.cajasState.loadCajasPersonales(rama || undefined);
+    }
   }
 }

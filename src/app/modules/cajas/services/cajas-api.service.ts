@@ -46,6 +46,15 @@ export class CajasApiService {
   }
 
   /**
+   * Get personal cajas with optional rama filter
+   * rama: 'Manada' | 'Unidad' | 'Caminantes' | 'Rovers' | 'educadores' | undefined
+   */
+  getPersonales(rama?: string): Observable<CajaConSaldo[]> {
+    const params = rama ? `&rama=${encodeURIComponent(rama)}` : '';
+    return this.http.get<CajaConSaldo[]>(`${this.endpoint}?tipo=${CajaType.PERSONAL}${params}`);
+  }
+
+  /**
    * Get caja by ID
    */
   getById(id: string): Observable<CajaConSaldo> {
