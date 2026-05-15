@@ -52,11 +52,11 @@ $color-info-light: t.$color-info-light;
 
 $input-padding-x: 14px;
 $input-padding-y: 12px;
-$input-border-radius: t.$radius-lg;  // 10px
+$input-border-radius: t.$radius-lg; // 10px
 $input-border-width: 1.5px;
 
 $checkbox-size: 20px;
-$checkbox-radius: t.$radius-md;  // 6px
+$checkbox-radius: t.$radius-md; // 6px
 
 $label-margin-bottom: 8px;
 $field-margin-bottom: 20px;
@@ -214,7 +214,6 @@ $shadow-card-hover: t.$shadow-card-hover;
   appearance: none;
   border: $input-border-width solid $stone-300;
   border-radius: $checkbox-radius;
-  background-color: white;
   cursor: pointer;
   transition: all $transition-fast;
   position: relative;

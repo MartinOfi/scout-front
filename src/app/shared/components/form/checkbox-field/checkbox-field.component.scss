@@ -37,8 +37,7 @@
 
   // Card variant - elevated interactive cards
   &--card {
-    background-color: white;
-    border: 1.5px solid $stone-200;
+    border: 1.5px solid var(--border-light);
     transition: all $transition-fast;
 
     // Mobile-first: touch-friendly padding
@@ -53,8 +52,8 @@
     }
 
     &:hover:not(:has(.scout-checkbox:disabled)) {
-      border-color: $stone-300;
-      background-color: $stone-50;
+      border-color: var(--border-default);
+      background-color: var(--surface-secondary);
     }
 
     &.scout-checkbox-label--checked {
@@ -62,7 +61,7 @@
       background-color: rgba($brand-burgundy, 0.02);
 
       .scout-checkbox-text {
-        color: $stone-900;
+        color: var(--text-primary);
       }
     }
   }
@@ -79,7 +78,7 @@
   font-family: var(--font-family-base);
   font-weight: 500;
   line-height: 1.4;
-  color: $stone-700;
+  color: var(--text-primary);
 
   // Mobile-first: slightly smaller text
   font-size: 13px;
@@ -92,7 +91,7 @@
 .scout-checkbox-description {
   font-family: var(--font-family-base);
   line-height: 1.4;
-  color: $stone-500;
+  color: var(--text-secondary);
 
   // Mobile-first: compact description
   font-size: 12px;
