@@ -36,6 +36,7 @@ import { MovimientosApiService } from '../movimientos/services/movimientos-api.s
 import { Movimiento, Evento } from '../../shared/models';
 import { TipoMovimientoEnum, RamaEnum, TipoEvento } from '../../shared/enums';
 import { humanize } from '../../shared/pipes';
+import { parseLocalDate } from '../../shared/utils/time-helpers';
 import type { Rama } from '../../shared/enums';
 
 // ============================================================================
@@ -197,13 +198,13 @@ export class DashboardComponent implements OnInit {
     const now = new Date();
 
     return eventos
-      .filter((evento) => new Date(evento.fecha) >= now)
-      .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())
+      .filter((evento) => parseLocalDate(evento.fecha) >= now)
+      .sort((a, b) => parseLocalDate(a.fecha).getTime() - parseLocalDate(b.fecha).getTime())
       .slice(0, 3)
       .map((evento) => ({
         id: evento.id,
         titulo: evento.nombre,
-        fecha: new Date(evento.fecha),
+        fecha: parseLocalDate(evento.fecha),
         categoria: EVENT_CATEGORY_STYLES[evento.tipo] ?? EVENT_CATEGORY_STYLES[TipoEvento.GRUPO],
       }));
   });

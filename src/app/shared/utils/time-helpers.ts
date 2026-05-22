@@ -20,10 +20,7 @@ export function parseTimeFromHHMM(timeString: string): Date {
 /**
  * Calcula la duración entre dos horas en minutos
  */
-export function calculateDurationInMinutes(
-  startTime: string,
-  endTime: string
-): number {
+export function calculateDurationInMinutes(startTime: string, endTime: string): number {
   const start = parseTimeFromHHMM(startTime);
   const end = parseTimeFromHHMM(endTime);
 
@@ -94,6 +91,20 @@ export function getAllDaysWithLabels(): {
     value: day,
     label: getDayNameInSpanish(day),
   }));
+}
+
+/**
+ * Parsea un string ISO (YYYY-MM-DD) como Date en zona horaria local.
+ *
+ * Why: `new Date("YYYY-MM-DD")` se interpreta como UTC medianoche, lo que en
+ * zonas con offset negativo (Argentina UTC-3) hace que `getDate()` devuelva
+ * el día anterior. Construir con (year, month, day) crea la fecha en zona local.
+ *
+ * @param dateString Fecha en formato YYYY-MM-DD (puede incluir parte horaria, se ignora)
+ */
+export function parseLocalDate(dateString: string): Date {
+  const [year, month, day] = dateString.slice(0, 10).split('-').map(Number);
+  return new Date(year, month - 1, day);
 }
 
 /**
