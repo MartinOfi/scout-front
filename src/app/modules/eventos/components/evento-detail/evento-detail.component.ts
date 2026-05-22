@@ -18,18 +18,20 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
-import { Subject } from 'rxjs';
+import { Subject, combineLatest } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
 
 import { EventosStateService } from '../../services/eventos-state.service';
 import { PersonasApiService } from '../../../personas/services/personas-api.service';
 import { TipoEvento } from '../../../../shared/enums';
 import {
+  EntregaResponse,
   Evento,
   EventoKpis,
   Movimiento,
   Persona,
   Producto,
+  StockEntregaResponse,
   VentaProducto,
 } from '../../../../shared/models';
 import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
@@ -48,6 +50,7 @@ import { ButtonComponent } from '../../../../shared/components/button/button.com
 import { TextFieldComponent } from '../../../../shared/components/form/text-field/text-field.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ConfirmDialogService } from '../../../../shared/services/confirm-dialog.service';
+import { EntregasTabComponent } from './components/entregas-tab/entregas-tab.component';
 
 /**
  * One row inside a VentaGroup, pre-augmented with the computed ganancia
@@ -104,8 +107,20 @@ interface KpiConfig {
 const TABS_VENTA: TabConfig[] = [
   { key: 'productos', label: 'Productos', icon: 'inventory_2' },
   { key: 'ventas', label: 'Ventas', icon: 'point_of_sale' },
+  { key: 'entregas', label: 'Entregas', icon: 'local_shipping' },
   { key: 'movimientos', label: 'Movimientos', icon: 'swap_horiz' },
 ];
+
+/**
+ * Per-product delivery progress shown as KPI cards above the tabs.
+ *   "Locro 123/200" → entregado / vendido aggregated across all vendors.
+ */
+interface ProductoKpi {
+  productoId: string;
+  productoNombre: string;
+  cantidadVendida: number;
+  cantidadEntregada: number;
+}
 
 const TABS_GRUPO: TabConfig[] = [{ key: 'movimientos', label: 'Movimientos', icon: 'swap_horiz' }];
 
@@ -126,6 +141,7 @@ const TABS_GRUPO: TabConfig[] = [{ key: 'movimientos', label: 'Movimientos', ico
     ButtonComponent,
     TextFieldComponent,
     MatProgressSpinnerModule,
+    EntregasTabComponent,
   ],
   templateUrl: './evento-detail.component.html',
   styleUrls: ['./evento-detail.component.scss'],
@@ -143,8 +159,10 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   private destroyed = false;
   private readonly destroy$ = new Subject<void>();
   private readonly vendedorSearch$ = new Subject<string>();
+  private readonly entregaSearch$ = new Subject<string>();
 
   readonly vendedorSearch = signal('');
+  readonly entregaSearch = signal('');
 
   readonly loading = this.state.loading;
   readonly personas = signal<Persona[]>([]);
@@ -178,6 +196,47 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
     this.eventoId ? (this.state.movimientos()[this.eventoId] ?? []) : [],
   );
 
+  readonly eventoEntregas = computed((): EntregaResponse[] =>
+    this.eventoId ? (this.state.entregas()[this.eventoId] ?? []) : [],
+  );
+
+  readonly eventoStockEntregas = computed((): StockEntregaResponse[] =>
+    this.eventoId ? (this.state.stockEntregas()[this.eventoId] ?? []) : [],
+  );
+
+  /**
+   * Aggregates stock-disponible rows by productoId so each product gets a
+   * single KPI card with total entregado/vendido across all vendors.
+   * Empty when there are no ventas yet.
+   */
+  readonly productosKpis = computed((): ProductoKpi[] => {
+    // Functional reduce + immutable accumulator: each iteration builds a
+    // new ProductoKpi by spreading the previous total. No mutation of an
+    // object that has already been stored in the Map.
+    const byProducto = this.eventoStockEntregas().reduce((acc, row) => {
+      const prev = acc.get(row.productoId);
+      const next: ProductoKpi = prev
+        ? {
+            ...prev,
+            cantidadVendida: prev.cantidadVendida + row.cantidadVendida,
+            cantidadEntregada: prev.cantidadEntregada + row.cantidadEntregada,
+          }
+        : {
+            productoId: row.productoId,
+            productoNombre: row.productoNombre,
+            cantidadVendida: row.cantidadVendida,
+            cantidadEntregada: row.cantidadEntregada,
+          };
+      acc.set(row.productoId, next);
+      return acc;
+    }, new Map<string, ProductoKpi>());
+    return [...byProducto.values()].sort((a, b) =>
+      a.productoNombre.localeCompare(b.productoNombre),
+    );
+  });
+
+  readonly deletingIdsSet = computed((): ReadonlySet<string> => this.state.deletingIds());
+
   readonly activeTab = signal<string>('');
 
   readonly tipoEvento = TipoEvento;
@@ -207,6 +266,8 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
     this.state.loadProductos(id);
     this.state.loadVentas(id).subscribe();
     this.state.loadMovimientos(id);
+    this.state.loadStockEntregas(id).subscribe();
+    this.state.loadEntregas(id).subscribe();
     this.activeTab.set('productos');
 
     this.personasApi.getAll().subscribe((ps) => this.personas.set(ps));
@@ -224,6 +285,28 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
       )
       .subscribe();
+
+    /**
+     * Entregas tab search — both requests run inside the same `combineLatest`
+     * so `switchMap` cancels BOTH when a newer query arrives. Earlier, only
+     * `loadStockEntregas` was returned and `loadEntregas` was a stray
+     * `.subscribe()`, so a stale entregas response could overwrite a fresh
+     * one if the user typed fast.
+     */
+    this.entregaSearch$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((query) => {
+          const trimmed = query.trim() || undefined;
+          return combineLatest([
+            this.state.loadEntregas(this.eventoId, trimmed),
+            this.state.loadStockEntregas(this.eventoId, trimmed),
+          ]);
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe();
   }
 
   ngOnDestroy(): void {
@@ -235,6 +318,11 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   onVendedorSearchChange(value: string): void {
     this.vendedorSearch.set(value);
     this.vendedorSearch$.next(value);
+  }
+
+  onEntregaSearchChange(value: string): void {
+    this.entregaSearch.set(value);
+    this.entregaSearch$.next(value);
   }
 
   onTabChange(key: string): void {
@@ -334,6 +422,37 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
 
   navigateToVentasLote(): void {
     this.router.navigate(['/eventos', this.eventoId, 'ventas', 'registrar']);
+  }
+
+  /**
+   * Opens the entrega dialog. If `vendedorId` is provided, the dialog
+   * preselects that vendor (used when the operator clicks "Registrar entrega"
+   * on a specific vendor row).
+   */
+  openEntregaDialog(vendedorId?: string): void {
+    void import('../shared/entrega-dialog/entrega-dialog.component').then(
+      ({ EntregaDialogComponent }) => {
+        if (this.destroyed) return;
+        this.dialog.open(EntregaDialogComponent, {
+          width: '640px',
+          maxWidth: '95vw',
+          data: {
+            eventoId: this.eventoId,
+            stockEntregas: this.eventoStockEntregas(),
+            vendedorIdPreseleccionado: vendedorId,
+          },
+          disableClose: false,
+        });
+      },
+    );
+  }
+
+  onDeleteEntrega(entregaId: string): void {
+    this.confirmDialog.confirmDelete('entrega').subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.state.deleteEntrega(this.eventoId, entregaId).subscribe();
+      }
+    });
   }
 
   /**

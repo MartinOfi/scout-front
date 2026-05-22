@@ -1,0 +1,118 @@
+@if (rows().length === 0) {
+  <div class="entregas-empty" role="status">
+    <mat-icon aria-hidden="true">local_shipping</mat-icon>
+    <p>Todavía no hay ventas registradas. Una vez que registres ventas, vas a poder marcar entregas de productos acá.</p>
+  </div>
+} @else {
+  <ul class="entregas-list">
+    @for (row of rows(); track row.vendedorId) {
+      <li class="vendedor-card">
+
+        <div
+          class="vendedor-header"
+          role="button"
+          tabindex="0"
+          [class.vendedor-header--expanded]="isExpanded(row.vendedorId)"
+          [attr.aria-expanded]="isExpanded(row.vendedorId)"
+          [attr.aria-controls]="'detalles-' + row.vendedorId"
+          (click)="toggleExpanded(row.vendedorId)"
+          (keydown.enter)="toggleExpanded(row.vendedorId)"
+          (keydown.space)="toggleExpanded(row.vendedorId); $event.preventDefault()"
+        >
+          <span class="vendedor-header__left">
+            <mat-icon class="vendedor-header__chevron" aria-hidden="true">
+              {{ isExpanded(row.vendedorId) ? 'expand_more' : 'chevron_right' }}
+            </mat-icon>
+            <span class="vendedor-info">
+              <span class="vendedor-nombre">{{ row.vendedorNombre }}</span>
+              <span class="vendedor-productos">
+                @for (prod of row.productos; track prod.productoId) {
+                  <span
+                    class="producto-chip"
+                    [class.producto-chip--completo]="prod.cantidadEntregada >= prod.cantidadVendida"
+                    [class.producto-chip--parcial]="prod.cantidadEntregada > 0 && prod.cantidadEntregada < prod.cantidadVendida"
+                  >
+                    {{ prod.productoNombre }}
+                    <strong>{{ prod.cantidadEntregada }}/{{ prod.cantidadVendida }}</strong>
+                  </span>
+                }
+              </span>
+            </span>
+          </span>
+
+          @if (row.tieneStockDisponible) {
+            <button
+              type="button"
+              class="btn btn--primary btn--sm"
+              [attr.aria-label]="'Registrar entrega para ' + row.vendedorNombre"
+              (click)="onRegistrar(row.vendedorId, $event)"
+            >
+              <mat-icon aria-hidden="true">add</mat-icon>
+              Registrar entrega
+            </button>
+          } @else {
+            <span class="vendedor-completo">
+              <mat-icon aria-hidden="true">check_circle</mat-icon>
+              Todo entregado
+            </span>
+          }
+        </div>
+
+        @if (isExpanded(row.vendedorId)) {
+          <div class="vendedor-details" [id]="'detalles-' + row.vendedorId">
+            @if (row.entregas.length === 0) {
+              <p class="entregas-vacio">Aún no se registraron entregas para este vendedor.</p>
+            } @else {
+              <ul class="entregas-historial">
+                @for (entrega of row.entregas; track entrega.id) {
+                  <li class="entrega-item">
+                    <div class="entrega-item__main">
+                      <div class="entrega-item__meta">
+                        <mat-icon aria-hidden="true">event</mat-icon>
+                        <span class="entrega-fecha">
+                          {{ (entrega.fecha ?? entrega.createdAt) | date: 'dd/MM/yyyy HH:mm' }}
+                        </span>
+                      </div>
+
+                      <ul class="entrega-lineas">
+                        @for (linea of entrega.lineas; track linea.id) {
+                          <li class="entrega-linea">
+                            <span class="entrega-linea__cant">{{ linea.cantidad }}</span>
+                            <span class="entrega-linea__nombre">{{ linea.productoNombre }}</span>
+                          </li>
+                        }
+                      </ul>
+
+                      @if (entrega.notas) {
+                        <p class="entrega-notas">
+                          <mat-icon aria-hidden="true">sticky_note_2</mat-icon>
+                          <span>{{ entrega.notas }}</span>
+                        </p>
+                      }
+                    </div>
+
+                    <button
+                      type="button"
+                      class="btn-icon btn-icon--danger"
+                      title="Eliminar entrega"
+                      [attr.aria-label]="'Eliminar entrega del ' + ((entrega.fecha ?? entrega.createdAt) | date: 'dd/MM/yyyy HH:mm')"
+                      [disabled]="isDeleting(entrega.id)"
+                      (click)="onDelete(entrega.id, $event)"
+                    >
+                      @if (isDeleting(entrega.id)) {
+                        <mat-spinner diameter="16" />
+                      } @else {
+                        <mat-icon aria-hidden="true">delete</mat-icon>
+                      }
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+        }
+
+      </li>
+    }
+  </ul>
+}

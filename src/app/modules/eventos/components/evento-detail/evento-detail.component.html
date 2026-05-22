@@ -55,6 +55,29 @@
       </div>
     </section>
 
+    <!-- Productos KPI (entregado/vendido por producto) -->
+    @if (evento()!.tipo === tipoEvento.VENTA && productosKpis().length > 0) {
+    <section class="kpi-section" aria-label="Entregas por producto">
+      <h2 class="kpi-section__title">
+        <mat-icon>local_shipping</mat-icon>
+        Entregas por producto
+      </h2>
+      <div class="productos-kpi-grid">
+        @for (prod of productosKpis(); track prod.productoId) {
+        <article class="producto-kpi-card"
+          [class.producto-kpi-card--completo]="prod.cantidadEntregada >= prod.cantidadVendida && prod.cantidadVendida > 0">
+          <h3 class="producto-kpi-card__title">{{ prod.productoNombre }}</h3>
+          <p class="producto-kpi-card__value">
+            <span class="producto-kpi-card__entregado">{{ prod.cantidadEntregada }}</span>
+            <span class="producto-kpi-card__sep">/</span>
+            <span class="producto-kpi-card__vendido">{{ prod.cantidadVendida }}</span>
+          </p>
+        </article>
+        }
+      </div>
+    </section>
+    }
+
     <!-- Tabs + Tab Content -->
     <section class="tabs-section">
       <div class="tabs-header">
@@ -155,6 +178,29 @@
           </div>
         </div>
         }
+        }
+
+        <!-- ENTREGAS tab -->
+        @if (activeTab() === 'entregas') {
+        <div class="tab-toolbar">
+          <label class="visually-hidden" for="entregas-search">
+            Buscar por nombre de persona
+          </label>
+          <app-text-field
+            id="entregas-search"
+            type="search"
+            placeholder="Buscar persona..."
+            [ngModel]="entregaSearch()"
+            (ngModelChange)="onEntregaSearchChange($event)"
+          />
+        </div>
+        <app-entregas-tab
+          [stock]="eventoStockEntregas()"
+          [entregas]="eventoEntregas()"
+          [deletingIds]="deletingIdsSet()"
+          (registrarEntrega)="openEntregaDialog($event)"
+          (deleteEntrega)="onDeleteEntrega($event)"
+        />
         }
 
         <!-- MOVIMIENTOS tab -->

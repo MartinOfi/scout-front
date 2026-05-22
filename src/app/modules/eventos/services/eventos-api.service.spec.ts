@@ -119,4 +119,70 @@ describe('EventosApiService', () => {
       req.flush({});
     });
   });
+
+  describe('getEntregas', () => {
+    it('should call GET /eventos/:id/entregas without vendedor param', () => {
+      service.getEntregas('evento-123').subscribe();
+      const req = httpMock.expectOne(
+        (r) => r.url.includes('/eventos/evento-123/entregas') && r.method === 'GET',
+      );
+      expect(req.request.params.get('vendedor')).toBeNull();
+      req.flush([]);
+    });
+
+    it('should pass vendedor as query param when provided', () => {
+      service.getEntregas('evento-123', 'Juan').subscribe();
+      const req = httpMock.expectOne(
+        (r) => r.url.includes('/eventos/evento-123/entregas') && r.method === 'GET',
+      );
+      expect(req.request.params.get('vendedor')).toBe('Juan');
+      req.flush([]);
+    });
+  });
+
+  describe('getStockEntregas', () => {
+    it('should call GET /eventos/:id/entregas/stock-disponible', () => {
+      service.getStockEntregas('evento-123').subscribe();
+      const req = httpMock.expectOne(
+        (r) =>
+          r.url.includes('/eventos/evento-123/entregas/stock-disponible') && r.method === 'GET',
+      );
+      req.flush([]);
+    });
+  });
+
+  describe('crearEntrega', () => {
+    it('should call POST /eventos/:id/entregas with the dto body', () => {
+      const dto = {
+        vendedorId: 'vendedor-abc',
+        notas: 'Retiró María 18:30',
+        items: [{ productoId: 'prod-1', cantidad: 4 }],
+      };
+      service.crearEntrega('evento-123', dto).subscribe();
+      const req = httpMock.expectOne(
+        (r) => r.url.includes('/eventos/evento-123/entregas') && r.method === 'POST',
+      );
+      expect(req.request.body).toEqual(dto);
+      req.flush({
+        id: 'entrega-1',
+        eventoId: 'evento-123',
+        vendedorId: 'vendedor-abc',
+        vendedorNombre: 'Juan',
+        fecha: null,
+        notas: 'Retiró María 18:30',
+        createdAt: '2026-05-22T18:30:00Z',
+        lineas: [],
+      });
+    });
+  });
+
+  describe('deleteEntrega', () => {
+    it('should call DELETE /eventos/:eventoId/entregas/:entregaId', () => {
+      service.deleteEntrega('evento-123', 'entrega-456').subscribe();
+      const req = httpMock.expectOne(
+        (r) => r.url.includes('/eventos/evento-123/entregas/entrega-456') && r.method === 'DELETE',
+      );
+      req.flush({});
+    });
+  });
 });

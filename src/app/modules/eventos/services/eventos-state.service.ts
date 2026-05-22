@@ -24,6 +24,9 @@ import {
   RegistrarIngresoEventoDto,
   RegistrarGastoEventoDto,
   DeleteVentaResponse,
+  CreateEntregaDto,
+  EntregaResponse,
+  StockEntregaResponse,
 } from '../../../shared/models';
 
 import { EventosApiService } from './eventos-api.service';
@@ -55,6 +58,16 @@ export class EventosStateService {
   private readonly _kpis: WritableSignal<Record<string, EventoKpis>> = signal({});
   private readonly _resumenVentas: WritableSignal<Record<string, ResumenVentas>> = signal({});
   private readonly _movimientos: WritableSignal<Record<string, Movimiento[]>> = signal({});
+  private readonly _entregas: WritableSignal<Record<string, EntregaResponse[]>> = signal({});
+  private readonly _stockEntregas: WritableSignal<Record<string, StockEntregaResponse[]>> = signal(
+    {},
+  );
+  /**
+   * Active vendedor filter per evento for the entregas tab. Persisted so
+   * post-mutation refreshes can re-apply the search instead of clobbering
+   * it back to unfiltered (same shape as _ventasFilter).
+   */
+  private readonly _entregasFilter: WritableSignal<Record<string, string | undefined>> = signal({});
   private readonly _loading: WritableSignal<boolean> = signal(false);
   private readonly _error: WritableSignal<string | null> = signal(null);
   private readonly _selectedId: WritableSignal<string | null> = signal(null);
@@ -70,6 +83,9 @@ export class EventosStateService {
   readonly kpis: Signal<Record<string, EventoKpis>> = this._kpis.asReadonly();
   readonly resumenVentas: Signal<Record<string, ResumenVentas>> = this._resumenVentas.asReadonly();
   readonly movimientos: Signal<Record<string, Movimiento[]>> = this._movimientos.asReadonly();
+  readonly entregas: Signal<Record<string, EntregaResponse[]>> = this._entregas.asReadonly();
+  readonly stockEntregas: Signal<Record<string, StockEntregaResponse[]>> =
+    this._stockEntregas.asReadonly();
   readonly loading: Signal<boolean> = this._loading.asReadonly();
   readonly error: Signal<string | null> = this._error.asReadonly();
   readonly deletingIds: Signal<ReadonlySet<string>> = this._deletingIds.asReadonly();
@@ -472,6 +488,94 @@ export class EventosStateService {
   }
 
   // ============================================================================
+  // Entrega Actions
+  // ============================================================================
+
+  /**
+   * Loads entregas for an evento, optionally filtered by vendedor name.
+   * Returns a cold Observable so callers can compose with switchMap (same
+   * pattern as loadVentas).
+   */
+  loadEntregas(eventoId: string, vendedor?: string): Observable<EntregaResponse[]> {
+    this._loading.set(true);
+    this._entregasFilter.update((prev) => ({ ...prev, [eventoId]: vendedor }));
+
+    return this.apiService.getEntregas(eventoId, vendedor).pipe(
+      tap((entregas) => {
+        this._entregas.update((prev) => ({ ...prev, [eventoId]: entregas }));
+      }),
+      catchError((err: unknown) => {
+        this._handleError(err, 'Error al cargar entregas');
+        return EMPTY;
+      }),
+      // finalize fires on success, error AND unsubscribe (switchMap cancel).
+      // Without it, a cancelled request would leave _loading stuck at true.
+      finalize(() => this._loading.set(false)),
+    );
+  }
+
+  /**
+   * Loads the stock-disponible report for an evento. Used by the entregas
+   * tab to show vendor rows with "entregado/vendido" per product, and by
+   * the entrega dialog to filter the products list to those with stock > 0
+   * for the chosen vendedor.
+   */
+  loadStockEntregas(eventoId: string, vendedor?: string): Observable<StockEntregaResponse[]> {
+    this._loading.set(true);
+
+    return this.apiService.getStockEntregas(eventoId, vendedor).pipe(
+      tap((stock) => {
+        this._stockEntregas.update((prev) => ({ ...prev, [eventoId]: stock }));
+      }),
+      catchError((err: unknown) => {
+        this._handleError(err, 'Error al cargar stock de entregas');
+        return EMPTY;
+      }),
+      finalize(() => this._loading.set(false)),
+    );
+  }
+
+  crearEntrega(eventoId: string, dto: CreateEntregaDto): Observable<EntregaResponse> {
+    this._loading.set(true);
+
+    return this.apiService.crearEntrega(eventoId, dto).pipe(
+      tap(() => {
+        this.notificationService.showSuccess('Entrega registrada exitosamente');
+        // Refetch both lists with the active filter rather than prepending
+        // optimistically. Prepending would inject the new entrega into a
+        // filtered list even if the filter excludes it (e.g. filter="Ana",
+        // entrega for "Juan" appears in the filtered view until the next
+        // search/refresh). A refetch keeps the view consistent.
+        const activeFilter = this._entregasFilter()[eventoId];
+        this.loadEntregas(eventoId, activeFilter).subscribe();
+        this.loadStockEntregas(eventoId, activeFilter).subscribe();
+      }),
+      catchError((err: unknown) => this._catchError(err, 'Error al registrar entrega')),
+      finalize(() => this._loading.set(false)),
+    );
+  }
+
+  deleteEntrega(eventoId: string, entregaId: string): Observable<void> {
+    this._markDeleting(entregaId);
+    return this.apiService.deleteEntrega(eventoId, entregaId).pipe(
+      tap(() => {
+        this._entregas.update((prev) => ({
+          ...prev,
+          [eventoId]: (prev[eventoId] ?? []).filter((e) => e.id !== entregaId),
+        }));
+        this.notificationService.showSuccess('Entrega eliminada exitosamente');
+        const activeFilter = this._entregasFilter()[eventoId];
+        this.loadStockEntregas(eventoId, activeFilter).subscribe();
+      }),
+      catchError((err: unknown) => {
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al eliminar entrega'));
+        return throwError(() => err);
+      }),
+      finalize(() => this._unmarkDeleting(entregaId)),
+    );
+  }
+
+  // ============================================================================
   // Util
   // ============================================================================
 
@@ -479,8 +583,13 @@ export class EventosStateService {
     this._eventos.set([]);
     this._productos.set({});
     this._ventas.set({});
+    this._ventasFilter.set({});
     this._kpis.set({});
     this._resumenVentas.set({});
+    this._movimientos.set({});
+    this._entregas.set({});
+    this._stockEntregas.set({});
+    this._entregasFilter.set({});
     this._loading.set(false);
     this._error.set(null);
     this._selectedId.set(null);

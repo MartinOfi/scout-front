@@ -15,6 +15,9 @@ import {
   RegistrarIngresoEventoDto,
   RegistrarGastoEventoDto,
   DeleteVentaResponse,
+  CreateEntregaDto,
+  EntregaResponse,
+  StockEntregaResponse,
 } from '../../../shared/models';
 import { Movimiento } from '../../../shared/models';
 import { HttpService } from '../../../shared/services';
@@ -155,5 +158,39 @@ export class EventosApiService {
       `${this.endpoint}/${eventoId}/gastos`,
       dto,
     );
+  }
+
+  // ============================================================================
+  // ENTREGAS
+  // ============================================================================
+
+  getEntregas(eventoId: string, vendedor?: string): Observable<EntregaResponse[]> {
+    const params: Record<string, string> = {};
+    if (vendedor) params['vendedor'] = vendedor;
+    return this.http.get<EntregaResponse[]>(`${this.endpoint}/${eventoId}/entregas`, params);
+  }
+
+  getStockEntregas(eventoId: string, vendedor?: string): Observable<StockEntregaResponse[]> {
+    const params: Record<string, string> = {};
+    if (vendedor) params['vendedor'] = vendedor;
+    return this.http.get<StockEntregaResponse[]>(
+      `${this.endpoint}/${eventoId}/entregas/stock-disponible`,
+      params,
+    );
+  }
+
+  getEntregaById(eventoId: string, entregaId: string): Observable<EntregaResponse> {
+    return this.http.get<EntregaResponse>(`${this.endpoint}/${eventoId}/entregas/${entregaId}`);
+  }
+
+  crearEntrega(eventoId: string, dto: CreateEntregaDto): Observable<EntregaResponse> {
+    return this.http.post<EntregaResponse, CreateEntregaDto>(
+      `${this.endpoint}/${eventoId}/entregas`,
+      dto,
+    );
+  }
+
+  deleteEntrega(eventoId: string, entregaId: string): Observable<void> {
+    return this.http.delete<void>(`${this.endpoint}/${eventoId}/entregas/${entregaId}`);
   }
 }

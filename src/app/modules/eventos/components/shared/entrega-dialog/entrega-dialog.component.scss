@@ -1,0 +1,306 @@
+// Entrega Dialog
+// Uses project design tokens (surface-*, text-*, border-*, color-*) so light
+// and dark themes are correct out of the box without per-component overrides.
+
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 95vw;
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+}
+
+.dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-default);
+  color: var(--text-primary);
+  font-weight: 600;
+
+  mat-icon {
+    color: var(--color-info);
+  }
+}
+
+.dialog-content {
+  padding: 1.25rem 1.5rem;
+  max-height: 70vh;
+  overflow-y: auto;
+  background: var(--surface-elevated);
+}
+
+.dialog-saving {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem 0;
+
+  &__text {
+    color: var(--text-secondary);
+    margin: 0;
+  }
+}
+
+.entrega-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+// Static vendor label (used when the dialog opens preselected from a row).
+.vendedor-fixed {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 1rem;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: 0.5rem;
+
+  &__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__nombre {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+}
+
+.productos-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+
+    mat-icon {
+      font-size: 1.1rem;
+      width: 1.1rem;
+      height: 1.1rem;
+      color: var(--text-secondary);
+    }
+  }
+}
+
+.empty-state {
+  margin: 0;
+  padding: 1rem;
+  background: var(--surface-secondary);
+  border-radius: 0.5rem;
+  color: var(--text-secondary);
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.productos-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+
+  th,
+  td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  th {
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--surface-secondary);
+  }
+
+  .col-disponible,
+  .col-cantidad {
+    text-align: right;
+    width: 7rem;
+  }
+}
+
+.producto-row {
+  background: transparent;
+  transition: background 0.15s;
+  color: var(--text-primary);
+
+  &--active {
+    background: var(--color-info-subtle);
+  }
+
+  &--invalid {
+    background: var(--color-danger-subtle);
+  }
+}
+
+.cantidad-input {
+  width: 5.5rem;
+  min-height: 2.75rem; // WCAG 2.5.5 / 2.5.8 — touch target ≥ 44px
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 0.375rem;
+  text-align: right;
+  font-size: 1rem; // 16px+ prevents iOS Safari auto-zoom on focus
+  background: var(--surface-primary);
+  color: var(--text-primary);
+
+  &:focus {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 1px;
+    border-color: var(--color-info);
+  }
+
+  &:disabled {
+    background: var(--surface-tertiary);
+    color: var(--text-muted);
+  }
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-default);
+  margin-top: 0.5rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+
+  &:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  mat-icon {
+    font-size: 1rem;
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &--secondary {
+    background: var(--surface-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-default);
+
+    &:hover:not(:disabled) {
+      background: var(--surface-tertiary);
+    }
+  }
+
+  &--primary {
+    background: var(--color-primary-burgundy);
+    color: #ffffff;
+    border-color: var(--color-primary-burgundy);
+
+    &:hover:not(:disabled) {
+      background: var(--color-burgundy-dark);
+      border-color: var(--color-burgundy-dark);
+    }
+  }
+}
+
+// Visually hidden but available to screen readers (WCAG 2.4.6).
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Mobile layout — at <520px, the 3-column productos table collapses into
+// stacked rows so long names don't truncate and the input stays reachable.
+@media (max-width: 520px) {
+  .productos-table {
+    thead {
+      display: none;
+    }
+
+    tbody,
+    tr,
+    td {
+      display: block;
+      width: 100%;
+    }
+
+    tr.producto-row {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border-default);
+      border-radius: 0;
+
+      td {
+        padding: 0.2rem 0;
+        border: 0;
+        text-align: left;
+      }
+
+      .col-nombre {
+        font-weight: 600;
+        font-size: 1rem;
+      }
+
+      .col-disponible {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+
+        &::before {
+          content: 'Disponible: ';
+          font-weight: 500;
+        }
+      }
+
+      .col-cantidad {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        &::before {
+          content: 'A entregar:';
+          font-size: 0.85rem;
+          color: var(--text-secondary);
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}

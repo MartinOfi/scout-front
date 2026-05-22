@@ -14,6 +14,7 @@ export * from './campamento.model';
 export * from './participante-campamento.model';
 export * from './pago-campamento.model';
 export * from './evento.model';
+export * from './entrega.model';
 export * from './producto-evento.model';
 export * from './consolidado-saldos.model';
 export * from './venta-por-persona.model';

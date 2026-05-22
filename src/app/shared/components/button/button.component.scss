@@ -273,8 +273,13 @@
 .scout-btn--outline {
   --btn-bg: transparent;
   --btn-bg-hover: rgba(129, 33, 40, 0.06);
-  --btn-color: #{t.$brand-burgundy};
-  --btn-border: #{t.$brand-burgundy};
+  // Use the semantic brand token instead of the static SASS variable so
+  // the color tracks light/dark mode: --brand-primary maps to
+  // burgundy-800 (#812128) in light and burgundy-400 (#e57f88) in dark.
+  // The static `t.$brand-burgundy` was always #812128, giving ~2.7:1
+  // contrast on the dark surface ladder — below WCAG 1.4.3 AA (4.5:1).
+  --btn-color: var(--brand-primary);
+  --btn-border: var(--brand-primary);
   --btn-shadow: none;
   --btn-shadow-hover: none;
 
@@ -283,7 +288,8 @@
   }
 
   &:hover:not(:disabled) {
-    --btn-border: #{t.$brand-burgundy-dark};
+    --btn-border: var(--brand-primary-hover);
+    --btn-color: var(--brand-primary-hover);
   }
 }
 

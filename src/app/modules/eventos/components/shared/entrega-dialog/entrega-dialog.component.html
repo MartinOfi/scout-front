@@ -1,0 +1,128 @@
+<div class="dialog-container">
+
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon aria-hidden="true">local_shipping</mat-icon>
+    Registrar entrega
+  </h2>
+
+  <mat-dialog-content class="dialog-content">
+    @if (submitting()) {
+      <div class="dialog-saving" role="status" aria-live="polite">
+        <mat-spinner diameter="40" />
+        <p class="dialog-saving__text">Registrando entrega...</p>
+      </div>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="entrega-form">
+
+        <!-- Vendedor: label fijo si preselect; sino dropdown -->
+        @if (isPreseleccionado()) {
+          <div class="vendedor-fixed">
+            <span class="vendedor-fixed__label">Vendedor</span>
+            <span class="vendedor-fixed__nombre">{{ vendedorPreseleccionadoNombre() }}</span>
+          </div>
+        } @else {
+          <app-form-field
+            label="Vendedor"
+            forId="entrega-vendedor"
+            [required]="true"
+            [invalid]="!!(form.get('vendedorId')?.invalid && form.get('vendedorId')?.touched)"
+          >
+            <app-select-field
+              id="entrega-vendedor"
+              formControlName="vendedorId"
+              [options]="vendedoresOptions()"
+              [optionValueFn]="getVendedorId"
+              [optionLabelFn]="getVendedorLabel"
+              placeholder="Seleccioná un vendedor"
+            />
+            <span error>El vendedor es requerido</span>
+          </app-form-field>
+        }
+
+        <!-- Productos del vendedor -->
+        @if (selectedVendedorId()) {
+          <section class="productos-section" formGroupName="cantidades">
+            <h3 class="productos-section__title">
+              <mat-icon aria-hidden="true">inventory_2</mat-icon>
+              Productos a entregar
+            </h3>
+
+            @if (productosDisponibles().length === 0) {
+              <p class="empty-state">
+                Este vendedor no tiene productos con stock disponible para entregar.
+              </p>
+            } @else {
+              <table class="productos-table">
+                <thead>
+                  <tr>
+                    <th class="col-nombre" scope="col">Producto</th>
+                    <th class="col-disponible" scope="col">Disponible</th>
+                    <th class="col-cantidad" scope="col">A entregar</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (prod of productosDisponibles(); track prod.productoId) {
+                    <tr
+                      class="producto-row"
+                      [class.producto-row--active]="getCantidad(prod.productoId) > 0"
+                      [class.producto-row--invalid]="isCantidadInvalid(prod)"
+                    >
+                      <td class="col-nombre">{{ prod.productoNombre }}</td>
+                      <td class="col-disponible">{{ prod.cantidadDisponible }}</td>
+                      <td class="col-cantidad">
+                        <label class="visually-hidden" [for]="'cant-' + prod.productoId">
+                          Cantidad a entregar de {{ prod.productoNombre }}
+                        </label>
+                        <input
+                          [id]="'cant-' + prod.productoId"
+                          type="number"
+                          class="cantidad-input"
+                          [formControlName]="prod.productoId"
+                          [max]="prod.cantidadDisponible"
+                          [attr.aria-invalid]="isCantidadInvalid(prod)"
+                          min="0"
+                          step="1"
+                          placeholder="0"
+                        />
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </section>
+        }
+
+        <!-- Notas -->
+        <app-form-field
+          label="Notas (opcional)"
+          forId="entrega-notas"
+          hint="Por ejemplo: quién retiró y a qué hora"
+        >
+          <app-text-field
+            id="entrega-notas"
+            formControlName="notas"
+            placeholder="Retiró María 18:30..."
+          />
+        </app-form-field>
+
+        <!-- Actions -->
+        <div class="dialog-actions">
+          <button type="button" class="btn btn--secondary" (click)="onCancel()">
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn btn--primary"
+            [disabled]="submitDisabled()"
+          >
+            <mat-icon aria-hidden="true">check</mat-icon>
+            Registrar entrega
+          </button>
+        </div>
+
+      </form>
+    }
+  </mat-dialog-content>
+
+</div>
