@@ -23,15 +23,10 @@
 @use 'app/shared/components/form/form-tokens';
 
 // -----------------------------------------------------------------------------
-// 2. EXTERNAL IMPORTS
+// 2. CSS CUSTOM PROPERTIES (DESIGN TOKENS)
 // -----------------------------------------------------------------------------
-
-// Google Fonts - Inter & Inter Tight
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@400;500;600&display=swap');
-
-// -----------------------------------------------------------------------------
-// 3. CSS CUSTOM PROPERTIES (DESIGN TOKENS)
-// -----------------------------------------------------------------------------
+// NOTE: Google Fonts (Inter, Inter Tight) are loaded via <link> in index.html
+// to avoid breaking the build when the font inliner cannot reach Google.
 
 :root {
   // =========================================================================
