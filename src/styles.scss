@@ -355,6 +355,20 @@ textarea:not([matInput]):not(.unstyled) {
   }
 }
 
+// Quitar las flechas de los <input type="number"> globalmente
+// (visualmente; el comportamiento de scroll se neutraliza en main.ts)
+input[type='number'] {
+  -moz-appearance: textfield;       // Firefox
+  appearance: textfield;            // Estándar
+}
+
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;         // Chrome / Safari / Edge
+  appearance: none;
+  margin: 0;
+}
+
 // -----------------------------------------------------------------------------
 // 5. MATERIAL THEME CUSTOMIZATION
 // -----------------------------------------------------------------------------
