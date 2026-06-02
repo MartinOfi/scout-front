@@ -29,6 +29,7 @@ export interface Evento {
   reportePublico: boolean; // Si el reporte es visible sin login
   productos: Producto[];
   resumenFinanciero?: EventoResumenFinanciero;
+  estaCerrado: boolean;
   createdAt: string;
   updatedAt: string;
 }

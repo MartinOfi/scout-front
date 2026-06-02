@@ -40,6 +40,12 @@
       </div>
 
       <div class="detail-header__right">
+        @if (eventoCerrado()) {
+        <span class="evento-cerrado-badge">
+          <mat-icon>lock</mat-icon>
+          Cerrado
+        </span>
+        }
         <app-button variant="outline" size="sm" icon="arrow_back" (clicked)="onBack()">Volver</app-button>
         <app-button variant="outline" size="sm" icon="bar_chart" (clicked)="navigateToReporte()">Ver reporte</app-button>
         <app-button
@@ -55,7 +61,10 @@
             Copiar link
           </app-button>
         }
+        @if (!eventoCerrado()) {
         <app-button variant="outline" size="sm" icon="edit" (clicked)="onEdit()" />
+        <app-button variant="danger" size="sm" icon="lock" (clicked)="onCerrarEvento()">Cerrar evento</app-button>
+        }
       </div>
     </header>
 
@@ -104,7 +113,7 @@
         <!-- PRODUCTOS tab -->
         @if (activeTab() === 'productos') {
         <div class="tab-toolbar">
-          <app-button icon="add" (clicked)="openProductoDialog()">Gestionar Productos</app-button>
+          <app-button icon="add" [disabled]="eventoCerrado()" (clicked)="openProductoDialog()">Gestionar Productos</app-button>
         </div>
         @if (eventoProductos().length === 0) {
         <div class="tab-empty">
@@ -126,7 +135,7 @@
         <div class="tab-toolbar">
           <app-text-field type="search" placeholder="Buscar por vendedor..." [ngModel]="vendedorSearch()"
             (ngModelChange)="onVendedorSearchChange($event)" />
-          <app-button icon="add_shopping_cart" (clicked)="navigateToVentasLote()">Registrar Ventas en Lote</app-button>
+          <app-button icon="add_shopping_cart" [disabled]="eventoCerrado()" (clicked)="navigateToVentasLote()">Registrar Ventas en Lote</app-button>
         </div>
 
         @if (eventoVentas().length === 0) {
@@ -159,7 +168,7 @@
                   <span class="venta-card__date">{{ group.fecha | date:'d MMM' }}</span>
                 </div>
                 <button type="button" class="venta-card__delete unstyled"
-                  [disabled]="isGroupDeleting(group)"
+                  [disabled]="isGroupDeleting(group) || eventoCerrado()"
                   (click)="onDeleteVenta(group.primaryVentaId)"
                   aria-label="Eliminar venta">
                   @if (isGroupDeleting(group)) {
@@ -221,9 +230,9 @@
         @if (activeTab() === 'movimientos') {
         <div class="tab-toolbar">
           @if (evento()!.tipo === tipoEvento.GRUPO) {
-          <app-button variant="success" icon="add_circle" (clicked)="openIngresoDialog()">Registrar Ingreso</app-button>
+          <app-button variant="success" icon="add_circle" [disabled]="eventoCerrado()" (clicked)="openIngresoDialog()">Registrar Ingreso</app-button>
           }
-          <app-button icon="remove_circle" (clicked)="openGastoDialog()">Registrar Gasto</app-button>
+          <app-button icon="remove_circle" [disabled]="eventoCerrado()" (clicked)="openGastoDialog()">Registrar Gasto</app-button>
         </div>
 
         @if (eventoMovimientos().length === 0) {
@@ -257,7 +266,7 @@
             </div>
 
             <button type="button" class="movimiento-row__delete unstyled"
-              [disabled]="isDeleting(mov.id)"
+              [disabled]="isDeleting(mov.id) || eventoCerrado()"
               (click)="onDeleteMovimiento(mov.id)"
               aria-label="Eliminar movimiento">
               @if (isDeleting(mov.id)) {

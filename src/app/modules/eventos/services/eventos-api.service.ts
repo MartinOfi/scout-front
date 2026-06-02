@@ -61,6 +61,10 @@ export class EventosApiService {
     return this.http.delete<void>(`${this.endpoint}/${id}`);
   }
 
+  cerrarEvento(id: string): Observable<Evento> {
+    return this.http.post<Evento, Record<string, never>>(`${this.endpoint}/${id}/cerrar`, {});
+  }
+
   // ============================================================================
   // KPIs & RESUMEN
   // ============================================================================

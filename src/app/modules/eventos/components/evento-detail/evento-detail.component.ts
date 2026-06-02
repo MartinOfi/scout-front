@@ -22,6 +22,7 @@ import { Subject, combineLatest } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
 
 import { EventosStateService } from '../../services/eventos-state.service';
+import { EventosApiService } from '../../services/eventos-api.service';
 import { PersonasApiService } from '../../../personas/services/personas-api.service';
 import { TipoEvento } from '../../../../shared/enums';
 import {
@@ -154,6 +155,7 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   private readonly dialog = inject(MatDialog);
   private readonly confirmDialog = inject(ConfirmDialogService);
   readonly state = inject(EventosStateService);
+  private readonly eventosApi = inject(EventosApiService);
   private readonly personasApi = inject(PersonasApiService);
   private readonly notification = inject(NotificationService);
 
@@ -174,6 +176,8 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
 
   /** Si el reporte del evento es visible públicamente (sin login). */
   readonly reportePublico = computed((): boolean => this.evento()?.reportePublico ?? false);
+
+  readonly eventoCerrado = computed((): boolean => this.state.selected()?.estaCerrado ?? false);
 
   readonly eventoKpis = computed((): EventoKpis | null =>
     this.eventoId ? (this.state.kpis()[this.eventoId] ?? null) : null,
@@ -347,6 +351,7 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   }
 
   openProductoDialog(): void {
+    if (this.eventoCerrado()) return;
     void import('../shared/producto-dialog/producto-dialog.component').then(
       ({ ProductoDialogComponent }) => {
         if (this.destroyed) return;
@@ -361,6 +366,7 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   }
 
   openIngresoDialog(): void {
+    if (this.eventoCerrado()) return;
     void import('../shared/ingreso-evento-dialog/ingreso-evento-dialog.component').then(
       ({ IngresoEventoDialogComponent }) => {
         if (this.destroyed) return;
@@ -379,6 +385,7 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   }
 
   openGastoDialog(): void {
+    if (this.eventoCerrado()) return;
     void import('../shared/gasto-evento-dialog/gasto-evento-dialog.component').then(
       ({ GastoEventoDialogComponent }) => {
         if (this.destroyed) return;
@@ -393,10 +400,12 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   }
 
   onRemoveProducto(productoId: string): void {
+    if (this.eventoCerrado()) return;
     this.state.deleteProducto(this.eventoId, productoId).subscribe();
   }
 
   onDeleteVenta(ventaId: string): void {
+    if (this.eventoCerrado()) return;
     this.confirmDialog.confirmDelete('venta').subscribe((confirmed: boolean) => {
       if (confirmed) {
         this.state.deleteVenta(this.eventoId, ventaId).subscribe();
@@ -405,6 +414,7 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   }
 
   onDeleteMovimiento(movimientoId: string): void {
+    if (this.eventoCerrado()) return;
     this.confirmDialog.confirmDelete('movimiento').subscribe((confirmed: boolean) => {
       if (confirmed) {
         this.state.deleteMovimiento(this.eventoId, movimientoId).subscribe();
@@ -426,6 +436,7 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   }
 
   navigateToVentasLote(): void {
+    if (this.eventoCerrado()) return;
     this.router.navigate(['/eventos', this.eventoId, 'ventas', 'registrar']);
   }
 
@@ -453,6 +464,7 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
    * on a specific vendor row).
    */
   openEntregaDialog(vendedorId?: string): void {
+    if (this.eventoCerrado()) return;
     void import('../shared/entrega-dialog/entrega-dialog.component').then(
       ({ EntregaDialogComponent }) => {
         if (this.destroyed) return;
@@ -471,11 +483,26 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   }
 
   onDeleteEntrega(entregaId: string): void {
+    if (this.eventoCerrado()) return;
     this.confirmDialog.confirmDelete('entrega').subscribe((confirmed: boolean) => {
       if (confirmed) {
         this.state.deleteEntrega(this.eventoId, entregaId).subscribe();
       }
     });
+  }
+
+  onCerrarEvento(): void {
+    this.confirmDialog
+      .confirm(
+        '¿Cerrar evento?',
+        'Una vez cerrado no se podrán registrar más ventas, gastos ni entregas. Esta acción es irreversible.',
+      )
+      .subscribe((confirmed: boolean) => {
+        if (!confirmed) return;
+        this.eventosApi.cerrarEvento(this.eventoId).subscribe(() => {
+          this.state.loadById(this.eventoId);
+        });
+      });
   }
 
   /**
