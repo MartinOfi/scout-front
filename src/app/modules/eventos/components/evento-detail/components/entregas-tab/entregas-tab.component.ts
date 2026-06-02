@@ -66,6 +66,7 @@ export class EntregasTabComponent {
   private readonly _entregas = signal<EntregaResponse[]>([]);
   private readonly _deletingIds = signal<ReadonlySet<string>>(new Set());
   private readonly _expanded = signal<ReadonlySet<string>>(new Set());
+  private readonly _readonly = signal<boolean>(false);
 
   @Input() set stock(value: StockEntregaResponse[]) {
     this._stock.set(value ?? []);
@@ -78,6 +79,12 @@ export class EntregasTabComponent {
   @Input() set deletingIds(value: ReadonlySet<string>) {
     this._deletingIds.set(value ?? new Set());
   }
+
+  @Input() set readonly(value: boolean) {
+    this._readonly.set(value ?? false);
+  }
+
+  readonly isReadonly = this._readonly.asReadonly();
 
   @Output() readonly registrarEntrega = new EventEmitter<string>();
   @Output() readonly deleteEntrega = new EventEmitter<string>();

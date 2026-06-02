@@ -21,6 +21,7 @@ import { MoneyPipe } from '../../pipes/money.pipe';
 })
 export class ProductoCardComponent {
   readonly producto = input.required<Producto>();
+  readonly readonly = input<boolean>(false);
   readonly remove = output<string>();
 
   readonly ganancia = computed(() => this.producto().precioVenta - this.producto().precioCosto);

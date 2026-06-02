@@ -112,9 +112,11 @@
 
         <!-- PRODUCTOS tab -->
         @if (activeTab() === 'productos') {
+        @if (!eventoCerrado()) {
         <div class="tab-toolbar">
-          <app-button icon="add" [disabled]="eventoCerrado()" (clicked)="openProductoDialog()">Gestionar Productos</app-button>
+          <app-button icon="add" (clicked)="openProductoDialog()">Gestionar Productos</app-button>
         </div>
+        }
         @if (eventoProductos().length === 0) {
         <div class="tab-empty">
           <div class="tab-empty__icon"><mat-icon>inventory_2</mat-icon></div>
@@ -124,7 +126,7 @@
         } @else {
         <div class="productos-grid">
           @for (prod of eventoProductos(); track prod.id) {
-          <app-producto-card [producto]="prod" (remove)="onRemoveProducto($event)" />
+          <app-producto-card [producto]="prod" [readonly]="eventoCerrado()" (remove)="onRemoveProducto($event)" />
           }
         </div>
         }
@@ -135,7 +137,9 @@
         <div class="tab-toolbar">
           <app-text-field type="search" placeholder="Buscar por vendedor..." [ngModel]="vendedorSearch()"
             (ngModelChange)="onVendedorSearchChange($event)" />
-          <app-button icon="add_shopping_cart" [disabled]="eventoCerrado()" (clicked)="navigateToVentasLote()">Registrar Ventas en Lote</app-button>
+          @if (!eventoCerrado()) {
+          <app-button icon="add_shopping_cart" (clicked)="navigateToVentasLote()">Registrar Ventas en Lote</app-button>
+          }
         </div>
 
         @if (eventoVentas().length === 0) {
@@ -167,8 +171,9 @@
                   <span class="venta-card__vendedor">{{ group.vendedorNombre }}</span>
                   <span class="venta-card__date">{{ group.fecha | date:'d MMM' }}</span>
                 </div>
+                @if (!eventoCerrado()) {
                 <button type="button" class="venta-card__delete unstyled"
-                  [disabled]="isGroupDeleting(group) || eventoCerrado()"
+                  [disabled]="isGroupDeleting(group)"
                   (click)="onDeleteVenta(group.primaryVentaId)"
                   aria-label="Eliminar venta">
                   @if (isGroupDeleting(group)) {
@@ -177,6 +182,7 @@
                   <mat-icon>close</mat-icon>
                   }
                 </button>
+                }
               </header>
 
               <ul class="venta-card__items">
@@ -221,6 +227,7 @@
           [stock]="eventoStockEntregas()"
           [entregas]="eventoEntregas()"
           [deletingIds]="deletingIdsSet()"
+          [readonly]="eventoCerrado()"
           (registrarEntrega)="openEntregaDialog($event)"
           (deleteEntrega)="onDeleteEntrega($event)"
         />
@@ -228,12 +235,14 @@
 
         <!-- MOVIMIENTOS tab -->
         @if (activeTab() === 'movimientos') {
+        @if (!eventoCerrado()) {
         <div class="tab-toolbar">
           @if (evento()!.tipo === tipoEvento.GRUPO) {
-          <app-button variant="success" icon="add_circle" [disabled]="eventoCerrado()" (clicked)="openIngresoDialog()">Registrar Ingreso</app-button>
+          <app-button variant="success" icon="add_circle" (clicked)="openIngresoDialog()">Registrar Ingreso</app-button>
           }
-          <app-button icon="remove_circle" [disabled]="eventoCerrado()" (clicked)="openGastoDialog()">Registrar Gasto</app-button>
+          <app-button icon="remove_circle" (clicked)="openGastoDialog()">Registrar Gasto</app-button>
         </div>
+        }
 
         @if (eventoMovimientos().length === 0) {
         <div class="tab-empty">
@@ -265,8 +274,9 @@
               {{ (mov.tipo === 'ingreso' ? '+' : '-') }}{{ mov.monto | money }}
             </div>
 
+            @if (!eventoCerrado()) {
             <button type="button" class="movimiento-row__delete unstyled"
-              [disabled]="isDeleting(mov.id) || eventoCerrado()"
+              [disabled]="isDeleting(mov.id)"
               (click)="onDeleteMovimiento(mov.id)"
               aria-label="Eliminar movimiento">
               @if (isDeleting(mov.id)) {
@@ -275,6 +285,7 @@
               <mat-icon>delete_outline</mat-icon>
               }
             </button>
+            }
 
           </article>
           }

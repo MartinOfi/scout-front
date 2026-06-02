@@ -2,6 +2,7 @@
 
   <div class="producto-card__header">
     <span class="producto-card__nombre">{{ producto().nombre }}</span>
+    @if (!readonly()) {
     <button
       mat-icon-button
       class="producto-card__delete"
@@ -10,6 +11,7 @@
     >
       <mat-icon>delete_outline</mat-icon>
     </button>
+    }
   </div>
 
   <div class="producto-card__price">
