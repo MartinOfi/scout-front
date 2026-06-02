@@ -11,6 +11,18 @@
  * el resto del CSS consume estas variables `--r-*`, así un solo override de
  * variables alterna ambos temas sin duplicar reglas.
  */
+
+/**
+ * El host del componente debe ocupar el ancho completo. En la ruta pública
+ * (top-level, fuera del layout) el custom element es `inline` por defecto, así
+ * que el contenido `w-full` colapsaba al ancho mínimo. Forzarlo a block/100%
+ * arregla tanto el reporte como los estados loading/error/no-disponible.
+ */
+app-evento-reporte {
+  display: block;
+  width: 100%;
+}
+
 .reporte-scope {
   // ----- Paleta CLARA (default) -----
   --r-bg: #f6f8fc;
