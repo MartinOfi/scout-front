@@ -171,6 +171,16 @@ export class EventosStateService {
     );
   }
 
+  updateReportePublico(id: string, reportePublico: boolean): Observable<Evento> {
+    return this.apiService.updateReportePublico(id, reportePublico).pipe(
+      tap((evento) => {
+        this._eventos.update((prev) => prev.map((e) => (e.id === id ? evento : e)));
+        this.notificationService.showSuccess('Visibilidad del reporte actualizada');
+      }),
+      catchError((err: unknown) => this._catchError(err, 'Error al actualizar el reporte')),
+    );
+  }
+
   delete(id: string): Observable<void> {
     this._markDeleting(id);
     return this.apiService.delete(id).pipe(

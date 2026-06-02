@@ -65,6 +65,13 @@ export class EventosApiService {
     return this.http.post<Evento, Record<string, never>>(`${this.endpoint}/${id}/cerrar`, {});
   }
 
+  updateReportePublico(id: string, reportePublico: boolean): Observable<Evento> {
+    return this.http.patch<Evento, { reportePublico: boolean }>(
+      `${this.endpoint}/${id}/reporte-publico`,
+      { reportePublico },
+    );
+  }
+
   // ============================================================================
   // KPIs & RESUMEN
   // ============================================================================

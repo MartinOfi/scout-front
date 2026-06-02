@@ -446,7 +446,7 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
 
   /** Prende/apaga la visibilidad pública del reporte de este evento. */
   toggleReportePublico(): void {
-    this.state.update(this.eventoId, { reportePublico: !this.reportePublico() }).subscribe();
+    this.state.updateReportePublico(this.eventoId, !this.reportePublico()).subscribe();
   }
 
   /** Copia al portapapeles el link público del reporte. */
