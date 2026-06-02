@@ -9,6 +9,7 @@ import {
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { firstValueFrom } from 'rxjs';
 
 import { routes } from './app.routes';
@@ -64,6 +65,7 @@ export const appConfig: ApplicationConfig = {
       ]),
     ),
     provideAnimationsAsync(),
+    provideCharts(withDefaultRegisterables()),
     { provide: LOCALE_ID, useValue: 'es-AR' },
     // Initialize auth state on app startup
     {

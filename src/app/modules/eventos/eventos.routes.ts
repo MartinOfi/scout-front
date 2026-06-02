@@ -33,6 +33,13 @@ export const EVENTOS_ROUTES: Routes = [
       import('./pages/ventas-lote/ventas-lote.component').then((m) => m.VentasLoteComponent),
   },
   {
+    path: ':id/reporte',
+    loadComponent: () =>
+      import('./pages/evento-reporte/evento-reporte.component').then(
+        (m) => m.EventoReporteComponent,
+      ),
+  },
+  {
     path: ':id/editar',
     loadComponent: () =>
       import('./components/evento-form/smart/evento-form.component').then(

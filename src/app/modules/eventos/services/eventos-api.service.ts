@@ -18,6 +18,7 @@ import {
   CreateEntregaDto,
   EntregaResponse,
   StockEntregaResponse,
+  ReporteEvento,
 } from '../../../shared/models';
 import { Movimiento } from '../../../shared/models';
 import { HttpService } from '../../../shared/services';
@@ -70,6 +71,13 @@ export class EventosApiService {
     const params: Record<string, string> = {};
     if (vendedor) params['vendedor'] = vendedor;
     return this.http.get<ResumenVentas>(`${this.endpoint}/${eventoId}/resumen-ventas`, params);
+  }
+
+  /**
+   * Reporte completo del evento (contrato unión-discriminada por `variante`).
+   */
+  getReporte(eventoId: string): Observable<ReporteEvento> {
+    return this.http.get<ReporteEvento>(`${this.endpoint}/${eventoId}/reporte`);
   }
 
   // ============================================================================

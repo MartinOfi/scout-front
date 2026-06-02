@@ -424,6 +424,10 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
     this.router.navigate(['/eventos', this.eventoId, 'ventas', 'registrar']);
   }
 
+  navigateToReporte(): void {
+    this.router.navigate(['/eventos', this.eventoId, 'reporte']);
+  }
+
   /**
    * Opens the entrega dialog. If `vendedorId` is provided, the dialog
    * preselects that vendor (used when the operator clicks "Registrar entrega"
