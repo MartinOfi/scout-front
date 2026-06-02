@@ -28,6 +28,7 @@ export interface Evento {
   tipoEvento: string | null; // Only for TipoEvento.GRUPO (e.g. "Kermesse")
   productos: Producto[];
   resumenFinanciero?: EventoResumenFinanciero;
+  estaCerrado: boolean;
   createdAt: string;
   updatedAt: string;
 }
