@@ -58,10 +58,12 @@
               </span>
             }
           } @else {
-            <span class="vendedor-completo">
-              <mat-icon aria-hidden="true">check_circle</mat-icon>
-              Todo entregado
-            </span>
+            @if (!row.tieneStockDisponible) {
+              <span class="vendedor-completo">
+                <mat-icon aria-hidden="true">check_circle</mat-icon>
+                Todo entregado
+              </span>
+            }
           }
         </div>
 
