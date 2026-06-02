@@ -50,12 +50,13 @@ $dialog-transition: t.$transition-fast;
 
   .mat-mdc-dialog-content {
     padding: 0 !important;
-
-    // Mobile: taller max-height for more content visibility
-    max-height: 80vh;
+    // Subtract estimated title height (~60px) + mobile stacked-button actions (~140px)
+    // so the actions footer is always visible without needing to scroll the page.
+    max-height: calc(90dvh - 220px);
+    overflow-y: auto;
 
     @include respond-to('md') {
-      max-height: 70vh;
+      max-height: 65vh; // Desktop: horizontal actions are ~60px, title ~70px
     }
   }
 

@@ -3,42 +3,39 @@
 // =============================================================================
 @use 'app/shared/styles/responsive' as *;
 
-// Wrapper: constrains width and clips overflow
+// Host: block-level so the component participates correctly in flex layouts.
+// min-width: 0 allows it to shrink below its content size when a sibling
+// (e.g. "Nuevo Miembro" button) needs space in the same row.
+:host {
+  display: block;
+  width: 100%;   // constrain to parent — prevents page-level horizontal overflow
+  min-width: 0;  // allow shrinking below content size in flex siblings
+}
+
+// Wrapper: THIS is the scroll container. The inner inline-flex naturally
+// grows to max-content width, overflowing this constrained box, triggering
+// the scroll. Scrollbar is hidden but touch-scroll still works.
 .button-tabs-wrapper {
   width: 100%;
-  max-width: 100%;
-  // Mobile-first: clip overflow, scroll happens on inner
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
   margin-bottom: var(--spacing-md);
 
-  // Desktop: allow visible overflow
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
   @include respond-to('md') {
-    overflow: visible;
     margin-bottom: var(--spacing-lg);
   }
 }
 
-// Inner container: scrollable content
+// Inner container: content that overflows the wrapper.
+// inline-flex auto-sizes to its children (max-content) — no explicit width.
 .button-tabs {
   display: inline-flex;
   gap: 0;
-  min-width: max-content; // Force natural width for scroll
-
-  // Mobile-first: horizontal scroll on content
-  overflow-x: scroll;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; // Firefox
-  width: 100%;
-
-  &::-webkit-scrollbar {
-    display: none; // Chrome, Safari
-  }
-
-  // Desktop: no scroll needed
-  @include respond-to('md') {
-    overflow-x: visible;
-    width: auto;
-  }
 }
 
 .button-tab {

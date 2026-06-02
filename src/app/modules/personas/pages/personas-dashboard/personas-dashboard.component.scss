@@ -28,8 +28,25 @@
 
   &-container-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: var(--spacing-sm);
+
+    app-button-tabs {
+      flex: 1;
+      min-width: 0;
+    }
+
+    app-button {
+      flex-shrink: 0;
+
+      // Mobile: icon-only, compact to ~60% of default size
+      @media (max-width: 767px) {
+        ::ng-deep .scout-btn {
+          padding: 5px 8px;
+          border-radius: 8px;
+        }
+      }
+    }
   }
 
   &-container {
@@ -37,6 +54,13 @@
     border-radius: 8px;
     padding: var(--spacing-lg);
     box-shadow: t.$shadow-card;
+  }
+}
+
+// Mobile: hide button label so only the + icon shows
+.btn-label--desktop {
+  @media (max-width: 767px) {
+    display: none;
   }
 }
 

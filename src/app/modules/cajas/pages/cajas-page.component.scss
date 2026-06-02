@@ -42,12 +42,9 @@
 
   &-header {
     display: flex;
-    // Mobile-first: allow wrap for long content
-    flex-wrap: wrap;
     gap: var(--spacing-sm);
     justify-content: space-between;
     align-items: center;
-    overflow: scroll;
   }
 }
 

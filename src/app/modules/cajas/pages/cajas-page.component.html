@@ -1,27 +1,31 @@
-<div class="cajas-page">
-  <div class="cajas-tabs-container">
-    <div class="cajas-tabs-container-header">
-      <app-button-tabs [tabs]="tabs" [activeTab]="activeTab()" (tabChange)="onTabChange($event)" />
-    </div>
+<mat-sidenav-container class="cajas-sidenav-container" autosize>
+  <mat-sidenav #drawer mode="over" position="end" [opened]="drawerOpen()" (closed)="onDrawerClosed()"
+    class="caja-sidenav">
+    <app-caja-drawer (close)="onDrawerClosed()" (registrarMovimiento)="onRegistrarMovimiento()"
+      (verTodosMovimientos)="onVerTodosMovimientos()" />
+  </mat-sidenav>
 
-    <div class="tab-content">
-      @switch (activeTab()) {
-      @case ('grupo') {
-      <app-caja-grupo />
-      }
-      @case ('rama') {
-      <app-fondos-rama />
-      }
-      @case ('personal') {
-      <app-cuentas-personales />
-      }
-      }
-    </div>
-  </div>
-</div>
+  <mat-sidenav-content>
+    <div class="cajas-page">
+      <div class="cajas-tabs-container">
+        <div class="cajas-tabs-container-header">
+          <app-button-tabs [tabs]="tabs" [activeTab]="activeTab()" (tabChange)="onTabChange($event)" />
+        </div>
 
-<!-- Drawer -->
-<mat-sidenav #drawer mode="over" position="end" [opened]="drawerOpen()" (closed)="onDrawerClosed()"
-  class="caja-sidenav">
-  <app-caja-drawer (close)="onDrawerClosed()" (registrarMovimiento)="onRegistrarMovimiento()"
-    (verTodosMovimientos)="onVerTodosMovimientos()" />
+        <div class="tab-content">
+          @switch (activeTab()) {
+          @case ('grupo') {
+          <app-caja-grupo />
+          }
+          @case ('rama') {
+          <app-fondos-rama />
+          }
+          @case ('personal') {
+          <app-cuentas-personales />
+          }
+          }
+        </div>
+      </div>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
