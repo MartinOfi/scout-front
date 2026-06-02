@@ -50,6 +50,7 @@ import { ButtonComponent } from '../../../../shared/components/button/button.com
 import { TextFieldComponent } from '../../../../shared/components/form/text-field/text-field.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ConfirmDialogService } from '../../../../shared/services/confirm-dialog.service';
+import { NotificationService } from '../../../../shared/services';
 import { EntregasTabComponent } from './components/entregas-tab/entregas-tab.component';
 
 /**
@@ -154,6 +155,7 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   private readonly confirmDialog = inject(ConfirmDialogService);
   readonly state = inject(EventosStateService);
   private readonly personasApi = inject(PersonasApiService);
+  private readonly notification = inject(NotificationService);
 
   private eventoId = '';
   private destroyed = false;
@@ -169,6 +171,9 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   readonly error = this.state.error;
 
   readonly evento = computed((): Evento | null => this.state.selected());
+
+  /** Si el reporte del evento es visible públicamente (sin login). */
+  readonly reportePublico = computed((): boolean => this.evento()?.reportePublico ?? false);
 
   readonly eventoKpis = computed((): EventoKpis | null =>
     this.eventoId ? (this.state.kpis()[this.eventoId] ?? null) : null,
@@ -426,6 +431,20 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
 
   navigateToReporte(): void {
     this.router.navigate(['/eventos', this.eventoId, 'reporte']);
+  }
+
+  /** Prende/apaga la visibilidad pública del reporte de este evento. */
+  toggleReportePublico(): void {
+    this.state.update(this.eventoId, { reportePublico: !this.reportePublico() }).subscribe();
+  }
+
+  /** Copia al portapapeles el link público del reporte. */
+  copiarLinkReporte(): void {
+    const url = `${window.location.origin}/eventos/${this.eventoId}/reporte`;
+    void navigator.clipboard
+      .writeText(url)
+      .then(() => this.notification.showSuccess('Link del reporte copiado'))
+      .catch(() => this.notification.showError('No se pudo copiar el link'));
   }
 
   /**

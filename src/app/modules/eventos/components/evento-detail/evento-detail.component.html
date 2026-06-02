@@ -42,6 +42,19 @@
       <div class="detail-header__right">
         <app-button variant="outline" size="sm" icon="arrow_back" (clicked)="onBack()">Volver</app-button>
         <app-button variant="outline" size="sm" icon="bar_chart" (clicked)="navigateToReporte()">Ver reporte</app-button>
+        <app-button
+          variant="outline"
+          size="sm"
+          [icon]="reportePublico() ? 'public' : 'public_off'"
+          (clicked)="toggleReportePublico()"
+        >
+          {{ reportePublico() ? 'Reporte público' : 'Hacer público' }}
+        </app-button>
+        @if (reportePublico()) {
+          <app-button variant="outline" size="sm" icon="link" (clicked)="copiarLinkReporte()">
+            Copiar link
+          </app-button>
+        }
         <app-button variant="outline" size="sm" icon="edit" (clicked)="onEdit()" />
       </div>
     </header>

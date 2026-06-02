@@ -26,6 +26,7 @@ export interface Evento {
   tipo: TipoEvento;
   destinoGanancia: DestinoGanancia | null; // Only for TipoEvento.VENTA
   tipoEvento: string | null; // Only for TipoEvento.GRUPO (e.g. "Kermesse")
+  reportePublico: boolean; // Si el reporte es visible sin login
   productos: Producto[];
   resumenFinanciero?: EventoResumenFinanciero;
   createdAt: string;
@@ -170,6 +171,7 @@ export interface UpdateEventoDto {
   tipo?: TipoEvento;
   destinoGanancia?: DestinoGanancia;
   tipoEvento?: string;
+  reportePublico?: boolean;
 }
 
 /**

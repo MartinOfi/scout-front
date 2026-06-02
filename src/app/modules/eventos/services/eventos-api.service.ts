@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { HttpContext } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   Evento,
@@ -23,6 +24,7 @@ import {
 import { Movimiento } from '../../../shared/models';
 import { HttpService } from '../../../shared/services';
 import { API_CONFIG } from '../../../shared/constants';
+import { SKIP_GLOBAL_ERROR } from '../../../core/interceptors/http-context.tokens';
 
 /**
  * API service for Eventos module
@@ -78,6 +80,19 @@ export class EventosApiService {
    */
   getReporte(eventoId: string): Observable<ReporteEvento> {
     return this.http.get<ReporteEvento>(`${this.endpoint}/${eventoId}/reporte`);
+  }
+
+  /**
+   * Versión pública del reporte (sin autenticación). El backend responde 404 si
+   * el evento no tiene el reporte público; marcamos SKIP_GLOBAL_ERROR para que
+   * ese 404 lo maneje la página (cartel "no disponible") sin snackbar global.
+   */
+  getReportePublico(eventoId: string): Observable<ReporteEvento> {
+    return this.http.get<ReporteEvento>(
+      `${this.endpoint}/${eventoId}/reporte/publico`,
+      undefined,
+      new HttpContext().set(SKIP_GLOBAL_ERROR, true),
+    );
   }
 
   // ============================================================================

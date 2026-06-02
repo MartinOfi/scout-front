@@ -14,8 +14,19 @@ export const routes: Routes = [
   {
     path: 'login',
     loadComponent: () =>
-      import('./modules/auth/login/login.component').then(
-        (m) => m.LoginComponent
+      import('./modules/auth/login/login.component').then((m) => m.LoginComponent),
+  },
+
+  // Reporte de evento (público - sin layout ni guard).
+  // Debe ir ANTES del layout con guard: el router usa first-match-wins, así
+  // esta ruta gana sobre `path: ''` y la misma URL `/eventos/:id/reporte` queda
+  // accesible sin login. El componente decide qué endpoint consumir según haya
+  // sesión (autenticado: siempre; anónimo: solo si el evento es público).
+  {
+    path: 'eventos/:id/reporte',
+    loadComponent: () =>
+      import('./modules/eventos/pages/evento-reporte/evento-reporte.component').then(
+        (m) => m.EventoReporteComponent,
       ),
   },
 
@@ -36,9 +47,7 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         loadComponent: () =>
-          import('./modules/dashboard/dashboard.component').then(
-            (m) => m.DashboardComponent
-          ),
+          import('./modules/dashboard/dashboard.component').then((m) => m.DashboardComponent),
         data: {
           page: {
             title: 'Dashboard',
@@ -51,9 +60,7 @@ export const routes: Routes = [
       {
         path: 'personas',
         loadChildren: () =>
-          import('./modules/personas/personas.routes').then(
-            (m) => m.PERSONAS_ROUTES
-          ),
+          import('./modules/personas/personas.routes').then((m) => m.PERSONAS_ROUTES),
         data: {
           page: {
             title: 'Gestión de Personas',
@@ -65,8 +72,7 @@ export const routes: Routes = [
       // Módulo Cajas (Caja Grupo, Fondos Rama, Cuentas Personales)
       {
         path: 'cajas',
-        loadChildren: () =>
-          import('./modules/cajas/cajas.routes').then((m) => m.CAJAS_ROUTES),
+        loadChildren: () => import('./modules/cajas/cajas.routes').then((m) => m.CAJAS_ROUTES),
         data: {
           page: {
             title: 'Gestión Financiera',
@@ -79,9 +85,7 @@ export const routes: Routes = [
       {
         path: 'movimientos',
         loadChildren: () =>
-          import('./modules/movimientos/movimientos.routes').then(
-            (m) => m.MOVIMIENTOS_ROUTES
-          ),
+          import('./modules/movimientos/movimientos.routes').then((m) => m.MOVIMIENTOS_ROUTES),
         data: {
           page: {
             title: 'Movimientos',
@@ -95,7 +99,7 @@ export const routes: Routes = [
         path: 'inscripciones',
         loadChildren: () =>
           import('./modules/inscripciones/inscripciones.routes').then(
-            (m) => m.INSCRIPCIONES_ROUTES
+            (m) => m.INSCRIPCIONES_ROUTES,
           ),
         data: {
           page: {
@@ -109,9 +113,7 @@ export const routes: Routes = [
       {
         path: 'eventos',
         loadChildren: () =>
-          import('./modules/eventos/eventos.routes').then(
-            (m) => m.EVENTOS_ROUTES
-          ),
+          import('./modules/eventos/eventos.routes').then((m) => m.EVENTOS_ROUTES),
         data: {
           page: {
             title: 'Eventos',
@@ -124,9 +126,7 @@ export const routes: Routes = [
       {
         path: 'campamentos',
         loadChildren: () =>
-          import('./modules/campamentos/campamentos.routes').then(
-            (m) => m.CAMPAMENTOS_ROUTES
-          ),
+          import('./modules/campamentos/campamentos.routes').then((m) => m.CAMPAMENTOS_ROUTES),
         data: {
           page: {
             title: 'Campamentos',
@@ -139,9 +139,7 @@ export const routes: Routes = [
       {
         path: 'reportes',
         loadChildren: () =>
-          import('./modules/reportes/reportes.routes').then(
-            (m) => m.REPORTES_ROUTES
-          ),
+          import('./modules/reportes/reportes.routes').then((m) => m.REPORTES_ROUTES),
         data: {
           page: {
             title: 'Reportes',
@@ -155,7 +153,7 @@ export const routes: Routes = [
         path: 'configuracion',
         loadChildren: () =>
           import('./modules/configuracion/configuracion.routes').then(
-            (m) => m.CONFIGURACION_ROUTES
+            (m) => m.CONFIGURACION_ROUTES,
           ),
         data: {
           page: {
@@ -171,8 +169,6 @@ export const routes: Routes = [
   {
     path: '**',
     loadComponent: () =>
-      import('./shared/components/not-found/not-found.component').then(
-        (m) => m.NotFoundComponent
-      ),
+      import('./shared/components/not-found/not-found.component').then((m) => m.NotFoundComponent),
   },
 ];

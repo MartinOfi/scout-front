@@ -32,13 +32,9 @@ export const EVENTOS_ROUTES: Routes = [
     loadComponent: () =>
       import('./pages/ventas-lote/ventas-lote.component').then((m) => m.VentasLoteComponent),
   },
-  {
-    path: ':id/reporte',
-    loadComponent: () =>
-      import('./pages/evento-reporte/evento-reporte.component').then(
-        (m) => m.EventoReporteComponent,
-      ),
-  },
+  // NOTA: `:id/reporte` se sirve como ruta pública top-level en app.routes.ts
+  // (sin guard ni layout), para que el mismo link funcione sin login. Por eso
+  // NO está acá abajo (este árbol cuelga del authGuard).
   {
     path: ':id/editar',
     loadComponent: () =>
