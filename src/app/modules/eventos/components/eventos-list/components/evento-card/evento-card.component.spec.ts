@@ -18,6 +18,7 @@ const makeEvento = (overrides: Partial<Evento> = {}): Evento => ({
   tipo: TipoEvento.GRUPO,
   destinoGanancia: null,
   tipoEvento: 'Kermesse',
+  reportePublico: false,
   productos: [],
   createdAt: '2026-01-01T00:00:00Z',
   updatedAt: '2026-01-01T00:00:00Z',
@@ -88,8 +89,24 @@ describe('EventoCardComponent', () => {
       component.evento = makeEvento({
         tipo: TipoEvento.VENTA,
         productos: [
-          { id: 'p1', eventoId: 'ev1', nombre: 'Empanada', precioVenta: 100, precioCosto: 50, createdAt: '', updatedAt: '' },
-          { id: 'p2', eventoId: 'ev1', nombre: 'Jugo', precioVenta: 50, precioCosto: 20, createdAt: '', updatedAt: '' },
+          {
+            id: 'p1',
+            eventoId: 'ev1',
+            nombre: 'Empanada',
+            precioVenta: 100,
+            precioCosto: 50,
+            createdAt: '',
+            updatedAt: '',
+          },
+          {
+            id: 'p2',
+            eventoId: 'ev1',
+            nombre: 'Jugo',
+            precioVenta: 50,
+            precioCosto: 20,
+            createdAt: '',
+            updatedAt: '',
+          },
         ],
       });
       expect(component.productosCount).toBe(2);
@@ -104,7 +121,9 @@ describe('EventoCardComponent', () => {
   describe('stopPropagation on action buttons', () => {
     it('should stop propagation and emit edit when edit button clicked', () => {
       const spy = spyOn(component.edit, 'emit');
-      const editBtn: HTMLButtonElement = fixture.nativeElement.querySelector('[data-testid="edit-btn"]');
+      const editBtn: HTMLButtonElement = fixture.nativeElement.querySelector(
+        '[data-testid="edit-btn"]',
+      );
       expect(editBtn).toBeTruthy();
       editBtn.click();
       expect(spy).toHaveBeenCalledWith('ev1');

@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { API_CONFIG } from '../constants';
@@ -20,10 +20,14 @@ export class HttpService {
   /**
    * GET request
    */
-  get<T>(endpoint: string, params?: Record<string, string | number | boolean>): Observable<T> {
+  get<T>(
+    endpoint: string,
+    params?: Record<string, string | number | boolean>,
+    context?: HttpContext,
+  ): Observable<T> {
     const httpParams = this.buildParams(params);
     return this.http
-      .get<T>(`${this.baseUrl}/${endpoint}`, { params: httpParams })
+      .get<T>(`${this.baseUrl}/${endpoint}`, { params: httpParams, context })
       .pipe(catchError(this.handleError));
   }
 
@@ -49,9 +53,7 @@ export class HttpService {
    * DELETE request
    */
   delete<T>(endpoint: string): Observable<T> {
-    return this.http
-      .delete<T>(`${this.baseUrl}/${endpoint}`)
-      .pipe(catchError(this.handleError));
+    return this.http.delete<T>(`${this.baseUrl}/${endpoint}`).pipe(catchError(this.handleError));
   }
 
   /**
