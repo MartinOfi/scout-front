@@ -22,7 +22,6 @@ import { Subject, combineLatest } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
 
 import { EventosStateService } from '../../services/eventos-state.service';
-import { EventosApiService } from '../../services/eventos-api.service';
 import { PersonasApiService } from '../../../personas/services/personas-api.service';
 import { TipoEvento } from '../../../../shared/enums';
 import {
@@ -155,7 +154,6 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   private readonly dialog = inject(MatDialog);
   private readonly confirmDialog = inject(ConfirmDialogService);
   readonly state = inject(EventosStateService);
-  private readonly eventosApi = inject(EventosApiService);
   private readonly personasApi = inject(PersonasApiService);
   private readonly notification = inject(NotificationService);
 
@@ -169,6 +167,8 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   readonly entregaSearch = signal('');
 
   readonly loading = this.state.loading;
+  readonly togglingVisibilidad = signal(false);
+  readonly cerrandoEvento = signal(false);
   readonly personas = signal<Persona[]>([]);
   readonly error = this.state.error;
 
@@ -446,7 +446,11 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
 
   /** Prende/apaga la visibilidad pública del reporte de este evento. */
   toggleReportePublico(): void {
-    this.state.updateReportePublico(this.eventoId, !this.reportePublico()).subscribe();
+    this.togglingVisibilidad.set(true);
+    this.state.updateReportePublico(this.eventoId, !this.reportePublico()).subscribe({
+      complete: () => this.togglingVisibilidad.set(false),
+      error: () => this.togglingVisibilidad.set(false),
+    });
   }
 
   /** Copia al portapapeles el link público del reporte. */
@@ -499,8 +503,10 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
       )
       .subscribe((confirmed: boolean) => {
         if (!confirmed) return;
-        this.eventosApi.cerrarEvento(this.eventoId).subscribe(() => {
-          this.state.loadById(this.eventoId);
+        this.cerrandoEvento.set(true);
+        this.state.cerrarEvento(this.eventoId).subscribe({
+          complete: () => this.cerrandoEvento.set(false),
+          error: () => this.cerrandoEvento.set(false),
         });
       });
   }

@@ -52,6 +52,7 @@
           variant="outline"
           size="sm"
           [icon]="reportePublico() ? 'public' : 'public_off'"
+          [loading]="togglingVisibilidad()"
           (clicked)="toggleReportePublico()"
         >
           {{ reportePublico() ? 'Reporte público' : 'Hacer público' }}
@@ -63,7 +64,7 @@
         }
         @if (!eventoCerrado()) {
         <app-button variant="outline" size="sm" icon="edit" (clicked)="onEdit()" />
-        <app-button variant="danger" size="sm" icon="lock" (clicked)="onCerrarEvento()">Cerrar evento</app-button>
+        <app-button variant="danger" size="sm" icon="lock" [loading]="cerrandoEvento()" (clicked)="onCerrarEvento()">Cerrar evento</app-button>
         }
       </div>
     </header>

@@ -172,12 +172,30 @@ export class EventosStateService {
   }
 
   updateReportePublico(id: string, reportePublico: boolean): Observable<Evento> {
+    this._loading.set(true);
+    this._error.set(null);
+
     return this.apiService.updateReportePublico(id, reportePublico).pipe(
       tap((evento) => {
         this._eventos.update((prev) => prev.map((e) => (e.id === id ? evento : e)));
         this.notificationService.showSuccess('Visibilidad del reporte actualizada');
       }),
       catchError((err: unknown) => this._catchError(err, 'Error al actualizar el reporte')),
+      finalize(() => this._loading.set(false)),
+    );
+  }
+
+  cerrarEvento(id: string): Observable<Evento> {
+    this._loading.set(true);
+    this._error.set(null);
+
+    return this.apiService.cerrarEvento(id).pipe(
+      tap((evento) => {
+        this._eventos.update((prev) => prev.map((e) => (e.id === id ? evento : e)));
+        this.notificationService.showSuccess('Evento cerrado exitosamente');
+      }),
+      catchError((err: unknown) => this._catchError(err, 'Error al cerrar el evento')),
+      finalize(() => this._loading.set(false)),
     );
   }
 
