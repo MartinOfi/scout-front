@@ -24,7 +24,10 @@ import { CampamentosStateService } from '../../../services';
 import { CajasApiService } from '../../../../cajas/services/cajas-api.service';
 import { PersonasApiService } from '../../../../personas/services/personas-api.service';
 import { MovimientosApiService } from '../../../../movimientos/services/movimientos-api.service';
-import { MovimientoCampamentoCardComponent } from '../../shared/movimiento-campamento-card/movimiento-campamento-card.component';
+import {
+  MovimientoCardComponent,
+  MovimientoCardVM,
+} from '../../../../../shared/components/movimiento-card/movimiento-card.component';
 import {
   LoadingSpinnerComponent,
   ConfirmDialogService,
@@ -42,7 +45,6 @@ import {
   CampamentoInfoDto,
   CampamentoKpisDto,
   ParticipantePagoDto,
-  MovimientoCampamentoDto,
   PagoParticipanteDto,
   RegistrarPagoCampamentoDto,
   UpdatePagoDto,
@@ -62,7 +64,7 @@ import {
 } from '../../../../../shared/components/persona-selector-dialog/persona-selector-dialog.component';
 import { AddParticipanteDto } from '../../../../../shared/models';
 import { formatMoney, MoneyPipe } from '../../../../../shared/pipes/money.pipe';
-import { EstadoPago, PersonaType, FiltroMovimientosCampamento } from '../../../../../shared/enums';
+import { EstadoPago, PersonaType, FiltroMovimientos } from '../../../../../shared/enums';
 import { FilterValueMap } from '../../../../../shared/components/filters/generic-filters/filter-value.type';
 import { ParticipantesFiltrosComponent } from '../components/participantes-filtros/participantes-filtros.component';
 
@@ -87,7 +89,7 @@ interface KpiConfig {
     EmptyStateComponent,
     StatCardComponent,
     ButtonTabsComponent,
-    MovimientoCampamentoCardComponent,
+    MovimientoCardComponent,
     MoneyPipe,
     DatePipe,
     ParticipantesFiltrosComponent,
@@ -120,9 +122,7 @@ export class CampamentoDetailComponent implements OnInit {
   readonly activeTab = signal<string>('participantes');
 
   /** Active movements filter */
-  readonly filtroMovimientos = signal<FiltroMovimientosCampamento>(
-    FiltroMovimientosCampamento.TODOS,
-  );
+  readonly filtroMovimientos = signal<FiltroMovimientos>(FiltroMovimientos.TODOS);
 
   private readonly participantesFilter = signal<{ nombre?: string; rama?: string }>({});
   private readonly filterSubject = new Subject<{ nombre?: string; rama?: string }>();
@@ -148,10 +148,10 @@ export class CampamentoDetailComponent implements OnInit {
 
   /** Filter tab configurations for movimientos */
   readonly filtroTabs: TabConfig[] = [
-    { key: FiltroMovimientosCampamento.TODOS, label: 'Todos' },
-    { key: FiltroMovimientosCampamento.INGRESOS, label: 'Ingresos' },
-    { key: FiltroMovimientosCampamento.EGRESOS, label: 'Egresos' },
-    { key: FiltroMovimientosCampamento.GASTOS, label: 'Gastos' },
+    { key: FiltroMovimientos.TODOS, label: 'Todos' },
+    { key: FiltroMovimientos.INGRESOS, label: 'Ingresos' },
+    { key: FiltroMovimientos.EGRESOS, label: 'Egresos' },
+    { key: FiltroMovimientos.GASTOS, label: 'Gastos' },
   ];
 
   /** KPI configurations - mapped to CampamentoKpisDto keys */
@@ -219,7 +219,7 @@ export class CampamentoDetailComponent implements OnInit {
   }
 
   onFiltroChange(key: string): void {
-    const filtro = key as FiltroMovimientosCampamento;
+    const filtro = key as FiltroMovimientos;
     this.filtroMovimientos.set(filtro);
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -345,7 +345,7 @@ export class CampamentoDetailComponent implements OnInit {
       });
   }
 
-  onPagarReembolso(movimiento: MovimientoCampamentoDto): void {
+  onPagarReembolso(movimiento: MovimientoCardVM): void {
     const camp = this.campamento();
     if (!camp) return;
 

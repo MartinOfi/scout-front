@@ -1,0 +1,34 @@
+@if (!esReadonly()) {
+<div class="tab-toolbar">
+  @if (eventoTipo() === tipoEvento.GRUPO) {
+  <app-button variant="success" icon="add_circle" (clicked)="registrarIngreso.emit()">Registrar Ingreso</app-button>
+  }
+  <app-button icon="remove_circle" (clicked)="registrarGasto.emit()">Registrar Gasto</app-button>
+</div>
+}
+
+@if (movs().length === 0) {
+<div class="tab-empty">
+  <div class="tab-empty__icon"><mat-icon>swap_horiz</mat-icon></div>
+  <p class="tab-empty__text">Sin movimientos registrados</p>
+  <p class="tab-empty__hint">Usá los botones de arriba para registrar ingresos y gastos.</p>
+</div>
+} @else {
+<div class="movimientos-filtros">
+  <app-button-tabs [tabs]="filtroMovimientosTabs" [activeTab]="filtroMovimientos()"
+    (tabChange)="onFiltroChange($event)" />
+</div>
+
+@if (movimientosCard().length === 0) {
+<div class="tab-empty">
+  <p class="tab-empty__text">Sin movimientos para este filtro</p>
+</div>
+} @else {
+<div class="movimientos-list">
+  @for (mov of movimientosCard(); track mov.id) {
+  <app-movimiento-card [movimiento]="mov" [deletable]="!esReadonly()" [deleting]="deleting().has(mov.id)"
+    (pagarReembolso)="pagarReembolso.emit($event)" (eliminar)="eliminarMovimiento.emit($event)" />
+  }
+</div>
+}
+}

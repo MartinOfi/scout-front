@@ -15,7 +15,7 @@ import {
 } from '../../../shared/models';
 import { HttpService } from '../../../shared/services';
 import { API_CONFIG } from '../../../shared/constants';
-import { FiltroMovimientosCampamento } from '../../../shared/enums';
+import { FiltroMovimientos } from '../../../shared/enums';
 
 /**
  * API service for Campamentos module
@@ -50,7 +50,7 @@ export class CampamentosApiService {
    */
   getDetalle(
     id: string,
-    filtro: FiltroMovimientosCampamento = FiltroMovimientosCampamento.TODOS,
+    filtro: FiltroMovimientos = FiltroMovimientos.TODOS,
     participantesFilter?: { nombre?: string; rama?: string },
   ): Observable<CampamentoDetalleDto> {
     const params: Record<string, string> = { filtroMovimientos: filtro };

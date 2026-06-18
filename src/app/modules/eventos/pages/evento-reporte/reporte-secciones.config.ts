@@ -5,6 +5,7 @@ import {
   ReporteVentaCuentasPersonales,
 } from '../../../../shared/models';
 import { PersonaType } from '../../../../shared/enums/persona.enum';
+import { EstadoPago } from '../../../../shared/enums';
 import { ReporteSectionDescriptor } from './reporte-section.model';
 import { ReporteKpiItem } from './sections/reporte-kpi-item';
 import { formatArs, formatPct } from './reporte-format';
@@ -12,6 +13,7 @@ import { ReporteHeaderSection } from './sections/reporte-header.section';
 import { ReporteKpisSection } from './sections/reporte-kpis.section';
 import { ReporteResultadoEconomicoSection } from './sections/reporte-resultado-economico.section';
 import { ReporteEgresosSection } from './sections/reporte-egresos.section';
+import { ReportePendientePagoSection } from './sections/reporte-pendiente-pago.section';
 import { ReporteIntegridadSection } from './sections/reporte-integridad.section';
 import { ReporteProductosSection } from './sections/reporte-productos.section';
 import { ReportePorTipoPersonaSection } from './sections/reporte-por-tipo-persona.section';
@@ -34,9 +36,8 @@ const ACCENT = {
 
 function ventaKpiItems(vm: ReporteVentaBase): ReporteKpiItem[] {
   const educ = vm.porTipoPersona.find((t) => t.tipo === PersonaType.EDUCADOR)?.vendedores ?? 0;
-  const prot =
-    vm.porTipoPersona.find((t) => t.tipo === PersonaType.PROTAGONISTA)?.vendedores ?? 0;
-  return [
+  const prot = vm.porTipoPersona.find((t) => t.tipo === PersonaType.PROTAGONISTA)?.vendedores ?? 0;
+  const items: ReporteKpiItem[] = [
     {
       label: 'Recaudación bruta',
       value: formatArs(vm.kpis.recaudacionBruta),
@@ -74,6 +75,18 @@ function ventaKpiItems(vm: ReporteVentaBase): ReporteKpiItem[] {
       accent: ACCENT.cyan,
     },
   ];
+
+  // Solo destino cuentas_personales genera recupero (> 0); en caja_grupo es 0.
+  if (vm.kpis.recuperoCosto > 0) {
+    items.push({
+      label: 'Costo recuperado por el grupo',
+      value: formatArs(vm.kpis.recuperoCosto),
+      sub: 'Devuelto a la caja del grupo',
+      accent: ACCENT.amarillo,
+    });
+  }
+
+  return items;
 }
 
 function grupoKpiItems(vm: ReporteGrupo): ReporteKpiItem[] {
@@ -104,7 +117,11 @@ function genericSections(
 /** Bloques comunes a eventos de venta (productos, ranking, stock, etc.). */
 function ventaSections(vm: ReporteVentaBase): ReporteSectionDescriptor[] {
   return [
-    { key: 'productos', component: ReporteProductosSection, inputs: () => ({ productos: vm.productos }) },
+    {
+      key: 'productos',
+      component: ReporteProductosSection,
+      inputs: () => ({ productos: vm.productos }),
+    },
     {
       key: 'por-tipo',
       component: ReportePorTipoPersonaSection,
@@ -135,7 +152,18 @@ function ventaSections(vm: ReporteVentaBase): ReporteSectionDescriptor[] {
 }
 
 function egresosEIntegridad(vm: ReporteEvento): ReporteSectionDescriptor[] {
+  const pendientes = vm.egresos.filter((e) => e.estadoPago === EstadoPago.PENDIENTE_REEMBOLSO);
   return [
+    // Solo se muestra si hay algo pendiente de reembolsar.
+    ...(pendientes.length > 0
+      ? [
+          {
+            key: 'pendiente-pago',
+            component: ReportePendientePagoSection,
+            inputs: () => ({ egresos: pendientes }),
+          },
+        ]
+      : []),
     { key: 'egresos', component: ReporteEgresosSection, inputs: () => ({ egresos: vm.egresos }) },
     {
       key: 'integridad',

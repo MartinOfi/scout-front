@@ -101,6 +101,7 @@ export interface DeleteVentaResponse {
 export interface EventoKpis {
   totalRecaudado: number; // Total revenue (ventas + ingresos manuales)
   gananciaVentas: number; // (precioVenta - precioCosto) × cantidadVendida
+  totalRecuperado: number; // Costo devuelto a la caja grupo (solo cuentas_personales); 0 en otros destinos
   totalGastado: number; // Only gastos with estadoPago === PAGADO
   totalPendienteReembolso: number; // Gastos with estadoPago === PENDIENTE_REEMBOLSO
   balance: number; // totalRecaudado - totalGastado

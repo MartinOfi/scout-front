@@ -25,7 +25,7 @@ import {
   UpdatePagoDto,
   ResultadoPagoDto,
 } from '../../../shared/models';
-import { FiltroMovimientosCampamento } from '../../../shared/enums';
+import { FiltroMovimientos } from '../../../shared/enums';
 
 import { CampamentosApiService } from './campamentos-api.service';
 import { ErrorHandlerService, NotificationService } from '../../../shared/services';
@@ -125,7 +125,7 @@ export class CampamentosStateService {
    */
   loadDetalle(
     id: string,
-    filtro: FiltroMovimientosCampamento = FiltroMovimientosCampamento.TODOS,
+    filtro: FiltroMovimientos = FiltroMovimientos.TODOS,
     participantesFilter?: { nombre?: string; rama?: string },
   ): void {
     this._loading.set(true);

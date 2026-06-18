@@ -6,10 +6,7 @@
 import { TipoEvento, DestinoGanancia } from '../enums';
 import { PersonaType } from '../enums/persona.enum';
 
-export type ReporteVariante =
-  | 'venta_caja_grupo'
-  | 'venta_cuentas_personales'
-  | 'grupo';
+export type ReporteVariante = 'venta_caja_grupo' | 'venta_cuentas_personales' | 'grupo';
 
 export type ReporteSeveridad = 'alta' | 'media' | 'ok';
 
@@ -30,6 +27,11 @@ export interface ReporteKpis {
   margen: number;
   unidades: number;
   pendienteReembolso: number;
+  /**
+   * Costo recuperado por el grupo (solo destino cuentas_personales): Σ
+   * precioCosto × cantidad devuelto a la caja grupo. 0 en otros destinos.
+   */
+  recuperoCosto: number;
 }
 
 export interface ReporteEgreso {
@@ -167,7 +169,4 @@ export interface ReporteGrupo extends ReporteBase {
   ingresosItemizados: ReporteIngresoItem[];
 }
 
-export type ReporteEvento =
-  | ReporteVentaCajaGrupo
-  | ReporteVentaCuentasPersonales
-  | ReporteGrupo;
+export type ReporteEvento = ReporteVentaCajaGrupo | ReporteVentaCuentasPersonales | ReporteGrupo;

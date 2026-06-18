@@ -17,6 +17,7 @@ export type { EventCategoryConfig } from './event-list-item/event-list-item.comp
 export * from './tables/data-table.component';
 export * from './tables/enhanced-data-table/enhanced-data-table.component';
 export * from './button-tabs/button-tabs.component';
+export * from './movimiento-card/movimiento-card.component';
 export * from './filters/chips-filter/chips-filter.component';
 export * from './filters/generic-filters/generic-filters.component';
 export * from './forms/days-selector/days-selector.component';

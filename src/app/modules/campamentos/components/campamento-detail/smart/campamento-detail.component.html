@@ -226,7 +226,7 @@
         @if (movimientos().length > 0) {
         <div class="movimientos-list">
           @for (movimiento of movimientos(); track movimiento.id) {
-          <app-movimiento-campamento-card [movimiento]="movimiento" (pagarReembolso)="onPagarReembolso($event)" />
+          <app-movimiento-card [movimiento]="movimiento" (pagarReembolso)="onPagarReembolso($event)" />
           }
         </div>
         } @else {

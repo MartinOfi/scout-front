@@ -34,6 +34,7 @@ export enum ConceptoMovimiento {
   // Eventos de venta
   EVENTO_VENTA_INGRESO = 'evento_venta_ingreso',
   EVENTO_VENTA_GASTO = 'evento_venta_gasto',
+  EVENTO_VENTA_RECUPERO_COSTO = 'evento_venta_recupero_costo',
 
   // Eventos de grupo
   EVENTO_GRUPO_INGRESO = 'evento_grupo_ingreso',
@@ -71,6 +72,7 @@ export const CONCEPTO_MOVIMIENTO_LABELS: Record<ConceptoMovimiento, string> = {
   [ConceptoMovimiento.CAMPAMENTO_GASTO]: 'Gasto de Campamento',
   [ConceptoMovimiento.EVENTO_VENTA_INGRESO]: 'Ingreso Evento de Venta',
   [ConceptoMovimiento.EVENTO_VENTA_GASTO]: 'Gasto Evento de Venta',
+  [ConceptoMovimiento.EVENTO_VENTA_RECUPERO_COSTO]: 'Recupero de Costo (Evento de Venta)',
   [ConceptoMovimiento.EVENTO_GRUPO_INGRESO]: 'Ingreso Evento de Grupo',
   [ConceptoMovimiento.EVENTO_GRUPO_GASTO]: 'Gasto Evento de Grupo',
   [ConceptoMovimiento.GASTO_GENERAL]: 'Gasto General',
@@ -129,6 +131,27 @@ export const CONCEPTOS_CREABLES_MANUALMENTE: readonly ConceptoMovimiento[] = [
   ConceptoMovimiento.GASTO_GENERAL,
   ConceptoMovimiento.AJUSTE_INICIAL,
 ] as const;
+
+/**
+ * Filtro de la lista de movimientos (común a campamentos y eventos).
+ * - TODOS: todos los movimientos
+ * - INGRESOS: solo tipo ingreso
+ * - EGRESOS: todos los egresos (incluye uso_saldo_personal)
+ * - GASTOS: gastos reales (egresos, excluye uso_saldo_personal)
+ */
+export enum FiltroMovimientos {
+  TODOS = 'todos',
+  INGRESOS = 'ingresos',
+  EGRESOS = 'egresos',
+  GASTOS = 'gastos',
+}
+
+export const FILTRO_MOVIMIENTOS_LABELS: Record<FiltroMovimientos, string> = {
+  [FiltroMovimientos.TODOS]: 'Todos',
+  [FiltroMovimientos.INGRESOS]: 'Ingresos',
+  [FiltroMovimientos.EGRESOS]: 'Egresos',
+  [FiltroMovimientos.GASTOS]: 'Gastos',
+} as const;
 
 /**
  * Category of movement — orthogonal axis to concepto, used for reports.

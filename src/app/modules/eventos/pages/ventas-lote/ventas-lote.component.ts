@@ -145,13 +145,18 @@ export class VentasLoteComponent implements OnInit {
 
     this.submitting.set(true);
     this.state.registrarVentasLote(this.eventoId, dto).subscribe({
-      next: () => this.router.navigate(['/eventos', this.eventoId]),
+      next: () =>
+        this.router.navigate(['/eventos', this.eventoId], {
+          queryParams: { tab: 'ventas' },
+        }),
       error: () => this.submitting.set(false),
       complete: () => this.submitting.set(false),
     });
   }
 
   onBack(): void {
-    this.router.navigate(['/eventos', this.eventoId]);
+    this.router.navigate(['/eventos', this.eventoId], {
+      queryParams: { tab: 'ventas' },
+    });
   }
 }

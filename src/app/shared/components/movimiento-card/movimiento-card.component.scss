@@ -1,8 +1,8 @@
 // =============================================================================
-// MOVIMIENTO CAMPAMENTO CARD
+// MOVIMIENTO CARD (compartida: campamentos + eventos)
 // =============================================================================
 
-@use '../../../../../shared/styles/tokens' as t;
+@use '../../styles/tokens' as t;
 @use 'app/shared/styles/responsive' as *;
 
 $card-radius: 12px;
@@ -162,6 +162,42 @@ $card-radius: 12px;
         outline: 2px solid t.$color-error;
         outline-offset: 2px;
       }
+    }
+  }
+
+  &__delete {
+    flex-shrink: 0;
+    order: 5;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    color: t.$stone-500;
+    cursor: pointer;
+
+    @include respond-to('sm') {
+      order: unset;
+    }
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    &:hover:not(:disabled) {
+      background-color: color-mix(in srgb, t.$color-error 12%, transparent);
+      color: t.$color-error;
+    }
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.6;
     }
   }
 }

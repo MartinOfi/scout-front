@@ -21,12 +21,14 @@ describe('EventoKpis interface', () => {
     const kpis: EventoKpis = {
       totalRecaudado: 1000,
       gananciaVentas: 400,
+      totalRecuperado: 600,
       totalGastado: 200,
       totalPendienteReembolso: 50,
       balance: 800,
     };
     expect(kpis.totalRecaudado).toBe(1000);
     expect(kpis.gananciaVentas).toBe(400);
+    expect(kpis.totalRecuperado).toBe(600);
     expect(kpis.totalGastado).toBe(200);
     expect(kpis.totalPendienteReembolso).toBe(50);
     expect(kpis.balance).toBe(800);

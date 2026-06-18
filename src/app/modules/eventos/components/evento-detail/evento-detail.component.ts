@@ -18,12 +18,13 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
-import { Subject, combineLatest } from 'rxjs';
+import { Subject, combineLatest, firstValueFrom } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
 
 import { EventosStateService } from '../../services/eventos-state.service';
 import { PersonasApiService } from '../../../personas/services/personas-api.service';
-import { TipoEvento } from '../../../../shared/enums';
+import { MovimientosApiService } from '../../../movimientos/services/movimientos-api.service';
+import { TipoEvento, DestinoGanancia, EstadoPago } from '../../../../shared/enums';
 import {
   EntregaResponse,
   Evento,
@@ -34,7 +35,9 @@ import {
   StockEntregaResponse,
   VentaProducto,
 } from '../../../../shared/models';
-import { MoneyPipe } from '../../../../shared/pipes/money.pipe';
+import { MoneyPipe, formatMoney } from '../../../../shared/pipes/money.pipe';
+import { MovimientoCardVM } from '../../../../shared/components/movimiento-card/movimiento-card.component';
+import { EventoMovimientosTabComponent } from './components/evento-movimientos-tab/evento-movimientos-tab.component';
 import {
   StatCardComponent,
   StatCardVariant,
@@ -100,7 +103,12 @@ interface KpiConfig {
   readonly title: string;
   readonly key: keyof Pick<
     EventoKpis,
-    'totalRecaudado' | 'gananciaVentas' | 'totalGastado' | 'totalPendienteReembolso' | 'balance'
+    | 'totalRecaudado'
+    | 'gananciaVentas'
+    | 'totalRecuperado'
+    | 'totalGastado'
+    | 'totalPendienteReembolso'
+    | 'balance'
   >;
   readonly variant: StatCardVariant;
 }
@@ -143,6 +151,7 @@ const TABS_GRUPO: TabConfig[] = [{ key: 'movimientos', label: 'Movimientos', ico
     TextFieldComponent,
     MatProgressSpinnerModule,
     EntregasTabComponent,
+    EventoMovimientosTabComponent,
   ],
   templateUrl: './evento-detail.component.html',
   styleUrls: ['./evento-detail.component.scss'],
@@ -155,6 +164,7 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   private readonly confirmDialog = inject(ConfirmDialogService);
   readonly state = inject(EventosStateService);
   private readonly personasApi = inject(PersonasApiService);
+  private readonly movimientosApi = inject(MovimientosApiService);
   private readonly notification = inject(NotificationService);
 
   private eventoId = '';
@@ -252,7 +262,7 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
 
   readonly tabs: TabConfig[] = TABS_VENTA;
 
-  readonly kpiConfigs: readonly KpiConfig[] = [
+  private readonly baseKpiConfigs: readonly KpiConfig[] = [
     { icon: 'payments', title: 'Recaudado', key: 'totalRecaudado', variant: 'info' },
     { icon: 'trending_up', title: 'Ganancia Ventas', key: 'gananciaVentas', variant: 'success' },
     { icon: 'shopping_cart', title: 'Gastado', key: 'totalGastado', variant: 'warning' },
@@ -264,6 +274,25 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
     },
     { icon: 'savings', title: 'Balance', key: 'balance', variant: 'primary' },
   ];
+
+  private readonly recuperoKpiConfig: KpiConfig = {
+    icon: 'account_balance',
+    title: 'Costo recuperado (grupo)',
+    key: 'totalRecuperado',
+    variant: 'info',
+  };
+
+  /**
+   * KPIs a mostrar. El "Costo recuperado" solo aplica a eventos de venta con
+   * destino cuentas_personales (en otros casos el recupero es 0 y la card
+   * confundiría); por eso se agrega condicionalmente.
+   */
+  readonly kpiConfigs = computed((): readonly KpiConfig[] => {
+    const ev = this.evento();
+    const aplicaRecupero =
+      ev?.tipo === TipoEvento.VENTA && ev?.destinoGanancia === DestinoGanancia.CUENTAS_PERSONALES;
+    return aplicaRecupero ? [...this.baseKpiConfigs, this.recuperoKpiConfig] : this.baseKpiConfigs;
+  });
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -277,7 +306,10 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
     this.state.loadMovimientos(id);
     this.state.loadStockEntregas(id).subscribe();
     this.state.loadEntregas(id).subscribe();
-    this.activeTab.set('productos');
+    // Permite aterrizar en un tab puntual (ej. volver a "ventas" tras registrar
+    // una venta). Sin query param, arranca en "productos".
+    const tab = this.route.snapshot.queryParamMap.get('tab');
+    this.activeTab.set(tab ?? 'productos');
 
     this.personasApi.getAll().subscribe((ps) => this.personas.set(ps));
 
@@ -420,6 +452,48 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
         this.state.deleteMovimiento(this.eventoId, movimientoId).subscribe();
       }
     });
+  }
+
+  /**
+   * Marca un gasto pendiente de reembolso como pagado. Reutiliza el mismo flujo
+   * de confirmación que campamentos (ConfirmDialogService + movimientosApi.update).
+   */
+  onPagarReembolso(movimiento: MovimientoCardVM): void {
+    if (this.eventoCerrado()) return;
+    const eventoId = this.eventoId;
+    this.confirmDialog
+      .confirmAsync(
+        'Confirmar pago de reembolso',
+        '¿Confirmás que este gasto fue reembolsado?',
+        () =>
+          firstValueFrom(
+            this.movimientosApi.update(movimiento.id, {
+              estadoPago: EstadoPago.PAGADO,
+            }),
+          ).then(() => undefined),
+        {
+          icon: 'payments',
+          confirmText: 'Pagar',
+          cancelText: 'Cancelar',
+          details: [
+            { label: 'Monto', value: formatMoney(movimiento.monto) },
+            {
+              label: 'Descripción',
+              value: movimiento.descripcion ?? 'Sin descripción',
+            },
+            {
+              label: 'Responsable',
+              value: movimiento.responsableNombre || 'Desconocido',
+            },
+          ],
+        },
+      )
+      .subscribe((result) => {
+        if (result.confirmed) {
+          this.state.loadMovimientos(eventoId);
+          this.state.loadKpis(eventoId);
+        }
+      });
   }
 
   isDeleting(id: string): boolean {

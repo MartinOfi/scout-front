@@ -72,7 +72,7 @@
     <!-- KPI Grid -->
     <section class="kpi-section" aria-label="KPIs financieros">
       <div class="kpi-grid">
-        @for (kpi of kpiConfigs; track kpi.key) {
+        @for (kpi of kpiConfigs(); track kpi.key) {
         <app-stat-card [icon]="kpi.icon" [title]="kpi.title" [value]="eventoKpis() ? eventoKpis()![kpi.key] : 0"
           [variant]="kpi.variant" format="currency" />
         }
@@ -236,62 +236,10 @@
 
         <!-- MOVIMIENTOS tab -->
         @if (activeTab() === 'movimientos') {
-        @if (!eventoCerrado()) {
-        <div class="tab-toolbar">
-          @if (evento()!.tipo === tipoEvento.GRUPO) {
-          <app-button variant="success" icon="add_circle" (clicked)="openIngresoDialog()">Registrar Ingreso</app-button>
-          }
-          <app-button icon="remove_circle" (clicked)="openGastoDialog()">Registrar Gasto</app-button>
-        </div>
-        }
-
-        @if (eventoMovimientos().length === 0) {
-        <div class="tab-empty">
-          <div class="tab-empty__icon"><mat-icon>swap_horiz</mat-icon></div>
-          <p class="tab-empty__text">Sin movimientos registrados</p>
-          <p class="tab-empty__hint">Usá los botones de arriba para registrar ingresos y gastos.</p>
-        </div>
-        } @else {
-        <div class="movimientos-list">
-          @for (mov of eventoMovimientos(); track mov.id) {
-          <article class="movimiento-row" [class.movimiento-row--ingreso]="mov.tipo === 'ingreso'"
-            [class.movimiento-row--egreso]="mov.tipo === 'egreso'"
-            [class.movimiento-row--deleting]="isDeleting(mov.id)">
-
-            <div class="movimiento-row__icon">
-              <mat-icon>{{ mov.tipo === 'ingreso' ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
-            </div>
-
-            <div class="movimiento-row__info">
-              <span class="movimiento-row__date">{{ mov.fecha | date:'d MMM yyyy' }}</span>
-              <span class="movimiento-row__description">{{ mov.descripcion ?? 'Sin descripción' }}</span>
-              @if (mov.responsable) {
-              <span class="movimiento-row__responsable">{{ mov.responsable.nombre }}</span>
-              }
-            </div>
-
-            <div class="movimiento-row__amount" [class.movimiento-row__amount--positive]="mov.tipo === 'ingreso'"
-              [class.movimiento-row__amount--negative]="mov.tipo === 'egreso'">
-              {{ (mov.tipo === 'ingreso' ? '+' : '-') }}{{ mov.monto | money }}
-            </div>
-
-            @if (!eventoCerrado()) {
-            <button type="button" class="movimiento-row__delete unstyled"
-              [disabled]="isDeleting(mov.id)"
-              (click)="onDeleteMovimiento(mov.id)"
-              aria-label="Eliminar movimiento">
-              @if (isDeleting(mov.id)) {
-              <mat-spinner diameter="16" />
-              } @else {
-              <mat-icon>delete_outline</mat-icon>
-              }
-            </button>
-            }
-
-          </article>
-          }
-        </div>
-        }
+        <app-evento-movimientos-tab [movimientos]="eventoMovimientos()" [tipo]="evento()!.tipo"
+          [readonly]="eventoCerrado()" [deletingIds]="deletingIdsSet()" (registrarIngreso)="openIngresoDialog()"
+          (registrarGasto)="openGastoDialog()" (pagarReembolso)="onPagarReembolso($event)"
+          (eliminarMovimiento)="onDeleteMovimiento($event)" />
         }
 
       </div>
