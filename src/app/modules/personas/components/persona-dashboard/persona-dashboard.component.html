@@ -45,11 +45,8 @@
       />
     </div>
 
-    <!-- Recent Movements Timeline (full width) -->
-    <app-movimientos-timeline
-      [movimientos]="movimientos()"
-      (verTodos)="onVerTodosMovimientos()"
-    />
+    <!-- Movements Timeline (full width) -->
+    <app-movimientos-timeline [movimientos]="movimientos()" />
   </div>
   } @else {
   <div class="dashboard-empty">

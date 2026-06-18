@@ -134,10 +134,4 @@ export class PersonaDashboardComponent implements OnInit, OnDestroy {
   onCuotaClick(cuotaId: string): void {
     this.router.navigate(['/cuotas', cuotaId]);
   }
-
-  onVerTodosMovimientos(): void {
-    this.router.navigate(['/movimientos'], {
-      queryParams: { persona: this.personaId },
-    });
-  }
 }

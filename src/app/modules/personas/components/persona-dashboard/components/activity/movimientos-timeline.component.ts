@@ -4,7 +4,7 @@
  * components, which colorize ingresos (green) and egresos (red) automatically.
  */
 
-import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, computed } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import { MovimientoDashboard } from '../../../../models';
@@ -55,8 +55,6 @@ const CONCEPTO_ICONS: Partial<Record<ConceptoMovimiento, string>> = {
 })
 export class MovimientosTimelineComponent {
   readonly movimientos = input.required<MovimientoDashboard[]>();
-
-  readonly verTodos = output<void>();
 
   readonly rows = computed<readonly MovimientoRow[]>(() =>
     this.movimientos().map((mov) => {

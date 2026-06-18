@@ -1,8 +1,4 @@
-<app-data-list-card
-  title="Últimos Movimientos"
-  [linkText]="movimientos().length > 0 ? 'Ver todos' : ''"
-  (linkClicked)="verTodos.emit()"
->
+<app-data-list-card title="Movimientos" [scrollable]="false">
   @if (rows().length === 0) {
     <div class="movimientos-empty">Sin movimientos recientes</div>
   } @else {

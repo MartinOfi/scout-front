@@ -18,6 +18,8 @@ export class DataListCardComponent {
   readonly title = input.required<string>();
   readonly linkText = input<string>('');
   readonly linkIcon = input<string>('arrow_forward');
+  /** When false, the content expands to fit all items instead of scrolling. */
+  readonly scrollable = input<boolean>(true);
 
   readonly linkClicked = output<void>();
 

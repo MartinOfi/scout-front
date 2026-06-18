@@ -110,6 +110,20 @@
     }
   }
 
+  // Expanded variant: show all items, no internal scroll
+  &__content--expanded {
+    max-height: none;
+    overflow-y: visible;
+
+    @include respond-to('md') {
+      max-height: none;
+    }
+
+    @include respond-to('lg') {
+      max-height: none;
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Scroll Container (holds items at natural width)
   // ---------------------------------------------------------------------------
