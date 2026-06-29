@@ -62,9 +62,12 @@
                 <app-checkbox-field id="dni" formControlName="dni">
                   DNI
                 </app-checkbox-field>
-                <app-checkbox-field id="dniPadres" formControlName="dniPadres">
-                  DNI de los padres
-                </app-checkbox-field>
+                <!-- Los Rovers (mayores de edad) no entregan el DNI de los padres -->
+                @if (!esRover) {
+                  <app-checkbox-field id="dniPadres" formControlName="dniPadres">
+                    DNI de los padres
+                  </app-checkbox-field>
+                }
                 <app-checkbox-field id="carnetObraSocial" formControlName="carnetObraSocial">
                   Carnet de obra social
                 </app-checkbox-field>

@@ -67,10 +67,9 @@ interface PersonaTableRow {
   carnetObraSocial?: boolean;
 }
 
-/** Tab types: Rama tabs + persona type tabs + special tabs */
+/** Tab types: Rama tabs + persona type tabs */
 type PersonaTabKey = 'educadores' | 'externos';
-type SpecialTabKey = 'deudores';
-type TabKey = RamaTabKey | PersonaTabKey | SpecialTabKey;
+type TabKey = RamaTabKey | PersonaTabKey;
 
 @Component({
   selector: 'app-personas-dashboard',
@@ -136,7 +135,6 @@ export class PersonasDashboardComponent implements OnInit {
     ...generateRamaTabs(),
     { key: 'educadores', label: 'Educadores', icon: PERSONA_TYPE_ICONS[PersonaType.EDUCADOR] },
     { key: 'externos', label: 'Externos', icon: PERSONA_TYPE_ICONS[PersonaType.EXTERNA] },
-    { key: 'deudores', label: 'Deudores', icon: 'warning' },
   ];
 
   /** Filter configurations */
@@ -150,20 +148,45 @@ export class PersonasDashboardComponent implements OnInit {
     },
   ];
 
-  /** Table columns configuration */
-  readonly tableColumns: TableColumn[] = [
-    { key: 'nombreCompleto', header: 'Nombre y Apellido', type: 'text' },
+  /** Documentación personal entregada. */
+  private readonly docColumns: TableColumn[] = [
     { key: 'partidaNacimiento', header: 'Partida', type: 'boolean' },
     { key: 'dni', header: 'DNI', type: 'boolean' },
     { key: 'dniPadres', header: 'DNI Padres', type: 'boolean' },
     { key: 'carnetObraSocial', header: 'Obra Social', type: 'boolean' },
-    {
+  ];
+
+  /**
+   * Table columns según la tab:
+   * - Educadores: no tienen documentación personal → sin columnas de docs.
+   * - Rovers: mayores de edad → se oculta solo "DNI Padres".
+   * - Resto de ramas: todas las columnas de documentación.
+   */
+  readonly tableColumns = computed((): TableColumn[] => {
+    const tab = this.activeTab();
+
+    let docColumns: TableColumn[];
+    if (tab === 'educadores') {
+      docColumns = [];
+    } else if (tab === RAMA_TAB_KEYS[RamaEnum.ROVERS]) {
+      docColumns = this.docColumns.filter((c) => c.key !== 'dniPadres');
+    } else {
+      docColumns = this.docColumns;
+    }
+
+    const actions: TableColumn = {
       key: 'actions',
       header: 'Acciones',
       type: 'action',
       actions: this.getTableActions(),
-    },
-  ];
+    };
+
+    return [
+      { key: 'nombreCompleto', header: 'Nombre y Apellido', type: 'text' },
+      ...docColumns,
+      actions,
+    ];
+  });
 
   /** Filtered personas based on active tab and search */
   readonly filteredPersonas = computed((): PersonaTableRow[] => {
@@ -179,8 +202,6 @@ export class PersonasDashboardComponent implements OnInit {
       personas = this.state.educadores();
     } else if (tab === 'externos') {
       personas = this.state.personasExternas();
-    } else if (tab === 'deudores') {
-      personas = this.getDeudores();
     }
 
     // Apply search filter
@@ -212,7 +233,7 @@ export class PersonasDashboardComponent implements OnInit {
     } else if (tab === 'externos') {
       this.router.navigate([PERSONA_TYPE_ROUTES[PersonaType.EXTERNA], 'crear']);
     } else {
-      // For Rama tabs (manada, unidad, caminantes, rovers) and deudores
+      // For Rama tabs (manada, unidad, caminantes, rovers)
       this.router.navigate([PERSONA_TYPE_ROUTES[PersonaType.PROTAGONISTA], 'crear']);
     }
   }
@@ -264,11 +285,6 @@ export class PersonasDashboardComponent implements OnInit {
 
   private getProtagonistasbyRama(rama: Rama): Protagonista[] {
     return this.state.protagonistas().filter((p) => p.rama === rama);
-  }
-
-  private getDeudores(): PersonaUnion[] {
-    // TODO: Implement actual deudores logic when saldo is available
-    return [];
   }
 
   private mapToTableRow(persona: PersonaUnion): PersonaTableRow {

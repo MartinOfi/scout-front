@@ -173,12 +173,7 @@
                 <div>
                   <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Documentación</p>
                   <div class="flex flex-wrap gap-1.5">
-                    @for (item of [
-                      { ok: persona.documentacionPersonal.dni, label: 'DNI' },
-                      { ok: persona.documentacionPersonal.partidaNacimiento, label: 'Partida nac.' },
-                      { ok: persona.documentacionPersonal.dniPadres, label: 'DNI padres' },
-                      { ok: persona.documentacionPersonal.carnetObraSocial, label: 'Obra social' }
-                    ]; track item.label) {
+                    @for (item of personalDocItems(persona); track item.label) {
                       <span class="flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded-full border font-medium"
                         [class.border-green-200]="item.ok"
                         [class.bg-green-50]="item.ok"

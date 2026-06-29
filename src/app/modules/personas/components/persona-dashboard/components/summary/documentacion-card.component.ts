@@ -4,7 +4,7 @@
  * Uses auth-grid/auth-item pattern from inscripcion-detail
  */
 
-import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -14,6 +14,13 @@ interface DocItem {
   key: keyof DocumentacionPersonal;
   label: string;
 }
+
+const DOC_ITEMS: DocItem[] = [
+  { key: 'partidaNacimiento', label: 'Partida de Nacimiento' },
+  { key: 'dni', label: 'DNI' },
+  { key: 'dniPadres', label: 'DNI Padres' },
+  { key: 'carnetObraSocial', label: 'Carnet Obra Social' },
+];
 
 @Component({
   selector: 'app-documentacion-card',
@@ -26,10 +33,10 @@ interface DocItem {
 export class DocumentacionCardComponent {
   readonly documentacion = input.required<DocumentacionPersonal>();
 
-  readonly docItems: DocItem[] = [
-    { key: 'partidaNacimiento', label: 'Partida de Nacimiento' },
-    { key: 'dni', label: 'DNI' },
-    { key: 'dniPadres', label: 'DNI Padres' },
-    { key: 'carnetObraSocial', label: 'Carnet Obra Social' },
-  ];
+  /** Mayores de edad (Rovers): no entregan el DNI de los padres. */
+  readonly esMayorDeEdad = input<boolean>(false);
+
+  readonly docItems = computed((): DocItem[] =>
+    this.esMayorDeEdad() ? DOC_ITEMS.filter((item) => item.key !== 'dniPadres') : DOC_ITEMS,
+  );
 }

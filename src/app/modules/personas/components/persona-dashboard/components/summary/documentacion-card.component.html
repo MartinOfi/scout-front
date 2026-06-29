@@ -5,7 +5,7 @@
   </header>
 
   <div class="doc-grid">
-    @for (item of docItems; track item.key) {
+    @for (item of docItems(); track item.key) {
     <div
       class="doc-item"
       [attr.aria-label]="item.label + ': ' + (documentacion()[item.key] ? 'Entregado' : 'Pendiente')"

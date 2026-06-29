@@ -233,9 +233,9 @@ export class DashboardComponent implements OnInit {
       variant: 'success',
     },
     {
-      icon: 'assessment',
-      label: 'Ver Reportes',
-      route: '/reportes',
+      icon: 'warning',
+      label: 'Deudores',
+      route: '/reportes/deudas',
       variant: 'warning',
     },
   ];

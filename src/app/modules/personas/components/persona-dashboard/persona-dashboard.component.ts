@@ -18,7 +18,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { PersonasStateService } from '../../services/personas-state.service';
 import { ConfirmDialogService } from '../../../../shared/services';
-import { PersonaType } from '../../../../shared/enums';
+import { PersonaType, RamaEnum } from '../../../../shared/enums';
 
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
@@ -64,8 +64,14 @@ export class PersonaDashboardComponent implements OnInit, OnDestroy {
   readonly persona = computed(() => this.dashboard()?.persona);
   readonly cuentaPersonal = computed(() => this.dashboard()?.cuentaPersonal);
   readonly documentacion = computed(() => this.dashboard()?.documentacionPersonal);
+
+  /**
+   * Rovers (mayores de edad): no entregan el DNI de los padres, por lo que ese
+   * ítem se oculta dentro de la tarjeta de documentación.
+   */
+  readonly esMayorDeEdad = computed(() => this.persona()?.rama === RamaEnum.ROVERS);
   readonly inscripciones = computed(() => this.dashboard()?.inscripciones);
-  readonly cuotas = computed(() => this.dashboard()?.cuotas);
+  readonly campamentos = computed(() => this.dashboard()?.campamentos);
   readonly deudaTotal = computed(() => this.dashboard()?.deudaTotal);
   readonly movimientos = computed(() => this.dashboard()?.ultimosMovimientos ?? []);
 
@@ -131,7 +137,7 @@ export class PersonaDashboardComponent implements OnInit, OnDestroy {
     this.router.navigate(['/inscripciones', inscripcionId]);
   }
 
-  onCuotaClick(cuotaId: string): void {
-    this.router.navigate(['/cuotas', cuotaId]);
+  onCampamentoClick(campamentoId: string): void {
+    this.router.navigate(['/campamentos', campamentoId]);
   }
 }

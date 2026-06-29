@@ -166,24 +166,35 @@ export class ReporteDeudasComponent implements OnInit {
     return p.campamentos.some((c) => !c.autorizacionEntregada);
   }
 
+  /**
+   * Chips de documentación personal. Educadores no tienen (null → sin chips).
+   * A los mayores de edad no se les muestra el DNI de los padres (partida, DNI
+   * y obra social sí).
+   */
+  personalDocItems(p: PersonaDeuda): { ok: boolean; label: string }[] {
+    const doc = p.documentacionPersonal;
+    if (!doc) return [];
+
+    const dniPadres = p.esMayorDeEdad ? [] : [{ ok: doc.dniPadres, label: 'DNI padres' }];
+
+    return [
+      { ok: doc.dni, label: 'DNI' },
+      { ok: doc.partidaNacimiento, label: 'Partida nac.' },
+      ...dniPadres,
+      { ok: doc.carnetObraSocial, label: 'Obra social' },
+    ];
+  }
+
   hasDocDeuda(p: PersonaDeuda): boolean {
     return (
-      !p.documentacionPersonal.dni ||
-      !p.documentacionPersonal.partidaNacimiento ||
-      !p.documentacionPersonal.dniPadres ||
-      !p.documentacionPersonal.carnetObraSocial ||
+      this.personalDocItems(p).some((d) => !d.ok) ||
       p.documentacionInscripcion.length > 0 ||
       p.campamentos.some((c) => !c.autorizacionEntregada)
     );
   }
 
   countDocsFaltantes(p: PersonaDeuda): number {
-    const personal = [
-      p.documentacionPersonal.dni,
-      p.documentacionPersonal.partidaNacimiento,
-      p.documentacionPersonal.dniPadres,
-      p.documentacionPersonal.carnetObraSocial,
-    ].filter((v) => !v).length;
+    const personal = this.personalDocItems(p).filter((d) => !d.ok).length;
 
     const inscCount = p.documentacionInscripcion.reduce((acc, i) => {
       return (

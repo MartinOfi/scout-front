@@ -48,12 +48,15 @@ export interface PersonaDeuda {
   personaId: string;
   nombre: string;
   rama: string;
+  /** Mayor de edad (Educador o Rovers): no entrega DNI de los padres. */
+  esMayorDeEdad: boolean;
   deudaTotal: number;
   campamentos: CampamentoDeuda[];
   inscripcionesGrupo: InscripcionDeuda[];
   inscripcionesScout: InscripcionDeuda[];
   cuotas: CuotaDeuda[];
-  documentacionPersonal: DocumentacionPersonal;
+  /** null para educadores (no tienen documentación personal). */
+  documentacionPersonal: DocumentacionPersonal | null;
   documentacionInscripcion: DocInscripcion[];
 }
 

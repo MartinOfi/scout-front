@@ -29,19 +29,22 @@
       [deudaTotal]="deudaTotal()!"
     />
 
-    <!-- Row: Documentación + Inscripciones + Cuotas -->
+    <!-- Row: Documentación + Inscripciones + Campamentos -->
     <div class="dashboard-cards-row">
       <!-- Documentation Checklist (Protagonista only) -->
       @if (isProtagonista() && documentacion()) {
-        <app-documentacion-card [documentacion]="documentacion()!" />
+        <app-documentacion-card
+          [documentacion]="documentacion()!"
+          [esMayorDeEdad]="esMayorDeEdad()"
+        />
       }
 
-      <!-- Obligations: Inscripciones & Cuotas -->
+      <!-- Obligations: Inscripciones & Campamentos -->
       <app-obligaciones-section
         [inscripciones]="inscripciones()!"
-        [cuotas]="cuotas()!"
+        [campamentos]="campamentos()!"
         (inscripcionClick)="onInscripcionClick($event)"
-        (cuotaClick)="onCuotaClick($event)"
+        (campamentoClick)="onCampamentoClick($event)"
       />
     </div>
 

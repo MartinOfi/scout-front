@@ -24,7 +24,7 @@ import {
   CreateProtagonistaDto,
   UpdatePersonaDto,
 } from '../../../../../shared/models';
-import { Rama, RAMAS } from '../../../../../shared/enums';
+import { Rama, RamaEnum, RAMAS } from '../../../../../shared/enums';
 
 // Shared Form Components
 import { FormFieldComponent } from '../../../../../shared/components/form/form-field/form-field.component';
@@ -60,6 +60,14 @@ export class ProtagonistasFormComponent implements OnInit {
 
   readonly loading: Signal<boolean> = this.state.loading;
   readonly error: Signal<string | null> = this.state.error;
+
+  /**
+   * Los Rovers son mayores de edad: no se les exige documentación personal,
+   * por lo que la sección no se muestra para esa rama.
+   */
+  get esRover(): boolean {
+    return this.form.get('rama')?.value === RamaEnum.ROVERS;
+  }
   readonly selected: Signal<Protagonista | null> = computed(() => {
     const s = this.state.selected();
     return s && s.tipo === 'protagonista' ? (s as Protagonista) : null;

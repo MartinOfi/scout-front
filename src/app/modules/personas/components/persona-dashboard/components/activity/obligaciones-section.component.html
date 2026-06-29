@@ -44,35 +44,37 @@
     </div>
   </article>
 
-  <!-- Cuotas Card -->
+  <!-- Campamentos Card -->
   <article class="oblig-card">
     <header class="oblig-card__header">
-      <mat-icon aria-hidden="true">calendar_month</mat-icon>
-      <h3 class="oblig-card__title">Cuotas</h3>
-      @if (cuotas().deudaTotal > 0) {
+      <mat-icon aria-hidden="true">cabin</mat-icon>
+      <h3 class="oblig-card__title">Campamentos</h3>
+      @if (campamentos().deudaTotal > 0) {
         <span class="oblig-card__badge oblig-card__badge--danger">
-          {{ cuotas().deudaTotal | currency: 'ARS' : 'symbol' : '1.0-0' }}
+          {{ campamentos().deudaTotal | currency: 'ARS' : 'symbol' : '1.0-0' }}
         </span>
       }
     </header>
 
     <div class="oblig-card__body">
-      @if (cuotas().items.length === 0) {
+      @if (campamentos().items.length === 0) {
         <div class="oblig-card__empty">
-          <span>Sin cuotas registradas</span>
+          <span>Sin campamentos registrados</span>
         </div>
       } @else {
         <ul class="oblig-list" role="list">
-          @for (item of cuotas().items; track item.id) {
-            <li class="oblig-list__item" (click)="cuotaClick.emit(item.id)">
+          @for (item of campamentos().items; track item.id) {
+            <li class="oblig-list__item" (click)="campamentoClick.emit(item.id)">
               <div class="oblig-list__main">
                 <div class="oblig-list__info">
                   <span class="oblig-list__type">{{ item.nombre }}</span>
                   <span class="oblig-list__year">{{ item.ano }}</span>
                 </div>
-                <span class="status-badge" [class]="'status-badge--' + item.estado">
-                  {{ estadoCuotaLabels[item.estado] }}
-                </span>
+                @if (!item.autorizacionEntregada) {
+                  <span class="status-badge status-badge--pendiente">
+                    Falta autorización
+                  </span>
+                }
               </div>
               @if (item.saldoPendiente > 0) {
                 <div class="oblig-list__saldo">

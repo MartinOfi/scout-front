@@ -11,7 +11,6 @@ import {
   CargoEducador,
   TipoInscripcion,
   EstadoInscripcion,
-  EstadoCuota,
   MedioPago,
   ConceptoMovimiento,
   TipoMovimiento,
@@ -30,7 +29,7 @@ export interface PersonaDashboardDto {
   cuentaPersonal: CuentaPersonalResumen;
   documentacionPersonal?: DocumentacionPersonal;
   inscripciones: InscripcionesResumen;
-  cuotas: CuotasResumen;
+  campamentos: CampamentosResumen;
   deudaTotal: DeudaTotal;
   ultimosMovimientos: MovimientoDashboard[];
 }
@@ -106,31 +105,31 @@ export interface InscripcionDashboardItem {
 }
 
 // =============================================================================
-// CUOTAS SECTION
+// CAMPAMENTOS SECTION
 // =============================================================================
 
 /**
- * Cuotas summary with items
+ * Campamentos summary with items
  */
-export interface CuotasResumen {
+export interface CampamentosResumen {
   total: number;
   pagadas: number;
   pendientes: number;
   deudaTotal: number;
-  items: CuotaDashboardItem[];
+  items: CampamentoDashboardItem[];
 }
 
 /**
- * Single cuota item for dashboard list
+ * Single campamento item for dashboard list
  */
-export interface CuotaDashboardItem {
+export interface CampamentoDashboardItem {
   id: string;
   nombre: string;
   ano: number;
-  estado: EstadoCuota;
   montoTotal: number;
   montoPagado: number;
   saldoPendiente: number;
+  autorizacionEntregada: boolean;
 }
 
 // =============================================================================
@@ -143,7 +142,7 @@ export interface CuotaDashboardItem {
 export interface DeudaTotal {
   total: number;
   inscripciones: number;
-  cuotas: number;
+  campamentos: number;
 }
 
 // =============================================================================

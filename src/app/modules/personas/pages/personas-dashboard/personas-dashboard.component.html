@@ -31,7 +31,7 @@
       <p>No se encontraron personas</p>
     </div>
     } @else {
-    <app-data-table [data]="filteredPersonas()" [columns]="tableColumns"
+    <app-data-table [data]="filteredPersonas()" [columns]="tableColumns()"
       [config]="{ showHeader: true, hoverable: true }" (actionClick)="onActionClick($event)" />
     }
   </div>
