@@ -12,8 +12,8 @@
           <mat-spinner diameter="32" />
         </div>
       }
-      <app-producto-editor [producto]="producto" (addProducto)="onAdd($event)"
-        (saveProducto)="onSave($event)" (cancel)="onClose()" />
+      <app-producto-editor [producto]="producto" [preciosBloqueados]="preciosBloqueados"
+        (addProducto)="onAdd($event)" (saveProducto)="onSave($event)" (cancel)="onClose()" />
     </div>
   </mat-dialog-content>
 
