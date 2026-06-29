@@ -3,14 +3,24 @@
   <div class="producto-card__header">
     <span class="producto-card__nombre">{{ producto().nombre }}</span>
     @if (!readonly()) {
-    <button
-      mat-icon-button
-      class="producto-card__delete"
-      (click)="onRemove()"
-      aria-label="Eliminar producto"
-    >
-      <mat-icon>delete_outline</mat-icon>
-    </button>
+    <div class="producto-card__actions">
+      <button
+        mat-icon-button
+        class="producto-card__edit"
+        (click)="onEdit()"
+        aria-label="Editar producto"
+      >
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        class="producto-card__delete"
+        (click)="onRemove()"
+        aria-label="Eliminar producto"
+      >
+        <mat-icon>delete_outline</mat-icon>
+      </button>
+    </div>
     }
   </div>
 
@@ -22,11 +32,19 @@
   <div class="producto-card__stats">
     <div class="producto-card__stat">
       <span class="producto-card__stat-label">costo</span>
+      @if (sinCosto()) {
+      <span class="producto-card__stat-value producto-card__stat-value--pending">Sin costo</span>
+      } @else {
       <span class="producto-card__stat-value">{{ producto().precioCosto | money }}</span>
+      }
     </div>
     <div class="producto-card__stat" [ngClass]="gananciaClass()">
       <span class="producto-card__stat-label">ganancia</span>
+      @if (ganancia() === null) {
+      <span class="producto-card__stat-value">—</span>
+      } @else {
       <span class="producto-card__stat-value">{{ ganancia() | money }}</span>
+      }
     </div>
   </div>
 

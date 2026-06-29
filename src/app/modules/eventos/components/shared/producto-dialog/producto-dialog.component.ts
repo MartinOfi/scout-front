@@ -11,11 +11,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { EventosStateService } from '../../../services/eventos-state.service';
-import { CreateProductoDto } from '../../../../../shared/models';
+import { CreateProductoDto, Producto, UpdateProductoDto } from '../../../../../shared/models';
 import { ProductoEditorComponent } from '../producto-editor/producto-editor.component';
 
 export interface ProductoDialogData {
   eventoId: string;
+  /** When present, the dialog edits this producto instead of creating one. */
+  producto?: Producto;
 }
 
 @Component({
@@ -41,9 +43,23 @@ export class ProductoDialogComponent {
     private readonly state: EventosStateService,
   ) {}
 
+  get producto(): Producto | null {
+    return this.data.producto ?? null;
+  }
+
   onAdd(dto: CreateProductoDto): void {
     this.saving.set(true);
     this.state.createProducto(this.data.eventoId, dto).subscribe({
+      next: () => this.dialogRef.close(),
+      error: () => this.saving.set(false),
+    });
+  }
+
+  onSave(dto: UpdateProductoDto): void {
+    const producto = this.data.producto;
+    if (!producto) return;
+    this.saving.set(true);
+    this.state.updateProducto(this.data.eventoId, producto.id, dto).subscribe({
       next: () => this.dialogRef.close(),
       error: () => this.saving.set(false),
     });

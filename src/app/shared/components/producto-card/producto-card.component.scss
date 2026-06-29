@@ -28,7 +28,8 @@
     box-shadow: t.$shadow-lg;
     transform: translateY(-2px);
 
-    .producto-card__delete {
+    .producto-card__delete,
+    .producto-card__edit {
       opacity: 1;
       pointer-events: auto;
     }
@@ -53,6 +54,27 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  &__edit {
+    flex-shrink: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease, color 150ms ease;
+    color: t.$stone-400 !important;
+    position: relative;
+    z-index: 3;
+
+    &:hover {
+      color: var(--primary-600, #2563eb) !important;
+    }
   }
 
   &__delete {
@@ -129,6 +151,17 @@
 
     &--negative &-value {
       color: t.$color-error;
+    }
+  }
+
+  &__stat-value--pending {
+    font-style: italic;
+    color: var(--text-muted);
+  }
+
+  &__stat--pending {
+    .producto-card__stat-value {
+      color: var(--text-muted);
     }
   }
 

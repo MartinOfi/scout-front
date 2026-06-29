@@ -59,6 +59,7 @@ describe('EventosApiService', () => {
       const eventoId = 'evento-123';
       const dto = {
         vendedorId: 'vendedor-abc',
+        medioPago: MedioPagoEnum.EFECTIVO,
         items: [{ productoId: 'prod-1', cantidad: 3 }],
       };
       service.registrarVentasLote(eventoId, dto).subscribe();
@@ -210,6 +211,38 @@ describe('EventosApiService', () => {
 
       const req = httpMock.expectOne(
         (r) => r.url.includes(`/eventos/${eventoId}/cerrar`) && r.method === 'POST',
+      );
+      expect(req.request.body).toEqual({});
+      req.flush(mockEvento);
+    });
+  });
+
+  describe('habilitarMovimientos', () => {
+    it('should call POST /eventos/:id/habilitar-movimientos and return the updated Evento', () => {
+      const eventoId = 'evento-123';
+      const mockEvento = {
+        id: eventoId,
+        estaCerrado: false,
+        movimientosHabilitados: true,
+        nombre: 'Venta de Empanadas',
+        tipo: 'venta',
+        fecha: '2026-05-25',
+        descripcion: null,
+        destinoGanancia: 'cuentas_personales',
+        tipoEvento: null,
+        reportePublico: false,
+        productos: [],
+        createdAt: '2026-05-01T00:00:00Z',
+        updatedAt: '2026-05-25T00:00:00Z',
+      };
+
+      service.habilitarMovimientos(eventoId).subscribe((res) => {
+        expect(res.movimientosHabilitados).toBe(true);
+        expect(res.id).toBe(eventoId);
+      });
+
+      const req = httpMock.expectOne(
+        (r) => r.url.includes(`/eventos/${eventoId}/habilitar-movimientos`) && r.method === 'POST',
       );
       expect(req.request.body).toEqual({});
       req.flush(mockEvento);

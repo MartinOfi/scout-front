@@ -30,6 +30,9 @@ export interface Evento {
   productos: Producto[];
   resumenFinanciero?: EventoResumenFinanciero;
   estaCerrado: boolean;
+  // Flag irreversible (false → true). Mientras es false, las ventas no generan
+  // movimientos; al habilitarlo se generan los movimientos retroactivos.
+  movimientosHabilitados: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -51,7 +54,8 @@ export interface Producto {
   eventoId: string;
   nombre: string;
   precioVenta: number;
-  precioCosto: number;
+  // Puede ser null si el producto se creó sin costo (se carga después).
+  precioCosto: number | null;
   cantidadVendida?: number; // populated by backend when available
   createdAt: string;
   updatedAt: string;
@@ -182,7 +186,8 @@ export interface UpdateEventoDto {
 export interface CreateProductoDto {
   nombre: string;
   precioVenta: number;
-  precioCosto: number;
+  // Opcional: se puede crear el producto sin costo y cargarlo después.
+  precioCosto?: number;
 }
 
 /**
