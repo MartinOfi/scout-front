@@ -2,7 +2,7 @@
 
   <h2 mat-dialog-title class="dialog-title">
     <mat-icon>inventory_2</mat-icon>
-    Gestionar Productos
+    {{ producto ? 'Editar Producto' : 'Gestionar Productos' }}
   </h2>
 
   <mat-dialog-content class="dialog-content">
@@ -12,7 +12,8 @@
           <mat-spinner diameter="32" />
         </div>
       }
-      <app-producto-editor (addProducto)="onAdd($event)" (cancel)="onClose()" />
+      <app-producto-editor [producto]="producto" (addProducto)="onAdd($event)"
+        (saveProducto)="onSave($event)" (cancel)="onClose()" />
     </div>
   </mat-dialog-content>
 

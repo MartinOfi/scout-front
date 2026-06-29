@@ -179,6 +179,7 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   readonly loading = this.state.loading;
   readonly togglingVisibilidad = signal(false);
   readonly cerrandoEvento = signal(false);
+  readonly habilitandoMovimientos = signal(false);
   readonly personas = signal<Persona[]>([]);
   readonly error = this.state.error;
 
@@ -188,6 +189,28 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   readonly reportePublico = computed((): boolean => this.evento()?.reportePublico ?? false);
 
   readonly eventoCerrado = computed((): boolean => this.state.selected()?.estaCerrado ?? false);
+
+  /** Si las ventas del evento generan movimientos. */
+  readonly movimientosHabilitados = computed(
+    (): boolean => this.state.selected()?.movimientosHabilitados ?? false,
+  );
+
+  /** Productos que aún no tienen precio de costo cargado. */
+  readonly productosSinCosto = computed((): Producto[] =>
+    this.eventoProductos().filter((p) => p.precioCosto === null),
+  );
+
+  /**
+   * Se puede habilitar movimientos cuando es un evento de venta abierto que
+   * todavía no los habilitó. La validación de costos completos la hace el
+   * botón (y, definitivamente, el backend).
+   */
+  readonly puedeHabilitarMovimientos = computed(
+    (): boolean =>
+      this.evento()?.tipo === TipoEvento.VENTA &&
+      !this.movimientosHabilitados() &&
+      !this.eventoCerrado(),
+  );
 
   readonly eventoKpis = computed((): EventoKpis | null =>
     this.eventoId ? (this.state.kpis()[this.eventoId] ?? null) : null,
@@ -397,6 +420,21 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
     );
   }
 
+  onEditProducto(producto: Producto): void {
+    if (this.eventoCerrado()) return;
+    void import('../shared/producto-dialog/producto-dialog.component').then(
+      ({ ProductoDialogComponent }) => {
+        if (this.destroyed) return;
+        this.dialog.open(ProductoDialogComponent, {
+          width: '420px',
+          maxWidth: '95vw',
+          data: { eventoId: this.eventoId, producto },
+          disableClose: false,
+        });
+      },
+    );
+  }
+
   openIngresoDialog(): void {
     if (this.eventoCerrado()) return;
     void import('../shared/ingreso-evento-dialog/ingreso-evento-dialog.component').then(
@@ -581,6 +619,31 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
         this.state.cerrarEvento(this.eventoId).subscribe({
           complete: () => this.cerrandoEvento.set(false),
           error: () => this.cerrandoEvento.set(false),
+        });
+      });
+  }
+
+  onHabilitarMovimientos(): void {
+    const sinCosto = this.productosSinCosto();
+    if (sinCosto.length > 0) {
+      const nombres = sinCosto.map((p) => p.nombre).join(', ');
+      this.notification.showError(
+        `Faltan cargar los costos de: ${nombres}. Cargá el precio de costo de todos los productos antes de habilitar movimientos.`,
+      );
+      return;
+    }
+
+    this.confirmDialog
+      .confirm(
+        '¿Habilitar movimientos?',
+        'Se generarán los movimientos de todas las ventas ya cargadas y, a partir de ahora, cada venta generará su movimiento. Esta acción es irreversible.',
+      )
+      .subscribe((confirmed: boolean) => {
+        if (!confirmed) return;
+        this.habilitandoMovimientos.set(true);
+        this.state.habilitarMovimientos(this.eventoId).subscribe({
+          complete: () => this.habilitandoMovimientos.set(false),
+          error: () => this.habilitandoMovimientos.set(false),
         });
       });
   }

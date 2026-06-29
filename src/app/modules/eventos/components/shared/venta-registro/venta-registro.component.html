@@ -68,7 +68,11 @@
       </div>
       <div class="summary-item">
         <span class="label">Ganancia:</span>
+        @if (ganancia === null) {
+        <span class="value">— (falta el costo)</span>
+        } @else {
         <span class="value success">{{ ganancia | money:2 }}</span>
+        }
       </div>
     </div>
   }

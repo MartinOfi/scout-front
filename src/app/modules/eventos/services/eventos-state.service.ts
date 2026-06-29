@@ -199,6 +199,26 @@ export class EventosStateService {
     );
   }
 
+  /**
+   * Enables movimientos for the venta event (irreversible). On success the
+   * backend has back-filled the movimientos of the ventas already loaded, so we
+   * refresh ventas + movimientos + KPIs to reflect the new state.
+   */
+  habilitarMovimientos(id: string): Observable<Evento> {
+    this._loading.set(true);
+    this._error.set(null);
+
+    return this.apiService.habilitarMovimientos(id).pipe(
+      tap((evento) => {
+        this._eventos.update((prev) => prev.map((e) => (e.id === id ? evento : e)));
+        this._refreshEventoAfterMutation(id);
+        this.notificationService.showSuccess('Movimientos habilitados exitosamente');
+      }),
+      catchError((err: unknown) => this._catchError(err, 'Error al habilitar movimientos')),
+      finalize(() => this._loading.set(false)),
+    );
+  }
+
   delete(id: string): Observable<void> {
     this._markDeleting(id);
     return this.apiService.delete(id).pipe(

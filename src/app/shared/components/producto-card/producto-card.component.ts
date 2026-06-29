@@ -23,14 +23,27 @@ export class ProductoCardComponent {
   readonly producto = input.required<Producto>();
   readonly readonly = input<boolean>(false);
   readonly remove = output<string>();
+  readonly edit = output<Producto>();
 
-  readonly ganancia = computed(() => this.producto().precioVenta - this.producto().precioCosto);
+  /** True when the producto has no cost loaded yet. */
+  readonly sinCosto = computed(() => this.producto().precioCosto === null);
 
-  readonly gananciaClass = computed(() =>
-    this.ganancia() >= 0 ? 'producto-card__stat--positive' : 'producto-card__stat--negative',
-  );
+  readonly ganancia = computed<number | null>(() => {
+    const costo = this.producto().precioCosto;
+    return costo === null ? null : this.producto().precioVenta - costo;
+  });
+
+  readonly gananciaClass = computed(() => {
+    const ganancia = this.ganancia();
+    if (ganancia === null) return 'producto-card__stat--pending';
+    return ganancia >= 0 ? 'producto-card__stat--positive' : 'producto-card__stat--negative';
+  });
 
   onRemove(): void {
     this.remove.emit(this.producto().id);
+  }
+
+  onEdit(): void {
+    this.edit.emit(this.producto());
   }
 }

@@ -3,11 +3,11 @@
  * Form for adding a new producto to an event.
  */
 
-import { Component, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 
-import { CreateProductoDto } from '../../../../../shared/models';
+import { CreateProductoDto, Producto, UpdateProductoDto } from '../../../../../shared/models';
 import {
   positiveNumberValidator,
   decimalValidator,
@@ -38,29 +38,57 @@ import { FormActionsComponent } from '../../../../../shared/components/form/form
 })
 export class ProductoEditorComponent {
   @Output() addProducto = new EventEmitter<CreateProductoDto>();
+  @Output() saveProducto = new EventEmitter<UpdateProductoDto>();
   @Output() cancel = new EventEmitter<void>();
+
+  /** When set, the editor switches to edit mode and prefills the form. */
+  @Input() set producto(value: Producto | null) {
+    this.editing = value !== null;
+    if (value) {
+      this.form.patchValue({
+        nombre: value.nombre,
+        precioCosto: value.precioCosto ?? '',
+        precioVenta: value.precioVenta,
+      });
+    }
+  }
+
+  editing = false;
 
   readonly form: FormGroup;
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
-      precioCosto: ['', [Validators.required, positiveNumberValidator(), decimalValidator(2)]],
+      // precioCosto es opcional: se puede cargar el producto sin costo y completarlo después.
+      precioCosto: ['', [positiveNumberValidator(), decimalValidator(2)]],
       precioVenta: ['', [Validators.required, positiveNumberValidator(), decimalValidator(2)]],
     });
   }
 
-  onAdd(): void {
+  onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-    this.addProducto.emit({
-      nombre: this.form.value.nombre as string,
-      precioCosto: Number(this.form.value.precioCosto),
-      precioVenta: Number(this.form.value.precioVenta),
-    });
+    if (this.editing) {
+      this.saveProducto.emit(this.buildDto());
+      return;
+    }
+    this.addProducto.emit(this.buildDto());
     this.form.reset();
+  }
+
+  /** Builds a DTO including precioCosto only when the user provided it. */
+  private buildDto(): CreateProductoDto & UpdateProductoDto {
+    const precioCostoRaw = this.form.value.precioCosto;
+    return {
+      nombre: this.form.value.nombre as string,
+      precioVenta: Number(this.form.value.precioVenta),
+      ...(precioCostoRaw !== '' && precioCostoRaw != null
+        ? { precioCosto: Number(precioCostoRaw) }
+        : {}),
+    };
   }
 
   onCancel(): void {

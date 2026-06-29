@@ -62,6 +62,10 @@
             Copiar link
           </app-button>
         }
+        @if (puedeHabilitarMovimientos()) {
+        <app-button variant="primary" size="sm" icon="payments" [loading]="habilitandoMovimientos()"
+          (clicked)="onHabilitarMovimientos()">Habilitar movimientos</app-button>
+        }
         @if (!eventoCerrado()) {
         <app-button variant="outline" size="sm" icon="edit" (clicked)="onEdit()" />
         <app-button variant="danger" size="sm" icon="lock" [loading]="cerrandoEvento()" (clicked)="onCerrarEvento()">Cerrar evento</app-button>
@@ -113,6 +117,19 @@
 
         <!-- PRODUCTOS tab -->
         @if (activeTab() === 'productos') {
+        @if (evento()!.tipo === tipoEvento.VENTA && !movimientosHabilitados()) {
+        <div class="movimientos-pendientes-banner">
+          <mat-icon>info</mat-icon>
+          <span>
+            Movimientos pendientes: las ventas no generan movimientos todavía.
+            @if (productosSinCosto().length > 0) {
+            Cargá el precio de costo de todos los productos y luego usá "Habilitar movimientos".
+            } @else {
+            Ya podés usar "Habilitar movimientos".
+            }
+          </span>
+        </div>
+        }
         @if (!eventoCerrado()) {
         <div class="tab-toolbar">
           <app-button icon="add" (clicked)="openProductoDialog()">Gestionar Productos</app-button>
@@ -127,7 +144,8 @@
         } @else {
         <div class="productos-grid">
           @for (prod of eventoProductos(); track prod.id) {
-          <app-producto-card [producto]="prod" [readonly]="eventoCerrado()" (remove)="onRemoveProducto($event)" />
+          <app-producto-card [producto]="prod" [readonly]="eventoCerrado()"
+            (edit)="onEditProducto($event)" (remove)="onRemoveProducto($event)" />
           }
         </div>
         }

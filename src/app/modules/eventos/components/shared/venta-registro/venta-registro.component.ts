@@ -84,10 +84,16 @@ export class VentaRegistroComponent implements OnInit {
     return producto ? producto.precioVenta * cantidad : 0;
   }
 
-  get ganancia(): number {
+  /**
+   * Ganancia estimada de la venta. Es null cuando el producto todavía no tiene
+   * costo cargado: en ese caso no se puede calcular la ganancia (sería el 100%
+   * del precio de venta, un número engañoso).
+   */
+  get ganancia(): number | null {
     const producto = this.productoSeleccionado;
+    if (!producto || producto.precioCosto === null) return null;
     const cantidad = this.form.get('cantidad')?.value || 0;
-    return producto ? (producto.precioVenta - producto.precioCosto) * cantidad : 0;
+    return (producto.precioVenta - producto.precioCosto) * cantidad;
   }
 
   onSubmit(): void {

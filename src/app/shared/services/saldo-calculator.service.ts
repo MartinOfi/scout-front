@@ -86,7 +86,7 @@ export class SaldoCalculatorService {
     return ventas.reduce((ganancia, venta) => {
       const producto = productos.find((p) => p.id === venta.productoId);
       if (!producto) return ganancia;
-      return ganancia + (producto.precioVenta - producto.precioCosto) * venta.cantidad;
+      return ganancia + (producto.precioVenta - (producto.precioCosto ?? 0)) * venta.cantidad;
     }, 0);
   }
 
@@ -107,7 +107,7 @@ export class SaldoCalculatorService {
       const producto = productos.find((p) => p.id === venta.productoId);
       if (!producto) return;
 
-      const gananciaVenta = (producto.precioVenta - producto.precioCosto) * venta.cantidad;
+      const gananciaVenta = (producto.precioVenta - (producto.precioCosto ?? 0)) * venta.cantidad;
 
       const gananciaActual = gananciaPorPersona.get(venta.vendedorId) || 0;
       gananciaPorPersona.set(venta.vendedorId, gananciaActual + gananciaVenta);
