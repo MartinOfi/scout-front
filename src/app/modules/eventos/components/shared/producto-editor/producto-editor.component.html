@@ -1,5 +1,11 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="producto-form">
 
+  @if (preciosBloqueados) {
+  <p class="precios-congelados-nota">
+    Los movimientos ya están habilitados: los precios quedaron congelados y no se pueden modificar. Solo podés editar el nombre.
+  </p>
+  }
+
   <!-- Nombre -->
   <app-form-field label="Nombre del Producto" [forId]="'nombre-input'" [required]="true"
     [invalid]="!!(form.get('nombre')?.invalid && form.get('nombre')?.touched)">
@@ -25,7 +31,7 @@
   </app-form-field>
 
   <!-- Precio de Venta -->
-  <app-form-field label="Precio de Venta" [forId]="'precio-venta-input'" [required]="true"
+  <app-form-field label="Precio de Venta" [forId]="'precio-venta-input'" [required]="!preciosBloqueados"
     [invalid]="!!(form.get('precioVenta')?.invalid && form.get('precioVenta')?.touched)">
     <div class="input-with-prefix">
       <span class="input-prefix">$</span>

@@ -22,3 +22,14 @@
   color: t.$stone-500;
   font-weight: 500;
 }
+
+.precios-congelados-nota {
+  margin: 0 0 4px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--warning-50, #fffbeb);
+  border: 1px solid var(--warning-200, #fde68a);
+  color: var(--warning-800, #92400e);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}

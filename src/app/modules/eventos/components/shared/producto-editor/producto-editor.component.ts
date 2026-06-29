@@ -3,7 +3,14 @@
  * Form for adding a new producto to an event.
  */
 
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy,
+  OnInit,
+} from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 
@@ -36,7 +43,7 @@ import { FormActionsComponent } from '../../../../../shared/components/form/form
   styleUrl: './producto-editor.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProductoEditorComponent {
+export class ProductoEditorComponent implements OnInit {
   @Output() addProducto = new EventEmitter<CreateProductoDto>();
   @Output() saveProducto = new EventEmitter<UpdateProductoDto>();
   @Output() cancel = new EventEmitter<void>();
@@ -53,6 +60,13 @@ export class ProductoEditorComponent {
     }
   }
 
+  /**
+   * Cuando los movimientos del evento ya están habilitados, los precios quedan
+   * congelados (el backend los rechaza). En ese caso solo se permite editar el
+   * nombre: los campos de precio se muestran deshabilitados.
+   */
+  @Input() preciosBloqueados = false;
+
   editing = false;
 
   readonly form: FormGroup;
@@ -66,21 +80,28 @@ export class ProductoEditorComponent {
     });
   }
 
+  ngOnInit(): void {
+    if (this.editing && this.preciosBloqueados) {
+      this.form.get('precioCosto')?.disable();
+      this.form.get('precioVenta')?.disable();
+    }
+  }
+
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
     if (this.editing) {
-      this.saveProducto.emit(this.buildDto());
+      this.saveProducto.emit(this.buildUpdateDto());
       return;
     }
-    this.addProducto.emit(this.buildDto());
+    this.addProducto.emit(this.buildCreateDto());
     this.form.reset();
   }
 
-  /** Builds a DTO including precioCosto only when the user provided it. */
-  private buildDto(): CreateProductoDto & UpdateProductoDto {
+  /** DTO de creación: precioVenta siempre, precioCosto solo si se cargó. */
+  private buildCreateDto(): CreateProductoDto {
     const precioCostoRaw = this.form.value.precioCosto;
     return {
       nombre: this.form.value.nombre as string,
@@ -89,6 +110,17 @@ export class ProductoEditorComponent {
         ? { precioCosto: Number(precioCostoRaw) }
         : {}),
     };
+  }
+
+  /**
+   * DTO de edición. Con precios congelados solo viaja el nombre; de lo
+   * contrario incluye los precios igual que en la creación.
+   */
+  private buildUpdateDto(): UpdateProductoDto {
+    if (this.preciosBloqueados) {
+      return { nombre: this.form.value.nombre as string };
+    }
+    return this.buildCreateDto();
   }
 
   onCancel(): void {

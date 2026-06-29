@@ -18,6 +18,8 @@ export interface ProductoDialogData {
   eventoId: string;
   /** When present, the dialog edits this producto instead of creating one. */
   producto?: Producto;
+  /** Movimientos habilitados → precios congelados (solo se edita el nombre). */
+  preciosBloqueados?: boolean;
 }
 
 @Component({
@@ -45,6 +47,10 @@ export class ProductoDialogComponent {
 
   get producto(): Producto | null {
     return this.data.producto ?? null;
+  }
+
+  get preciosBloqueados(): boolean {
+    return this.data.preciosBloqueados ?? false;
   }
 
   onAdd(dto: CreateProductoDto): void {

@@ -428,7 +428,11 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
         this.dialog.open(ProductoDialogComponent, {
           width: '420px',
           maxWidth: '95vw',
-          data: { eventoId: this.eventoId, producto },
+          data: {
+            eventoId: this.eventoId,
+            producto,
+            preciosBloqueados: this.movimientosHabilitados(),
+          },
           disableClose: false,
         });
       },
