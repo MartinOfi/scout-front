@@ -55,6 +55,10 @@ import {
   PagoCampamentoDialogResult,
 } from '../../shared/pago-campamento-dialog/pago-campamento-dialog.component';
 import {
+  BonificarParticipanteDialogData,
+  BonificarParticipanteDialogResult,
+} from '../../shared/bonificar-participante-dialog/bonificar-participante-dialog.component';
+import {
   GastoCampamentoDialogData,
   GastoCampamentoDialogResult,
 } from '../../shared/gasto-campamento-dialog/gasto-campamento-dialog.component';
@@ -352,6 +356,31 @@ export class CampamentoDetailComponent implements OnInit {
       });
   }
 
+  /** Open dialog to bonificar (or ajustar/quitar) a participant against the fondo solidario */
+  onBonificar(participante: ParticipantePagoDto): void {
+    const camp = this.campamento();
+    if (!camp) return;
+
+    const dialogData: BonificarParticipanteDialogData = {
+      campamentoId: camp.id,
+      personaId: participante.id,
+      participanteNombre: participante.nombre,
+      montoAsignado: participante.montoAsignado,
+      montoBonificadoActual: participante.montoBonificado,
+    };
+
+    this.openBonificarDialog(dialogData)
+      .pipe(switchMap((dialogRef) => dialogRef.afterClosed()))
+      .subscribe((result: BonificarParticipanteDialogResult | undefined) => {
+        if (!result) return;
+        if (result.monto === 0) {
+          this.state.quitarBonificacionParticipante(camp.id, participante.id).subscribe();
+        } else {
+          this.state.bonificarParticipante(camp.id, participante.id, result.monto).subscribe();
+        }
+      });
+  }
+
   onPagarReembolso(movimiento: MovimientoCardVM): void {
     const camp = this.campamento();
     if (!camp) return;
@@ -449,6 +478,21 @@ export class CampamentoDetailComponent implements OnInit {
         ({ PagoCampamentoDialogComponent }) => {
           return this.dialog.open(PagoCampamentoDialogComponent, {
             width: '500px',
+            maxWidth: '90vw',
+            data: dialogData,
+            disableClose: false,
+          });
+        },
+      ),
+    );
+  }
+
+  private openBonificarDialog(dialogData: BonificarParticipanteDialogData) {
+    return from(
+      import('../../shared/bonificar-participante-dialog/bonificar-participante-dialog.component').then(
+        ({ BonificarParticipanteDialogComponent }) => {
+          return this.dialog.open(BonificarParticipanteDialogComponent, {
+            width: '480px',
             maxWidth: '90vw',
             data: dialogData,
             disableClose: false,

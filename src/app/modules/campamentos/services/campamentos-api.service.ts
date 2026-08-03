@@ -125,6 +125,26 @@ export class CampamentosApiService {
   }
 
   /**
+   * Fijar el monto bonificado de un participante contra el fondo solidario.
+   * Recibe el monto total deseado (no un delta).
+   */
+  bonificarParticipante(campamentoId: string, personaId: string, monto: number): Observable<void> {
+    return this.http.patch<void, { monto: number }>(
+      `${this.endpoint}/${campamentoId}/participantes/${personaId}/bonificacion`,
+      { monto },
+    );
+  }
+
+  /**
+   * Quitar la bonificación de un participante
+   */
+  quitarBonificacionParticipante(campamentoId: string, personaId: string): Observable<void> {
+    return this.http.delete<void>(
+      `${this.endpoint}/${campamentoId}/participantes/${personaId}/bonificacion`,
+    );
+  }
+
+  /**
    * Register a payment for campamento
    * POST /api/v1/campamentos/:id/pagos/:personaId
    * Supports mixed payments (cash/transfer + personal account balance)

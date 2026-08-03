@@ -671,6 +671,18 @@ $section-gap: 20px;
     gap: 4px;
   }
 
+  &__actions {
+    display: flex;
+
+    .participante-card__action {
+      border-top: 1px solid t.$stone-100;
+
+      &:not(:last-child) {
+        border-right: 1px solid t.$stone-100;
+      }
+    }
+  }
+
   &__action {
     display: flex;
     align-items: center;
@@ -680,7 +692,6 @@ $section-gap: 20px;
     padding: 10px;
     background-color: t.$stone-50;
     border: none;
-    border-top: 1px solid t.$stone-100;
     color: t.$brand-burgundy;
     font-size: 13px;
     font-weight: 500;
@@ -695,6 +706,10 @@ $section-gap: 20px;
 
     &:hover {
       background-color: t.$stone-100;
+    }
+
+    &--bonificar {
+      color: t.$brand-indigo;
     }
   }
 }

@@ -194,12 +194,21 @@
             }
 
             <!-- Add Payment Action -->
-            @if (participante.saldoPendiente > 0) {
-            <button class="participante-card__action" (click)="onRegistrarPago(participante)">
-              <mat-icon>add</mat-icon>
-              Registrar pago
-            </button>
-            }
+            <div class="participante-card__actions">
+              @if (participante.saldoPendiente > 0) {
+              <button class="participante-card__action" (click)="onRegistrarPago(participante)">
+                <mat-icon>add</mat-icon>
+                Registrar pago
+              </button>
+              }
+              @if (participante.estadoPago !== EstadoPagoCampamento.EXENTO) {
+              <button class="participante-card__action participante-card__action--bonificar"
+                (click)="onBonificar(participante)">
+                <mat-icon>volunteer_activism</mat-icon>
+                {{ participante.montoBonificado > 0 ? 'Ajustar bonificación' : 'Bonificar' }}
+              </button>
+              }
+            </div>
           </article>
           }
         </div>
