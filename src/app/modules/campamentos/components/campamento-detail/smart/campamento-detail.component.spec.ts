@@ -166,6 +166,7 @@ describe('CampamentoDetailComponent', () => {
       fechaInicio: new Date('2026-01-15'),
       fechaFin: new Date('2026-01-20'),
       costoPorPersona: 50000,
+      costoEducadores: 0,
       cuotasBase: 3,
     });
     mockState.detalleParticipantes.set([
@@ -195,6 +196,7 @@ describe('CampamentoDetailComponent', () => {
       fechaInicio: new Date('2026-01-15'),
       fechaFin: new Date('2026-01-20'),
       costoPorPersona: 50000,
+      costoEducadores: 0,
       cuotasBase: 3,
     });
     mockState.detalleParticipantes.set([
@@ -225,6 +227,7 @@ describe('CampamentoDetailComponent', () => {
       fechaInicio: new Date('2026-01-15'),
       fechaFin: new Date('2026-01-20'),
       costoPorPersona: 50000,
+      costoEducadores: 0,
       cuotasBase: 3,
     });
     fixture.detectChanges();
@@ -241,6 +244,7 @@ describe('CampamentoDetailComponent', () => {
       fechaInicio: new Date('2026-01-15'),
       fechaFin: new Date('2026-01-20'),
       costoPorPersona: 50000,
+      costoEducadores: 0,
       cuotasBase: 3,
     });
     mockState.detalleParticipantes.set([mockParticipanteBonificado]);
@@ -263,6 +267,7 @@ describe('CampamentoDetailComponent', () => {
       fechaInicio: new Date('2026-01-15'),
       fechaFin: new Date('2026-01-20'),
       costoPorPersona: 50000,
+      costoEducadores: 0,
       cuotasBase: 3,
     });
     mockState.detalleParticipantes.set([{ ...mockParticipanteBonificado, montoBonificado: 0 }]);

@@ -173,6 +173,7 @@ export interface CampamentoInfoDto {
   fechaInicio: Date;
   fechaFin: Date;
   costoPorPersona: number;
+  costoEducadores: number;
   cuotasBase: number;
   descripcion?: string;
 }
