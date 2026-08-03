@@ -193,6 +193,30 @@ export class InscripcionDetailComponent implements OnInit {
     this.router.navigate(['/inscripciones']);
   }
 
+  /** Otorgar o ajustar la bonificación de esta inscripción (fondo solidario) */
+  onBonificar(): void {
+    const d = this.detail();
+    if (!d) return;
+
+    const input = window.prompt(
+      'Monto total bonificado (no es un delta — reemplaza el actual):',
+      String(d.montoBonificado),
+    );
+    if (input === null) return;
+
+    const monto = Number(input);
+    if (!Number.isFinite(monto) || monto < 0) return;
+
+    this.state.bonificar(d.id, monto).subscribe();
+  }
+
+  /** Quitar la bonificación de esta inscripción */
+  onQuitarBonificacion(): void {
+    const d = this.detail();
+    if (!d) return;
+    this.state.quitarBonificacion(d.id).subscribe();
+  }
+
   onRegisterPayment(): void {
     const d = this.detail();
     if (!d || d.saldoPendiente <= 0) return;

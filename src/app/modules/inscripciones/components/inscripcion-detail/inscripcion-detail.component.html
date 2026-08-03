@@ -103,6 +103,19 @@
           <span class="payment-breakdown__value payment-breakdown__value--success">{{ d.montoPagado | money }}</span>
         </div>
       </div>
+
+      <div class="payment-breakdown__actions">
+        <button type="button" class="unstyled" (click)="onBonificar()"
+          aria-label="Otorgar o ajustar la bonificación de esta inscripción">
+          {{ d.montoBonificado > 0 ? 'Ajustar bonificación' : 'Bonificar' }}
+        </button>
+        @if (d.montoBonificado > 0) {
+        <button type="button" class="unstyled" (click)="onQuitarBonificacion()"
+          aria-label="Quitar la bonificación de esta inscripción">
+          Quitar bonificación
+        </button>
+        }
+      </div>
     </section>
 
     <!-- Two Column Layout: Timeline + Authorizations -->

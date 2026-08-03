@@ -35,7 +35,6 @@ export class InscripcionesFormBuilder {
       tipo: ['scout_argentina' as TipoInscripcion, [Validators.required]],
       ano: [new Date().getFullYear(), [Validators.required]],
       montoTotal: ['', [Validators.required, positiveNumberValidator(), decimalValidator(2)]],
-      montoBonificado: [0, [Validators.min(0), decimalValidator(2)]],
       declaracionDeSalud: [false],
       autorizacionDeImagen: [false],
       salidasCercanas: [false],
@@ -46,11 +45,11 @@ export class InscripcionesFormBuilder {
 
   /**
    * Construir formulario para editar una inscripción
-   * Solo permite editar bonificación y autorizaciones
+   * Solo permite editar autorizaciones — la bonificación se maneja aparte,
+   * vía PATCH /inscripciones/:id/bonificacion (fondo solidario)
    */
   buildEditForm(inscripcion: Inscripcion): FormGroup {
     return this.fb.group({
-      montoBonificado: [inscripcion.montoBonificado, [Validators.min(0), decimalValidator(2)]],
       declaracionDeSalud: [inscripcion.declaracionDeSalud],
       autorizacionDeImagen: [inscripcion.autorizacionDeImagen],
       salidasCercanas: [inscripcion.salidasCercanas],
@@ -72,9 +71,6 @@ export class InscripcionesFormBuilder {
     };
 
     // Only include optional fields if they have non-default values
-    if (value.montoBonificado > 0) {
-      dto.montoBonificado = Number(value.montoBonificado);
-    }
     if (value.declaracionDeSalud) {
       dto.declaracionDeSalud = true;
     }
@@ -100,7 +96,6 @@ export class InscripcionesFormBuilder {
   extractUpdateDto(form: FormGroup): UpdateInscripcionDto {
     const value = form.value;
     return {
-      montoBonificado: Number(value.montoBonificado),
       declaracionDeSalud: value.declaracionDeSalud as boolean,
       autorizacionDeImagen: value.autorizacionDeImagen as boolean,
       salidasCercanas: value.salidasCercanas as boolean,

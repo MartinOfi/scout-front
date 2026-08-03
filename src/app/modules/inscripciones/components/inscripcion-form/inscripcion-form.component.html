@@ -124,20 +124,6 @@
               }
             </div>
 
-            <div class="amount-card">
-              <span class="amount-card__label">Bonificación</span>
-              <div class="amount-card__input">
-                <span class="currency currency--discount">−$</span>
-                <app-number-field
-                  id="monto-bonificado"
-                  formControlName="montoBonificado"
-                  [min]="0"
-                  placeholder="0"
-                />
-              </div>
-              <span class="amount-card__hint">Descuento a aplicar</span>
-            </div>
-
             @if (!isEditing) {
               <div class="amount-card">
                 <span class="amount-card__label">Pago Inicial</span>
@@ -232,7 +218,7 @@
                 <line x1="12" y1="8" x2="12" y2="12"/>
                 <line x1="12" y1="16" x2="12.01" y2="16"/>
               </svg>
-              <span>La suma de bonificación, pago inicial y saldo personal no puede superar el monto total</span>
+              <span>La suma de pago inicial y saldo personal no puede superar el monto total</span>
             </div>
           }
 
@@ -241,11 +227,6 @@
             <div class="summary-item">
               <span class="summary-label">Total</span>
               <span class="summary-value">{{ inscripcionForm.get('montoTotal')?.value | money }}</span>
-            </div>
-            <span class="summary-operator">−</span>
-            <div class="summary-item">
-              <span class="summary-label">Bonificación</span>
-              <span class="summary-value">{{ (inscripcionForm.get('montoBonificado')?.value || 0) | money }}</span>
             </div>
             @if (!isEditing && (inscripcionForm.get('montoConSaldoPersonal')?.value || 0) > 0) {
               <span class="summary-operator">−</span>
@@ -258,7 +239,7 @@
             <div class="summary-item summary-item--result">
               <span class="summary-label">A pagar</span>
               <span class="summary-value">
-                {{ ((inscripcionForm.get('montoTotal')?.value || 0) - (inscripcionForm.get('montoBonificado')?.value || 0) - (inscripcionForm.get('montoConSaldoPersonal')?.value || 0)) | money }}
+                {{ ((inscripcionForm.get('montoTotal')?.value || 0) - (inscripcionForm.get('montoConSaldoPersonal')?.value || 0)) | money }}
               </span>
             </div>
           </div>

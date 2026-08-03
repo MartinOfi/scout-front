@@ -385,6 +385,24 @@ $card-padding-compact: 20px;
       color: t.$color-success;
     }
   }
+
+  &__actions {
+    display: flex;
+    gap: 16px;
+    padding: 10px 16px;
+    border-top: 1px solid t.$stone-200;
+
+    button {
+      font-size: 13px;
+      font-weight: 500;
+      color: t.$brand-indigo;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
 }
 
 // -----------------------------------------------------------------------------
