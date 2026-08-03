@@ -150,6 +150,11 @@ export class CajasStateService {
     return this._consolidado()?.fondoSolidario.bonificacionesOtorgadas ?? 0;
   });
 
+  /** Id de la caja de fondo solidario, o null si todavía no fue creada */
+  readonly cajaFondoSolidarioId = computed((): string | null => {
+    return this._consolidado()?.fondoSolidario.id ?? null;
+  });
+
   readonly saldoManada = computed((): number => {
     const caja = this._cajasRama()[RamaEnum.MANADA];
     return caja?.saldoActual ?? 0;

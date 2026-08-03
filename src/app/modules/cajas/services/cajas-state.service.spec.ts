@@ -87,4 +87,25 @@ describe('CajasStateService', () => {
       expect(service.bonificacionesOtorgadas()).toBe(0);
     });
   });
+
+  describe('cajaFondoSolidarioId', () => {
+    it('expone el id cuando la caja ya fue creada', () => {
+      mockApiService.getConsolidado.mockReturnValue(
+        of({
+          ...mockConsolidado,
+          fondoSolidario: { id: 'fondo-id', saldo: 500000, bonificacionesOtorgadas: 80000 },
+        }),
+      );
+
+      service.loadConsolidado();
+
+      expect(service.cajaFondoSolidarioId()).toBe('fondo-id');
+    });
+
+    it('devuelve null cuando la caja todavía no fue creada', () => {
+      service.loadConsolidado();
+
+      expect(service.cajaFondoSolidarioId()).toBeNull();
+    });
+  });
 });
