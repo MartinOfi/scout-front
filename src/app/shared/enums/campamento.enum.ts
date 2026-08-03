@@ -13,6 +13,8 @@ export enum EstadoPagoCampamento {
   PENDIENTE = 'pendiente',
   PARCIAL = 'parcial',
   PAGADO = 'pagado',
+  /** Monto asignado 0: no se espera pago (típicamente educadores) */
+  EXENTO = 'exento',
 }
 
 /**
@@ -22,4 +24,5 @@ export const ESTADO_PAGO_CAMPAMENTO_LABELS: Record<EstadoPagoCampamento, string>
   [EstadoPagoCampamento.PENDIENTE]: 'Pendiente',
   [EstadoPagoCampamento.PARCIAL]: 'Pago Parcial',
   [EstadoPagoCampamento.PAGADO]: 'Pagado',
+  [EstadoPagoCampamento.EXENTO]: 'Exento',
 } as const;
