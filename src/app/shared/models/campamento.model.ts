@@ -25,6 +25,8 @@ export interface Campamento {
   fechaInicio: Date;
   fechaFin: Date;
   costoPorPersona: number;
+  /** Aporte esperado de educadores. 0 = quedan exentos. */
+  costoEducadores: number;
   cuotasBase?: number; // Suggested number of payments
   participantes?: Persona[];
   createdAt: Date;
@@ -74,6 +76,8 @@ export interface CreateCampamentoDto {
   fechaInicio: string; // ISO date string
   fechaFin: string; // ISO date string
   costoPorPersona: number;
+  /** Aporte esperado de educadores. 0 = quedan exentos. */
+  costoEducadores?: number;
   cuotasBase?: number;
 }
 
@@ -86,6 +90,8 @@ export interface UpdateCampamentoDto {
   fechaInicio?: string;
   fechaFin?: string;
   costoPorPersona?: number;
+  /** Aporte esperado de educadores. 0 = quedan exentos. */
+  costoEducadores?: number;
   cuotasBase?: number;
 }
 
