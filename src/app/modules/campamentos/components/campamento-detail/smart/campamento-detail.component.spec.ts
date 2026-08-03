@@ -43,6 +43,8 @@ interface MockStateService {
   registrarGasto: ReturnType<typeof vi.fn>;
   removeParticipante: ReturnType<typeof vi.fn>;
   updateParticipanteAutorizacion: ReturnType<typeof vi.fn>;
+  bonificarParticipante: ReturnType<typeof vi.fn>;
+  quitarBonificacionParticipante: ReturnType<typeof vi.fn>;
 }
 
 function buildMockStateService(): MockStateService {
@@ -64,8 +66,24 @@ function buildMockStateService(): MockStateService {
     registrarGasto: vi.fn().mockReturnValue(of(undefined)),
     removeParticipante: vi.fn().mockReturnValue(of(undefined)),
     updateParticipanteAutorizacion: vi.fn().mockReturnValue(of(undefined)),
+    bonificarParticipante: vi.fn().mockReturnValue(of(undefined)),
+    quitarBonificacionParticipante: vi.fn().mockReturnValue(of(undefined)),
   };
 }
+
+const mockParticipanteBonificado: ParticipantePagoDto = {
+  id: 'edu-2',
+  nombre: 'Tito Educador',
+  tipo: PersonaType.EDUCADOR,
+  montoAsignado: 10000,
+  montoBonificado: 4000,
+  totalPagado: 6000,
+  saldoPendiente: 0,
+  estadoPago: EstadoPagoCampamento.PAGADO,
+  saldoCuentaPersonal: 0,
+  autorizacionEntregada: true,
+  pagos: [],
+};
 
 // ─── Test suite ───────────────────────────────────────────────────────────────
 
@@ -198,5 +216,61 @@ describe('CampamentoDetailComponent', () => {
 
     expect(fixture.nativeElement.textContent).toContain('Bonificado');
     expect(fixture.nativeElement.textContent).not.toContain('Exento');
+  });
+
+  it('onQuitarBonificacion llama a quitarBonificacionParticipante con el campamento y el participante actuales', () => {
+    mockState.detalleInfo.set({
+      id: 'camp-1',
+      nombre: 'Campamento Verano',
+      fechaInicio: new Date('2026-01-15'),
+      fechaFin: new Date('2026-01-20'),
+      costoPorPersona: 50000,
+      cuotasBase: 3,
+    });
+    fixture.detectChanges();
+
+    component.onQuitarBonificacion(mockParticipanteBonificado);
+
+    expect(mockState.quitarBonificacionParticipante).toHaveBeenCalledWith('camp-1', 'edu-2');
+  });
+
+  it('muestra el botón "Quitar bonificación" sólo cuando el participante tiene un monto bonificado, y dispara la acción al clickear', () => {
+    mockState.detalleInfo.set({
+      id: 'camp-1',
+      nombre: 'Campamento Verano',
+      fechaInicio: new Date('2026-01-15'),
+      fechaFin: new Date('2026-01-20'),
+      costoPorPersona: 50000,
+      cuotasBase: 3,
+    });
+    mockState.detalleParticipantes.set([mockParticipanteBonificado]);
+    fixture.detectChanges();
+
+    const quitarBtn: HTMLButtonElement | null = fixture.nativeElement.querySelector(
+      '.participante-card__action--quitar-bonificacion',
+    );
+    expect(quitarBtn).toBeTruthy();
+
+    quitarBtn!.click();
+
+    expect(mockState.quitarBonificacionParticipante).toHaveBeenCalledWith('camp-1', 'edu-2');
+  });
+
+  it('no muestra el botón "Quitar bonificación" para un participante sin bonificación', () => {
+    mockState.detalleInfo.set({
+      id: 'camp-1',
+      nombre: 'Campamento Verano',
+      fechaInicio: new Date('2026-01-15'),
+      fechaFin: new Date('2026-01-20'),
+      costoPorPersona: 50000,
+      cuotasBase: 3,
+    });
+    mockState.detalleParticipantes.set([{ ...mockParticipanteBonificado, montoBonificado: 0 }]);
+    fixture.detectChanges();
+
+    const quitarBtn = fixture.nativeElement.querySelector(
+      '.participante-card__action--quitar-bonificacion',
+    );
+    expect(quitarBtn).toBeNull();
   });
 });

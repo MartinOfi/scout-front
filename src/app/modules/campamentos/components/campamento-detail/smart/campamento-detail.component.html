@@ -208,6 +208,13 @@
                 {{ participante.montoBonificado > 0 ? 'Ajustar bonificación' : 'Bonificar' }}
               </button>
               }
+              @if (participante.montoBonificado > 0) {
+              <button class="participante-card__action participante-card__action--quitar-bonificacion"
+                (click)="onQuitarBonificacion(participante)">
+                <mat-icon>remove_circle_outline</mat-icon>
+                Quitar bonificación
+              </button>
+              }
             </div>
           </article>
           }

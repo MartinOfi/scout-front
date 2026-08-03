@@ -381,6 +381,13 @@ export class CampamentoDetailComponent implements OnInit {
       });
   }
 
+  /** Quitar la bonificación de este participante */
+  onQuitarBonificacion(participante: ParticipantePagoDto): void {
+    const camp = this.campamento();
+    if (!camp) return;
+    this.state.quitarBonificacionParticipante(camp.id, participante.id).subscribe();
+  }
+
   onPagarReembolso(movimiento: MovimientoCardVM): void {
     const camp = this.campamento();
     if (!camp) return;
