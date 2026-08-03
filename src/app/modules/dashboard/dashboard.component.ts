@@ -165,6 +165,12 @@ export class DashboardComponent implements OnInit {
       value: this.cajasState.totalReembolsosPendientes(),
       variant: 'danger' as const,
     },
+    {
+      icon: 'volunteer_activism',
+      title: 'Fondo Solidario',
+      value: this.cajasState.saldoFondoSolidario(),
+      variant: 'info' as const,
+    },
   ]);
 
   // ============================================================================

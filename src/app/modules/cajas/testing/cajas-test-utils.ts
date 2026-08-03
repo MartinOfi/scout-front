@@ -89,6 +89,8 @@ export interface MockCajasStateService {
   saldoRovers: WritableSignal<number>;
   totalSaldosRamas: WritableSignal<number>;
   totalSaldos: WritableSignal<number>;
+  totalCuentasPersonales: WritableSignal<number>;
+  totalReembolsosPendientes: WritableSignal<number>;
   saldoFondoSolidario: WritableSignal<number>;
   bonificacionesOtorgadas: WritableSignal<number>;
   cajaFondoSolidarioId: WritableSignal<string | null>;
@@ -122,6 +124,8 @@ export function createMockCajasStateService(): MockCajasStateService {
     saldoRovers: signal<number>(0),
     totalSaldosRamas: signal<number>(0),
     totalSaldos: signal<number>(0),
+    totalCuentasPersonales: signal<number>(0),
+    totalReembolsosPendientes: signal<number>(0),
     saldoFondoSolidario: signal<number>(0),
     bonificacionesOtorgadas: signal<number>(0),
     cajaFondoSolidarioId: signal<string | null>(null),

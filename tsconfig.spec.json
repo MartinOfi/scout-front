@@ -54,6 +54,9 @@
     "src/app/modules/cajas/services/cajas-state.service.ts",
     "src/app/modules/cajas/services/cajas-state.service.spec.ts",
     "src/app/modules/cajas/components/fondo-solidario/fondo-solidario.component.ts",
-    "src/app/modules/cajas/components/fondo-solidario/fondo-solidario.component.spec.ts"
+    "src/app/modules/cajas/components/fondo-solidario/fondo-solidario.component.spec.ts",
+    "src/app/modules/dashboard/dashboard.component.ts",
+    "src/app/modules/dashboard/dashboard.component.spec.ts",
+    "src/app/modules/movimientos/services/movimientos-api.service.ts"
   ]
 }
