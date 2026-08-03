@@ -49,6 +49,9 @@
     "src/app/modules/campamentos/components/campamento-detail/smart/campamento-detail.component.spec.ts",
     "src/app/modules/campamentos/services/**/*.ts",
     "src/app/modules/eventos/services/eventos-api.service.ts",
-    "src/app/modules/eventos/services/eventos-api.service.spec.ts"
+    "src/app/modules/eventos/services/eventos-api.service.spec.ts",
+    "src/app/modules/cajas/services/cajas-api.service.ts",
+    "src/app/modules/cajas/services/cajas-state.service.ts",
+    "src/app/modules/cajas/services/cajas-state.service.spec.ts"
   ]
 }

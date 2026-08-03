@@ -140,6 +140,16 @@ export class CajasStateService {
     return this._consolidado()?.deudasTotales ?? null;
   });
 
+  /** Saldo disponible del fondo solidario from consolidado */
+  readonly saldoFondoSolidario = computed((): number => {
+    return this._consolidado()?.fondoSolidario.saldo ?? 0;
+  });
+
+  /** Total histórico bonificado from consolidado */
+  readonly bonificacionesOtorgadas = computed((): number => {
+    return this._consolidado()?.fondoSolidario.bonificacionesOtorgadas ?? 0;
+  });
+
   readonly saldoManada = computed((): number => {
     const caja = this._cajasRama()[RamaEnum.MANADA];
     return caja?.saldoActual ?? 0;
