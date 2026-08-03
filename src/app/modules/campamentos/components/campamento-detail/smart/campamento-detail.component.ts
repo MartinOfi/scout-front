@@ -64,7 +64,12 @@ import {
 } from '../../../../../shared/components/persona-selector-dialog/persona-selector-dialog.component';
 import { AddParticipanteDto } from '../../../../../shared/models';
 import { formatMoney, MoneyPipe } from '../../../../../shared/pipes/money.pipe';
-import { EstadoPago, PersonaType, FiltroMovimientos } from '../../../../../shared/enums';
+import {
+  EstadoPago,
+  EstadoPagoCampamento,
+  PersonaType,
+  FiltroMovimientos,
+} from '../../../../../shared/enums';
 import { FilterValueMap } from '../../../../../shared/components/filters/generic-filters/filter-value.type';
 import { ParticipantesFiltrosComponent } from '../components/participantes-filtros/participantes-filtros.component';
 
@@ -99,6 +104,8 @@ interface KpiConfig {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CampamentoDetailComponent implements OnInit {
+  protected readonly EstadoPagoCampamento = EstadoPagoCampamento;
+
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly confirmDialog = inject(ConfirmDialogService);
@@ -293,7 +300,7 @@ export class CampamentoDetailComponent implements OnInit {
             campamentoId: camp.id,
             participanteId: participante.id,
             participanteNombre: participante.nombre,
-            costoPorPersona: participante.costoPorPersona,
+            costoPorPersona: participante.montoAsignado - participante.montoBonificado,
             totalPagado: participante.totalPagado,
             montoPendiente: participante.saldoPendiente,
             saldoCuentaPersonal,
@@ -323,7 +330,7 @@ export class CampamentoDetailComponent implements OnInit {
             campamentoId: camp.id,
             participanteId: participante.id,
             participanteNombre: participante.nombre,
-            costoPorPersona: participante.costoPorPersona,
+            costoPorPersona: participante.montoAsignado - participante.montoBonificado,
             totalPagado: participante.totalPagado,
             montoPendiente: participante.saldoPendiente,
             saldoCuentaPersonal,

@@ -195,7 +195,10 @@ export interface ParticipantePagoDto {
   nombre: string;
   tipo: PersonaType;
   rama?: Rama;
-  costoPorPersona: number;
+  /** Snapshot copiado al agregar al participante */
+  montoAsignado: number;
+  /** Monto cubierto por el fondo solidario */
+  montoBonificado: number;
   totalPagado: number;
   saldoPendiente: number;
   estadoPago: EstadoPagoCampamento;
@@ -227,6 +230,7 @@ export interface MovimientoCampamentoDto {
 export interface CampamentoKpisDto {
   totalARecaudar: number;
   totalRecaudado: number;
+  totalBonificado: number;
   totalGastado: number;
   totalPendienteReembolso: number;
   balance: number;
@@ -235,6 +239,7 @@ export interface CampamentoKpisDto {
   participantesPagadosCompleto: number;
   participantesPagadosParcial: number;
   participantesPendientes: number;
+  participantesExentos: number;
 }
 
 /**

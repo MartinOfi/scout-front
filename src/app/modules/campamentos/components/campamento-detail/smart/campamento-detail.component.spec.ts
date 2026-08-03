@@ -23,6 +23,7 @@ import {
   CampamentoKpisDto,
   MovimientoCampamentoDto,
 } from '../../../../../shared/models';
+import { EstadoPagoCampamento, PersonaType } from '../../../../../shared/enums';
 
 interface MockStateService {
   detalleInfo: WritableSignal<CampamentoInfoDto | null>;
@@ -138,5 +139,64 @@ describe('CampamentoDetailComponent', () => {
 
   it('should expose error signal from state', () => {
     expect(component.error).toBe(mockState.error as unknown as typeof component.error);
+  });
+
+  it('muestra el chip Exento para un participante sin monto asignado', () => {
+    mockState.detalleInfo.set({
+      id: 'camp-1',
+      nombre: 'Campamento Verano',
+      fechaInicio: new Date('2026-01-15'),
+      fechaFin: new Date('2026-01-20'),
+      costoPorPersona: 50000,
+      cuotasBase: 3,
+    });
+    mockState.detalleParticipantes.set([
+      {
+        id: 'edu-1',
+        nombre: 'Rosa Educadora',
+        tipo: PersonaType.EDUCADOR,
+        montoAsignado: 0,
+        montoBonificado: 0,
+        totalPagado: 0,
+        saldoPendiente: 0,
+        estadoPago: EstadoPagoCampamento.EXENTO,
+        saldoCuentaPersonal: 0,
+        autorizacionEntregada: true,
+        pagos: [],
+      },
+    ]);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Exento');
+  });
+
+  it('muestra el monto bonificado cuando el participante no está exento', () => {
+    mockState.detalleInfo.set({
+      id: 'camp-1',
+      nombre: 'Campamento Verano',
+      fechaInicio: new Date('2026-01-15'),
+      fechaFin: new Date('2026-01-20'),
+      costoPorPersona: 50000,
+      cuotasBase: 3,
+    });
+    mockState.detalleParticipantes.set([
+      {
+        id: 'edu-2',
+        nombre: 'Tito Educador',
+        tipo: PersonaType.EDUCADOR,
+        montoAsignado: 10000,
+        montoBonificado: 4000,
+        totalPagado: 6000,
+        saldoPendiente: 0,
+        estadoPago: EstadoPagoCampamento.PAGADO,
+        saldoCuentaPersonal: 0,
+        autorizacionEntregada: true,
+        pagos: [],
+      },
+    ]);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Bonificado');
+    expect(fixture.nativeElement.textContent).not.toContain('Exento');
   });
 });
