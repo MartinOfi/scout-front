@@ -103,6 +103,7 @@ export interface MockCajasStateService {
   loadMovimientosRama: ReturnType<typeof vi.fn>;
   loadMovimientosPersonal: ReturnType<typeof vi.fn>;
   loadConsolidado: ReturnType<typeof vi.fn>;
+  loadFondoSolidario: ReturnType<typeof vi.fn>;
   selectCaja: ReturnType<typeof vi.fn>;
   create: ReturnType<typeof vi.fn<(dto: unknown) => Observable<Caja>>>;
 }
@@ -138,6 +139,7 @@ export function createMockCajasStateService(): MockCajasStateService {
     loadMovimientosRama: vi.fn(),
     loadMovimientosPersonal: vi.fn(),
     loadConsolidado: vi.fn(),
+    loadFondoSolidario: vi.fn(),
     selectCaja: vi.fn(),
     create: vi.fn(() => of({} as Caja)),
   };

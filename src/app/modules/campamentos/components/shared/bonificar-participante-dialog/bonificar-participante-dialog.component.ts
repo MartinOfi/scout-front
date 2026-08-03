@@ -69,6 +69,7 @@ export class BonificarParticipanteDialogComponent {
     this.form = this.fb.group({
       monto: [data.montoBonificadoActual, [Validators.required, Validators.min(0)]],
     });
+    this.cajasState.loadFondoSolidario();
   }
 
   private get montoIngresado(): number {

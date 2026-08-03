@@ -56,6 +56,10 @@ export class CajasStateService {
   private readonly _movimientosRama: WritableSignal<Record<string, Movimiento[]>> = signal({});
   private readonly _movimientosPersonal: WritableSignal<Record<string, Movimiento[]>> = signal({});
   private readonly _consolidado: WritableSignal<ConsolidadoSaldosResponse | null> = signal(null);
+  private readonly _fondoSolidarioStandalone: WritableSignal<{
+    id: string;
+    saldo: number;
+  } | null> = signal(null);
   private readonly _loading: WritableSignal<boolean> = signal(false);
   private readonly _error: WritableSignal<string | null> = signal(null);
   private readonly _selectedRama: WritableSignal<Rama | null> = signal(null);
@@ -140,8 +144,14 @@ export class CajasStateService {
     return this._consolidado()?.deudasTotales ?? null;
   });
 
-  /** Saldo disponible del fondo solidario from consolidado */
+  /**
+   * Saldo disponible del fondo solidario. Prioriza la carga puntual de
+   * loadFondoSolidario() (más reciente cuando alguien la pidió explícitamente,
+   * ej. un diálogo de bonificar) por sobre el consolidado del dashboard.
+   */
   readonly saldoFondoSolidario = computed((): number => {
+    const standalone = this._fondoSolidarioStandalone();
+    if (standalone) return standalone.saldo;
     return this._consolidado()?.fondoSolidario.saldo ?? 0;
   });
 
@@ -152,6 +162,8 @@ export class CajasStateService {
 
   /** Id de la caja de fondo solidario, o null si todavía no fue creada */
   readonly cajaFondoSolidarioId = computed((): string | null => {
+    const standalone = this._fondoSolidarioStandalone();
+    if (standalone) return standalone.id;
     return this._consolidado()?.fondoSolidario.id ?? null;
   });
 
@@ -216,6 +228,24 @@ export class CajasStateService {
       error: (err: unknown) => {
         this._error.set(this.errorHandler.extractMessage(err, 'Error al cargar caja de grupo'));
         this._loading.set(false);
+      },
+    });
+  }
+
+  /**
+   * Cargar puntualmente el saldo del fondo solidario, sin depender de haber
+   * cargado el consolidado antes (ej. desde un diálogo de bonificar)
+   * Endpoint: GET /cajas/fondo-solidario
+   */
+  loadFondoSolidario(): void {
+    this.apiService.getFondoSolidario().subscribe({
+      next: ({ caja }) => {
+        this._fondoSolidarioStandalone.set(caja ? { id: caja.id, saldo: caja.saldoActual } : null);
+      },
+      error: (err: unknown) => {
+        this._error.set(
+          this.errorHandler.extractMessage(err, 'Error al cargar el fondo solidario'),
+        );
       },
     });
   }

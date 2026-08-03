@@ -60,6 +60,11 @@ describe('BonificarParticipanteDialogComponent', () => {
     expect(component.form.value.monto).toBe(5000);
   });
 
+  it('carga el saldo del fondo solidario al abrirse, sin depender de haber visitado el dashboard antes', () => {
+    setup();
+    expect(mockStateService.loadFondoSolidario).toHaveBeenCalledTimes(1);
+  });
+
   it('permite confirmar cuando el fondo alcanza y no excede lo asignado', () => {
     setup();
     component.form.patchValue({ monto: 5000 });

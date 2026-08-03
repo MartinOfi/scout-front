@@ -14,6 +14,7 @@ interface MockApiService {
   getPersonales: Mock;
   getMovimientos: Mock;
   create: Mock;
+  getFondoSolidario: Mock;
 }
 
 const mockConsolidado: ConsolidadoSaldosResponse = {
@@ -44,9 +45,11 @@ describe('CajasStateService', () => {
       getPersonales: vi.fn(),
       getMovimientos: vi.fn(),
       create: vi.fn(),
+      getFondoSolidario: vi.fn(),
     };
 
     mockApiService.getConsolidado.mockReturnValue(of(mockConsolidado));
+    mockApiService.getFondoSolidario.mockReturnValue(of({ caja: null }));
 
     TestBed.configureTestingModule({
       providers: [
@@ -106,6 +109,47 @@ describe('CajasStateService', () => {
       service.loadConsolidado();
 
       expect(service.cajaFondoSolidarioId()).toBeNull();
+    });
+  });
+
+  describe('loadFondoSolidario', () => {
+    it('carga el saldo sin depender de loadConsolidado', () => {
+      mockApiService.getFondoSolidario.mockReturnValue(
+        of({ caja: { id: 'fondo-id', saldoActual: 545000 } }),
+      );
+
+      service.loadFondoSolidario();
+
+      expect(service.saldoFondoSolidario()).toBe(545000);
+      expect(service.cajaFondoSolidarioId()).toBe('fondo-id');
+      expect(mockApiService.getConsolidado).not.toHaveBeenCalled();
+    });
+
+    it('devuelve 0/null cuando la caja todavía no fue creada', () => {
+      mockApiService.getFondoSolidario.mockReturnValue(of({ caja: null }));
+
+      service.loadFondoSolidario();
+
+      expect(service.saldoFondoSolidario()).toBe(0);
+      expect(service.cajaFondoSolidarioId()).toBeNull();
+    });
+
+    it('una carga puntual más reciente prevalece sobre un consolidado ya cargado', () => {
+      mockApiService.getConsolidado.mockReturnValue(
+        of({
+          ...mockConsolidado,
+          fondoSolidario: { id: 'fondo-id', saldo: 500000, bonificacionesOtorgadas: 0 },
+        }),
+      );
+      service.loadConsolidado();
+      expect(service.saldoFondoSolidario()).toBe(500000);
+
+      mockApiService.getFondoSolidario.mockReturnValue(
+        of({ caja: { id: 'fondo-id', saldoActual: 495000 } }),
+      );
+      service.loadFondoSolidario();
+
+      expect(service.saldoFondoSolidario()).toBe(495000);
     });
   });
 });
