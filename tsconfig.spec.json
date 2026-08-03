@@ -52,6 +52,8 @@
     "src/app/modules/eventos/services/eventos-api.service.spec.ts",
     "src/app/modules/cajas/services/cajas-api.service.ts",
     "src/app/modules/cajas/services/cajas-state.service.ts",
-    "src/app/modules/cajas/services/cajas-state.service.spec.ts"
+    "src/app/modules/cajas/services/cajas-state.service.spec.ts",
+    "src/app/modules/cajas/components/fondo-solidario/fondo-solidario.component.ts",
+    "src/app/modules/cajas/components/fondo-solidario/fondo-solidario.component.spec.ts"
   ]
 }

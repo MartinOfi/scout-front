@@ -104,7 +104,8 @@
               "src/app/core/services/theme.service.spec.ts",
               "src/app/layout/components/theme-toggle/theme-toggle.component.spec.ts",
               "src/app/modules/campamentos/components/campamento-detail/smart/campamento-detail.component.spec.ts",
-              "src/app/modules/cajas/services/cajas-state.service.spec.ts"
+              "src/app/modules/cajas/services/cajas-state.service.spec.ts",
+              "src/app/modules/cajas/components/fondo-solidario/fondo-solidario.component.spec.ts"
             ]
           }
         }

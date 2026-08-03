@@ -6,6 +6,7 @@
 import { vi } from 'vitest';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { signal, WritableSignal } from '@angular/core';
+import { Observable, of } from 'rxjs';
 import { Caja, CajaConSaldo, Movimiento } from '../../../shared/models';
 import {
   CajaType,
@@ -88,6 +89,9 @@ export interface MockCajasStateService {
   saldoRovers: WritableSignal<number>;
   totalSaldosRamas: WritableSignal<number>;
   totalSaldos: WritableSignal<number>;
+  saldoFondoSolidario: WritableSignal<number>;
+  bonificacionesOtorgadas: WritableSignal<number>;
+  cajaFondoSolidarioId: WritableSignal<string | null>;
   loading: WritableSignal<boolean>;
   error: WritableSignal<string | null>;
   loadCajaGrupo: ReturnType<typeof vi.fn>;
@@ -96,7 +100,9 @@ export interface MockCajasStateService {
   loadMovimientosGrupo: ReturnType<typeof vi.fn>;
   loadMovimientosRama: ReturnType<typeof vi.fn>;
   loadMovimientosPersonal: ReturnType<typeof vi.fn>;
+  loadConsolidado: ReturnType<typeof vi.fn>;
   selectCaja: ReturnType<typeof vi.fn>;
+  create: ReturnType<typeof vi.fn<(dto: unknown) => Observable<Caja>>>;
 }
 
 /**
@@ -116,6 +122,9 @@ export function createMockCajasStateService(): MockCajasStateService {
     saldoRovers: signal<number>(0),
     totalSaldosRamas: signal<number>(0),
     totalSaldos: signal<number>(0),
+    saldoFondoSolidario: signal<number>(0),
+    bonificacionesOtorgadas: signal<number>(0),
+    cajaFondoSolidarioId: signal<string | null>(null),
     loading: signal<boolean>(false),
     error: signal<string | null>(null),
     loadCajaGrupo: vi.fn(),
@@ -124,7 +133,9 @@ export function createMockCajasStateService(): MockCajasStateService {
     loadMovimientosGrupo: vi.fn(),
     loadMovimientosRama: vi.fn(),
     loadMovimientosPersonal: vi.fn(),
+    loadConsolidado: vi.fn(),
     selectCaja: vi.fn(),
+    create: vi.fn(() => of({} as Caja)),
   };
 }
 

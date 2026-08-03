@@ -1,0 +1,57 @@
+<div class="fondo-solidario-container">
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Cargando...</span>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-state">
+      <mat-icon color="warn">error</mat-icon>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <section class="fondo-solidario-header">
+    <p class="fondo-solidario-hint">
+      Financia las bonificaciones. Su saldo no forma parte de la caja de grupo: sólo se libera al
+      otorgar una bonificación.
+    </p>
+
+    <div class="fondo-solidario-stats">
+      <app-stat-card
+        icon="volunteer_activism"
+        title="Saldo Disponible"
+        [value]="saldo()"
+        [variant]="saldo() > 0 ? 'success' : 'info'"
+        format="currency"
+      />
+      <app-stat-card
+        icon="favorite"
+        title="Bonificado a la Fecha"
+        [value]="bonificacionesOtorgadas()"
+        variant="info"
+        format="currency"
+      />
+    </div>
+
+    <div class="action-buttons">
+      @if (cajaFondoSolidarioId()) {
+        <app-action-button
+          icon="compare_arrows"
+          label="Transferir a Fondo Solidario"
+          variant="info"
+          (clicked)="onTransferir()"
+        />
+      } @else {
+        <app-action-button
+          icon="add"
+          label="Crear Fondo Solidario"
+          variant="success"
+          (clicked)="onCrear()"
+        />
+      }
+    </div>
+  </section>
+</div>

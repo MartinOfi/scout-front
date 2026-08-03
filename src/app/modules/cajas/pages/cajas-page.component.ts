@@ -18,6 +18,7 @@ import {
 import { CajaGrupoComponent } from '../components/caja-grupo/caja-grupo.component';
 import { FondosRamaComponent } from '../components/fondos-rama/fondos-rama.component';
 import { CuentasPersonalesComponent } from '../components/cuentas-personales/cuentas-personales.component';
+import { FondoSolidarioComponent } from '../components/fondo-solidario/fondo-solidario.component';
 import { CajaDrawerComponent } from '../components/caja-drawer/caja-drawer.component';
 import { CajasStateService } from '../services/cajas-state.service';
 import {
@@ -37,6 +38,7 @@ import { MovimientosApiService } from '../../movimientos/services/movimientos-ap
     CajaGrupoComponent,
     FondosRamaComponent,
     CuentasPersonalesComponent,
+    FondoSolidarioComponent,
     CajaDrawerComponent,
   ],
   templateUrl: './cajas-page.component.html',
@@ -57,6 +59,7 @@ export class CajasPageComponent {
     { key: 'grupo', label: 'Caja de Grupo', icon: 'account_balance_wallet' },
     { key: 'rama', label: 'Fondos de Rama', icon: 'forest' },
     { key: 'personal', label: 'Cuentas Personales', icon: 'person' },
+    { key: 'fondo-solidario', label: 'Fondo Solidario', icon: 'volunteer_activism' },
   ];
 
   readonly activeTab = signal<string>('grupo');
