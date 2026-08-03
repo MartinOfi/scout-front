@@ -271,6 +271,9 @@ export class CampamentoDetailComponent implements OnInit {
       excludeIds: existingIds,
       showRamaFilter: true,
       showAutorizacionField: true,
+      showBonificarField: true,
+      montoBonificableFn: (persona) =>
+        persona.tipo === PersonaType.EDUCADOR ? camp.costoEducadores : camp.costoPorPersona,
       confirmLabel: 'Agregar',
     };
 
@@ -284,7 +287,15 @@ export class CampamentoDetailComponent implements OnInit {
         };
         this.state.addParticipante(camp.id, dto).subscribe({
           next: () => {
-            this.loadCampamento(camp.id);
+            if (result.montoBonificado) {
+              this.state
+                .bonificarParticipante(camp.id, result.persona.id, result.montoBonificado)
+                .subscribe({
+                  next: () => this.loadCampamento(camp.id),
+                });
+            } else {
+              this.loadCampamento(camp.id);
+            }
           },
         });
       });

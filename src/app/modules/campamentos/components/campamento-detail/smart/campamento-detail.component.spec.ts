@@ -12,6 +12,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 
 import { CampamentoDetailComponent } from './campamento-detail.component';
+import { PersonaSelectorDialogResult } from '../../../../../shared/components/persona-selector-dialog/persona-selector-dialog.component';
 import { CampamentosStateService } from '../../../services/campamentos-state.service';
 import { ConfirmDialogService } from '../../../../../shared';
 import { CajasApiService } from '../../../../cajas/services/cajas-api.service';
@@ -277,5 +278,83 @@ describe('CampamentoDetailComponent', () => {
       '.participante-card__action--quitar-bonificacion',
     );
     expect(quitarBtn).toBeNull();
+  });
+
+  describe('onAddParticipante', () => {
+    let mockDialogRef: { afterClosed: ReturnType<typeof vi.fn> };
+    const nuevaPersona = {
+      id: 'prota-9',
+      tipo: PersonaType.PROTAGONISTA,
+    } as PersonaSelectorDialogResult['persona'];
+
+    beforeEach(() => {
+      mockState.detalleInfo.set({
+        id: 'camp-1',
+        nombre: 'Campamento Verano',
+        fechaInicio: new Date('2026-01-15'),
+        fechaFin: new Date('2026-01-20'),
+        costoPorPersona: 50000,
+        costoEducadores: 0,
+        cuotasBase: 3,
+      });
+      fixture.detectChanges();
+
+      mockDialogRef = { afterClosed: vi.fn() };
+      vi.spyOn(
+        component as unknown as { openPersonaSelectorDialog: () => unknown },
+        'openPersonaSelectorDialog',
+      ).mockReturnValue(of(mockDialogRef));
+    });
+
+    it('no bonifica ni recarga si el diálogo se cierra sin resultado', () => {
+      mockDialogRef.afterClosed.mockReturnValue(of(undefined));
+
+      component.onAddParticipante();
+
+      expect(mockState.addParticipante).not.toHaveBeenCalled();
+      expect(mockState.bonificarParticipante).not.toHaveBeenCalled();
+    });
+
+    it('agrega el participante sin bonificar cuando no se ingresó monto', () => {
+      const result: PersonaSelectorDialogResult = { persona: nuevaPersona };
+      mockDialogRef.afterClosed.mockReturnValue(of(result));
+      mockState.loadDetalle.mockClear();
+
+      component.onAddParticipante();
+
+      expect(mockState.addParticipante).toHaveBeenCalledWith('camp-1', {
+        personaId: 'prota-9',
+        autorizacionEntregada: false,
+      });
+      expect(mockState.bonificarParticipante).not.toHaveBeenCalled();
+      expect(mockState.loadDetalle).toHaveBeenCalledTimes(1);
+    });
+
+    it('agrega el participante y lo bonifica antes de recargar el detalle cuando se ingresó un monto', () => {
+      const result: PersonaSelectorDialogResult = {
+        persona: nuevaPersona,
+        montoBonificado: 4000,
+      };
+      mockDialogRef.afterClosed.mockReturnValue(of(result));
+      mockState.loadDetalle.mockClear();
+
+      const callOrder: string[] = [];
+      mockState.bonificarParticipante.mockImplementation(() => {
+        callOrder.push('bonificarParticipante');
+        return of(undefined);
+      });
+      mockState.loadDetalle.mockImplementation(() => {
+        callOrder.push('loadDetalle');
+      });
+
+      component.onAddParticipante();
+
+      expect(mockState.addParticipante).toHaveBeenCalledWith('camp-1', {
+        personaId: 'prota-9',
+        autorizacionEntregada: false,
+      });
+      expect(mockState.bonificarParticipante).toHaveBeenCalledWith('camp-1', 'prota-9', 4000);
+      expect(callOrder).toEqual(['bonificarParticipante', 'loadDetalle']);
+    });
   });
 });

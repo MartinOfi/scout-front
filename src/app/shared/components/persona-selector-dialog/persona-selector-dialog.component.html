@@ -51,6 +51,20 @@
       </div>
       }
 
+      <!-- Bonificar (optional, sólo si la persona seleccionada admite bonificación) -->
+      @if (mostrarCampoBonificar) {
+      <app-form-field label="Bonificar (opcional)" [forId]="'monto-bonificar'"
+        [hint]="'Máximo: ' + (montoMaximoBonificable | money)" [invalid]="bonificarExcedeMaximo">
+        <div class="input-with-prefix">
+          <span class="input-prefix">$</span>
+          <app-number-field id="monto-bonificar" formControlName="monto" [min]="0" placeholder="0" />
+        </div>
+        @if (bonificarExcedeMaximo) {
+        <span error>No puede exceder {{ montoMaximoBonificable | money }}</span>
+        }
+      </app-form-field>
+      }
+
       <!-- Available count info -->
       @if (!loading() && filteredPersonas().length > 0) {
       <p class="available-count">
@@ -65,7 +79,8 @@
     <app-button variant="secondary" (clicked)="onCancel()">
       Cancelar
     </app-button>
-    <app-button variant="primary" [disabled]="form.invalid || loading()" (clicked)="onConfirm()">
+    <app-button variant="primary" [disabled]="form.invalid || loading() || bonificarExcedeMaximo"
+      (clicked)="onConfirm()">
       {{ data.confirmLabel ?? 'Confirmar' }}
     </app-button>
   </mat-dialog-actions>

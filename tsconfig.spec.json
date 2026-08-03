@@ -61,6 +61,9 @@
     "src/app/modules/campamentos/components/shared/bonificar-participante-dialog/bonificar-participante-dialog.component.ts",
     "src/app/modules/campamentos/components/shared/bonificar-participante-dialog/bonificar-participante-dialog.component.spec.ts",
     "src/app/modules/inscripciones/components/shared/bonificar-inscripcion-dialog/bonificar-inscripcion-dialog.component.ts",
-    "src/app/modules/inscripciones/components/shared/bonificar-inscripcion-dialog/bonificar-inscripcion-dialog.component.spec.ts"
+    "src/app/modules/inscripciones/components/shared/bonificar-inscripcion-dialog/bonificar-inscripcion-dialog.component.spec.ts",
+    "src/app/shared/components/persona-selector-dialog/persona-selector-dialog.component.ts",
+    "src/app/shared/components/persona-selector-dialog/persona-selector-dialog.component.spec.ts",
+    "src/app/modules/personas/services/personas-api.service.ts"
   ]
 }

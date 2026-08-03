@@ -33,7 +33,9 @@ import { PersonaType, Rama, RAMAS, PERSONA_TYPE_LABELS, RAMA_LABELS } from '../.
 import { PersonasApiService } from '../../../modules/personas/services/personas-api.service';
 import { FormFieldComponent } from '../form/form-field/form-field.component';
 import { SelectFieldComponent } from '../form/select-field/select-field.component';
+import { NumberFieldComponent } from '../form/number-field/number-field.component';
 import { ButtonComponent } from '../button/button.component';
+import { MoneyPipe } from '../../pipes';
 
 // ============================================================================
 // Public Interfaces
@@ -59,6 +61,13 @@ export interface PersonaSelectorDialogData {
   showAutorizacionField?: boolean;
   /** Custom confirm button label (default: 'Confirmar') */
   confirmLabel?: string;
+  /**
+   * Habilita un campo opcional de "monto a bonificar" (fondo solidario) una
+   * vez que se selecciona una persona. Requiere montoBonificableFn.
+   */
+  showBonificarField?: boolean;
+  /** Monto máximo bonificable para la persona seleccionada (0 = no bonificable) */
+  montoBonificableFn?: (persona: PersonaUnion) => number;
 }
 
 /**
@@ -69,6 +78,8 @@ export interface PersonaSelectorDialogResult {
   persona: PersonaUnion;
   /** Autorización entregada (present only when showAutorizacionField is true) */
   autorizacionEntregada?: boolean;
+  /** Monto a bonificar (presente sólo si showBonificarField es true y es > 0) */
+  montoBonificado?: number;
 }
 
 // ============================================================================
@@ -86,7 +97,9 @@ export interface PersonaSelectorDialogResult {
     MatCheckboxModule,
     FormFieldComponent,
     SelectFieldComponent,
+    NumberFieldComponent,
     ButtonComponent,
+    MoneyPipe,
   ],
   templateUrl: './persona-selector-dialog.component.html',
   styleUrl: './persona-selector-dialog.component.scss',
@@ -109,6 +122,7 @@ export class PersonaSelectorDialogComponent implements OnInit {
   readonly form: FormGroup = this.fb.group({
     personaId: ['', Validators.required],
     autorizacionEntregada: [false],
+    monto: [0, [Validators.min(0)]],
   });
 
   // Rama options for filter (spread to mutable array for select component)
@@ -148,6 +162,28 @@ export class PersonaSelectorDialogComponent implements OnInit {
     return this.form.invalid;
   });
 
+  /** Persona actualmente seleccionada en el form (o undefined) */
+  private get selectedPersona(): PersonaUnion | undefined {
+    const personaId = this.form.value.personaId;
+    return this.filteredPersonas().find((p) => p.id === personaId);
+  }
+
+  /** Monto máximo bonificable para la persona seleccionada (0 = no aplica) */
+  get montoMaximoBonificable(): number {
+    const persona = this.selectedPersona;
+    if (!persona || !this.data.montoBonificableFn) return 0;
+    return this.data.montoBonificableFn(persona);
+  }
+
+  /** true si corresponde mostrar el campo de bonificar (persona seleccionada y bonificable) */
+  get mostrarCampoBonificar(): boolean {
+    return !!this.data.showBonificarField && this.montoMaximoBonificable > 0;
+  }
+
+  get bonificarExcedeMaximo(): boolean {
+    return (Number(this.form.value.monto) || 0) > this.montoMaximoBonificable;
+  }
+
   // ============================================================================
   // Lifecycle
   // ============================================================================
@@ -182,17 +218,19 @@ export class PersonaSelectorDialogComponent implements OnInit {
   }
 
   onConfirm(): void {
-    if (this.form.invalid) return;
+    if (this.form.invalid || this.bonificarExcedeMaximo) return;
 
     const personaId = this.form.value.personaId;
     const persona = this.filteredPersonas().find((p) => p.id === personaId);
 
     if (persona) {
+      const montoBonificado = this.mostrarCampoBonificar ? Number(this.form.value.monto) || 0 : 0;
       const result: PersonaSelectorDialogResult = {
         persona,
         ...(this.data.showAutorizacionField && {
           autorizacionEntregada: !!this.form.value.autorizacionEntregada,
         }),
+        ...(montoBonificado > 0 && { montoBonificado }),
       };
       this.dialogRef.close(result);
     }
