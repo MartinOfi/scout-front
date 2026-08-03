@@ -388,20 +388,10 @@ $card-padding-compact: 20px;
 
   &__actions {
     display: flex;
-    gap: 16px;
+    flex-wrap: wrap;
+    gap: 10px;
     padding: 10px 16px;
     border-top: 1px solid t.$stone-200;
-
-    button {
-      font-size: 13px;
-      font-weight: 500;
-      color: t.$brand-indigo;
-      cursor: pointer;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
   }
 }
 

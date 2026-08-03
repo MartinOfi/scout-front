@@ -105,15 +105,13 @@
       </div>
 
       <div class="payment-breakdown__actions">
-        <button type="button" class="unstyled" (click)="onBonificar()"
-          aria-label="Otorgar o ajustar la bonificación de esta inscripción">
+        <app-button variant="outline" icon="volunteer_activism" (clicked)="onBonificar()">
           {{ d.montoBonificado > 0 ? 'Ajustar bonificación' : 'Bonificar' }}
-        </button>
+        </app-button>
         @if (d.montoBonificado > 0) {
-        <button type="button" class="unstyled" (click)="onQuitarBonificacion()"
-          aria-label="Quitar la bonificación de esta inscripción">
+        <app-button variant="ghost" icon="remove_circle_outline" (clicked)="onQuitarBonificacion()">
           Quitar bonificación
-        </button>
+        </app-button>
         }
       </div>
     </section>

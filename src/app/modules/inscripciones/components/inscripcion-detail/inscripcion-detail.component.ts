@@ -22,6 +22,7 @@ import { InscripcionesStateService } from '../../services/inscripciones-state.se
 import { CajasApiService } from '../../../cajas/services/cajas-api.service';
 import { ConfirmDialogService } from '../../../../shared/services';
 import { LoadingSpinnerComponent, EmptyStateComponent } from '../../../../shared';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { MoneyPipe } from '../../../../shared/pipes';
 import {
   InscripcionConEstado,
@@ -40,6 +41,10 @@ import type {
   PagoInscripcionDialogData,
   PagoInscripcionDialogResult,
 } from '../shared/pago-inscripcion-dialog/pago-inscripcion-dialog.component';
+import type {
+  BonificarInscripcionDialogData,
+  BonificarInscripcionDialogResult,
+} from '../shared/bonificar-inscripcion-dialog/bonificar-inscripcion-dialog.component';
 
 /** Mapping for payment method labels */
 const MEDIO_PAGO_LABELS: Record<string, string> = {
@@ -61,6 +66,7 @@ const MEDIO_PAGO_LABELS: Record<string, string> = {
     MatIconModule,
     LoadingSpinnerComponent,
     EmptyStateComponent,
+    ButtonComponent,
   ],
   templateUrl: './inscripcion-detail.component.html',
   styleUrl: './inscripcion-detail.component.scss',
@@ -198,16 +204,19 @@ export class InscripcionDetailComponent implements OnInit {
     const d = this.detail();
     if (!d) return;
 
-    const input = window.prompt(
-      'Monto total bonificado (no es un delta — reemplaza el actual):',
-      String(d.montoBonificado),
-    );
-    if (input === null) return;
+    const dialogData: BonificarInscripcionDialogData = {
+      inscripcionId: d.id,
+      personaNombre: d.persona?.nombre ?? 'Sin nombre',
+      montoTotal: d.montoTotal,
+      montoBonificadoActual: d.montoBonificado,
+    };
 
-    const monto = Number(input);
-    if (!Number.isFinite(monto) || monto < 0) return;
-
-    this.state.bonificar(d.id, monto).subscribe();
+    this.openBonificarDialog(dialogData)
+      .pipe(switchMap((dialogRef) => dialogRef.afterClosed()))
+      .subscribe((result: BonificarInscripcionDialogResult | undefined) => {
+        if (!result) return;
+        this.state.bonificar(d.id, result.monto).subscribe();
+      });
   }
 
   /** Quitar la bonificación de esta inscripción */
@@ -283,6 +292,22 @@ export class InscripcionDetailComponent implements OnInit {
             disableClose: false,
           });
           return dialogRef;
+        },
+      ),
+    );
+  }
+
+  /** Open bonificar dialog with dynamic import */
+  private openBonificarDialog(dialogData: BonificarInscripcionDialogData) {
+    return from(
+      import('../shared/bonificar-inscripcion-dialog/bonificar-inscripcion-dialog.component').then(
+        ({ BonificarInscripcionDialogComponent }) => {
+          return this.dialog.open(BonificarInscripcionDialogComponent, {
+            width: '480px',
+            maxWidth: '90vw',
+            data: dialogData,
+            disableClose: false,
+          });
         },
       ),
     );
