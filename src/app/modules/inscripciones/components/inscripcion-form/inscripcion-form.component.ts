@@ -136,6 +136,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
       montoTotal: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
       montoPagado: [0, [Validators.min(0)]],
       montoConSaldoPersonal: [0, [Validators.min(0)]],
+      montoBonificado: [0, [Validators.min(0)]],
       medioPago: [MedioPagoEnum.EFECTIVO],
       declaracionDeSalud: [false],
       autorizacionDeImagen: [false],
@@ -236,10 +237,11 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
     const montoTotal = group.get('montoTotal')?.value || 0;
     const montoPagado = group.get('montoPagado')?.value || 0;
     const montoConSaldoPersonal = group.get('montoConSaldoPersonal')?.value || 0;
+    const montoBonificado = group.get('montoBonificado')?.value || 0;
 
-    // Validamos que la suma de todos los pagos no exceda el monto total
-    // saldoRestante = montoTotal - montoPagado - montoConSaldoPersonal >= 0
-    const totalPagos = montoPagado + montoConSaldoPersonal;
+    // Validamos que la suma de todos los pagos y la bonificación no exceda el monto total
+    // saldoRestante = montoTotal - montoPagado - montoConSaldoPersonal - montoBonificado >= 0
+    const totalPagos = montoPagado + montoConSaldoPersonal + montoBonificado;
 
     if (totalPagos > montoTotal) {
       this.montosExcedenTotal.set(true);
@@ -342,10 +344,19 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
         autorizacionIngreso: formValue.autorizacionIngreso || undefined,
         certificadoAptitudFisica: formValue.certificadoAptitudFisica || undefined,
       };
-      this.state.create(dto).subscribe(() => {
-        this.router.navigate(['/inscripciones'], {
-          queryParams: { tipo: formValue.tipo },
-        });
+      const montoBonificado = formValue.montoBonificado || 0;
+      this.state.create(dto).subscribe((inscripcion: Inscripcion) => {
+        if (montoBonificado > 0) {
+          this.state.bonificar(inscripcion.id, montoBonificado).subscribe(() => {
+            this.router.navigate(['/inscripciones'], {
+              queryParams: { tipo: formValue.tipo },
+            });
+          });
+        } else {
+          this.router.navigate(['/inscripciones'], {
+            queryParams: { tipo: formValue.tipo },
+          });
+        }
       });
     }
   }
