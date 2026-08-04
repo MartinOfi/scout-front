@@ -350,25 +350,17 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
         montoPagado: formValue.montoPagado || undefined,
         montoConSaldoPersonal: formValue.montoConSaldoPersonal || undefined,
         medioPago: hasPago ? formValue.medioPago : undefined,
+        montoBonificado: formValue.montoBonificado || undefined,
         declaracionDeSalud: formValue.declaracionDeSalud || undefined,
         autorizacionDeImagen: formValue.autorizacionDeImagen || undefined,
         salidasCercanas: formValue.salidasCercanas || undefined,
         autorizacionIngreso: formValue.autorizacionIngreso || undefined,
         certificadoAptitudFisica: formValue.certificadoAptitudFisica || undefined,
       };
-      const montoBonificado = formValue.montoBonificado || 0;
-      this.state.create(dto).subscribe((inscripcion: Inscripcion) => {
-        if (montoBonificado > 0) {
-          this.state.bonificar(inscripcion.id, montoBonificado).subscribe(() => {
-            this.router.navigate(['/inscripciones'], {
-              queryParams: { tipo: formValue.tipo },
-            });
-          });
-        } else {
-          this.router.navigate(['/inscripciones'], {
-            queryParams: { tipo: formValue.tipo },
-          });
-        }
+      this.state.create(dto).subscribe(() => {
+        this.router.navigate(['/inscripciones'], {
+          queryParams: { tipo: formValue.tipo },
+        });
       });
     }
   }

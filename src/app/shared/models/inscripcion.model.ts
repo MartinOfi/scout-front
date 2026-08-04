@@ -72,6 +72,7 @@ export interface CreateInscripcionDto {
   montoPagado?: number;
   montoConSaldoPersonal?: number;
   medioPago?: MedioPago;
+  montoBonificado?: number;
   declaracionDeSalud?: boolean;
   autorizacionDeImagen?: boolean;
   salidasCercanas?: boolean;
