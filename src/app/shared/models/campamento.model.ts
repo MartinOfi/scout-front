@@ -186,6 +186,9 @@ export interface PagoParticipanteDto {
   fecha: Date;
   monto: number;
   medioPago: MedioPago;
+  tipo: TipoMovimiento;
+  /** campamento_pago = pago real; bonificacion_* = movimientos de la bonificación (no suman a totalPagado) */
+  concepto: ConceptoMovimiento;
 }
 
 /**

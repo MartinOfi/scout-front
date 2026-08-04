@@ -29,6 +29,7 @@ describe('BonificarParticipanteDialogComponent', () => {
     participanteNombre: 'Martín',
     montoAsignado: 10000,
     montoBonificadoActual: 0,
+    totalPagado: 0,
   };
 
   function setup(data: BonificarParticipanteDialogData = baseData): void {
@@ -99,6 +100,28 @@ describe('BonificarParticipanteDialogComponent', () => {
     setup();
     component.onBonificarTodo();
     expect(component.form.value.monto).toBe(10000);
+  });
+
+  it('rechaza confirmar si el monto excede el saldo pendiente cuando ya hay un pago parcial', () => {
+    // $10.000 asignados, $2.000 ya pagados: sólo $8.000 son bonificables.
+    setup({ ...baseData, totalPagado: 2000 });
+    component.form.patchValue({ monto: 8001 });
+    expect(component.maxBonificable).toBe(8000);
+    expect(component.excedeAsignado).toBe(true);
+    expect(component.puedeConfirmar).toBe(false);
+  });
+
+  it('permite confirmar exactamente el saldo pendiente cuando ya hay un pago parcial', () => {
+    setup({ ...baseData, totalPagado: 2000 });
+    component.form.patchValue({ monto: 8000 });
+    expect(component.excedeAsignado).toBe(false);
+    expect(component.puedeConfirmar).toBe(true);
+  });
+
+  it('onBonificarTodo fija el monto al saldo pendiente, no al total asignado, cuando ya hay un pago parcial', () => {
+    setup({ ...baseData, totalPagado: 2000 });
+    component.onBonificarTodo();
+    expect(component.form.value.monto).toBe(8000);
   });
 
   it('onConfirmar cierra el diálogo con el monto ingresado', () => {

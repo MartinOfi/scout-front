@@ -24,6 +24,8 @@ export interface BonificarParticipanteDialogData {
   participanteNombre: string;
   montoAsignado: number;
   montoBonificadoActual: number;
+  /** Ya pagado en efectivo/transferencia — no bonificable de nuevo. */
+  totalPagado: number;
 }
 
 /**
@@ -76,6 +78,11 @@ export class BonificarParticipanteDialogComponent {
     return Number(this.form.value.monto) || 0;
   }
 
+  /** Lo ya pagado no puede volver a cubrirse con una bonificación. */
+  get maxBonificable(): number {
+    return Math.max(0, this.data.montoAsignado - this.data.totalPagado);
+  }
+
   /** Ajustar de 5.000 a 6.000 sólo necesita 1.000 nuevos en el fondo, no 6.000. */
   get montoAdicional(): number {
     return Math.max(0, this.montoIngresado - this.data.montoBonificadoActual);
@@ -86,7 +93,7 @@ export class BonificarParticipanteDialogComponent {
   }
 
   get excedeAsignado(): boolean {
-    return this.montoIngresado > this.data.montoAsignado;
+    return this.montoIngresado > this.maxBonificable;
   }
 
   get puedeConfirmar(): boolean {
@@ -94,7 +101,7 @@ export class BonificarParticipanteDialogComponent {
   }
 
   onBonificarTodo(): void {
-    this.form.patchValue({ monto: this.data.montoAsignado });
+    this.form.patchValue({ monto: this.maxBonificable });
   }
 
   onConfirmar(): void {
