@@ -162,7 +162,11 @@
                     placeholder="0"
                   />
                 </div>
-                <span class="amount-card__hint">Opcional</span>
+                @if (saldoFondoInsuficiente) {
+                <span class="amount-card__error">El fondo solidario no tiene saldo suficiente</span>
+                } @else {
+                <span class="amount-card__hint">Fondo Solidario: {{ saldoFondoSolidario() | money }}</span>
+                }
               </div>
             }
           </div>
@@ -331,7 +335,7 @@
         </button>
         <button
           type="submit"
-          [disabled]="inscripcionForm.invalid || loading()"
+          [disabled]="inscripcionForm.invalid || loading() || (!isEditing && saldoFondoInsuficiente)"
         >
           {{ isEditing ? 'Guardar cambios' : 'Crear inscripción' }}
         </button>

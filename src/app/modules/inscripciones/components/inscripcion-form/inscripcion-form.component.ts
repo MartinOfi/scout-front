@@ -29,6 +29,7 @@ import { Subscription } from 'rxjs';
 import { InscripcionesStateService } from '../../services/inscripciones-state.service';
 import { PersonasStateService } from '../../../personas/services/personas-state.service';
 import { CajasApiService } from '../../../cajas/services/cajas-api.service';
+import { CajasStateService } from '../../../cajas/services/cajas-state.service';
 import {
   CreateInscripcionDto,
   UpdateInscripcionDto,
@@ -83,6 +84,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
   private readonly state: InscripcionesStateService = inject(InscripcionesStateService);
   private readonly personasState: PersonasStateService = inject(PersonasStateService);
   private readonly cajasApi = inject(CajasApiService);
+  private readonly cajasState = inject(CajasStateService);
   private readonly configService = inject(ConfiguracionService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -117,6 +119,9 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
   /** Saldo de cuenta personal de la persona seleccionada */
   readonly saldoCuentaPersonal: WritableSignal<number> = signal(0);
   readonly loadingSaldo: WritableSignal<boolean> = signal(false);
+
+  /** Saldo disponible del fondo solidario (para bonificar al crear) */
+  readonly saldoFondoSolidario = this.cajasState.saldoFondoSolidario;
 
   /** Validation error message for amounts exceeding total */
   readonly montosExcedenTotal: WritableSignal<boolean> = signal(false);
@@ -206,7 +211,14 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
         this.currentTipo.set(tipoParam);
       }
       this.setMontoFromConfig();
+      this.cajasState.loadFondoSolidario();
     }
+  }
+
+  /** El monto a bonificar ingresado supera el saldo disponible del fondo solidario */
+  get saldoFondoInsuficiente(): boolean {
+    const montoBonificado = Number(this.inscripcionForm.get('montoBonificado')?.value) || 0;
+    return montoBonificado > this.saldoFondoSolidario();
   }
 
   /**
@@ -311,7 +323,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    if (this.inscripcionForm.invalid) {
+    if (this.inscripcionForm.invalid || (!this.isEditing && this.saldoFondoInsuficiente)) {
       return;
     }
 
