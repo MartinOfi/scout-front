@@ -25,6 +25,8 @@ export interface Campamento {
   fechaInicio: Date;
   fechaFin: Date;
   costoPorPersona: number;
+  /** Aporte esperado de educadores. 0 = quedan exentos. */
+  costoEducadores: number;
   cuotasBase?: number; // Suggested number of payments
   participantes?: Persona[];
   createdAt: Date;
@@ -74,6 +76,8 @@ export interface CreateCampamentoDto {
   fechaInicio: string; // ISO date string
   fechaFin: string; // ISO date string
   costoPorPersona: number;
+  /** Aporte esperado de educadores. 0 = quedan exentos. */
+  costoEducadores?: number;
   cuotasBase?: number;
 }
 
@@ -86,6 +90,8 @@ export interface UpdateCampamentoDto {
   fechaInicio?: string;
   fechaFin?: string;
   costoPorPersona?: number;
+  /** Aporte esperado de educadores. 0 = quedan exentos. */
+  costoEducadores?: number;
   cuotasBase?: number;
 }
 
@@ -167,6 +173,7 @@ export interface CampamentoInfoDto {
   fechaInicio: Date;
   fechaFin: Date;
   costoPorPersona: number;
+  costoEducadores: number;
   cuotasBase: number;
   descripcion?: string;
 }
@@ -179,6 +186,9 @@ export interface PagoParticipanteDto {
   fecha: Date;
   monto: number;
   medioPago: MedioPago;
+  tipo: TipoMovimiento;
+  /** campamento_pago = pago real; bonificacion_* = movimientos de la bonificación (no suman a totalPagado) */
+  concepto: ConceptoMovimiento;
 }
 
 /**
@@ -189,7 +199,10 @@ export interface ParticipantePagoDto {
   nombre: string;
   tipo: PersonaType;
   rama?: Rama;
-  costoPorPersona: number;
+  /** Snapshot copiado al agregar al participante */
+  montoAsignado: number;
+  /** Monto cubierto por el fondo solidario */
+  montoBonificado: number;
   totalPagado: number;
   saldoPendiente: number;
   estadoPago: EstadoPagoCampamento;
@@ -221,6 +234,7 @@ export interface MovimientoCampamentoDto {
 export interface CampamentoKpisDto {
   totalARecaudar: number;
   totalRecaudado: number;
+  totalBonificado: number;
   totalGastado: number;
   totalPendienteReembolso: number;
   balance: number;
@@ -229,6 +243,7 @@ export interface CampamentoKpisDto {
   participantesPagadosCompleto: number;
   participantesPagadosParcial: number;
   participantesPendientes: number;
+  participantesExentos: number;
 }
 
 /**

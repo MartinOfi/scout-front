@@ -137,15 +137,22 @@
               <div class="participante-card__info">
                 <h3 class="participante-card__name">{{ participante.nombre }}</h3>
                 <div class="participante-card__progress">
-                  <span class="participante-card__paid">{{ participante.totalPagado | money }}</span>
+                  <span class="participante-card__paid">{{ (participante.totalPagado + participante.montoBonificado) | money }}</span>
                   <span class="participante-card__separator">/</span>
-                  <span class="participante-card__total">{{ participante.costoPorPersona | money }}</span>
+                  <span class="participante-card__total">{{ participante.montoAsignado | money }}</span>
                 </div>
+                @if (participante.estadoPago !== EstadoPagoCampamento.EXENTO && participante.montoBonificado > 0) {
+                <span class="participante-card__bonificado">
+                  Bonificado: {{ participante.montoBonificado | money }}
+                </span>
+                }
               </div>
               <div class="participante-card__status"
                 [class.participante-card__status--complete]="participante.saldoPendiente === 0"
                 [class.participante-card__status--pending]="participante.saldoPendiente > 0">
-                @if (participante.saldoPendiente === 0) {
+                @if (participante.estadoPago === EstadoPagoCampamento.EXENTO) {
+                <span class="participante-card__chip participante-card__chip--exento">Exento</span>
+                } @else if (participante.saldoPendiente === 0) {
                 <mat-icon>check_circle</mat-icon>
                 <span>Al día</span>
                 } @else {
@@ -173,26 +180,43 @@
             @if (participante.pagos.length > 0) {
             <div class="participante-card__payments">
               @for (pago of participante.pagos; track pago.movimientoId) {
-              <div class="payment-row">
+              <div class="payment-row" [class.payment-row--egreso]="pago.tipo === 'egreso'">
                 <span class="payment-row__date">{{ pago.fecha | date:'d/M' }}</span>
-                <span class="payment-row__amount">{{ pago.monto | money}}</span>
+                <span class="payment-row__amount" [class.payment-row__amount--egreso]="pago.tipo === 'egreso'">
+                  @if (pago.tipo === 'egreso') { - }{{ pago.monto | money}}
+                </span>
+                <span class="payment-row__concepto">{{ conceptoLabel(pago.concepto) }}</span>
                 <span class="payment-row__method">{{ pago.medioPago }}</span>
+                @if (esPagoEditable(pago)) {
                 <button class="payment-row__edit unstyled" (click)="onEditPago(participante, pago)"
                   aria-label="Editar pago">
                   <mat-icon>edit</mat-icon>
                 </button>
+                }
               </div>
               }
             </div>
             }
 
             <!-- Add Payment Action -->
-            @if (participante.saldoPendiente > 0) {
-            <button class="participante-card__action" (click)="onRegistrarPago(participante)">
-              <mat-icon>add</mat-icon>
-              Registrar pago
-            </button>
-            }
+            <div class="participante-card__actions">
+              @if (participante.saldoPendiente > 0) {
+              <app-button size="sm" variant="secondary" icon="add" (clicked)="onRegistrarPago(participante)">
+                Registrar pago
+              </app-button>
+              }
+              @if (participante.estadoPago !== EstadoPagoCampamento.EXENTO) {
+              <app-button size="sm" variant="outline" icon="volunteer_activism" (clicked)="onBonificar(participante)">
+                {{ participante.montoBonificado > 0 ? 'Ajustar bonificación' : 'Bonificar' }}
+              </app-button>
+              }
+              @if (participante.montoBonificado > 0) {
+              <app-button size="sm" variant="ghost" icon="remove_circle_outline"
+                (clicked)="onQuitarBonificacion(participante)">
+                Quitar bonificación
+              </app-button>
+              }
+            </div>
           </article>
           }
         </div>

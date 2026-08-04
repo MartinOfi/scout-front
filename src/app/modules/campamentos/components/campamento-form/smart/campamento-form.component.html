@@ -111,6 +111,27 @@
             </app-form-field>
           </div>
 
+          <!-- Costo Educadores -->
+          <app-form-field
+            label="Aporte de Educadores"
+            [forId]="'costo-educadores-input'"
+            [required]="true"
+            [invalid]="!!(form.get('costoEducadores')?.invalid && form.get('costoEducadores')?.touched)"
+            hint="$0 = los educadores quedan exentos y no se les registran pagos ni bonificaciones. Si ponés un monto, cada educador que no aporte consume ese monto del fondo solidario al bonificarlo — dejalo en 0 salvo que se espere cobrarles."
+          >
+            <div class="input-with-prefix">
+              <span class="input-prefix">$</span>
+              <app-number-field
+                id="costo-educadores-input"
+                formControlName="costoEducadores"
+                [min]="0"
+                [step]="0.01"
+                placeholder="0.00"
+              />
+            </div>
+            <span error>El aporte de educadores no puede ser negativo</span>
+          </app-form-field>
+
           <!-- Descripción -->
           <app-form-field
             label="Descripción"

@@ -29,6 +29,7 @@ import { Subscription } from 'rxjs';
 import { InscripcionesStateService } from '../../services/inscripciones-state.service';
 import { PersonasStateService } from '../../../personas/services/personas-state.service';
 import { CajasApiService } from '../../../cajas/services/cajas-api.service';
+import { CajasStateService } from '../../../cajas/services/cajas-state.service';
 import {
   CreateInscripcionDto,
   UpdateInscripcionDto,
@@ -83,6 +84,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
   private readonly state: InscripcionesStateService = inject(InscripcionesStateService);
   private readonly personasState: PersonasStateService = inject(PersonasStateService);
   private readonly cajasApi = inject(CajasApiService);
+  private readonly cajasState = inject(CajasStateService);
   private readonly configService = inject(ConfiguracionService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -118,6 +120,9 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
   readonly saldoCuentaPersonal: WritableSignal<number> = signal(0);
   readonly loadingSaldo: WritableSignal<boolean> = signal(false);
 
+  /** Saldo disponible del fondo solidario (para bonificar al crear) */
+  readonly saldoFondoSolidario = this.cajasState.saldoFondoSolidario;
+
   /** Validation error message for amounts exceeding total */
   readonly montosExcedenTotal: WritableSignal<boolean> = signal(false);
 
@@ -134,9 +139,9 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
         [Validators.required, Validators.min(2000), Validators.max(2100)],
       ],
       montoTotal: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
-      montoBonificado: [0, [Validators.min(0)]],
       montoPagado: [0, [Validators.min(0)]],
       montoConSaldoPersonal: [0, [Validators.min(0)]],
+      montoBonificado: [0, [Validators.min(0)]],
       medioPago: [MedioPagoEnum.EFECTIVO],
       declaracionDeSalud: [false],
       autorizacionDeImagen: [false],
@@ -206,7 +211,14 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
         this.currentTipo.set(tipoParam);
       }
       this.setMontoFromConfig();
+      this.cajasState.loadFondoSolidario();
     }
+  }
+
+  /** El monto a bonificar ingresado supera el saldo disponible del fondo solidario */
+  get saldoFondoInsuficiente(): boolean {
+    const montoBonificado = Number(this.inscripcionForm.get('montoBonificado')?.value) || 0;
+    return montoBonificado > this.saldoFondoSolidario();
   }
 
   /**
@@ -230,18 +242,18 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Custom validator: bonificación + pago inicial + saldo personal <= monto total
+   * Custom validator: pago inicial + saldo personal <= monto total
    * La suma de todos los conceptos no puede exceder el monto total de la inscripción
    */
   private validateMontosNoExcedenTotal(group: AbstractControl): ValidationErrors | null {
     const montoTotal = group.get('montoTotal')?.value || 0;
-    const montoBonificado = group.get('montoBonificado')?.value || 0;
     const montoPagado = group.get('montoPagado')?.value || 0;
     const montoConSaldoPersonal = group.get('montoConSaldoPersonal')?.value || 0;
+    const montoBonificado = group.get('montoBonificado')?.value || 0;
 
-    // Validamos que la suma de todos los pagos no exceda el monto total
-    // saldoRestante = montoTotal - montoBonificado - montoPagado - montoConSaldoPersonal >= 0
-    const totalPagos = montoBonificado + montoPagado + montoConSaldoPersonal;
+    // Validamos que la suma de todos los pagos y la bonificación no exceda el monto total
+    // saldoRestante = montoTotal - montoPagado - montoConSaldoPersonal - montoBonificado >= 0
+    const totalPagos = montoPagado + montoConSaldoPersonal + montoBonificado;
 
     if (totalPagos > montoTotal) {
       this.montosExcedenTotal.set(true);
@@ -275,9 +287,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
   usarSaldoDisponible(): void {
     const saldo = this.saldoCuentaPersonal();
     if (saldo > 0) {
-      const montoTotal = this.inscripcionForm.get('montoTotal')?.value || 0;
-      const montoBonificado = this.inscripcionForm.get('montoBonificado')?.value || 0;
-      const montoAPagar = montoTotal - montoBonificado;
+      const montoAPagar = this.inscripcionForm.get('montoTotal')?.value || 0;
       const montoAUsar = Math.min(saldo, montoAPagar);
       this.inscripcionForm.patchValue({
         montoConSaldoPersonal: montoAUsar,
@@ -292,13 +302,12 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
     if (inscripcion) {
       // Update currentTipo for conditional rendering
       this.currentTipo.set(inscripcion.tipo);
-      // In edit mode, only allow editing authorization fields and bonificacion
+      // In edit mode, only allow editing authorization fields
       this.inscripcionForm.patchValue({
         personaId: inscripcion.personaId,
         tipo: inscripcion.tipo,
         ano: inscripcion.ano,
         montoTotal: inscripcion.montoTotal,
-        montoBonificado: inscripcion.montoBonificado,
         declaracionDeSalud: inscripcion.declaracionDeSalud,
         autorizacionDeImagen: inscripcion.autorizacionDeImagen,
         salidasCercanas: inscripcion.salidasCercanas,
@@ -314,7 +323,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    if (this.inscripcionForm.invalid) {
+    if (this.inscripcionForm.invalid || (!this.isEditing && this.saldoFondoInsuficiente)) {
       return;
     }
 
@@ -322,7 +331,6 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
 
     if (this.isEditing && this.inscripcionId) {
       const updateDto: UpdateInscripcionDto = {
-        montoBonificado: formValue.montoBonificado,
         declaracionDeSalud: formValue.declaracionDeSalud,
         autorizacionDeImagen: formValue.autorizacionDeImagen,
         salidasCercanas: formValue.salidasCercanas,
@@ -339,10 +347,10 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
         tipo: formValue.tipo,
         ano: formValue.ano,
         montoTotal: formValue.montoTotal,
-        montoBonificado: formValue.montoBonificado || undefined,
         montoPagado: formValue.montoPagado || undefined,
         montoConSaldoPersonal: formValue.montoConSaldoPersonal || undefined,
         medioPago: hasPago ? formValue.medioPago : undefined,
+        montoBonificado: formValue.montoBonificado || undefined,
         declaracionDeSalud: formValue.declaracionDeSalud || undefined,
         autorizacionDeImagen: formValue.autorizacionDeImagen || undefined,
         salidasCercanas: formValue.salidasCercanas || undefined,

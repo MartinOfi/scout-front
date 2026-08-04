@@ -545,6 +545,24 @@ $section-gap: 20px;
     color: t.$stone-500;
   }
 
+  &__bonificado {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--brand-secondary);
+  }
+
+  &__chip {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+
+    &--exento {
+      background-color: color-mix(in srgb, var(--brand-secondary) 12%, transparent);
+      color: var(--brand-secondary);
+    }
+  }
+
   &__status {
     display: flex;
     align-items: center;
@@ -654,31 +672,13 @@ $section-gap: 20px;
     gap: 4px;
   }
 
-  &__action {
+  &__actions {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
-    gap: 6px;
-    width: 100%;
-    padding: 10px;
-    background-color: t.$stone-50;
-    border: none;
-    border-top: 1px solid t.$stone-100;
-    color: t.$brand-burgundy;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color t.$transition-fast;
-
-    mat-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
-    }
-
-    &:hover {
-      background-color: t.$stone-100;
-    }
+    gap: 8px;
+    padding: 12px 16px 16px;
+    border-top: 1px solid var(--border-default);
   }
 }
 
@@ -688,11 +688,16 @@ $section-gap: 20px;
 
 .payment-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: 8px 12px;
   padding: 8px 12px;
   background-color: t.$stone-50;
   border-radius: 6px;
+
+  &--egreso {
+    background-color: color-mix(in srgb, t.$color-error 8%, t.$stone-50);
+  }
 
   &__date {
     font-size: 12px;
@@ -706,6 +711,15 @@ $section-gap: 20px;
     font-weight: 600;
     color: t.$stone-800;
     font-variant-numeric: tabular-nums;
+
+    &--egreso {
+      color: t.$color-error;
+    }
+  }
+
+  &__concepto {
+    font-size: 11px;
+    color: t.$stone-500;
   }
 
   &__method {

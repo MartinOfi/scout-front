@@ -1,0 +1,77 @@
+<div class="dialog-container">
+
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon>volunteer_activism</mat-icon>
+    Bonificar Participante
+  </h2>
+
+  <mat-dialog-content class="dialog-content">
+    <form [formGroup]="form" class="bonificar-form">
+      <!-- Participant Info -->
+      <div class="participant-info">
+        <div class="avatar">{{ data.participanteNombre[0] }}</div>
+        <div class="info">
+          <span class="name">{{ data.participanteNombre }}</span>
+          <span class="label">Participante</span>
+        </div>
+      </div>
+
+      <!-- Summary Section -->
+      <div class="summary">
+        <div class="summary-item">
+          <span class="label">Monto asignado:</span>
+          <span class="value">{{ data.montoAsignado | money }}</span>
+        </div>
+        @if (data.totalPagado > 0) {
+        <div class="summary-item">
+          <span class="label">Ya pagado:</span>
+          <span class="value">{{ data.totalPagado | money }}</span>
+        </div>
+        }
+        <div class="summary-item highlight">
+          <span class="label">
+            <mat-icon class="inline-icon">savings</mat-icon>
+            Saldo Fondo Solidario:
+          </span>
+          <span class="value" [class.danger]="saldoInsuficiente">{{ saldoFondo() | money }}</span>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- Monto a bonificar -->
+      <div class="form-fields">
+        <app-form-field label="Monto a Bonificar" [forId]="'monto'" [required]="true"
+          [hint]="'Máximo bonificable: ' + (maxBonificable | money)"
+          [invalid]="excedeAsignado || saldoInsuficiente">
+          <div class="input-with-prefix">
+            <span class="input-prefix">$</span>
+            <app-number-field id="monto" formControlName="monto" [min]="0" placeholder="0" />
+          </div>
+          @if (excedeAsignado) {
+          <span error>No puede exceder el saldo pendiente ({{ maxBonificable | money }})</span>
+          }
+          @if (saldoInsuficiente) {
+          <span error>El fondo solidario no tiene saldo suficiente</span>
+          }
+        </app-form-field>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <app-button variant="outline" icon="volunteer_activism" (clicked)="onBonificarTodo()">
+          Bonificar el saldo pendiente ({{ maxBonificable | money }})
+        </app-button>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions" align="end">
+    <app-button variant="secondary" (clicked)="onCancelar()">
+      Cancelar
+    </app-button>
+    <app-button variant="primary" [disabled]="!puedeConfirmar" (clicked)="onConfirmar()">
+      Confirmar
+    </app-button>
+  </mat-dialog-actions>
+</div>

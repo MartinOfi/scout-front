@@ -69,6 +69,7 @@ export class CampamentoFormComponent implements OnInit {
           fechaInicio: campamento.fechaInicio,
           fechaFin: campamento.fechaFin,
           costoPorPersona: campamento.costoPorPersona,
+          costoEducadores: campamento.costoEducadores ?? 0,
           cuotasBase: campamento.cuotasBase ?? 1,
           descripcion: campamento.descripcion ?? '',
         });

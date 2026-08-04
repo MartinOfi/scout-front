@@ -103,6 +103,17 @@
           <span class="payment-breakdown__value payment-breakdown__value--success">{{ d.montoPagado | money }}</span>
         </div>
       </div>
+
+      <div class="payment-breakdown__actions">
+        <app-button variant="outline" icon="volunteer_activism" (clicked)="onBonificar()">
+          {{ d.montoBonificado > 0 ? 'Ajustar bonificación' : 'Bonificar' }}
+        </app-button>
+        @if (d.montoBonificado > 0) {
+        <app-button variant="ghost" icon="remove_circle_outline" (clicked)="onQuitarBonificacion()">
+          Quitar bonificación
+        </app-button>
+        }
+      </div>
     </section>
 
     <!-- Two Column Layout: Timeline + Authorizations -->
@@ -138,13 +149,16 @@
                 <span class="timeline-item__date">{{ mov.fecha | date:'d MMM' }}</span>
               </div>
               <div class="timeline-item__details">
+                <span class="timeline-item__concept">{{ conceptoLabel(mov.concepto) }}</span>
                 <span class="timeline-item__method">{{ medioPagoLabel(mov.medioPago) }}</span>
               </div>
             </div>
+            @if (esPagoEditable(mov)) {
             <button type="button" class="timeline-item__edit unstyled" (click)="onEditPayment(mov)"
               aria-label="Editar pago de {{ mov.monto | money }}">
               <mat-icon>edit</mat-icon>
             </button>
+            }
           </article>
           }
           } @else {

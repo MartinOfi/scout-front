@@ -110,4 +110,13 @@ export class CajasApiService {
       .get<{ saldo: number }>(`${API_CONFIG.ENDPOINTS.CAJAS_PERSONAL_SALDO}/${personaId}/saldo`)
       .pipe(map((res) => res.saldo));
   }
+
+  /**
+   * Get la caja de fondo solidario (o null si todavía no fue creada)
+   * Endpoint: GET /cajas/fondo-solidario
+   * No depende de haber cargado el consolidado antes
+   */
+  getFondoSolidario(): Observable<{ caja: CajaConSaldo | null }> {
+    return this.http.get<{ caja: CajaConSaldo | null }>(API_CONFIG.ENDPOINTS.CAJAS_FONDO_SOLIDARIO);
+  }
 }

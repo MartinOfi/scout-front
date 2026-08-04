@@ -1,0 +1,194 @@
+// ============================================================================
+// Bonificar Inscripcion Dialog
+// Uses shared dialog styles + component-specific styles
+// ============================================================================
+
+@use '../../../../../shared/styles/tokens' as t;
+@use '../../../../../shared/styles/dialog' as dialog;
+@use '../../../../../shared/styles/responsive' as *;
+
+:host {
+  display: block;
+}
+
+:host ::ng-deep {
+  @include dialog.dialog-container-override;
+}
+
+.dialog-container {
+  padding: 1rem;
+}
+
+.dialog-title {
+  @include dialog.dialog-title;
+}
+
+.dialog-content {
+  @include dialog.dialog-content(360px, 420px);
+}
+
+.dialog-actions {
+  @include dialog.dialog-actions;
+  gap: 10px;
+}
+
+.bonificar-form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+  gap: 24px;
+}
+
+.participant-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, t.$stone-50 0%, t.$stone-100 100%);
+  border: 1px solid t.$stone-200;
+  border-radius: t.$radius-xl;
+
+  .avatar {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, t.$brand-burgundy 0%, t.$brand-burgundy-light 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    box-shadow: t.$shadow-card;
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+
+    .name {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: t.$stone-800;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .label {
+      font-size: 0.8125rem;
+      color: t.$stone-500;
+      font-weight: 400;
+    }
+  }
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background: linear-gradient(135deg, t.$stone-50 0%, t.$stone-100 100%);
+  border: 1px solid t.$stone-200;
+  border-radius: t.$radius-xl;
+
+  .summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8125rem;
+      color: t.$stone-500;
+      font-weight: 400;
+
+      .inline-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        color: t.$color-success-dark;
+      }
+    }
+
+    .value {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: t.$stone-800;
+      font-variant-numeric: tabular-nums;
+
+      &.danger {
+        color: t.$color-error;
+      }
+    }
+
+    &.highlight {
+      margin-top: 4px;
+      padding: 8px 12px;
+      background: linear-gradient(135deg, rgba(t.$color-success, 0.08) 0%, rgba(t.$color-success, 0.12) 100%);
+      border: 1px solid rgba(t.$color-success, 0.2);
+      border-radius: t.$radius-default;
+      margin-left: -12px;
+      margin-right: -12px;
+
+      .label {
+        color: t.$stone-600;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid t.$stone-200;
+  margin: 4px 0;
+}
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input-with-prefix {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  .input-prefix {
+    color: t.$stone-500;
+    font-weight: 500;
+    font-size: 0.9375rem;
+  }
+}
+
+.quick-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  button {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  @include respond-to('md') {
+    flex-direction: row;
+
+    button {
+      width: auto;
+      flex: 1;
+    }
+  }
+}

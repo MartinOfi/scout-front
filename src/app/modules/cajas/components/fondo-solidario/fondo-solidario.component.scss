@@ -1,0 +1,50 @@
+@use 'app/shared/styles/responsive' as *;
+
+.fondo-solidario-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.fondo-solidario-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.fondo-solidario-hint {
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.fondo-solidario-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+
+  @include respond-to('md') {
+    flex-direction: row;
+  }
+
+  app-stat-card {
+    flex: 1;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+
+  @include respond-to('md') {
+    flex-direction: row;
+    width: fit-content;
+  }
+}
+
+.loading-state,
+.error-state {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}

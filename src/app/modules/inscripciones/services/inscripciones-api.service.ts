@@ -8,6 +8,7 @@ import {
   UpdateInscripcionDto,
   PagoInscripcionDto,
   UpdatePagoDto,
+  BonificarInscripcionDto,
   TipoDeuda,
   InscripcionesConsolidado,
 } from '../../../shared/models';
@@ -107,7 +108,7 @@ export class InscripcionesApiService {
 
   /**
    * Update an inscripcion (PATCH)
-   * Use to update authorization fields or montoBonificado
+   * Use to update authorization fields
    */
   update(id: string, dto: UpdateInscripcionDto): Observable<Inscripcion> {
     return this.http.patch<Inscripcion, UpdateInscripcionDto>(`${this.endpoint}/${id}`, dto);
@@ -153,5 +154,24 @@ export class InscripcionesApiService {
     return this.http
       .delete<void>(`${this.movimientosEndpoint}/${movimientoId}`)
       .pipe(switchMap(() => this.getById(inscripcionId)));
+  }
+
+  /**
+   * Fijar el monto bonificado, financiado por el fondo solidario
+   * PATCH /api/v1/inscripciones/:id/bonificacion
+   */
+  bonificar(id: string, monto: number): Observable<InscripcionConEstado> {
+    return this.http.patch<InscripcionConEstado, BonificarInscripcionDto>(
+      `${this.endpoint}/${id}/bonificacion`,
+      { monto },
+    );
+  }
+
+  /**
+   * Quitar la bonificación de una inscripción
+   * DELETE /api/v1/inscripciones/:id/bonificacion
+   */
+  quitarBonificacion(id: string): Observable<InscripcionConEstado> {
+    return this.http.delete<InscripcionConEstado>(`${this.endpoint}/${id}/bonificacion`);
   }
 }

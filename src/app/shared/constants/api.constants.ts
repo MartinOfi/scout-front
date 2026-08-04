@@ -30,6 +30,7 @@ export const API_CONFIG = {
     CAJAS_GRUPO: 'cajas/grupo',
     CAJAS_CONSOLIDADO: 'cajas/consolidado',
     CAJAS_PERSONAL_SALDO: 'cajas/personal', // + /:personaId/saldo
+    CAJAS_FONDO_SOLIDARIO: 'cajas/fondo-solidario',
 
     // Movimientos
     MOVIMIENTOS: 'movimientos',

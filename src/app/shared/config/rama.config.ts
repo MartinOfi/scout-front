@@ -56,6 +56,7 @@ export const CAJA_ICONS: Record<CajaType, string> = {
   [CajaType.RAMA_ROVERS]: 'explore',
   [CajaType.GRUPO]: 'account_balance',
   [CajaType.PERSONAL]: 'person',
+  [CajaType.FONDO_SOLIDARIO]: 'volunteer_activism',
 } as const;
 
 /**

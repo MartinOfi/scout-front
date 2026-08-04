@@ -56,6 +56,7 @@ export class CampamentosFormBuilder {
           '',
           [Validators.required, positiveNumberValidator(), decimalValidator(2)],
         ],
+        costoEducadores: [0, [Validators.required, Validators.min(0), decimalValidator(2)]],
         cuotasBase: [1, [Validators.required, Validators.min(1), Validators.max(12)]],
         descripcion: ['', [Validators.maxLength(500), safeTextValidator()]],
       },
@@ -85,6 +86,10 @@ export class CampamentosFormBuilder {
         costoPorPersona: [
           campamento.costoPorPersona,
           [Validators.required, positiveNumberValidator(), decimalValidator(2)],
+        ],
+        costoEducadores: [
+          campamento.costoEducadores ?? 0,
+          [Validators.required, Validators.min(0), decimalValidator(2)],
         ],
         cuotasBase: [
           campamento.cuotasBase ?? 1,
@@ -142,6 +147,7 @@ export class CampamentosFormBuilder {
       fechaInicio: form.value.fechaInicio as string,
       fechaFin: form.value.fechaFin as string,
       costoPorPersona: Number(form.value.costoPorPersona) as number,
+      costoEducadores: Number(form.value.costoEducadores) as number,
       cuotasBase: Number(form.value.cuotasBase) as number,
       descripcion: form.value.descripcion || undefined,
     };
@@ -156,6 +162,7 @@ export class CampamentosFormBuilder {
       fechaInicio: form.value.fechaInicio as string,
       fechaFin: form.value.fechaFin as string,
       costoPorPersona: Number(form.value.costoPorPersona) as number,
+      costoEducadores: Number(form.value.costoEducadores) as number,
       cuotasBase: Number(form.value.cuotasBase) as number,
       descripcion: form.value.descripcion || undefined,
     };

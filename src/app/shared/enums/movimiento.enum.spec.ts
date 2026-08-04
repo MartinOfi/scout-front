@@ -4,8 +4,9 @@ import {
   MEDIO_PAGO_LABELS,
   CONCEPTOS_CREABLES_MANUALMENTE,
   ConceptoMovimiento,
-  CategoriaMovimiento,
   CATEGORIA_MOVIMIENTO_LABELS,
+  CategoriaMovimiento,
+  CONCEPTO_MOVIMIENTO_LABELS,
 } from './movimiento.enum';
 
 describe('MedioPagoEnum', () => {
@@ -45,6 +46,20 @@ describe('CONCEPTOS_CREABLES_MANUALMENTE', () => {
 
   it('debe tener exactamente 2 entradas', () => {
     expect(CONCEPTOS_CREABLES_MANUALMENTE.length).toBe(2);
+  });
+});
+
+describe('ConceptoMovimiento', () => {
+  it('incluye los conceptos de bonificación del fondo solidario', () => {
+    expect(ConceptoMovimiento.BONIFICACION_OTORGADA).toBe('bonificacion_otorgada');
+    expect(ConceptoMovimiento.BONIFICACION_RECIBIDA).toBe('bonificacion_recibida');
+  });
+
+  it('debe tener label para cada concepto (sin esto la tabla de movimientos muestra undefined)', () => {
+    const labels = CONCEPTO_MOVIMIENTO_LABELS as Record<string, string>;
+    for (const concepto of Object.values(ConceptoMovimiento)) {
+      expect(labels[concepto as string]).toBeTruthy();
+    }
   });
 });
 

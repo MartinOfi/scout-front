@@ -22,6 +22,7 @@ import { InscripcionesStateService } from '../../services/inscripciones-state.se
 import { CajasApiService } from '../../../cajas/services/cajas-api.service';
 import { ConfirmDialogService } from '../../../../shared/services';
 import { LoadingSpinnerComponent, EmptyStateComponent } from '../../../../shared';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { MoneyPipe } from '../../../../shared/pipes';
 import {
   InscripcionConEstado,
@@ -35,11 +36,23 @@ import {
   ESTADO_INSCRIPCION_LABELS,
   EstadoInscripcion,
   MedioPago,
+  ConceptoMovimiento,
+  CONCEPTO_MOVIMIENTO_LABELS,
 } from '../../../../shared/enums';
+
+/** Conceptos que representan un pago real editable desde este timeline */
+const CONCEPTOS_PAGO_EDITABLE: ReadonlySet<ConceptoMovimiento> = new Set([
+  ConceptoMovimiento.INSCRIPCION_SCOUT_ARGENTINA,
+  ConceptoMovimiento.INSCRIPCION_GRUPO,
+]);
 import type {
   PagoInscripcionDialogData,
   PagoInscripcionDialogResult,
 } from '../shared/pago-inscripcion-dialog/pago-inscripcion-dialog.component';
+import type {
+  BonificarInscripcionDialogData,
+  BonificarInscripcionDialogResult,
+} from '../shared/bonificar-inscripcion-dialog/bonificar-inscripcion-dialog.component';
 
 /** Mapping for payment method labels */
 const MEDIO_PAGO_LABELS: Record<string, string> = {
@@ -61,6 +74,7 @@ const MEDIO_PAGO_LABELS: Record<string, string> = {
     MatIconModule,
     LoadingSpinnerComponent,
     EmptyStateComponent,
+    ButtonComponent,
   ],
   templateUrl: './inscripcion-detail.component.html',
   styleUrl: './inscripcion-detail.component.scss',
@@ -170,6 +184,21 @@ export class InscripcionDetailComponent implements OnInit {
     return MEDIO_PAGO_LABELS[medioPago] ?? medioPago;
   }
 
+  /** Get human-readable label for a movement's concept */
+  conceptoLabel(concepto: ConceptoMovimiento): string {
+    return CONCEPTO_MOVIMIENTO_LABELS[concepto] ?? concepto;
+  }
+
+  /**
+   * Solo los ingresos reales de la inscripción (efectivo/transferencia/saldo
+   * personal como pago) son editables desde este timeline. Bonificación y
+   * uso de saldo personal son las patas internas de un movimiento linkeado
+   * y se ajustan por su propio flujo, no por edición directa.
+   */
+  esPagoEditable(mov: MovimientoInscripcion): boolean {
+    return mov.tipo === 'ingreso' && CONCEPTOS_PAGO_EDITABLE.has(mov.concepto);
+  }
+
   onEdit(): void {
     const id = this.detail()?.id;
     if (id) {
@@ -191,6 +220,33 @@ export class InscripcionDetailComponent implements OnInit {
 
   onBack(): void {
     this.router.navigate(['/inscripciones']);
+  }
+
+  /** Otorgar o ajustar la bonificación de esta inscripción (fondo solidario) */
+  onBonificar(): void {
+    const d = this.detail();
+    if (!d) return;
+
+    const dialogData: BonificarInscripcionDialogData = {
+      inscripcionId: d.id,
+      personaNombre: d.persona?.nombre ?? 'Sin nombre',
+      montoTotal: d.montoTotal,
+      montoBonificadoActual: d.montoBonificado,
+    };
+
+    this.openBonificarDialog(dialogData)
+      .pipe(switchMap((dialogRef) => dialogRef.afterClosed()))
+      .subscribe((result: BonificarInscripcionDialogResult | undefined) => {
+        if (!result) return;
+        this.state.bonificar(d.id, result.monto).subscribe();
+      });
+  }
+
+  /** Quitar la bonificación de esta inscripción */
+  onQuitarBonificacion(): void {
+    const d = this.detail();
+    if (!d) return;
+    this.state.quitarBonificacion(d.id).subscribe();
   }
 
   onRegisterPayment(): void {
@@ -259,6 +315,22 @@ export class InscripcionDetailComponent implements OnInit {
             disableClose: false,
           });
           return dialogRef;
+        },
+      ),
+    );
+  }
+
+  /** Open bonificar dialog with dynamic import */
+  private openBonificarDialog(dialogData: BonificarInscripcionDialogData) {
+    return from(
+      import('../shared/bonificar-inscripcion-dialog/bonificar-inscripcion-dialog.component').then(
+        ({ BonificarInscripcionDialogComponent }) => {
+          return this.dialog.open(BonificarInscripcionDialogComponent, {
+            width: '480px',
+            maxWidth: '90vw',
+            data: dialogData,
+            disableClose: false,
+          });
         },
       ),
     );

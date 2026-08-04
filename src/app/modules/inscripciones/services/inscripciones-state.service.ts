@@ -203,7 +203,7 @@ export class InscripcionesStateService {
 
   /**
    * Actualizar una inscripción (PATCH)
-   * Use to update authorization fields or montoBonificado
+   * Use to update authorization fields
    */
   update(id: string, dto: UpdateInscripcionDto): Observable<Inscripcion> {
     this._loading.set(true);
@@ -330,6 +330,58 @@ export class InscripcionesStateService {
       }),
       catchError((err: unknown) => {
         this._error.set(this.errorHandler.extractMessage(err, 'Error al eliminar pago'));
+        return throwError(() => err);
+      }),
+      finalize(() => this._loading.set(false)),
+    );
+  }
+
+  /**
+   * Fijar el monto bonificado, financiado por el fondo solidario
+   * PATCH /api/v1/inscripciones/:id/bonificacion
+   */
+  bonificar(id: string, monto: number): Observable<InscripcionConEstado> {
+    this._loading.set(true);
+    this._error.set(null);
+
+    return this.apiService.bonificar(id, monto).pipe(
+      tap((inscripcionConEstado: InscripcionConEstado) => {
+        if (this._selectedId() === id) {
+          this._selectedDetail.set(inscripcionConEstado);
+        }
+        this._inscripciones.update((prev) =>
+          prev.map((i) => (i.id === id ? inscripcionConEstado : i)),
+        );
+        this.notificationService.showSuccess('Bonificación otorgada exitosamente');
+      }),
+      catchError((err: unknown) => {
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al otorgar bonificación'));
+        return throwError(() => err);
+      }),
+      finalize(() => this._loading.set(false)),
+    );
+  }
+
+  /**
+   * Quitar la bonificación de una inscripción
+   * DELETE /api/v1/inscripciones/:id/bonificacion
+   */
+  quitarBonificacion(id: string): Observable<InscripcionConEstado> {
+    this._loading.set(true);
+    this._error.set(null);
+
+    return this.apiService.quitarBonificacion(id).pipe(
+      tap((inscripcionConEstado: InscripcionConEstado) => {
+        if (this._selectedId() === id) {
+          this._selectedDetail.set(inscripcionConEstado);
+        }
+        this._inscripciones.update((prev) =>
+          prev.map((i) => (i.id === id ? inscripcionConEstado : i)),
+        );
+        this.notificationService.showSuccess('Bonificación quitada exitosamente');
+      }),
+      catchError((err: unknown) => {
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al quitar bonificación'));
         return throwError(() => err);
       }),
       finalize(() => this._loading.set(false)),

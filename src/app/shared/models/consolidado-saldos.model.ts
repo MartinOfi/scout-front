@@ -83,6 +83,16 @@ export interface CajaGrupoConsolidado {
 }
 
 /**
+ * Fondo solidario. Su saldo NO es parte de la caja grupo: sólo entra a la
+ * caja grupo en el momento de otorgar una bonificación.
+ */
+export interface FondoSolidarioConsolidado {
+  readonly id: string | null;
+  readonly saldo: number;
+  readonly bonificacionesOtorgadas: number;
+}
+
+/**
  * Full consolidated response from GET /cajas/consolidado
  */
 export interface ConsolidadoSaldosResponse {
@@ -94,4 +104,5 @@ export interface ConsolidadoSaldosResponse {
   readonly reembolsosPendientes: ReembolsosPendientesConsolidado;
   readonly cobrosPendientes: CobrosPendientesConsolidado;
   readonly deudasTotales: DeudasTotalesConsolidado;
+  readonly fondoSolidario: FondoSolidarioConsolidado;
 }

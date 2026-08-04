@@ -103,7 +103,13 @@
               "src/app/modules/eventos/services/eventos-api.service.spec.ts",
               "src/app/core/services/theme.service.spec.ts",
               "src/app/layout/components/theme-toggle/theme-toggle.component.spec.ts",
-              "src/app/modules/campamentos/components/campamento-detail/smart/campamento-detail.component.spec.ts"
+              "src/app/modules/campamentos/components/campamento-detail/smart/campamento-detail.component.spec.ts",
+              "src/app/modules/cajas/services/cajas-state.service.spec.ts",
+              "src/app/modules/cajas/components/fondo-solidario/fondo-solidario.component.spec.ts",
+              "src/app/modules/dashboard/dashboard.component.spec.ts",
+              "src/app/modules/campamentos/components/shared/bonificar-participante-dialog/bonificar-participante-dialog.component.spec.ts",
+              "src/app/modules/inscripciones/components/shared/bonificar-inscripcion-dialog/bonificar-inscripcion-dialog.component.spec.ts",
+              "src/app/shared/components/persona-selector-dialog/persona-selector-dialog.component.spec.ts"
             ]
           }
         }

@@ -58,6 +58,12 @@ export enum ConceptoMovimiento {
 
   // Uso de saldo personal (egreso de cuenta personal)
   USO_SALDO_PERSONAL = 'uso_saldo_personal',
+
+  // Bonificaciones (fondo solidario)
+  /** Egreso del fondo solidario: ayuda otorgada a una persona */
+  BONIFICACION_OTORGADA = 'bonificacion_otorgada',
+  /** Ingreso a la caja grupo: contraparte de la bonificación otorgada */
+  BONIFICACION_RECIBIDA = 'bonificacion_recibida',
 }
 
 /**
@@ -82,6 +88,8 @@ export const CONCEPTO_MOVIMIENTO_LABELS: Record<ConceptoMovimiento, string> = {
   [ConceptoMovimiento.TRANSFERENCIA_SALDO_PERSONAL]: 'Transferencia de Saldo Personal',
   [ConceptoMovimiento.TRANSFERENCIA_ENTRE_CAJAS]: 'Transferencia entre Cajas',
   [ConceptoMovimiento.USO_SALDO_PERSONAL]: 'Uso de Saldo Personal',
+  [ConceptoMovimiento.BONIFICACION_OTORGADA]: 'Bonificación Otorgada',
+  [ConceptoMovimiento.BONIFICACION_RECIBIDA]: 'Bonificación Recibida',
 } as const;
 
 /**

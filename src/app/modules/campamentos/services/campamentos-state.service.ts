@@ -278,6 +278,46 @@ export class CampamentosStateService {
   }
 
   /**
+   * Fijar el monto bonificado de un participante contra el fondo solidario
+   */
+  bonificarParticipante(campamentoId: string, personaId: string, monto: number): Observable<void> {
+    this._loading.set(true);
+    this._error.set(null);
+
+    return this.apiService.bonificarParticipante(campamentoId, personaId, monto).pipe(
+      tap(() => {
+        this.loadDetalle(campamentoId);
+        this.notificationService.showSuccess('Bonificación actualizada exitosamente');
+      }),
+      catchError((err: unknown) => {
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al bonificar participante'));
+        return throwError(() => err);
+      }),
+      finalize(() => this._loading.set(false)),
+    );
+  }
+
+  /**
+   * Quitar la bonificación de un participante
+   */
+  quitarBonificacionParticipante(campamentoId: string, personaId: string): Observable<void> {
+    this._loading.set(true);
+    this._error.set(null);
+
+    return this.apiService.quitarBonificacionParticipante(campamentoId, personaId).pipe(
+      tap(() => {
+        this.loadDetalle(campamentoId);
+        this.notificationService.showSuccess('Bonificación removida exitosamente');
+      }),
+      catchError((err: unknown) => {
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al quitar bonificación'));
+        return throwError(() => err);
+      }),
+      finalize(() => this._loading.set(false)),
+    );
+  }
+
+  /**
    * Registrar un gasto para campamento
    */
   registrarGasto(campamentoId: string, dto: RegistrarGastoCampamentoDto): Observable<void> {

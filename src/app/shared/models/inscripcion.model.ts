@@ -69,10 +69,10 @@ export interface CreateInscripcionDto {
   tipo: TipoInscripcion;
   ano: number;
   montoTotal: number;
-  montoBonificado?: number;
   montoPagado?: number;
   montoConSaldoPersonal?: number;
   medioPago?: MedioPago;
+  montoBonificado?: number;
   declaracionDeSalud?: boolean;
   autorizacionDeImagen?: boolean;
   salidasCercanas?: boolean;
@@ -84,12 +84,19 @@ export interface CreateInscripcionDto {
  * DTO for updating an inscripcion
  */
 export interface UpdateInscripcionDto {
-  montoBonificado?: number;
   declaracionDeSalud?: boolean;
   autorizacionDeImagen?: boolean;
   salidasCercanas?: boolean;
   autorizacionIngreso?: boolean;
   certificadoAptitudFisica?: boolean;
+}
+
+/**
+ * DTO for fijar el monto bonificado de una inscripción (fondo solidario)
+ * PATCH /inscripciones/:id/bonificacion
+ */
+export interface BonificarInscripcionDto {
+  monto: number;
 }
 
 // ============================================================================

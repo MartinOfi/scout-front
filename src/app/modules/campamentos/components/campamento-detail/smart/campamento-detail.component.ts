@@ -55,6 +55,10 @@ import {
   PagoCampamentoDialogResult,
 } from '../../shared/pago-campamento-dialog/pago-campamento-dialog.component';
 import {
+  BonificarParticipanteDialogData,
+  BonificarParticipanteDialogResult,
+} from '../../shared/bonificar-participante-dialog/bonificar-participante-dialog.component';
+import {
   GastoCampamentoDialogData,
   GastoCampamentoDialogResult,
 } from '../../shared/gasto-campamento-dialog/gasto-campamento-dialog.component';
@@ -64,9 +68,22 @@ import {
 } from '../../../../../shared/components/persona-selector-dialog/persona-selector-dialog.component';
 import { AddParticipanteDto } from '../../../../../shared/models';
 import { formatMoney, MoneyPipe } from '../../../../../shared/pipes/money.pipe';
-import { EstadoPago, PersonaType, FiltroMovimientos } from '../../../../../shared/enums';
+import {
+  EstadoPago,
+  EstadoPagoCampamento,
+  PersonaType,
+  FiltroMovimientos,
+  ConceptoMovimiento,
+  CONCEPTO_MOVIMIENTO_LABELS,
+} from '../../../../../shared/enums';
+
+/** Conceptos que representan un pago real editable desde este historial */
+const CONCEPTOS_PAGO_EDITABLE: ReadonlySet<ConceptoMovimiento> = new Set([
+  ConceptoMovimiento.CAMPAMENTO_PAGO,
+]);
 import { FilterValueMap } from '../../../../../shared/components/filters/generic-filters/filter-value.type';
 import { ParticipantesFiltrosComponent } from '../components/participantes-filtros/participantes-filtros.component';
+import { ButtonComponent } from '../../../../../shared/components/button/button.component';
 
 interface KpiConfig {
   readonly icon: string;
@@ -93,12 +110,15 @@ interface KpiConfig {
     MoneyPipe,
     DatePipe,
     ParticipantesFiltrosComponent,
+    ButtonComponent,
   ],
   templateUrl: './campamento-detail.component.html',
   styleUrl: './campamento-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CampamentoDetailComponent implements OnInit {
+  protected readonly EstadoPagoCampamento = EstadoPagoCampamento;
+
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly confirmDialog = inject(ConfirmDialogService);
@@ -260,6 +280,9 @@ export class CampamentoDetailComponent implements OnInit {
       excludeIds: existingIds,
       showRamaFilter: true,
       showAutorizacionField: true,
+      showBonificarField: true,
+      montoBonificableFn: (persona) =>
+        persona.tipo === PersonaType.EDUCADOR ? camp.costoEducadores : camp.costoPorPersona,
       confirmLabel: 'Agregar',
     };
 
@@ -273,7 +296,15 @@ export class CampamentoDetailComponent implements OnInit {
         };
         this.state.addParticipante(camp.id, dto).subscribe({
           next: () => {
-            this.loadCampamento(camp.id);
+            if (result.montoBonificado) {
+              this.state
+                .bonificarParticipante(camp.id, result.persona.id, result.montoBonificado)
+                .subscribe({
+                  next: () => this.loadCampamento(camp.id),
+                });
+            } else {
+              this.loadCampamento(camp.id);
+            }
           },
         });
       });
@@ -293,7 +324,7 @@ export class CampamentoDetailComponent implements OnInit {
             campamentoId: camp.id,
             participanteId: participante.id,
             participanteNombre: participante.nombre,
-            costoPorPersona: participante.costoPorPersona,
+            costoPorPersona: participante.montoAsignado - participante.montoBonificado,
             totalPagado: participante.totalPagado,
             montoPendiente: participante.saldoPendiente,
             saldoCuentaPersonal,
@@ -307,6 +338,19 @@ export class CampamentoDetailComponent implements OnInit {
         if (!result) return;
         this.handleDialogResult(camp.id, participante.id, result);
       });
+  }
+
+  conceptoLabel(concepto: ConceptoMovimiento): string {
+    return CONCEPTO_MOVIMIENTO_LABELS[concepto] ?? concepto;
+  }
+
+  /**
+   * Sólo el pago real de campamento es editable desde este historial.
+   * Bonificación es un movimiento derivado — se ajusta con "Ajustar
+   * bonificación" / "Quitar bonificación", no editando su egreso/ingreso.
+   */
+  esPagoEditable(pago: PagoParticipanteDto): boolean {
+    return CONCEPTOS_PAGO_EDITABLE.has(pago.concepto);
   }
 
   /** Open payment dialog for editing an existing payment */
@@ -323,7 +367,7 @@ export class CampamentoDetailComponent implements OnInit {
             campamentoId: camp.id,
             participanteId: participante.id,
             participanteNombre: participante.nombre,
-            costoPorPersona: participante.costoPorPersona,
+            costoPorPersona: participante.montoAsignado - participante.montoBonificado,
             totalPagado: participante.totalPagado,
             montoPendiente: participante.saldoPendiente,
             saldoCuentaPersonal,
@@ -343,6 +387,39 @@ export class CampamentoDetailComponent implements OnInit {
         if (!result) return;
         this.handleDialogResult(camp.id, participante.id, result);
       });
+  }
+
+  /** Open dialog to bonificar (or ajustar/quitar) a participant against the fondo solidario */
+  onBonificar(participante: ParticipantePagoDto): void {
+    const camp = this.campamento();
+    if (!camp) return;
+
+    const dialogData: BonificarParticipanteDialogData = {
+      campamentoId: camp.id,
+      personaId: participante.id,
+      participanteNombre: participante.nombre,
+      montoAsignado: participante.montoAsignado,
+      montoBonificadoActual: participante.montoBonificado,
+      totalPagado: participante.totalPagado,
+    };
+
+    this.openBonificarDialog(dialogData)
+      .pipe(switchMap((dialogRef) => dialogRef.afterClosed()))
+      .subscribe((result: BonificarParticipanteDialogResult | undefined) => {
+        if (!result) return;
+        if (result.monto === 0) {
+          this.state.quitarBonificacionParticipante(camp.id, participante.id).subscribe();
+        } else {
+          this.state.bonificarParticipante(camp.id, participante.id, result.monto).subscribe();
+        }
+      });
+  }
+
+  /** Quitar la bonificación de este participante */
+  onQuitarBonificacion(participante: ParticipantePagoDto): void {
+    const camp = this.campamento();
+    if (!camp) return;
+    this.state.quitarBonificacionParticipante(camp.id, participante.id).subscribe();
   }
 
   onPagarReembolso(movimiento: MovimientoCardVM): void {
@@ -442,6 +519,21 @@ export class CampamentoDetailComponent implements OnInit {
         ({ PagoCampamentoDialogComponent }) => {
           return this.dialog.open(PagoCampamentoDialogComponent, {
             width: '500px',
+            maxWidth: '90vw',
+            data: dialogData,
+            disableClose: false,
+          });
+        },
+      ),
+    );
+  }
+
+  private openBonificarDialog(dialogData: BonificarParticipanteDialogData) {
+    return from(
+      import('../../shared/bonificar-participante-dialog/bonificar-participante-dialog.component').then(
+        ({ BonificarParticipanteDialogComponent }) => {
+          return this.dialog.open(BonificarParticipanteDialogComponent, {
+            width: '480px',
             maxWidth: '90vw',
             data: dialogData,
             disableClose: false,
