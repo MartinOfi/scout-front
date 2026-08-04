@@ -287,3 +287,30 @@ $card-radius: 12px;
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/* Checkboxes de la carga de ventas (entrega inmediata / queda a cobrar) */
+.venta-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  margin-top: 1rem;
+  cursor: pointer;
+
+  input[type='checkbox'] {
+    margin-top: 0.2rem;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  span {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    line-height: 1.35;
+  }
+
+  small {
+    opacity: 0.7;
+    font-size: 0.8125rem;
+  }
+}

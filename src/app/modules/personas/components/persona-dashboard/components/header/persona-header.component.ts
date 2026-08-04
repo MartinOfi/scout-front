@@ -37,6 +37,7 @@ export class PersonaHeaderComponent {
     [PersonaType.PROTAGONISTA]: 'Protagonista',
     [PersonaType.EDUCADOR]: 'Educador',
     [PersonaType.EXTERNA]: 'Persona Externa',
+    [PersonaType.COLECTIVO]: 'Grupo',
   };
 
   readonly estadoLabels: Record<EstadoPersona, string> = {

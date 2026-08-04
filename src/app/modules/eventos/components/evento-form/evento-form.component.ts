@@ -25,6 +25,8 @@ import {
   DestinoGanancia,
   DESTINO_GANANCIA_LABELS,
   TIPO_EVENTO_LABELS,
+  ModalidadVenta,
+  MODALIDAD_VENTA_LABELS,
 } from '../../../../shared/enums';
 
 // Shared Form Components
@@ -84,6 +86,22 @@ export class EventoFormComponent implements OnInit {
     label: DESTINO_GANANCIA_LABELS[d],
   }));
 
+  readonly modalidadOptions: SelectOption[] = Object.values(ModalidadVenta).map((m) => ({
+    value: m,
+    label: MODALIDAD_VENTA_LABELS[m],
+  }));
+
+  readonly modalidadVenta = ModalidadVenta;
+
+  /**
+   * Con modalidad mixta el destino del evento pasa a ser sólo un default que
+   * nadie usa: cada venta declara el suyo. Ocultamos el selector para no
+   * sugerir que esa elección decide algo.
+   */
+  readonly mostrarDestinoEvento = computed(
+    () => this.form.get('modalidadVenta')?.value !== ModalidadVenta.MIXTA,
+  );
+
   readonly destinoGananciaLabel = computed(() => {
     const evento = this.state.selected();
     if (!evento?.destinoGanancia) return null;
@@ -102,6 +120,7 @@ export class EventoFormComponent implements OnInit {
           fecha: evento.fecha,
           descripcion: evento.descripcion ?? '',
           destinoGanancia: evento.destinoGanancia ?? null,
+          modalidadVenta: evento.modalidadVenta ?? ModalidadVenta.UNICA,
           tipoEvento: evento.tipoEvento ?? '',
         });
         this.formPopulated = true;

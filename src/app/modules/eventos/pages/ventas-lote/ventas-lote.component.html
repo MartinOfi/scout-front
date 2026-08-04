@@ -67,6 +67,44 @@
             />
             <span error>El medio de pago es requerido</span>
           </app-form-field>
+
+          <!-- Destino: sólo en eventos de modalidad mixta -->
+          @if (esMixto()) {
+            <app-form-field
+              label="Destino de la ganancia"
+              hint="Este evento es mixto: cada venta define si su ganancia va a la caja del grupo o a la cuenta personal del vendedor."
+              forId="destino-select"
+              [required]="true"
+            >
+              <app-select-field
+                id="destino-select"
+                formControlName="destinoGanancia"
+                [options]="destinoOptions"
+                [optionValueFn]="getDestinoValue"
+                [optionLabelFn]="getDestinoLabel"
+                placeholder="Seleccioná el destino"
+              />
+            </app-form-field>
+          }
+
+          <label class="venta-check">
+            <input type="checkbox" formControlName="entregaInmediata" />
+            <span>
+              Entregado en el acto
+              <small>Si no, queda como preventa y aparece pendiente de entrega.</small>
+            </span>
+          </label>
+
+          <label class="venta-check">
+            <input type="checkbox" formControlName="quedaACobrar" />
+            <span>
+              Queda a cobrar
+              <small>
+                La venta se registra pero la plata todavía no entró: no suma al saldo de la caja
+                hasta que la marques como cobrada.
+              </small>
+            </span>
+          </label>
         </div>
 
         <!-- Products table -->

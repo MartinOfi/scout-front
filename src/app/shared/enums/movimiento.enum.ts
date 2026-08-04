@@ -113,6 +113,11 @@ export const MEDIO_PAGO_LABELS: Record<MedioPago, string> = {
 export enum EstadoPago {
   PAGADO = 'pagado',
   PENDIENTE_REEMBOLSO = 'pendiente_reembolso',
+  /**
+   * Ingreso registrado cuya plata todavía no entró (ej. pedido por WhatsApp).
+   * Espejo de PENDIENTE_REEMBOLSO: no afecta el saldo de la caja.
+   */
+  PENDIENTE_COBRO = 'pendiente_cobro',
 }
 
 /**
@@ -121,6 +126,7 @@ export enum EstadoPago {
 export const ESTADO_PAGO_LABELS: Record<EstadoPago, string> = {
   [EstadoPago.PAGADO]: 'Pagado',
   [EstadoPago.PENDIENTE_REEMBOLSO]: 'Pendiente de Reembolso',
+  [EstadoPago.PENDIENTE_COBRO]: 'A cobrar',
 } as const;
 
 /**

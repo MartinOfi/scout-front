@@ -3,6 +3,7 @@ import {
   ReporteGrupo,
   ReporteVentaBase,
   ReporteVentaCuentasPersonales,
+  ReporteVentaMixta,
 } from '../../../../shared/models';
 import { PersonaType } from '../../../../shared/enums/persona.enum';
 import { EstadoPago } from '../../../../shared/enums';
@@ -33,6 +34,43 @@ const ACCENT = {
   amarillo: '#fbbf24',
   cyan: '#22d3ee',
 } as const;
+
+/**
+ * KPIs propios del evento mixto: cada destino por separado.
+ *
+ * El neto del grupo ya viene con los egresos descontados y el recupero de
+ * costo sumado; el neto personal es la suma de márgenes sin descuento, porque
+ * los gastos del evento se imputan 100% al grupo.
+ */
+function destinoKpiItems(vm: ReporteVentaMixta): ReporteKpiItem[] {
+  const { cajaGrupo, cuentasPersonales } = vm.porDestino;
+  const items: ReporteKpiItem[] = [
+    {
+      label: 'Neto caja del grupo',
+      value: formatArs(cajaGrupo.neto),
+      sub: `${formatArs(cajaGrupo.recaudado)} recaudados − egresos`,
+      accent: ACCENT.azul,
+    },
+    {
+      label: 'Neto cuentas personales',
+      value: formatArs(cuentasPersonales.neto),
+      sub: `${formatArs(cuentasPersonales.recaudado)} recaudados, sin descuento de gastos`,
+      accent: ACCENT.verde,
+    },
+  ];
+
+  const pendiente = cajaGrupo.pendienteCobro + cuentasPersonales.pendienteCobro;
+  if (pendiente > 0) {
+    items.push({
+      label: 'A cobrar',
+      value: formatArs(pendiente),
+      sub: 'Ventas registradas cuya plata todavía no entró',
+      accent: ACCENT.rojo,
+    });
+  }
+
+  return items;
+}
 
 function ventaKpiItems(vm: ReporteVentaBase): ReporteKpiItem[] {
   const educ = vm.porTipoPersona.find((t) => t.tipo === PersonaType.EDUCADOR)?.vendedores ?? 0;
@@ -195,6 +233,20 @@ export function sectionsFor(vm: ReporteEvento): ReporteSectionDescriptor[] {
           key: 'ganancia-persona',
           component: ReporteGananciaPersonaSection,
           inputs: () => ({ ganancias: cp.gananciaPorPersona }),
+        },
+        ...egresosEIntegridad(vm),
+      ];
+    }
+
+    case 'venta_mixta': {
+      const mx = vm as ReporteVentaMixta;
+      return [
+        ...genericSections(vm, [...ventaKpiItems(mx), ...destinoKpiItems(mx)]),
+        ...ventaSections(mx),
+        {
+          key: 'ganancia-persona',
+          component: ReporteGananciaPersonaSection,
+          inputs: () => ({ ganancias: mx.gananciaPorPersona }),
         },
         ...egresosEIntegridad(vm),
       ];

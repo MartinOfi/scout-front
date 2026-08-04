@@ -27,6 +27,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { EventosStateService } from '../../services/eventos-state.service';
 import { PersonasApiService } from '../../../personas/services/personas-api.service';
 import { Producto, RegisterVentasLoteDto, VentaItemDto } from '../../../../shared/models';
+import {
+  DestinoGanancia,
+  DESTINO_GANANCIA_LABELS,
+  ModalidadVenta,
+  EstadoCobroVenta,
+} from '../../../../shared/enums';
 import { Persona } from '../../../../shared/models';
 import { MedioPagoEnum, MEDIO_PAGO_LABELS } from '../../../../shared/enums/movimiento.enum';
 import { SelectFieldComponent } from '../../../../shared/components/form/select-field/select-field.component';
@@ -71,8 +77,24 @@ export class VentasLoteComponent implements OnInit {
   readonly form: FormGroup = this.fb.group({
     vendedorId: ['', Validators.required],
     medioPago: [MedioPagoEnum.EFECTIVO, Validators.required],
+    // Solo se manda si el evento es mixto; en modalidad única el backend lo
+    // rechaza porque el destino se hereda del evento.
+    destinoGanancia: [DestinoGanancia.CAJA_GRUPO],
+    entregaInmediata: [false],
+    quedaACobrar: [false],
     cantidades: this.fb.record<number>({}),
   });
+
+  /** El evento decide si hay que elegir destino por venta. */
+  readonly esMixto = computed(
+    () => this.state.selected()?.modalidadVenta === ModalidadVenta.MIXTA,
+  );
+
+  readonly destinoOptions: { value: DestinoGanancia; label: string }[] = Object.values(
+    DestinoGanancia,
+  ).map((d) => ({ value: d, label: DESTINO_GANANCIA_LABELS[d] }));
+  readonly getDestinoValue = (o: { value: DestinoGanancia; label: string }): string => o.value;
+  readonly getDestinoLabel = (o: { value: DestinoGanancia; label: string }): string => o.label;
 
   get cantidadesRecord(): FormRecord {
     return this.form.get('cantidades') as FormRecord;
@@ -96,7 +118,9 @@ export class VentasLoteComponent implements OnInit {
     this.state.loadById(id);
     this.state.loadProductos(id);
 
-    this.personasApi.getAll().subscribe((ps) => {
+    // Vendedores elegibles, no getAll(): incluye a los colectivos para poder
+    // cargar "vendió el grupo" sin poner a un miembro de fachada.
+    this.personasApi.getVendedoresElegibles().subscribe((ps) => {
       this.personas.set(ps);
     });
   }
@@ -141,6 +165,15 @@ export class VentasLoteComponent implements OnInit {
       vendedorId: this.form.get('vendedorId')?.value as string,
       medioPago: this.form.get('medioPago')?.value as MedioPagoEnum,
       items,
+      entregaInmediata: this.form.get('entregaInmediata')?.value === true,
+      estadoCobro:
+        this.form.get('quedaACobrar')?.value === true
+          ? EstadoCobroVenta.PENDIENTE
+          : EstadoCobroVenta.COBRADO,
+      // Omitido en modalidad única: mandarlo sería un 400.
+      ...(this.esMixto()
+        ? { destinoGanancia: this.form.get('destinoGanancia')?.value as DestinoGanancia }
+        : {}),
     };
 
     this.submitting.set(true);

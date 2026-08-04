@@ -652,6 +652,70 @@ $section-gap: 20px;
     text-overflow: ellipsis;
   }
 
+  // ===== COBRO PENDIENTE =====
+  // Sólo se renderiza cuando el lote tiene plata sin entrar, así que la fila
+  // no ocupa espacio en el caso normal (venta cobrada).
+
+  &__cobro {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed t.$stone-200;
+  }
+
+  &__cobro-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    // Token de estado, no un color fijo: se adapta a tema claro y oscuro.
+    color: var(--color-warning);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  &__cobrar {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    border: 1px solid t.$stone-300;
+    background: var(--surface-primary);
+    color: t.$stone-700;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 150ms ease, color 150ms ease;
+
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+
+    &:hover:not(:disabled) {
+      border-color: t.$stone-500;
+      color: t.$stone-900;
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: default;
+    }
+  }
+
   &__date {
     flex-shrink: 0;
     font-size: 11px;

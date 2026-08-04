@@ -34,6 +34,15 @@ export class PersonasApiService {
   }
 
   /**
+   * Quiénes pueden figurar como vendedor de una venta de evento: miembros
+   * activos MÁS los colectivos ("Grupo Scout"). Es la única lista donde el
+   * colectivo aparece; getAll() lo excluye por no ser un miembro.
+   */
+  getVendedoresElegibles(): Observable<PersonaUnion[]> {
+    return this.http.get<PersonaUnion[]>(`${this.endpoint}/vendedores-elegibles`);
+  }
+
+  /**
    * Get persona by ID
    */
   getById(id: string): Observable<PersonaUnion> {

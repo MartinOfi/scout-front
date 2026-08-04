@@ -34,3 +34,30 @@ export const DESTINO_GANANCIA_LABELS: Record<DestinoGanancia, string> = {
   [DestinoGanancia.CUENTAS_PERSONALES]: 'Cuentas Personales',
   [DestinoGanancia.CAJA_GRUPO]: 'Caja de Grupo',
 } as const;
+
+/**
+ * Si todas las ventas del evento comparten destino o cada una elige el suyo.
+ *
+ * En MIXTA los gastos siguen siendo únicos para todo el evento y se imputan
+ * 100% al grupo: el neto personal es la suma de márgenes, sin descuento.
+ */
+export enum ModalidadVenta {
+  UNICA = 'unica',
+  MIXTA = 'mixta',
+}
+
+export const MODALIDAD_VENTA_LABELS: Record<ModalidadVenta, string> = {
+  [ModalidadVenta.UNICA]: 'Un solo destino',
+  [ModalidadVenta.MIXTA]: 'Mixta (destino por venta)',
+} as const;
+
+/** Si la plata de la venta ya entró o queda a cobrar. */
+export enum EstadoCobroVenta {
+  COBRADO = 'cobrado',
+  PENDIENTE = 'pendiente',
+}
+
+export const ESTADO_COBRO_VENTA_LABELS: Record<EstadoCobroVenta, string> = {
+  [EstadoCobroVenta.COBRADO]: 'Cobrado',
+  [EstadoCobroVenta.PENDIENTE]: 'A cobrar',
+} as const;

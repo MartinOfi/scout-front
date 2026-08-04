@@ -280,6 +280,10 @@ export class PersonasDashboardComponent implements OnInit {
         return 'educador';
       case PersonaType.EXTERNA:
         return 'persona externa';
+      case PersonaType.COLECTIVO:
+        // No se listan en el dashboard de personas, pero el switch debe ser
+        // exhaustivo para que agregar un tipo nuevo rompa acá y no en runtime.
+        return 'colectivo';
     }
   }
 

@@ -10,6 +10,11 @@ export enum PersonaType {
   PROTAGONISTA = 'protagonista',
   EDUCADOR = 'educador',
   EXTERNA = 'externo',
+  /**
+   * No es una persona: representa al grupo (o a una rama) actuando como
+   * vendedor. Nunca aparece en listados de miembros ni tiene caja personal.
+   */
+  COLECTIVO = 'colectivo',
 }
 
 /**
@@ -19,6 +24,7 @@ export const PERSONA_TYPE_LABELS: Record<PersonaType, string> = {
   [PersonaType.PROTAGONISTA]: 'Protagonista',
   [PersonaType.EDUCADOR]: 'Educador',
   [PersonaType.EXTERNA]: 'Persona Externa',
+  [PersonaType.COLECTIVO]: 'Grupo',
 } as const;
 
 /**

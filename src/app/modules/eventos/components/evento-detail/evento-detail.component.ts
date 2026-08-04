@@ -24,7 +24,12 @@ import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/o
 import { EventosStateService } from '../../services/eventos-state.service';
 import { PersonasApiService } from '../../../personas/services/personas-api.service';
 import { MovimientosApiService } from '../../../movimientos/services/movimientos-api.service';
-import { TipoEvento, DestinoGanancia, EstadoPago } from '../../../../shared/enums';
+import {
+  TipoEvento,
+  DestinoGanancia,
+  EstadoPago,
+  EstadoCobroVenta,
+} from '../../../../shared/enums';
 import {
   EntregaResponse,
   Evento,
@@ -96,6 +101,14 @@ interface VentaGroup {
   fecha: string;
   /** True when the group is a singleton (1 venta) — enables condensed UI. */
   isSingleton: boolean;
+  /**
+   * True cuando la plata del lote todavía no entró.
+   *
+   * Se decide por el lote, no por venta suelta: las ventas del lote comparten
+   * el movimiento agregado, así que el backend las cobra todas juntas. Basta
+   * con que una esté pendiente para que el lote lo esté.
+   */
+  aCobrar: boolean;
 }
 
 interface KpiConfig {
@@ -180,6 +193,11 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
   readonly togglingVisibilidad = signal(false);
   readonly cerrandoEvento = signal(false);
   readonly habilitandoMovimientos = signal(false);
+  /**
+   * Lotes con un cobro en vuelo. Local al componente y no en el state service
+   * porque es puro feedback visual del botón, no estado del dominio.
+   */
+  private readonly _cobrandoIds = signal<ReadonlySet<string>>(new Set());
   readonly personas = signal<Persona[]>([]);
   readonly error = this.state.error;
 
@@ -487,6 +505,37 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Registra el cobro de una venta pendiente. El backend alcanza también a las
+   * hermanas del lote, así que se avisa en la confirmación.
+   */
+  /**
+   * Registra el cobro de un lote pendiente. El backend cobra también las ventas
+   * hermanas, porque comparten el movimiento agregado: cobrar media parte de un
+   * movimiento no existe.
+   */
+  onCobrarVenta(ventaId: string): void {
+    if (this.eventoCerrado() || this._cobrandoIds().has(ventaId)) return;
+
+    this._cobrandoIds.update((prev) => new Set(prev).add(ventaId));
+    this.state.cobrarVenta(this.eventoId, ventaId).subscribe({
+      error: () => this._unmarkCobrando(ventaId),
+      complete: () => this._unmarkCobrando(ventaId),
+    });
+  }
+
+  isGroupCobrando(group: VentaGroup): boolean {
+    return this._cobrandoIds().has(group.primaryVentaId);
+  }
+
+  private _unmarkCobrando(ventaId: string): void {
+    this._cobrandoIds.update((prev) => {
+      const next = new Set(prev);
+      next.delete(ventaId);
+      return next;
+    });
+  }
+
   onDeleteMovimiento(movimientoId: string): void {
     if (this.eventoCerrado()) return;
     this.confirmDialog.confirmDelete('movimiento').subscribe((confirmed: boolean) => {
@@ -665,6 +714,7 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
     for (const venta of ventas) {
       const key = venta.movimientoId ?? `solo:${venta.id}`;
       const item = this._buildVentaItemView(venta);
+      const pendiente = venta.estadoCobro === EstadoCobroVenta.PENDIENTE;
       const existing = groups.get(key);
       if (existing) {
         groups.set(key, {
@@ -673,6 +723,7 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
           totalUnidades: existing.totalUnidades + item.cantidad,
           gananciaTotal: existing.gananciaTotal + item.ganancia,
           isSingleton: false,
+          aCobrar: existing.aCobrar || pendiente,
         });
         continue;
       }
@@ -686,6 +737,7 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
         items: [item],
         fecha: venta.createdAt,
         isSingleton: true,
+        aCobrar: pendiente,
       });
     }
     return Array.from(groups.values());

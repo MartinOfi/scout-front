@@ -24,6 +24,7 @@ import {
   RegistrarIngresoEventoDto,
   RegistrarGastoEventoDto,
   DeleteVentaResponse,
+  CobrarVentaResponse,
   CreateEntregaDto,
   EntregaResponse,
   StockEntregaResponse,
@@ -257,6 +258,25 @@ export class EventosStateService {
         return throwError(() => err);
       }),
       finalize(() => this._unmarkDeleting(ventaId)),
+    );
+  }
+
+  /**
+   * Registra el cobro de una venta pendiente.
+   *
+   * Mismo refresco completo que deleteVenta y por la misma razón: el backend
+   * cobra también las ventas hermanas del lote (comparten el movimiento
+   * agregado), así que un patch optimista sobre la venta clickeada dejaría a
+   * las hermanas mostrando "a cobrar" cuando ya se cobraron. Además cambian
+   * los saldos, porque el movimiento recién ahora impacta en la caja.
+   */
+  cobrarVenta(eventoId: string, ventaId: string): Observable<CobrarVentaResponse> {
+    return this.apiService.cobrarVenta(eventoId, ventaId).pipe(
+      tap(() => this._refreshEventoAfterMutation(eventoId)),
+      catchError((err: unknown) => {
+        this._error.set(this.errorHandler.extractMessage(err, 'Error al registrar el cobro'));
+        return throwError(() => err);
+      }),
     );
   }
 

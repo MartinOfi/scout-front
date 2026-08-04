@@ -16,7 +16,7 @@ import {
   RegistrarGastoEventoDto,
   Evento,
 } from '../../../shared/models';
-import { TipoEvento, DestinoGanancia } from '../../../shared/enums';
+import { TipoEvento, DestinoGanancia, ModalidadVenta } from '../../../shared/enums';
 import { MedioPagoEnum, EstadoPago } from '../../../shared/enums/movimiento.enum';
 
 import {
@@ -29,6 +29,12 @@ import {
  * Default destination for event earnings
  */
 const DEFAULT_DESTINO_GANANCIA = DestinoGanancia.CAJA_GRUPO;
+
+/**
+ * Los eventos arrancan con un solo destino: es el caso habitual y el que no
+ * obliga a decidir nada al cargar cada venta.
+ */
+const DEFAULT_MODALIDAD_VENTA = ModalidadVenta.UNICA;
 
 @Injectable({
   providedIn: 'root',
@@ -58,6 +64,7 @@ export class EventosFormBuilder {
       fecha: ['', [Validators.required]],
       descripcion: ['', [Validators.maxLength(500), safeTextValidator()]],
       destinoGanancia: [DEFAULT_DESTINO_GANANCIA],
+      modalidadVenta: [DEFAULT_MODALIDAD_VENTA],
       tipoEvento: ['', [Validators.maxLength(50), safeTextValidator()]],
     });
   }
@@ -80,6 +87,7 @@ export class EventosFormBuilder {
       fecha: [evento.fecha],
       descripcion: [evento.descripcion ?? '', [Validators.maxLength(500), safeTextValidator()]],
       destinoGanancia: [evento.destinoGanancia ?? DestinoGanancia.CAJA_GRUPO],
+      modalidadVenta: [evento.modalidadVenta ?? DEFAULT_MODALIDAD_VENTA],
       tipoEvento: [evento.tipoEvento ?? '', [Validators.maxLength(50), safeTextValidator()]],
     });
   }
@@ -145,6 +153,8 @@ export class EventosFormBuilder {
       descripcion: form.value.descripcion || undefined,
       destinoGanancia:
         tipo === TipoEvento.VENTA ? form.value.destinoGanancia || undefined : undefined,
+      modalidadVenta:
+        tipo === TipoEvento.VENTA ? form.value.modalidadVenta || undefined : undefined,
       tipoEvento: tipo === TipoEvento.GRUPO ? form.value.tipoEvento || undefined : undefined,
     };
   }
@@ -158,6 +168,8 @@ export class EventosFormBuilder {
       descripcion: form.value.descripcion || undefined,
       destinoGanancia:
         tipo === TipoEvento.VENTA ? form.value.destinoGanancia || undefined : undefined,
+      modalidadVenta:
+        tipo === TipoEvento.VENTA ? form.value.modalidadVenta || undefined : undefined,
       tipoEvento: tipo === TipoEvento.GRUPO ? form.value.tipoEvento || undefined : undefined,
     };
   }

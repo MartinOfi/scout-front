@@ -120,6 +120,16 @@ export class CajasStateService {
     return this._consolidado()?.reembolsosPendientes.cantidad ?? 0;
   });
 
+  /** Total de cobros pendientes (ventas cargadas sin cobrar) from consolidado */
+  readonly totalCobrosPendientes = computed((): number => {
+    return this._consolidado()?.cobrosPendientes.total ?? 0;
+  });
+
+  /** Cantidad de cobros pendientes from consolidado */
+  readonly cantidadCobrosPendientes = computed((): number => {
+    return this._consolidado()?.cobrosPendientes.cantidad ?? 0;
+  });
+
   /** Total general (grupo + ramas + personales) from consolidado */
   readonly totalGeneral = computed((): number => {
     return this._consolidado()?.resumen.totalGeneral ?? 0;

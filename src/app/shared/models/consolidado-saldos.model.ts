@@ -40,6 +40,14 @@ export interface ReembolsosPendientesConsolidado {
 }
 
 /**
+ * Summary of pending collections (ventas cargadas cuya plata todavía no entró)
+ */
+export interface CobrosPendientesConsolidado {
+  readonly total: number;
+  readonly cantidad: number;
+}
+
+/**
  * Detail of debt by category
  */
 export interface DeudaCategoriaConsolidado {
@@ -84,5 +92,6 @@ export interface ConsolidadoSaldosResponse {
   readonly fondosRama: FondosRamaConsolidado;
   readonly cuentasPersonales: CuentasPersonalesConsolidado;
   readonly reembolsosPendientes: ReembolsosPendientesConsolidado;
+  readonly cobrosPendientes: CobrosPendientesConsolidado;
   readonly deudasTotales: DeudasTotalesConsolidado;
 }

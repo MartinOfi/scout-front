@@ -204,6 +204,27 @@
                 }
               </header>
 
+              @if (group.aCobrar) {
+              <div class="venta-card__cobro">
+                <span class="venta-card__cobro-badge">
+                  <mat-icon>schedule</mat-icon>
+                  A cobrar
+                </span>
+                @if (!eventoCerrado()) {
+                <button type="button" class="venta-card__cobrar"
+                  [disabled]="isGroupCobrando(group) || isGroupDeleting(group)"
+                  (click)="onCobrarVenta(group.primaryVentaId)">
+                  @if (isGroupCobrando(group)) {
+                  <mat-spinner diameter="14" />
+                  } @else {
+                  <mat-icon>payments</mat-icon>
+                  }
+                  Registrar cobro
+                </button>
+                }
+              </div>
+              }
+
               <ul class="venta-card__items">
                 @for (item of group.items; track item.ventaId) {
                 <li class="venta-card__item">

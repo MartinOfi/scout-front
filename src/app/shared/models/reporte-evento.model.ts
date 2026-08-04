@@ -164,9 +164,36 @@ export interface ReporteVentaCuentasPersonales extends ReporteVentaBase {
   gananciaPorPersona: ReporteGananciaPersona[];
 }
 
+/** Un lado de un evento mixto. */
+export interface ReporteDestinoLado {
+  recaudado: number;
+  ganancia: number;
+  unidades: number;
+  /** Plata registrada que todavía no entró. */
+  pendienteCobro: number;
+  /**
+   * Lo que efectivamente le queda a este destino. Para el grupo descuenta los
+   * egresos del evento y suma el recupero de costo; para las cuentas personales
+   * es la suma de márgenes, sin descuento de gastos.
+   */
+  neto: number;
+}
+
+export interface ReportePorDestino {
+  cajaGrupo: ReporteDestinoLado;
+  cuentasPersonales: ReporteDestinoLado;
+}
+
+export interface ReporteVentaMixta extends ReporteVentaBase {
+  variante: 'venta_mixta';
+  porDestino: ReportePorDestino;
+  gananciaPorPersona: ReporteGananciaPersona[];
+}
+
 export interface ReporteGrupo extends ReporteBase {
   variante: 'grupo';
   ingresosItemizados: ReporteIngresoItem[];
 }
 
-export type ReporteEvento = ReporteVentaCajaGrupo | ReporteVentaCuentasPersonales | ReporteGrupo;
+export type ReporteEvento =
+  ReporteVentaCajaGrupo | ReporteVentaCuentasPersonales | ReporteVentaMixta | ReporteGrupo;

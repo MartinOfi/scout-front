@@ -16,6 +16,7 @@ import {
   RegistrarIngresoEventoDto,
   RegistrarGastoEventoDto,
   DeleteVentaResponse,
+  CobrarVentaResponse,
   CreateEntregaDto,
   EntregaResponse,
   StockEntregaResponse,
@@ -172,6 +173,17 @@ export class EventosApiService {
 
   deleteVenta(eventoId: string, ventaId: string): Observable<DeleteVentaResponse> {
     return this.http.delete<DeleteVentaResponse>(`${this.endpoint}/${eventoId}/ventas/${ventaId}`);
+  }
+
+  /**
+   * Registra el cobro de una venta pendiente. Alcanza a las ventas hermanas del
+   * mismo lote, porque comparten el movimiento agregado.
+   */
+  cobrarVenta(eventoId: string, ventaId: string): Observable<CobrarVentaResponse> {
+    return this.http.post<CobrarVentaResponse, Record<string, never>>(
+      `${this.endpoint}/${eventoId}/ventas/${ventaId}/cobrar`,
+      {},
+    );
   }
 
   // ============================================================================

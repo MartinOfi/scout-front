@@ -165,6 +165,12 @@ export class DashboardComponent implements OnInit {
       value: this.cajasState.totalReembolsosPendientes(),
       variant: 'danger' as const,
     },
+    {
+      icon: 'pending_actions',
+      title: 'Cobros Pendientes',
+      value: this.cajasState.totalCobrosPendientes(),
+      variant: 'primary' as const,
+    },
   ]);
 
   // ============================================================================

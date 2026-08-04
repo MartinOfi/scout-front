@@ -4,7 +4,12 @@
  * Mirrors backend: eventos-implementation-guide.md
  */
 
-import { TipoEvento, DestinoGanancia } from '../enums';
+import {
+  TipoEvento,
+  DestinoGanancia,
+  ModalidadVenta,
+  EstadoCobroVenta,
+} from '../enums';
 import { MedioPagoEnum, EstadoPago } from '../enums/movimiento.enum';
 
 export interface EventoResumenFinanciero {
@@ -24,7 +29,12 @@ export interface Evento {
   fecha: string; // ISO 8601 date (YYYY-MM-DD)
   descripcion: string | null;
   tipo: TipoEvento;
+  /**
+   * Con modalidadVenta UNICA es EL destino de todas las ventas; con MIXTA es
+   * sólo el default y cada venta lleva el suyo.
+   */
   destinoGanancia: DestinoGanancia | null; // Only for TipoEvento.VENTA
+  modalidadVenta: ModalidadVenta;
   tipoEvento: string | null; // Only for TipoEvento.GRUPO (e.g. "Kermesse")
   reportePublico: boolean; // Si el reporte es visible sin login
   productos: Producto[];
@@ -71,6 +81,10 @@ export interface VentaProducto {
   productoId: string;
   vendedorId: string;
   cantidad: number;
+  /** Destino del margen de ESTA venta (en un evento mixto varía por venta). */
+  destinoGanancia: DestinoGanancia;
+  /** Si la plata entró. PENDIENTE no mueve el saldo de la caja. */
+  estadoCobro: EstadoCobroVenta;
   /**
    * ID of the income Movimiento generated when this venta was registered.
    * Many ventas (a lote) can share the same movimientoId.
@@ -164,6 +178,7 @@ export interface CreateEventoDto {
   descripcion?: string;
   tipo: TipoEvento;
   destinoGanancia?: DestinoGanancia; // Required if tipo === VENTA
+  modalidadVenta?: ModalidadVenta; // Default UNICA
   tipoEvento?: string; // Max 50 chars. Only for tipo === GRUPO
 }
 
@@ -176,6 +191,7 @@ export interface UpdateEventoDto {
   descripcion?: string;
   tipo?: TipoEvento;
   destinoGanancia?: DestinoGanancia;
+  modalidadVenta?: ModalidadVenta;
   tipoEvento?: string;
   reportePublico?: boolean;
 }
@@ -223,9 +239,25 @@ export interface VentaItemDto {
  * Backend: POST /eventos/:id/ventas/lote
  */
 export interface RegisterVentasLoteDto {
+  /** Puede ser un COLECTIVO ("Grupo Scout") cuando vendió el grupo. */
   vendedorId: string;
   medioPago: MedioPagoEnum;
   items: VentaItemDto[];
+  /** Quién responde por la plata. Default: el vendedor. */
+  responsableId?: string;
+  /** Obligatorio si el evento es MIXTA; prohibido si es UNICA. */
+  destinoGanancia?: DestinoGanancia;
+  /** Default COBRADO. PENDIENTE registra la venta sin que haya entrado la plata. */
+  estadoCobro?: EstadoCobroVenta;
+  /** true crea la entrega junto con la venta: el stock pendiente queda en 0. */
+  entregaInmediata?: boolean;
+}
+
+/** Respuesta de POST /eventos/:eventoId/ventas/:ventaId/cobrar */
+export interface CobrarVentaResponse {
+  ventaId: string;
+  hermanasCobradas: number;
+  movimientosActualizados: string[];
 }
 
 /**
