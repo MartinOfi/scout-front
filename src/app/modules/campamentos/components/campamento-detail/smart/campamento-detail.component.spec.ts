@@ -221,6 +221,39 @@ describe('CampamentoDetailComponent', () => {
     expect(fixture.nativeElement.textContent).not.toContain('Exento');
   });
 
+  it('el progreso de pago suma totalPagado + montoBonificado, no solo lo efectivamente pagado', () => {
+    mockState.detalleInfo.set({
+      id: 'camp-1',
+      nombre: 'Campamento Verano',
+      fechaInicio: new Date('2026-01-15'),
+      fechaFin: new Date('2026-01-20'),
+      costoPorPersona: 10000,
+      costoEducadores: 0,
+      cuotasBase: 3,
+    });
+    mockState.detalleParticipantes.set([
+      {
+        id: 'prota-1',
+        nombre: 'Ramirez, Juan Pablo',
+        tipo: PersonaType.PROTAGONISTA,
+        montoAsignado: 10000,
+        montoBonificado: 5000,
+        totalPagado: 0,
+        saldoPendiente: 5000,
+        estadoPago: EstadoPagoCampamento.PARCIAL,
+        saldoCuentaPersonal: 0,
+        autorizacionEntregada: false,
+        pagos: [],
+      },
+    ]);
+    fixture.detectChanges();
+
+    const paidEl: HTMLElement | null = fixture.nativeElement.querySelector(
+      '.participante-card__paid',
+    );
+    expect(paidEl?.textContent).toContain('5.000');
+  });
+
   it('onQuitarBonificacion llama a quitarBonificacionParticipante con el campamento y el participante actuales', () => {
     mockState.detalleInfo.set({
       id: 'camp-1',
