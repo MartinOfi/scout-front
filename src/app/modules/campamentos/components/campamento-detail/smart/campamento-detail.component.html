@@ -180,14 +180,19 @@
             @if (participante.pagos.length > 0) {
             <div class="participante-card__payments">
               @for (pago of participante.pagos; track pago.movimientoId) {
-              <div class="payment-row">
+              <div class="payment-row" [class.payment-row--egreso]="pago.tipo === 'egreso'">
                 <span class="payment-row__date">{{ pago.fecha | date:'d/M' }}</span>
-                <span class="payment-row__amount">{{ pago.monto | money}}</span>
+                <span class="payment-row__amount" [class.payment-row__amount--egreso]="pago.tipo === 'egreso'">
+                  @if (pago.tipo === 'egreso') { - }{{ pago.monto | money}}
+                </span>
+                <span class="payment-row__concepto">{{ conceptoLabel(pago.concepto) }}</span>
                 <span class="payment-row__method">{{ pago.medioPago }}</span>
+                @if (esPagoEditable(pago)) {
                 <button class="payment-row__edit unstyled" (click)="onEditPago(participante, pago)"
                   aria-label="Editar pago">
                   <mat-icon>edit</mat-icon>
                 </button>
+                }
               </div>
               }
             </div>
@@ -196,24 +201,20 @@
             <!-- Add Payment Action -->
             <div class="participante-card__actions">
               @if (participante.saldoPendiente > 0) {
-              <button class="participante-card__action" (click)="onRegistrarPago(participante)">
-                <mat-icon>add</mat-icon>
+              <app-button size="sm" variant="secondary" icon="add" (clicked)="onRegistrarPago(participante)">
                 Registrar pago
-              </button>
+              </app-button>
               }
               @if (participante.estadoPago !== EstadoPagoCampamento.EXENTO) {
-              <button class="participante-card__action participante-card__action--bonificar"
-                (click)="onBonificar(participante)">
-                <mat-icon>volunteer_activism</mat-icon>
+              <app-button size="sm" variant="outline" icon="volunteer_activism" (clicked)="onBonificar(participante)">
                 {{ participante.montoBonificado > 0 ? 'Ajustar bonificación' : 'Bonificar' }}
-              </button>
+              </app-button>
               }
               @if (participante.montoBonificado > 0) {
-              <button class="participante-card__action participante-card__action--quitar-bonificacion"
-                (click)="onQuitarBonificacion(participante)">
-                <mat-icon>remove_circle_outline</mat-icon>
+              <app-button size="sm" variant="ghost" icon="remove_circle_outline"
+                (clicked)="onQuitarBonificacion(participante)">
                 Quitar bonificación
-              </button>
+              </app-button>
               }
             </div>
           </article>

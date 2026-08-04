@@ -73,9 +73,17 @@ import {
   EstadoPagoCampamento,
   PersonaType,
   FiltroMovimientos,
+  ConceptoMovimiento,
+  CONCEPTO_MOVIMIENTO_LABELS,
 } from '../../../../../shared/enums';
+
+/** Conceptos que representan un pago real editable desde este historial */
+const CONCEPTOS_PAGO_EDITABLE: ReadonlySet<ConceptoMovimiento> = new Set([
+  ConceptoMovimiento.CAMPAMENTO_PAGO,
+]);
 import { FilterValueMap } from '../../../../../shared/components/filters/generic-filters/filter-value.type';
 import { ParticipantesFiltrosComponent } from '../components/participantes-filtros/participantes-filtros.component';
+import { ButtonComponent } from '../../../../../shared/components/button/button.component';
 
 interface KpiConfig {
   readonly icon: string;
@@ -102,6 +110,7 @@ interface KpiConfig {
     MoneyPipe,
     DatePipe,
     ParticipantesFiltrosComponent,
+    ButtonComponent,
   ],
   templateUrl: './campamento-detail.component.html',
   styleUrl: './campamento-detail.component.scss',
@@ -331,6 +340,19 @@ export class CampamentoDetailComponent implements OnInit {
       });
   }
 
+  conceptoLabel(concepto: ConceptoMovimiento): string {
+    return CONCEPTO_MOVIMIENTO_LABELS[concepto] ?? concepto;
+  }
+
+  /**
+   * Sólo el pago real de campamento es editable desde este historial.
+   * Bonificación es un movimiento derivado — se ajusta con "Ajustar
+   * bonificación" / "Quitar bonificación", no editando su egreso/ingreso.
+   */
+  esPagoEditable(pago: PagoParticipanteDto): boolean {
+    return CONCEPTOS_PAGO_EDITABLE.has(pago.concepto);
+  }
+
   /** Open payment dialog for editing an existing payment */
   onEditPago(participante: ParticipantePagoDto, pago: PagoParticipanteDto): void {
     const camp = this.campamento();
@@ -378,6 +400,7 @@ export class CampamentoDetailComponent implements OnInit {
       participanteNombre: participante.nombre,
       montoAsignado: participante.montoAsignado,
       montoBonificadoActual: participante.montoBonificado,
+      totalPagado: participante.totalPagado,
     };
 
     this.openBonificarDialog(dialogData)

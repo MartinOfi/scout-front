@@ -24,7 +24,13 @@ import {
   CampamentoKpisDto,
   MovimientoCampamentoDto,
 } from '../../../../../shared/models';
-import { EstadoPagoCampamento, PersonaType } from '../../../../../shared/enums';
+import {
+  EstadoPagoCampamento,
+  PersonaType,
+  ConceptoMovimiento,
+  TipoMovimientoEnum,
+  MedioPagoEnum,
+} from '../../../../../shared/enums';
 
 interface MockStateService {
   detalleInfo: WritableSignal<CampamentoInfoDto | null>;
@@ -284,12 +290,13 @@ describe('CampamentoDetailComponent', () => {
     mockState.detalleParticipantes.set([mockParticipanteBonificado]);
     fixture.detectChanges();
 
-    const quitarBtn: HTMLButtonElement | null = fixture.nativeElement.querySelector(
-      '.participante-card__action--quitar-bonificacion',
+    const appButtons: HTMLElement[] = Array.from(
+      fixture.nativeElement.querySelectorAll('.participante-card__actions app-button'),
     );
+    const quitarBtn = appButtons.find((el) => el.textContent?.includes('Quitar bonificación'));
     expect(quitarBtn).toBeTruthy();
 
-    quitarBtn!.click();
+    quitarBtn!.querySelector('button')!.click();
 
     expect(mockState.quitarBonificacionParticipante).toHaveBeenCalledWith('camp-1', 'edu-2');
   });
@@ -307,10 +314,58 @@ describe('CampamentoDetailComponent', () => {
     mockState.detalleParticipantes.set([{ ...mockParticipanteBonificado, montoBonificado: 0 }]);
     fixture.detectChanges();
 
-    const quitarBtn = fixture.nativeElement.querySelector(
-      '.participante-card__action--quitar-bonificacion',
+    const appButtons: HTMLElement[] = Array.from(
+      fixture.nativeElement.querySelectorAll('.participante-card__actions app-button'),
     );
-    expect(quitarBtn).toBeNull();
+    const quitarBtn = appButtons.find((el) => el.textContent?.includes('Quitar bonificación'));
+    expect(quitarBtn).toBeUndefined();
+  });
+
+  it('muestra los movimientos de bonificación en el historial de pagos, con su concepto y sin botón de editar', () => {
+    mockState.detalleInfo.set({
+      id: 'camp-1',
+      nombre: 'Campamento Verano',
+      fechaInicio: new Date('2026-01-15'),
+      fechaFin: new Date('2026-01-20'),
+      costoPorPersona: 50000,
+      costoEducadores: 0,
+      cuotasBase: 3,
+    });
+    mockState.detalleParticipantes.set([
+      {
+        ...mockParticipanteBonificado,
+        pagos: [
+          {
+            movimientoId: 'mov-pago',
+            fecha: new Date('2026-01-10'),
+            monto: 6000,
+            medioPago: MedioPagoEnum.EFECTIVO,
+            tipo: TipoMovimientoEnum.INGRESO,
+            concepto: ConceptoMovimiento.CAMPAMENTO_PAGO,
+          },
+          {
+            movimientoId: 'mov-bon-otorgada',
+            fecha: new Date('2026-01-11'),
+            monto: 4000,
+            medioPago: MedioPagoEnum.EFECTIVO,
+            tipo: TipoMovimientoEnum.EGRESO,
+            concepto: ConceptoMovimiento.BONIFICACION_OTORGADA,
+          },
+        ],
+      },
+    ]);
+    fixture.detectChanges();
+
+    const rows: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.payment-row'));
+    expect(rows).toHaveLength(2);
+
+    const pagoRow = rows.find((r) => r.textContent?.includes('Pago de Campamento'));
+    const bonRow = rows.find((r) => r.textContent?.includes('Bonificación Otorgada'));
+    expect(pagoRow).toBeTruthy();
+    expect(bonRow).toBeTruthy();
+
+    expect(pagoRow!.querySelector('.payment-row__edit')).toBeTruthy();
+    expect(bonRow!.querySelector('.payment-row__edit')).toBeNull();
   });
 
   describe('onAddParticipante', () => {
