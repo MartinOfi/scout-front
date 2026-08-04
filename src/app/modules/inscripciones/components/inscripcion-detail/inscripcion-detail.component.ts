@@ -36,7 +36,15 @@ import {
   ESTADO_INSCRIPCION_LABELS,
   EstadoInscripcion,
   MedioPago,
+  ConceptoMovimiento,
+  CONCEPTO_MOVIMIENTO_LABELS,
 } from '../../../../shared/enums';
+
+/** Conceptos que representan un pago real editable desde este timeline */
+const CONCEPTOS_PAGO_EDITABLE: ReadonlySet<ConceptoMovimiento> = new Set([
+  ConceptoMovimiento.INSCRIPCION_SCOUT_ARGENTINA,
+  ConceptoMovimiento.INSCRIPCION_GRUPO,
+]);
 import type {
   PagoInscripcionDialogData,
   PagoInscripcionDialogResult,
@@ -174,6 +182,21 @@ export class InscripcionDetailComponent implements OnInit {
   /** Get human-readable label for payment method */
   medioPagoLabel(medioPago: string): string {
     return MEDIO_PAGO_LABELS[medioPago] ?? medioPago;
+  }
+
+  /** Get human-readable label for a movement's concept */
+  conceptoLabel(concepto: ConceptoMovimiento): string {
+    return CONCEPTO_MOVIMIENTO_LABELS[concepto] ?? concepto;
+  }
+
+  /**
+   * Solo los ingresos reales de la inscripción (efectivo/transferencia/saldo
+   * personal como pago) son editables desde este timeline. Bonificación y
+   * uso de saldo personal son las patas internas de un movimiento linkeado
+   * y se ajustan por su propio flujo, no por edición directa.
+   */
+  esPagoEditable(mov: MovimientoInscripcion): boolean {
+    return mov.tipo === 'ingreso' && CONCEPTOS_PAGO_EDITABLE.has(mov.concepto);
   }
 
   onEdit(): void {
