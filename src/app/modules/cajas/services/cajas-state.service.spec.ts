@@ -6,6 +6,8 @@ import { CajasStateService } from './cajas-state.service';
 import { CajasApiService } from './cajas-api.service';
 import { ErrorHandlerService, NotificationService } from '../../../shared/services';
 import { ConsolidadoSaldosResponse } from '../../../shared/models';
+import { ConceptoMovimiento } from '../../../shared/enums';
+import { createMockMovimiento } from '../testing/cajas-test-utils';
 
 interface MockApiService {
   getCajaGrupo: Mock;
@@ -151,6 +153,39 @@ describe('CajasStateService', () => {
       service.loadFondoSolidario();
 
       expect(service.saldoFondoSolidario()).toBe(495000);
+    });
+  });
+
+  describe('loadTransferenciasFondoSolidario / transferenciasFondoSolidario', () => {
+    it('carga y filtra solo las transferencias entrantes (TRANSFERENCIA_ENTRE_CAJAS)', () => {
+      mockApiService.getFondoSolidario.mockReturnValue(
+        of({ caja: { id: 'fondo-id', saldoActual: 500000 } }),
+      );
+      const transferencia = createMockMovimiento({
+        id: 'mov-transferencia',
+        cajaId: 'fondo-id',
+        concepto: ConceptoMovimiento.TRANSFERENCIA_ENTRE_CAJAS,
+      });
+      const bonificacion = createMockMovimiento({
+        id: 'mov-bonificacion',
+        cajaId: 'fondo-id',
+        concepto: ConceptoMovimiento.BONIFICACION_OTORGADA,
+      });
+      mockApiService.getMovimientos.mockReturnValue(of([transferencia, bonificacion]));
+
+      service.loadTransferenciasFondoSolidario();
+
+      expect(mockApiService.getMovimientos).toHaveBeenCalledWith('fondo-id');
+      expect(service.transferenciasFondoSolidario()).toEqual([transferencia]);
+    });
+
+    it('no intenta cargar movimientos cuando el fondo solidario todavia no fue creado', () => {
+      mockApiService.getFondoSolidario.mockReturnValue(of({ caja: null }));
+
+      service.loadTransferenciasFondoSolidario();
+
+      expect(mockApiService.getMovimientos).not.toHaveBeenCalled();
+      expect(service.transferenciasFondoSolidario()).toEqual([]);
     });
   });
 });

@@ -22,7 +22,13 @@ import {
   CreateCajaDto,
 } from '../../../shared/models';
 
-import { Rama, RamaEnum, CajaType, TipoMovimientoEnum } from '../../../shared/enums';
+import {
+  Rama,
+  RamaEnum,
+  CajaType,
+  TipoMovimientoEnum,
+  ConceptoMovimiento,
+} from '../../../shared/enums';
 
 /** Filter type for drawer movimientos */
 export type MovimientoFilterType = 'todos' | 'ingresos' | 'egresos';
@@ -53,6 +59,7 @@ export class CajasStateService {
   private readonly _cajasRama: WritableSignal<Record<string, CajaConSaldo>> = signal({});
   private readonly _cajasPersonales: WritableSignal<CajaConSaldo[]> = signal([]);
   private readonly _movimientosGrupo: WritableSignal<Movimiento[]> = signal([]);
+  private readonly _movimientosFondoSolidario: WritableSignal<Movimiento[]> = signal([]);
   private readonly _movimientosRama: WritableSignal<Record<string, Movimiento[]>> = signal({});
   private readonly _movimientosPersonal: WritableSignal<Record<string, Movimiento[]>> = signal({});
   private readonly _consolidado: WritableSignal<ConsolidadoSaldosResponse | null> = signal(null);
@@ -177,6 +184,17 @@ export class CajasStateService {
     return this._consolidado()?.fondoSolidario.id ?? null;
   });
 
+  /**
+   * Transferencias entrantes al fondo solidario (ingresos con concepto
+   * TRANSFERENCIA_ENTRE_CAJAS), para poder listarlas y eliminarlas.
+   * No incluye las bonificaciones otorgadas (egresos), que son un flujo aparte.
+   */
+  readonly transferenciasFondoSolidario = computed((): Movimiento[] => {
+    return this._movimientosFondoSolidario().filter(
+      (m) => m.concepto === ConceptoMovimiento.TRANSFERENCIA_ENTRE_CAJAS,
+    );
+  });
+
   readonly saldoManada = computed((): number => {
     const caja = this._cajasRama()[RamaEnum.MANADA];
     return caja?.saldoActual ?? 0;
@@ -258,6 +276,44 @@ export class CajasStateService {
         );
       },
     });
+  }
+
+  /**
+   * Cargar las transferencias entrantes al fondo solidario (para listarlas y
+   * poder eliminarlas). Resuelve la caja de fondo solidario primero (por si
+   * todavía no fue cargada) y luego trae sus movimientos.
+   * Endpoints: GET /cajas/fondo-solidario, GET /movimientos/caja/:cajaId
+   */
+  loadTransferenciasFondoSolidario(): void {
+    this._loading.set(true);
+    this._error.set(null);
+
+    this.apiService
+      .getFondoSolidario()
+      .pipe(
+        switchMap(({ caja }) => {
+          if (!caja) {
+            return of([]);
+          }
+          this._fondoSolidarioStandalone.set({ id: caja.id, saldo: caja.saldoActual });
+          return this.apiService.getMovimientos(caja.id);
+        }),
+      )
+      .subscribe({
+        next: (movimientos: Movimiento[]) => {
+          this._movimientosFondoSolidario.set(movimientos);
+          this._loading.set(false);
+        },
+        error: (err: unknown) => {
+          this._error.set(
+            this.errorHandler.extractMessage(
+              err,
+              'Error al cargar las transferencias del fondo solidario',
+            ),
+          );
+          this._loading.set(false);
+        },
+      });
   }
 
   /**
@@ -580,6 +636,7 @@ export class CajasStateService {
     this._movimientosGrupo.set([]);
     this._movimientosRama.set({});
     this._movimientosPersonal.set({});
+    this._movimientosFondoSolidario.set([]);
     this._loading.set(false);
     this._error.set(null);
     this._selectedRama.set(null);

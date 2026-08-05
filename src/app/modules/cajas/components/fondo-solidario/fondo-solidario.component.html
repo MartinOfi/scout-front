@@ -54,4 +54,16 @@
       }
     </div>
   </section>
+
+  @if (cajaFondoSolidarioId()) {
+    <section class="movimientos-section">
+      <h3 class="section-title">Transferencias Recibidas</h3>
+      <app-data-table
+        [data]="$any(transferenciasTableData())"
+        [columns]="transferenciasColumns"
+        [config]="{ showHeader: true, hoverable: true, hidePagination: true }"
+        (actionClick)="onTableAction($event)"
+      />
+    </section>
+  }
 </div>

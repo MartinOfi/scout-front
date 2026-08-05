@@ -95,6 +95,7 @@ export interface MockCajasStateService {
   saldoFondoSolidario: WritableSignal<number>;
   bonificacionesOtorgadas: WritableSignal<number>;
   cajaFondoSolidarioId: WritableSignal<string | null>;
+  transferenciasFondoSolidario: WritableSignal<Movimiento[]>;
   loading: WritableSignal<boolean>;
   error: WritableSignal<string | null>;
   loadCajaGrupo: ReturnType<typeof vi.fn>;
@@ -105,6 +106,7 @@ export interface MockCajasStateService {
   loadMovimientosPersonal: ReturnType<typeof vi.fn>;
   loadConsolidado: ReturnType<typeof vi.fn>;
   loadFondoSolidario: ReturnType<typeof vi.fn>;
+  loadTransferenciasFondoSolidario: ReturnType<typeof vi.fn>;
   selectCaja: ReturnType<typeof vi.fn>;
   create: ReturnType<typeof vi.fn<(dto: unknown) => Observable<Caja>>>;
 }
@@ -132,6 +134,7 @@ export function createMockCajasStateService(): MockCajasStateService {
     saldoFondoSolidario: signal<number>(0),
     bonificacionesOtorgadas: signal<number>(0),
     cajaFondoSolidarioId: signal<string | null>(null),
+    transferenciasFondoSolidario: signal<Movimiento[]>([]),
     loading: signal<boolean>(false),
     error: signal<string | null>(null),
     loadCajaGrupo: vi.fn(),
@@ -142,6 +145,7 @@ export function createMockCajasStateService(): MockCajasStateService {
     loadMovimientosPersonal: vi.fn(),
     loadConsolidado: vi.fn(),
     loadFondoSolidario: vi.fn(),
+    loadTransferenciasFondoSolidario: vi.fn(),
     selectCaja: vi.fn(),
     create: vi.fn(() => of({} as Caja)),
   };
