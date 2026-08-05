@@ -314,3 +314,24 @@ $card-radius: 12px;
     font-size: 0.8125rem;
   }
 }
+
+/* Aviso: agrupación elegida como vendedor con destino cuentas_personales */
+.venta-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border-radius: $card-radius;
+  background: var(--color-danger-subtle);
+  color: var(--color-danger);
+  font-size: 0.875rem;
+  line-height: 1.4;
+
+  mat-icon {
+    flex-shrink: 0;
+    font-size: 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}

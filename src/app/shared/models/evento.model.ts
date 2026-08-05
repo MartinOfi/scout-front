@@ -4,12 +4,7 @@
  * Mirrors backend: eventos-implementation-guide.md
  */
 
-import {
-  TipoEvento,
-  DestinoGanancia,
-  ModalidadVenta,
-  EstadoCobroVenta,
-} from '../enums';
+import { TipoEvento, DestinoGanancia, ModalidadVenta, EstadoCobroVenta } from '../enums';
 import { MedioPagoEnum, EstadoPago } from '../enums/movimiento.enum';
 
 export interface EventoResumenFinanciero {
@@ -239,7 +234,7 @@ export interface VentaItemDto {
  * Backend: POST /eventos/:id/ventas/lote
  */
 export interface RegisterVentasLoteDto {
-  /** Puede ser un COLECTIVO ("Grupo Scout") cuando vendió el grupo. */
+  /** Puede ser una AGRUPACION ("Grupo Scout") cuando vendió el grupo. */
   vendedorId: string;
   medioPago: MedioPagoEnum;
   items: VentaItemDto[];

@@ -36,13 +36,27 @@
             <app-select-field
               id="vendedor-select"
               formControlName="vendedorId"
-              [options]="personas()"
+              [options]="vendedoresDisponibles()"
               [optionValueFn]="getPersonaId"
               [optionLabelFn]="getPersonaLabel"
               placeholder="Seleccioná un vendedor"
             />
             <span error>El vendedor es requerido</span>
           </app-form-field>
+
+          @if (agrupacionConDestinoPersonalInvalido()) {
+            <p class="venta-warning" role="alert">
+              <mat-icon>error_outline</mat-icon>
+              Una agrupación (como "Grupo Scout") no puede tener cuenta personal: su plata siempre
+              va a la caja del grupo.
+              @if (esMixto()) {
+                Elegí "Caja del Grupo" como destino de la ganancia para esta venta.
+              } @else {
+                Este evento tiene destino "Cuentas Personales": cambiálo a "Caja del Grupo" en el
+                evento, o elegí una persona en vez de una agrupación como vendedor.
+              }
+            </p>
+          }
         </div>
 
         <!-- Medio de pago -->
@@ -170,7 +184,9 @@
           <button
             type="submit"
             class="btn btn--primary"
-            [disabled]="submitting() || productos().length === 0"
+            [disabled]="
+              submitting() || productos().length === 0 || agrupacionConDestinoPersonalInvalido()
+            "
           >
             @if (submitting()) {
               <mat-icon class="btn__spinner">sync</mat-icon>

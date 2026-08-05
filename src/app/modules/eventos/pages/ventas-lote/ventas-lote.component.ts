@@ -11,6 +11,7 @@ import {
   inject,
   signal,
   computed,
+  effect,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -22,6 +23,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
 
 import { EventosStateService } from '../../services/eventos-state.service';
@@ -32,6 +34,7 @@ import {
   DESTINO_GANANCIA_LABELS,
   ModalidadVenta,
   EstadoCobroVenta,
+  PersonaType,
 } from '../../../../shared/enums';
 import { Persona } from '../../../../shared/models';
 import { MedioPagoEnum, MEDIO_PAGO_LABELS } from '../../../../shared/enums/movimiento.enum';
@@ -86,8 +89,50 @@ export class VentasLoteComponent implements OnInit {
   });
 
   /** El evento decide si hay que elegir destino por venta. */
-  readonly esMixto = computed(
-    () => this.state.selected()?.modalidadVenta === ModalidadVenta.MIXTA,
+  readonly esMixto = computed(() => this.state.selected()?.modalidadVenta === ModalidadVenta.MIXTA);
+
+  /**
+   * Signal reactivo del form completo. Los FormControls no son signals por sí
+   * solos, así que sin esto los computed de abajo no re-evaluarían cuando el
+   * usuario cambia vendedor o destino.
+   */
+  private readonly formValues = toSignal(this.form.valueChanges, {
+    initialValue: this.form.value as Record<string, unknown>,
+  });
+
+  private readonly vendedorSeleccionado = computed((): Persona | undefined => {
+    const vendedorId = this.formValues()['vendedorId'] as string;
+    return this.personas().find((p) => p.id === vendedorId);
+  });
+
+  /**
+   * En modalidad única el destino lo define el evento (cada venta no elige);
+   * en mixta, lo elige el form. Una agrupación nunca puede tener caja personal
+   * (cajas.service.ts lo rechaza), así que si el destino efectivo termina
+   * siendo cuentas_personales con una agrupación como vendedor, la venta va a
+   * fallar en el backend — lo frenamos acá antes de intentarlo.
+   */
+  private readonly destinoEfectivo = computed((): DestinoGanancia | undefined =>
+    this.esMixto()
+      ? (this.formValues()['destinoGanancia'] as DestinoGanancia)
+      : (this.state.selected()?.destinoGanancia ?? undefined),
+  );
+
+  readonly agrupacionConDestinoPersonalInvalido = computed(
+    () =>
+      this.vendedorSeleccionado()?.tipo === PersonaType.AGRUPACION &&
+      this.destinoEfectivo() === DestinoGanancia.CUENTAS_PERSONALES,
+  );
+
+  /**
+   * Con destino cuentas_personales, las agrupaciones no son una opción
+   * válida de vendedor (no tienen caja personal) — ni siquiera aparecen en
+   * el desplegable, en vez de dejar elegirlas y recién avisar después.
+   */
+  readonly vendedoresDisponibles = computed((): Persona[] =>
+    this.destinoEfectivo() === DestinoGanancia.CUENTAS_PERSONALES
+      ? this.personas().filter((p) => p.tipo !== PersonaType.AGRUPACION)
+      : this.personas(),
   );
 
   readonly destinoOptions: { value: DestinoGanancia; label: string }[] = Object.values(
@@ -110,6 +155,19 @@ export class VentasLoteComponent implements OnInit {
   readonly getMedioPagoValue = (o: { value: MedioPagoEnum; label: string }): string => o.value;
   readonly getMedioPagoLabel = (o: { value: MedioPagoEnum; label: string }): string => o.label;
 
+  constructor() {
+    // En modalidad mixta el destino se elige después del vendedor: si el
+    // usuario ya había elegido una agrupación y cambia el destino a cuentas
+    // personales, esa selección deja de estar en vendedoresDisponibles() y
+    // hay que limpiarla — si no, queda seleccionada "por dentro" sin
+    // aparecer en el desplegable.
+    effect(() => {
+      if (this.agrupacionConDestinoPersonalInvalido()) {
+        this.form.get('vendedorId')?.setValue('');
+      }
+    });
+  }
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) return;
@@ -118,8 +176,8 @@ export class VentasLoteComponent implements OnInit {
     this.state.loadById(id);
     this.state.loadProductos(id);
 
-    // Vendedores elegibles, no getAll(): incluye a los colectivos para poder
-    // cargar "vendió el grupo" sin poner a un miembro de fachada.
+    // Vendedores elegibles, no getAll(): incluye a las agrupaciones para
+    // poder cargar "vendió el grupo" sin poner a un miembro de fachada.
     this.personasApi.getVendedoresElegibles().subscribe((ps) => {
       this.personas.set(ps);
     });
@@ -150,7 +208,7 @@ export class VentasLoteComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.form.invalid) {
+    if (this.form.invalid || this.agrupacionConDestinoPersonalInvalido()) {
       this.form.markAllAsTouched();
       return;
     }

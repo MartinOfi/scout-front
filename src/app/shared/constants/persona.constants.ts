@@ -13,7 +13,7 @@ export const PERSONA_TYPE_ICONS: Readonly<Record<PersonaType, string>> = {
   [PersonaType.PROTAGONISTA]: 'face',
   [PersonaType.EDUCADOR]: 'school',
   [PersonaType.EXTERNA]: 'person_outline',
-  [PersonaType.COLECTIVO]: 'groups',
+  [PersonaType.AGRUPACION]: 'groups',
 } as const;
 
 /**
@@ -23,9 +23,9 @@ export const PERSONA_TYPE_ROUTES: Readonly<Record<PersonaType, string>> = {
   [PersonaType.PROTAGONISTA]: '/personas/protagonistas',
   [PersonaType.EDUCADOR]: '/personas/educadores',
   [PersonaType.EXTERNA]: '/personas/personas-externas',
-  // Un colectivo no es un miembro: no tiene ficha propia. Apunta al listado
+  // Una agrupación no es un miembro: no tiene ficha propia. Apunta al listado
   // para no romper el Record exhaustivo con una ruta inventada.
-  [PersonaType.COLECTIVO]: '/personas',
+  [PersonaType.AGRUPACION]: '/personas',
 } as const;
 
 /**
@@ -35,8 +35,8 @@ export const PERSONA_TYPE_TAB_KEYS: Readonly<Record<PersonaType, string>> = {
   [PersonaType.PROTAGONISTA]: 'protagonistas',
   [PersonaType.EDUCADOR]: 'educadores',
   [PersonaType.EXTERNA]: 'externos',
-  // No tiene solapa propia: los colectivos no se listan entre las personas.
-  [PersonaType.COLECTIVO]: '',
+  // No tiene solapa propia: las agrupaciones no se listan entre las personas.
+  [PersonaType.AGRUPACION]: '',
 } as const;
 
 /**

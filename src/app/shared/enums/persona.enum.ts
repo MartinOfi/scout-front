@@ -14,7 +14,7 @@ export enum PersonaType {
    * No es una persona: representa al grupo (o a una rama) actuando como
    * vendedor. Nunca aparece en listados de miembros ni tiene caja personal.
    */
-  COLECTIVO = 'colectivo',
+  AGRUPACION = 'agrupacion',
 }
 
 /**
@@ -24,7 +24,7 @@ export const PERSONA_TYPE_LABELS: Record<PersonaType, string> = {
   [PersonaType.PROTAGONISTA]: 'Protagonista',
   [PersonaType.EDUCADOR]: 'Educador',
   [PersonaType.EXTERNA]: 'Persona Externa',
-  [PersonaType.COLECTIVO]: 'Grupo',
+  [PersonaType.AGRUPACION]: 'Grupo',
 } as const;
 
 /**
