@@ -1,3 +1,6 @@
+import { PersonaType } from '../../../shared/enums';
+import { TipoDeudaFilter } from '../constants/deuda.constants';
+
 export interface CampamentoDeuda {
   campamentoId: string;
   nombre: string;
@@ -47,6 +50,8 @@ export interface DocInscripcion {
 export interface PersonaDeuda {
   personaId: string;
   nombre: string;
+  /** Define a qué ficha enlaza la fila (protagonista o educador). */
+  tipo: PersonaType;
   rama: string;
   /** Mayor de edad (Educador o Rovers): no entrega DNI de los padres. */
   esMayorDeEdad: boolean;
@@ -60,7 +65,10 @@ export interface PersonaDeuda {
   documentacionInscripcion: DocInscripcion[];
 }
 
+/** Filtros del reporte de deudas. Los tres se resuelven en el backend. */
 export interface DeudaFilters {
+  /** Rama, o `Educadores` para ver solo educadores. */
   rama?: string;
   ano?: number;
+  tipo?: TipoDeudaFilter;
 }

@@ -8,6 +8,7 @@ import {
   DestroyRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -20,7 +21,14 @@ import { FilterConfig } from '../../../../shared/components/filters/generic-filt
 import { FilterType } from '../../../../shared/components/filters/generic-filters/filter-type.enum';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { formatMoney } from '../../../../shared/pipes/money.pipe';
-import { RamaEnum } from '../../../../shared/enums/persona.enum';
+import { PERSONA_TYPE_ROUTES } from '../../../../shared/constants/persona.constants';
+import {
+  DeudaFilterKey,
+  FILTER_ALL,
+  RAMA_FILTER_OPTIONS,
+  TIPO_DEUDA_FILTER_OPTIONS,
+  TipoDeudaFilter,
+} from '../../constants/deuda.constants';
 
 interface DebtCard {
   label: string;
@@ -40,6 +48,7 @@ const YEAR_OPTIONS = Array.from({ length: CURRENT_YEAR - 2019 }, (_, i) => ({
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     MatIconModule,
     MatProgressSpinnerModule,
     MatChipsModule,
@@ -61,16 +70,9 @@ export class ReporteDeudasComponent implements OnInit {
   readonly deudas = signal<PersonaDeuda[]>([]);
   readonly filters = signal<DeudaFilters>({});
   readonly selectedPersonaId = signal<string | null>(null);
-  readonly selectedTipo = signal<string>('');
-
-  readonly displayedDeudas = computed(() => {
-    const tipo = this.selectedTipo();
-    if (!tipo) return this.deudas();
-    return this.deudas().filter((p) => this.hasTipoDeuda(p, tipo));
-  });
 
   readonly summary = computed(() => {
-    const all = this.displayedDeudas();
+    const all = this.deudas();
     const totalDeuda = all.reduce((s, p) => s + p.deudaTotal, 0);
     const docsFaltantes = all.filter((p) => this.hasDocDeuda(p)).length;
     return { personas: all.length, totalDeuda, docsFaltantes };
@@ -78,40 +80,28 @@ export class ReporteDeudasComponent implements OnInit {
 
   readonly filterConfigs: FilterConfig[] = [
     {
-      key: 'rama',
+      key: DeudaFilterKey.RAMA,
       type: FilterType.SELECT,
       label: 'Rama',
       placeholder: 'Todas las ramas',
-      options: [
-        { value: '', label: 'Todas' },
-        { value: RamaEnum.MANADA, label: 'Manada' },
-        { value: RamaEnum.UNIDAD, label: 'Unidad' },
-        { value: RamaEnum.CAMINANTES, label: 'Caminantes' },
-        { value: RamaEnum.ROVERS, label: 'Rovers' },
-      ],
+      options: [...RAMA_FILTER_OPTIONS],
     },
     {
-      key: 'ano',
+      key: DeudaFilterKey.ANO,
       type: FilterType.SELECT,
       label: 'Año',
       placeholder: 'Todos los años',
       options: [
-        { value: '', label: 'Todos los años' },
+        { value: FILTER_ALL, label: 'Todos los años' },
         ...YEAR_OPTIONS.map((o) => ({ value: o.value.toString(), label: o.label })),
       ],
     },
     {
-      key: 'tipo',
+      key: DeudaFilterKey.TIPO,
       type: FilterType.SELECT,
       label: 'Tipo de deuda',
       placeholder: 'Todos los tipos',
-      options: [
-        { value: '', label: 'Todos' },
-        { value: 'campamentos', label: 'Campamentos' },
-        { value: 'inscripcionesScout', label: 'Inscripciones Scout AR' },
-        { value: 'inscripcionesGrupo', label: 'Inscripciones Grupo' },
-        { value: 'documentacion', label: 'Documentación' },
-      ],
+      options: TIPO_DEUDA_FILTER_OPTIONS,
     },
   ];
 
@@ -119,18 +109,29 @@ export class ReporteDeudasComponent implements OnInit {
     this.load();
   }
 
+  /**
+   * Los tres filtros (rama, año y tipo de deuda) se resuelven en el backend:
+   * cada cambio dispara una nueva consulta.
+   */
   onFiltersChanged(raw: Record<string, unknown>): void {
-    this.selectedTipo.set((raw['tipo'] as string) ?? '');
+    const rama = raw[DeudaFilterKey.RAMA];
+    const ano = raw[DeudaFilterKey.ANO];
+    const tipo = raw[DeudaFilterKey.TIPO];
 
     const next: DeudaFilters = {};
-    if (raw['rama'] && raw['rama'] !== '') next.rama = raw['rama'] as string;
-    if (raw['ano'] && raw['ano'] !== '') next.ano = Number(raw['ano']);
+    if (rama && rama !== FILTER_ALL) next.rama = rama as string;
+    if (ano && ano !== FILTER_ALL) next.ano = Number(ano);
+    if (tipo && tipo !== FILTER_ALL) next.tipo = tipo as TipoDeudaFilter;
 
-    const current = this.filters();
-    if (current.rama !== next.rama || current.ano !== next.ano) {
+    if (this.hasFilterChanges(next)) {
       this.filters.set(next);
       this.load();
     }
+  }
+
+  private hasFilterChanges(next: DeudaFilters): boolean {
+    const current = this.filters();
+    return current.rama !== next.rama || current.ano !== next.ano || current.tipo !== next.tipo;
   }
 
   retry(): void {
@@ -139,6 +140,11 @@ export class ReporteDeudasComponent implements OnInit {
 
   togglePersona(id: string): void {
     this.selectedPersonaId.update((current) => (current === id ? null : id));
+  }
+
+  /** Ruta a la ficha de la persona, según sea protagonista o educador. */
+  personaRoute(p: PersonaDeuda): string {
+    return `${PERSONA_TYPE_ROUTES[p.tipo]}/${p.personaId}`;
   }
 
   debtCards(p: PersonaDeuda): DebtCard[] {
@@ -212,23 +218,6 @@ export class ReporteDeudasComponent implements OnInit {
     const campCount = p.campamentos.filter((c) => !c.autorizacionEntregada).length;
 
     return personal + inscCount + campCount;
-  }
-
-  private hasTipoDeuda(p: PersonaDeuda, tipo: string): boolean {
-    switch (tipo) {
-      case 'campamentos':
-        return p.campamentos.some((c) => c.saldo > 0);
-      case 'inscripcionesScout':
-        return p.inscripcionesScout.some((i) => i.saldo > 0);
-      case 'inscripcionesGrupo':
-        return p.inscripcionesGrupo.some((i) => i.saldo > 0);
-      case 'cuotas':
-        return p.cuotas.some((c) => c.saldo > 0);
-      case 'documentacion':
-        return this.hasDocDeuda(p);
-      default:
-        return true;
-    }
   }
 
   private load(): void {

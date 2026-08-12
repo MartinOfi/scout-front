@@ -62,7 +62,7 @@
       <span>{{ error() }}</span>
       <app-button variant="secondary" (clicked)="retry()">Reintentar</app-button>
     </div>
-  } @else if (displayedDeudas().length === 0) {
+  } @else if (deudas().length === 0) {
     <div class="flex flex-col items-center justify-center gap-3 py-16 text-gray-500">
       <mat-icon>check_circle_outline</mat-icon>
       <span>No hay deudas pendientes con los filtros seleccionados</span>
@@ -85,7 +85,7 @@
         <span class="text-right">Total</span>
       </div>
 
-      @for (persona of displayedDeudas(); track persona.personaId) {
+      @for (persona of deudas(); track persona.personaId) {
 
         <!-- Row -->
         <div
@@ -95,9 +95,19 @@
 
           <div class="grid grid-cols-[160px_90px_1fr_96px] gap-3 px-4 py-3 items-start">
 
-            <!-- Name -->
-            <div class="flex flex-col justify-center">
-              <span class="text-sm font-semibold text-gray-900 leading-snug">{{ persona.nombre }}</span>
+            <!-- Name: enlaza a la ficha de la persona. stopPropagation para que
+                 el click navegue en vez de expandir/colapsar la fila. -->
+            <div class="flex flex-col justify-center min-w-0">
+              <a
+                [routerLink]="personaRoute(persona)"
+                (click)="$event.stopPropagation()"
+                [attr.aria-label]="'Ver ficha de ' + persona.nombre"
+                class="group flex items-center gap-1 w-fit max-w-full rounded-sm text-sm font-semibold text-gray-900 leading-snug hover:text-blue-600 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                <span class="truncate">{{ persona.nombre }}</span>
+                <mat-icon
+                  class="shrink-0 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-150"
+                  style="font-size:14px;height:14px;width:14px">open_in_new</mat-icon>
+              </a>
             </div>
 
             <!-- Rama -->
