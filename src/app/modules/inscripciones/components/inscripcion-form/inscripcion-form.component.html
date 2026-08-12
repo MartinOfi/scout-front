@@ -106,8 +106,22 @@
         <div class="section-content">
           <h2 class="section-heading">Importes</h2>
 
+          <!-- Persona nueva: inscripción sin costo (solo Scout Argentina) -->
+          @if (!isEditing && esScoutArgentina()) {
+            <div class="new-member-toggle">
+              <app-checkbox-field
+                id="persona-nueva"
+                formControlName="personaNueva"
+                variant="card"
+                description="La inscripción se registra sin costo: monto total en $0 y sin pagos, caja personal ni bonificación"
+              >
+                Persona nueva
+              </app-checkbox-field>
+            </div>
+          }
+
           <!-- Monto Cards -->
-          <div class="amount-grid">
+          <div class="amount-grid" [class.amount-grid--locked]="esPersonaNueva()">
             <div class="amount-card amount-card--primary">
               <span class="amount-card__label">Monto Total</span>
               <div class="amount-card__input">
@@ -173,7 +187,11 @@
 
           <!-- Cuenta Personal Panel -->
           @if (!isEditing && inscripcionForm.get('personaId')?.value) {
-            <div class="personal-account-panel" [class.personal-account-panel--has-funds]="saldoCuentaPersonal() > 0">
+            <div
+              class="personal-account-panel"
+              [class.personal-account-panel--has-funds]="saldoCuentaPersonal() > 0"
+              [class.personal-account-panel--locked]="esPersonaNueva()"
+            >
               <div class="personal-account-panel__header">
                 <div class="panel-icon">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -197,7 +215,7 @@
                     <span class="balance-value" [class.balance-value--positive]="saldoCuentaPersonal() > 0">
                       {{ saldoCuentaPersonal() | money }}
                     </span>
-                    @if (saldoCuentaPersonal() > 0) {
+                    @if (saldoCuentaPersonal() > 0 && !esPersonaNueva()) {
                       <button
                         type="button"
                         class="use-balance-btn"

@@ -63,6 +63,17 @@ interface MedioPagoOption {
   label: string;
 }
 
+/**
+ * Controles de importes que se deshabilitan cuando la inscripción es sin costo
+ * (persona nueva): sin pago inicial, sin saldo de caja personal y sin bonificación.
+ */
+const CAMPOS_DE_PAGO = [
+  'montoPagado',
+  'medioPago',
+  'montoConSaldoPersonal',
+  'montoBonificado',
+] as const;
+
 @Component({
   selector: 'app-inscripcion-form',
   standalone: true,
@@ -111,10 +122,19 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
   /** Track current tipo for conditional rendering */
   private readonly currentTipo = signal<TipoInscripcion>('scout_argentina');
 
-  /** Show authorization fields only for scout_argentina inscriptions */
-  readonly showAuthorizationFields: Signal<boolean> = computed(() => {
+  /** La inscripción en curso es de Scout Argentina */
+  readonly esScoutArgentina: Signal<boolean> = computed(() => {
     return this.currentTipo() === 'scout_argentina';
   });
+
+  /** Show authorization fields only for scout_argentina inscriptions */
+  readonly showAuthorizationFields: Signal<boolean> = this.esScoutArgentina;
+
+  /**
+   * Persona nueva: la inscripción se registra sin costo (monto total en 0) y
+   * se bloquean todos los importes (pago inicial, caja personal, bonificación).
+   */
+  readonly esPersonaNueva: WritableSignal<boolean> = signal(false);
 
   /** Saldo de cuenta personal de la persona seleccionada */
   readonly saldoCuentaPersonal: WritableSignal<number> = signal(0);
@@ -129,6 +149,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
   private tipoSubscription: Subscription | null = null;
   private personaSubscription: Subscription | null = null;
   private montosSubscription: Subscription | null = null;
+  private personaNuevaSubscription: Subscription | null = null;
 
   inscripcionForm: FormGroup = this.fb.group(
     {
@@ -143,6 +164,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
       montoConSaldoPersonal: [0, [Validators.min(0)]],
       montoBonificado: [0, [Validators.min(0)]],
       medioPago: [MedioPagoEnum.EFECTIVO],
+      personaNueva: [false],
       declaracionDeSalud: [false],
       autorizacionDeImagen: [false],
       salidasCercanas: [false],
@@ -176,6 +198,11 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
     this.tipoSubscription =
       this.inscripcionForm.get('tipo')?.valueChanges.subscribe((tipo: TipoInscripcion) => {
         this.currentTipo.set(tipo);
+        // "Persona nueva" solo aplica a Scout Argentina: al cambiar de tipo se
+        // destilda y se reestablecen los importes
+        if (tipo !== 'scout_argentina' && this.esPersonaNueva()) {
+          this.inscripcionForm.get('personaNueva')?.setValue(false);
+        }
         // Clear authorization fields when switching to grupo
         if (tipo === 'grupo') {
           this.inscripcionForm.patchValue({
@@ -190,6 +217,12 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
         if (!this.isEditing) {
           this.inscripcionForm.get('montoTotal')?.setValue(this.configService.getMontoByTipo(tipo));
         }
+      }) ?? null;
+
+    // Listen to "persona nueva" toggle to zero out and lock the amounts
+    this.personaNuevaSubscription =
+      this.inscripcionForm.get('personaNueva')?.valueChanges.subscribe((esNueva: boolean) => {
+        this.aplicarPersonaNueva(esNueva);
       }) ?? null;
 
     // Listen to persona changes to fetch their personal account balance
@@ -222,6 +255,29 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Aplicar el modo "persona nueva": monto total en 0 y todos los importes
+   * (pago inicial, medio de pago, caja personal y bonificación) en 0 y bloqueados.
+   * Al destildar se reestablece el monto configurado y se rehabilitan los campos.
+   */
+  private aplicarPersonaNueva(esNueva: boolean): void {
+    this.esPersonaNueva.set(esNueva);
+
+    if (esNueva) {
+      this.inscripcionForm.patchValue({
+        montoPagado: 0,
+        montoConSaldoPersonal: 0,
+        montoBonificado: 0,
+      });
+      this.inscripcionForm.get('montoTotal')?.setValue(0);
+      CAMPOS_DE_PAGO.forEach((campo) => this.inscripcionForm.get(campo)?.disable());
+      return;
+    }
+
+    CAMPOS_DE_PAGO.forEach((campo) => this.inscripcionForm.get(campo)?.enable());
+    this.setMontoFromConfig();
+  }
+
+  /**
    * Set montoTotal from config based on current tipo
    */
   private setMontoFromConfig(): void {
@@ -239,6 +295,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
     this.tipoSubscription?.unsubscribe();
     this.personaSubscription?.unsubscribe();
     this.montosSubscription?.unsubscribe();
+    this.personaNuevaSubscription?.unsubscribe();
   }
 
   /**
@@ -285,6 +342,9 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
    * Fill montoConSaldoPersonal with available balance
    */
   usarSaldoDisponible(): void {
+    if (this.esPersonaNueva()) {
+      return;
+    }
     const saldo = this.saldoCuentaPersonal();
     if (saldo > 0) {
       const montoAPagar = this.inscripcionForm.get('montoTotal')?.value || 0;

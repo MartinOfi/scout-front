@@ -64,6 +64,17 @@
     "src/app/modules/inscripciones/components/shared/bonificar-inscripcion-dialog/bonificar-inscripcion-dialog.component.spec.ts",
     "src/app/shared/components/persona-selector-dialog/persona-selector-dialog.component.ts",
     "src/app/shared/components/persona-selector-dialog/persona-selector-dialog.component.spec.ts",
-    "src/app/modules/personas/services/personas-api.service.ts"
+    "src/app/modules/personas/services/personas-api.service.ts",
+    "src/app/modules/inscripciones/components/inscripcion-form/inscripcion-form.component.ts",
+    "src/app/modules/inscripciones/components/inscripcion-form/inscripcion-form.component.spec.ts",
+    "src/app/modules/inscripciones/services/inscripciones-api.service.ts",
+    "src/app/modules/inscripciones/services/inscripciones-state.service.ts",
+    "src/app/modules/personas/services/personas-state.service.ts",
+    "src/app/shared/services/configuracion.service.ts",
+    "src/app/shared/pipes/money.pipe.ts",
+    "src/app/shared/components/form/form-actions/form-actions.component.ts",
+    "src/app/shared/components/form/select-field/select-field.component.ts",
+    "src/app/shared/components/form/number-field/number-field.component.ts",
+    "src/app/shared/components/form/checkbox-field/checkbox-field.component.ts"
   ]
 }

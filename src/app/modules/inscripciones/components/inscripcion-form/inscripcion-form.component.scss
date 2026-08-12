@@ -10,6 +10,17 @@
 @use '../../../../shared/components/form/form-tokens' as form;
 @use 'app/shared/styles/responsive' as *;
 
+// Estado visual para los bloques de importes bloqueados por "Persona nueva".
+// Los controles ya están deshabilitados por el FormGroup: esto solo comunica
+// visualmente que no son editables.
+@mixin locked-amounts {
+  opacity: 0.5;
+  filter: grayscale(1);
+  pointer-events: none;
+  user-select: none;
+  transition: opacity $transition-fast, filter $transition-fast;
+}
+
 // -----------------------------------------------------------------------------
 // PAGE CONTAINER
 // -----------------------------------------------------------------------------
@@ -244,6 +255,14 @@
 }
 
 // -----------------------------------------------------------------------------
+// PERSONA NUEVA - Inscripción sin costo
+// -----------------------------------------------------------------------------
+
+.new-member-toggle {
+  margin-bottom: 16px;
+}
+
+// -----------------------------------------------------------------------------
 // AMOUNT CARDS - Financial input grid
 // -----------------------------------------------------------------------------
 
@@ -257,6 +276,11 @@
   // Small screens+: two columns
   @include respond-to('xs') {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  // Persona nueva: los importes quedan bloqueados
+  &--locked {
+    @include locked-amounts;
   }
 }
 
@@ -380,6 +404,11 @@
   margin-bottom: 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   transition: all $transition-fast;
+
+  // Persona nueva: no se puede usar saldo de caja personal
+  &--locked {
+    @include locked-amounts;
+  }
 
   &--has-funds {
     border-color: #22c55e;
