@@ -188,10 +188,12 @@ src/app/
 ### Environment Configuration
 
 
-| Environment | API URL                                    |
-| ----------- | ------------------------------------------ |
-| Development | `https://scout-back.up.railway.app/api/v1` |
-| Production  | `https://scout-back.up.railway.app/api/v1` |
+| Environment | API URL                                          | Archivo                     |
+| ----------- | ------------------------------------------------ | --------------------------- |
+| Development | `http://localhost:3001/api/v1`                   | `environment.ts`            |
+| Production  | `https://scout-back-k56p.onrender.com/api/v1`    | `environment.prod.ts`       |
+
+El backend se despliega en **Render** (no Railway).
 
 
 
@@ -597,5 +599,5 @@ The frontend mirrors the backend domain model:
 1. Install dependencies: `npm install`
 2. Start server: `npm start`
 3. Access app: `http://localhost:4200`
-4. Backend API: `https://scout-back.up.railway.app/api/v1`
+4. Backend API: `http://localhost:3001/api/v1` (levantar el backend con `npm run start:dev`)
 
