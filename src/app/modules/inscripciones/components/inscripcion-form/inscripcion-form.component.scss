@@ -327,7 +327,7 @@
     color: $stone-400;
 
     &--discount {
-      color: #16a34a;
+      color: var(--color-success);
     }
   }
 
@@ -397,7 +397,9 @@
 // -----------------------------------------------------------------------------
 
 .personal-account-panel {
-  background: linear-gradient(135deg, $stone-50 0%, white 100%);
+  // Tokens, no literales: `white` acá dejaba el panel blanco en modo oscuro
+  // con el texto gris encima, ilegible.
+  background: linear-gradient(135deg, $stone-50 0%, var(--surface-primary) 100%);
   border: 1.5px solid $stone-200;
   border-radius: 16px;
   overflow: hidden;
@@ -411,19 +413,28 @@
   }
 
   &--has-funds {
-    border-color: #22c55e;
-    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-color: var(--color-success);
+    background: linear-gradient(
+      135deg,
+      var(--color-success-subtle) 0%,
+      var(--color-success-light) 100%
+    );
     box-shadow: 0 2px 8px rgba(34, 197, 94, 0.1);
 
     .panel-icon {
-      color: #16a34a;
+      color: var(--color-success);
       background-color: rgba(34, 197, 94, 0.1);
       padding: 6px;
       border-radius: 8px;
     }
 
     .panel-title {
-      color: #15803d;
+      color: var(--color-success);
+    }
+
+    .personal-account-panel__header {
+      // El header propio taparía el tinte verde del panel
+      background-color: transparent;
     }
   }
 }
@@ -433,8 +444,9 @@
   align-items: center;
   gap: 12px;
   padding: 16px 18px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  background-color: rgba(255, 255, 255, 0.5);
+  border-bottom: 1px solid $stone-200;
+  // surface-elevated queda apenas por encima del panel en ambos temas
+  background-color: var(--surface-elevated);
 }
 
 .panel-icon {
@@ -511,7 +523,7 @@
   letter-spacing: -0.02em;
 
   &--positive {
-    color: #16a34a;
+    color: var(--color-success);
   }
 }
 
@@ -522,7 +534,7 @@
   font-family: var(--font-family-base);
   font-size: 13px;
   font-weight: 600;
-  color: #15803d;
+  color: var(--color-success);
   background: rgba(34, 197, 94, 0.1);
   border: none;
   padding: 6px 12px;
@@ -534,7 +546,7 @@
 
   &:hover {
     background: rgba(34, 197, 94, 0.2);
-    color: #166534;
+    color: var(--color-success);
   }
 }
 
