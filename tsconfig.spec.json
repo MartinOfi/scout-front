@@ -75,6 +75,11 @@
     "src/app/shared/components/form/form-actions/form-actions.component.ts",
     "src/app/shared/components/form/select-field/select-field.component.ts",
     "src/app/shared/components/form/number-field/number-field.component.ts",
-    "src/app/shared/components/form/checkbox-field/checkbox-field.component.ts"
+    "src/app/shared/components/form/checkbox-field/checkbox-field.component.ts",
+    "src/app/modules/eventos/components/evento-form/evento-form.component.ts",
+    "src/app/modules/eventos/components/evento-form/evento-form.component.spec.ts",
+    "src/app/modules/eventos/services/eventos-state.service.ts",
+    "src/app/modules/eventos/services/eventos-form.builder.ts",
+    "src/app/shared/services/confirm-dialog.service.ts"
   ]
 }

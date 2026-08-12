@@ -13,6 +13,7 @@ import {
   effect,
   computed,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
@@ -20,6 +21,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { EventosStateService } from '../../services/eventos-state.service';
 import { EventosFormBuilder } from '../../services/eventos-form.builder';
+import { ConfirmDialogService } from '../../../../shared/services/confirm-dialog.service';
 import {
   TipoEvento,
   DestinoGanancia,
@@ -67,6 +69,7 @@ export class EventoFormComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly formBuilder = inject(EventosFormBuilder);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   readonly form: FormGroup = this.formBuilder.buildCreateForm();
   readonly isEditing = signal(false);
@@ -94,12 +97,30 @@ export class EventoFormComponent implements OnInit {
   readonly modalidadVenta = ModalidadVenta;
 
   /**
+   * Espejo en señal del control `modalidadVenta`, alimentado por valueChanges.
+   *
+   * Los computed no pueden leer `form.get(...).value` directamente: sin
+   * dependencias de señal se evalúan una sola vez y quedan congelados.
+   */
+  private readonly modalidadActual = signal<ModalidadVenta>(ModalidadVenta.UNICA);
+
+  readonly esMixta = computed(() => this.modalidadActual() === ModalidadVenta.MIXTA);
+
+  /**
    * Con modalidad mixta el destino del evento pasa a ser sólo un default que
    * nadie usa: cada venta declara el suyo. Ocultamos el selector para no
    * sugerir que esa elección decide algo.
    */
-  readonly mostrarDestinoEvento = computed(
-    () => this.form.get('modalidadVenta')?.value !== ModalidadVenta.MIXTA,
+  readonly mostrarDestinoEvento = computed(() => !this.esMixta());
+
+  readonly modalidadLabel = computed(() => MODALIDAD_VENTA_LABELS[this.modalidadActual()]);
+
+  /**
+   * La conversión ya se eligió pero todavía no se guardó. Sirve para avisar
+   * que el cambio recién impacta al enviar el formulario.
+   */
+  readonly conversionPendiente = computed(
+    () => this.esMixta() && this.state.selected()?.modalidadVenta !== ModalidadVenta.MIXTA,
   );
 
   readonly destinoGananciaLabel = computed(() => {
@@ -111,6 +132,15 @@ export class EventoFormComponent implements OnInit {
   private formPopulated = false;
 
   constructor() {
+    const modalidadControl = this.form.get('modalidadVenta');
+    // valueChanges no emite el valor inicial del control: hay que sembrarlo.
+    this.modalidadActual.set((modalidadControl?.value as ModalidadVenta) ?? ModalidadVenta.UNICA);
+    modalidadControl?.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((value) =>
+        this.modalidadActual.set((value as ModalidadVenta) ?? ModalidadVenta.UNICA),
+      );
+
     effect(() => {
       const evento = this.state.selected();
       if (evento && this.isEditing() && !this.formPopulated) {
@@ -156,6 +186,31 @@ export class EventoFormComponent implements OnInit {
         next: (evento) => this.router.navigate(['/eventos', evento.id]),
       });
     }
+  }
+
+  /**
+   * Convierte el evento a modalidad mixta. Es de una sola mano — el backend
+   * rechaza el camino inverso — así que se pide confirmación explícita antes
+   * de tocar el formulario. El cambio se persiste recién al guardar.
+   */
+  onConvertirAMixta(): void {
+    this.confirmDialog
+      .confirm(
+        'Convertir a modalidad mixta',
+        'A partir de ahora cada venta elige si su ganancia va a la caja del grupo ' +
+          'o a la cuenta personal del vendedor. Las ventas ya cargadas no se tocan: ' +
+          'conservan el destino con el que se registraron.',
+        {
+          icon: 'call_split',
+          confirmText: 'Convertir a mixto',
+          cancelText: 'Cancelar',
+        },
+      )
+      .subscribe((confirmed: boolean) => {
+        if (confirmed) {
+          this.form.patchValue({ modalidadVenta: ModalidadVenta.MIXTA });
+        }
+      });
   }
 
   onCancel(): void {

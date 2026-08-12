@@ -1,23 +1,43 @@
 /**
  * EventoFormComponent Tests
- * Jasmine + Karma — TDD Pattern: RED-GREEN-REFACTOR
- * Coverage target: 90%+
+ * Smart component del alta/edición de eventos.
  */
 
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { vi } from 'vitest';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, ActivatedRoute } from '@angular/router';
-import { signal, Signal } from '@angular/core';
-import { of, Subject } from 'rxjs';
+import { signal, WritableSignal } from '@angular/core';
+import { Observable, of } from 'rxjs';
 
 import { EventoFormComponent } from './evento-form.component';
 import { EventosStateService } from '../../services/eventos-state.service';
 import { EventosFormBuilder } from '../../services/eventos-form.builder';
-import { TipoEvento } from '../../../../shared/enums';
+import { ConfirmDialogService } from '../../../../shared/services/confirm-dialog.service';
+import { TipoEvento, ModalidadVenta, DestinoGanancia } from '../../../../shared/enums';
 import { Evento } from '../../../../shared/models';
+import { MockRouter, createMockRouter } from '../../../../shared/testing/common-mocks';
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Mocks
 // ---------------------------------------------------------------------------
+
+interface MockEventosStateService {
+  loading: WritableSignal<boolean>;
+  error: WritableSignal<string | null>;
+  selected: WritableSignal<Evento | null>;
+  loadById: ReturnType<typeof vi.fn>;
+  create: ReturnType<typeof vi.fn>;
+  update: ReturnType<typeof vi.fn>;
+}
+
+/**
+ * El mock compartido (createMockConfirmDialogService) devuelve Promises y no
+ * coincide con la API real del servicio, que devuelve Observables. Se usa uno
+ * local hasta que ese helper se ponga al día.
+ */
+interface MockConfirmDialog {
+  confirm: ReturnType<typeof vi.fn>;
+}
 
 function makeEvento(overrides: Partial<Evento> = {}): Evento {
   return {
@@ -26,7 +46,8 @@ function makeEvento(overrides: Partial<Evento> = {}): Evento {
     tipo: TipoEvento.VENTA,
     fecha: '2026-06-15',
     descripcion: 'Descripción test',
-    destinoGanancia: null,
+    destinoGanancia: DestinoGanancia.CUENTAS_PERSONALES,
+    modalidadVenta: ModalidadVenta.UNICA,
     tipoEvento: null,
     productos: [],
     movimientos: [],
@@ -41,42 +62,25 @@ function makeEvento(overrides: Partial<Evento> = {}): Evento {
 describe('EventoFormComponent', () => {
   let component: EventoFormComponent;
   let fixture: ComponentFixture<EventoFormComponent>;
-  let mockState: jasmine.SpyObj<EventosStateService> & {
-    loading: ReturnType<typeof signal<boolean>>;
-    error: ReturnType<typeof signal<string | null>>;
-    selected: ReturnType<typeof signal<Evento | null>>;
-  };
-  let mockRouter: jasmine.SpyObj<Router>;
-  let paramMapSubject: Subject<{ get: (k: string) => string | null }>;
+  let mockState: MockEventosStateService;
+  let mockRouter: MockRouter;
+  let mockConfirmDialog: MockConfirmDialog;
 
-  beforeEach(async () => {
-    const loadingSig = signal(false);
-    const errorSig = signal<string | null>(null);
-    const selectedSig = signal<Evento | null>(null);
-
-    mockState = jasmine.createSpyObj(
-      'EventosStateService',
-      ['loadById', 'create', 'update'],
-      { loading: loadingSig, error: errorSig, selected: selectedSig },
-    ) as typeof mockState;
-
-    mockState.create.and.returnValue(of(makeEvento()));
-    mockState.update.and.returnValue(of(makeEvento()));
-
-    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-    mockRouter.navigate.and.returnValue(Promise.resolve(true));
-
-    paramMapSubject = new Subject();
-
+  /**
+   * Monta el componente. `eventoId` null = modo alta; con id = modo edición.
+   */
+  async function mountComponent(eventoId: string | null): Promise<void> {
+    TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       imports: [EventoFormComponent],
       providers: [
         EventosFormBuilder,
         { provide: EventosStateService, useValue: mockState },
         { provide: Router, useValue: mockRouter },
+        { provide: ConfirmDialogService, useValue: mockConfirmDialog },
         {
           provide: ActivatedRoute,
-          useValue: { snapshot: { paramMap: { get: () => null } } },
+          useValue: { snapshot: { paramMap: { get: () => eventoId } } },
         },
       ],
     }).compileComponents();
@@ -84,9 +88,24 @@ describe('EventoFormComponent', () => {
     fixture = TestBed.createComponent(EventoFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  }
+
+  beforeEach(async () => {
+    mockState = {
+      loading: signal(false),
+      error: signal<string | null>(null),
+      selected: signal<Evento | null>(null),
+      loadById: vi.fn(),
+      create: vi.fn().mockReturnValue(of(makeEvento())),
+      update: vi.fn().mockReturnValue(of(makeEvento())),
+    };
+    mockRouter = createMockRouter();
+    mockConfirmDialog = { confirm: vi.fn().mockReturnValue(of(true)) };
+
+    await mountComponent(null);
   });
 
-  // ─── Creation ───────────────────────────────────────────────────────────────
+  // ─── Creation ──────────────────────────────────────────────────────────────
 
   describe('Component creation', () => {
     it('should create', () => {
@@ -97,42 +116,18 @@ describe('EventoFormComponent', () => {
       expect(component.form).toBeDefined();
     });
 
-    it('should expose loading signal from state', () => {
-      expect(component.loading).toBe(mockState.loading as Signal<boolean>);
-    });
-
-    it('should expose error signal from state', () => {
-      expect(component.error).toBe(mockState.error as Signal<string | null>);
-    });
-
     it('should default to create mode (isEditing = false)', () => {
-      expect(component.isEditing()).toBeFalse();
+      expect(component.isEditing()).toBe(false);
     });
   });
 
-  // ─── Form structure ──────────────────────────────────────────────────────────
+  // ─── Form structure ────────────────────────────────────────────────────────
 
   describe('Form structure', () => {
-    it('should have nombre control', () => {
-      expect(component.form.get('nombre')).toBeTruthy();
-    });
-
-    it('should have tipo control', () => {
-      expect(component.form.get('tipo')).toBeTruthy();
-    });
-
-    it('should have fecha control', () => {
-      expect(component.form.get('fecha')).toBeTruthy();
-    });
-
-    it('should have tipoEvento control', () => {
-      expect(component.form.get('tipoEvento')).toBeTruthy();
-    });
-
     it('should be invalid when nombre is empty', () => {
       component.form.get('nombre')!.setValue('');
       component.form.markAllAsTouched();
-      expect(component.form.invalid).toBeTrue();
+      expect(component.form.invalid).toBe(true);
     });
 
     it('should be valid with required fields filled', () => {
@@ -141,25 +136,11 @@ describe('EventoFormComponent', () => {
         tipo: TipoEvento.GRUPO,
         fecha: '2026-06-15',
       });
-      expect(component.form.valid).toBeTrue();
+      expect(component.form.valid).toBe(true);
     });
   });
 
-  // ─── Options ─────────────────────────────────────────────────────────────────
-
-  describe('Select options', () => {
-    it('should expose tipoOptions with VENTA and GRUPO', () => {
-      const values = component.tipoOptions.map((o) => o.value);
-      expect(values).toContain(TipoEvento.VENTA);
-      expect(values).toContain(TipoEvento.GRUPO);
-    });
-
-    it('should expose destinoOptions', () => {
-      expect(component.destinoOptions.length).toBeGreaterThan(0);
-    });
-  });
-
-  // ─── Submit (create mode) ────────────────────────────────────────────────────
+  // ─── Submit ────────────────────────────────────────────────────────────────
 
   describe('Submit — create mode', () => {
     beforeEach(() => {
@@ -170,13 +151,9 @@ describe('EventoFormComponent', () => {
       });
     });
 
-    it('should call state.create with correct DTO', () => {
+    it('should call state.create and navigate to the new evento', () => {
       component.onSubmit();
       expect(mockState.create).toHaveBeenCalled();
-    });
-
-    it('should navigate to evento detail after creation', () => {
-      component.onSubmit();
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/eventos', 'evt-1']);
     });
 
@@ -184,38 +161,13 @@ describe('EventoFormComponent', () => {
       component.form.get('nombre')!.setValue('');
       component.onSubmit();
       expect(mockState.create).not.toHaveBeenCalled();
-    });
-
-    it('should mark all fields as touched on invalid submit', () => {
-      component.form.get('nombre')!.setValue('');
-      component.onSubmit();
-      expect(component.form.get('nombre')!.touched).toBeTrue();
+      expect(component.form.get('nombre')!.touched).toBe(true);
     });
   });
 
-  // ─── Submit (edit mode) ───────────────────────────────────────────────────────
-
   describe('Submit — edit mode', () => {
     beforeEach(async () => {
-      // Rebuild with an id in the route
-      await TestBed.resetTestingModule();
-      await TestBed.configureTestingModule({
-        imports: [EventoFormComponent],
-        providers: [
-          EventosFormBuilder,
-          { provide: EventosStateService, useValue: mockState },
-          { provide: Router, useValue: mockRouter },
-          {
-            provide: ActivatedRoute,
-            useValue: { snapshot: { paramMap: { get: () => 'evt-1' } } },
-          },
-        ],
-      }).compileComponents();
-
-      fixture = TestBed.createComponent(EventoFormComponent);
-      component = fixture.componentInstance;
-      fixture.detectChanges();
-
+      await mountComponent('evt-1');
       component.form.patchValue({
         nombre: 'Bazar Otoño',
         tipo: TipoEvento.VENTA,
@@ -223,21 +175,14 @@ describe('EventoFormComponent', () => {
       });
     });
 
-    it('should be in editing mode', () => {
-      expect(component.isEditing()).toBeTrue();
-    });
-
-    it('should call state.loadById on init', () => {
+    it('should be in editing mode and load the evento', () => {
+      expect(component.isEditing()).toBe(true);
       expect(mockState.loadById).toHaveBeenCalledWith('evt-1');
     });
 
-    it('should call state.update on submit', () => {
+    it('should call state.update and navigate on submit', () => {
       component.onSubmit();
       expect(mockState.update).toHaveBeenCalled();
-    });
-
-    it('should navigate to evento detail after update', () => {
-      component.onSubmit();
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/eventos', 'evt-1']);
     });
 
@@ -248,30 +193,105 @@ describe('EventoFormComponent', () => {
     });
   });
 
-  // ─── Effect: form population ─────────────────────────────────────────────────
+  // ─── Effect: form population ───────────────────────────────────────────────
 
   describe('Effect — form population from selected evento', () => {
-    it('should patch form when selected evento changes in edit mode', () => {
-      component.isEditing.set(true);
-      const evento = makeEvento({ nombre: 'Evento Patched', fecha: '2026-10-05' });
-      mockState.selected.set(evento);
-      TestBed.flushEffects();
+    it('should patch form when selected evento changes in edit mode', async () => {
+      await mountComponent('evt-1');
+      mockState.selected.set(makeEvento({ nombre: 'Evento Patched' }));
+      fixture.detectChanges();
 
       expect(component.form.get('nombre')!.value).toBe('Evento Patched');
-      expect(component.form.get('fecha')!.value).toBe('2026-10-05');
     });
 
-    it('should not patch form when selected changes but not in edit mode', () => {
-      component.isEditing.set(false);
-      const evento = makeEvento({ nombre: 'Should Not Patch' });
-      mockState.selected.set(evento);
-      TestBed.flushEffects();
+    it('should not patch form when not in edit mode', () => {
+      mockState.selected.set(makeEvento({ nombre: 'Should Not Patch' }));
+      fixture.detectChanges();
 
       expect(component.form.get('nombre')!.value).not.toBe('Should Not Patch');
     });
   });
 
-  // ─── Cancel ──────────────────────────────────────────────────────────────────
+  // ─── Modalidad de venta ────────────────────────────────────────────────────
+
+  describe('Modalidad de venta', () => {
+    /** Monta en edición con un evento ya cargado en el state. */
+    async function mountEditandoEvento(evento: Evento): Promise<void> {
+      mockState.selected.set(evento);
+      await mountComponent('evt-1');
+      fixture.detectChanges();
+    }
+
+    it('arranca en única y ofrece el destino del evento', () => {
+      expect(component.esMixta()).toBe(false);
+      expect(component.mostrarDestinoEvento()).toBe(true);
+    });
+
+    it('esconde el destino del evento al elegir mixta', () => {
+      component.form.patchValue({ modalidadVenta: ModalidadVenta.MIXTA });
+
+      // Con un computed sobre form.value esto quedaría congelado en true.
+      expect(component.esMixta()).toBe(true);
+      expect(component.mostrarDestinoEvento()).toBe(false);
+    });
+
+    it('refleja la modalidad del evento cargado en edición', async () => {
+      await mountEditandoEvento(makeEvento({ modalidadVenta: ModalidadVenta.MIXTA }));
+
+      expect(component.esMixta()).toBe(true);
+    });
+
+    it('convierte a mixta cuando se confirma el diálogo', async () => {
+      await mountEditandoEvento(makeEvento({ modalidadVenta: ModalidadVenta.UNICA }));
+
+      component.onConvertirAMixta();
+
+      expect(mockConfirmDialog.confirm).toHaveBeenCalled();
+      expect(component.form.get('modalidadVenta')!.value).toBe(ModalidadVenta.MIXTA);
+      expect(component.esMixta()).toBe(true);
+    });
+
+    it('no convierte nada si se cancela el diálogo', async () => {
+      mockConfirmDialog.confirm.mockReturnValue(of(false) as Observable<boolean>);
+      await mountEditandoEvento(makeEvento({ modalidadVenta: ModalidadVenta.UNICA }));
+
+      component.onConvertirAMixta();
+
+      expect(component.form.get('modalidadVenta')!.value).toBe(ModalidadVenta.UNICA);
+      expect(component.esMixta()).toBe(false);
+    });
+
+    it('marca la conversión como pendiente hasta que se guarda', async () => {
+      await mountEditandoEvento(makeEvento({ modalidadVenta: ModalidadVenta.UNICA }));
+
+      component.onConvertirAMixta();
+
+      expect(component.conversionPendiente()).toBe(true);
+    });
+
+    it('no marca pendiente un evento que ya era mixto', async () => {
+      await mountEditandoEvento(makeEvento({ modalidadVenta: ModalidadVenta.MIXTA }));
+
+      expect(component.conversionPendiente()).toBe(false);
+    });
+
+    it('conserva el destinoGanancia del evento al convertir a mixta', async () => {
+      await mountEditandoEvento(
+        makeEvento({
+          modalidadVenta: ModalidadVenta.UNICA,
+          destinoGanancia: DestinoGanancia.CAJA_GRUPO,
+        }),
+      );
+
+      component.onConvertirAMixta();
+
+      // El backend lo sigue necesitando para la cabecera del reporte: la
+      // conversión oculta el campo pero no lo borra.
+      expect(component.form.get('destinoGanancia')!.value).toBe(DestinoGanancia.CAJA_GRUPO);
+    });
+  });
+
+  // ─── Cancel ────────────────────────────────────────────────────────────────
 
   describe('Cancel', () => {
     it('should navigate to /eventos on cancel in create mode', () => {

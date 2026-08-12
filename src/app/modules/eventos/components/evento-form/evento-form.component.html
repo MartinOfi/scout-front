@@ -99,22 +99,59 @@
               </app-form-field>
             }
 
-            <!-- Modalidad de venta (solo en creación para VENTA) -->
-            @if (!isEditing() && form.get('tipo')?.value === tipoEvento.VENTA) {
-              <app-form-field
-                label="Modalidad de venta"
-                hint="Con modalidad mixta, cada venta elige si su ganancia va a la caja del grupo o a la cuenta personal del vendedor. Los gastos siguen siendo únicos para todo el evento."
-                [forId]="'modalidad-select'"
-              >
-                <app-select-field
-                  id="modalidad-select"
-                  formControlName="modalidadVenta"
-                  placeholder="Seleccionar modalidad"
-                  [options]="modalidadOptions"
-                  optionValue="value"
-                  optionLabel="label"
-                />
-              </app-form-field>
+            <!-- Modalidad de venta (solo para VENTA) -->
+            @if (form.get('tipo')?.value === tipoEvento.VENTA) {
+              @if (!isEditing()) {
+                <app-form-field
+                  label="Modalidad de venta"
+                  hint="Con modalidad mixta, cada venta elige si su ganancia va a la caja del grupo o a la cuenta personal del vendedor. Los gastos siguen siendo únicos para todo el evento."
+                  [forId]="'modalidad-select'"
+                >
+                  <app-select-field
+                    id="modalidad-select"
+                    formControlName="modalidadVenta"
+                    placeholder="Seleccionar modalidad"
+                    [options]="modalidadOptions"
+                    optionValue="value"
+                    optionLabel="label"
+                  />
+                </app-form-field>
+              } @else if (esMixta()) {
+                <!-- Mixto es terminal: el backend rechaza volver a único -->
+                <app-form-field
+                  label="Modalidad de venta"
+                  hint="Un evento mixto no puede volver a tener un único destino: sus ventas ya quedaron imputadas a cajas distintas."
+                >
+                  <div class="flex flex-wrap items-center gap-3">
+                    <span class="text-sm font-medium text-gray-900">{{ modalidadLabel() }}</span>
+                    @if (conversionPendiente()) {
+                      <span
+                        class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800"
+                      >
+                        <mat-icon class="!h-4 !w-4 !text-base">schedule</mat-icon>
+                        Se aplica al guardar
+                      </span>
+                    }
+                  </div>
+                </app-form-field>
+              } @else {
+                <app-form-field
+                  label="Modalidad de venta"
+                  hint="Podés pasar a modalidad mixta en cualquier momento, incluso con ventas ya cargadas. No hay vuelta atrás."
+                >
+                  <div class="flex flex-wrap items-center gap-3">
+                    <span class="text-sm font-medium text-gray-900">{{ modalidadLabel() }}</span>
+                    <app-button
+                      variant="outline"
+                      size="sm"
+                      icon="call_split"
+                      (clicked)="onConvertirAMixta()"
+                    >
+                      Convertir a mixto
+                    </app-button>
+                  </div>
+                </app-form-field>
+              }
             }
 
             <!-- Destino Ganancia (solo en creación para VENTA de modalidad única) -->
