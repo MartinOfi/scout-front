@@ -121,3 +121,102 @@ describe('PersonaSelectorDialogComponent - bonificar field', () => {
     expect(result.montoBonificado).toBeUndefined();
   });
 });
+
+describe('PersonaSelectorDialogComponent - pago field', () => {
+  let component: PersonaSelectorDialogComponent;
+  let mockDialogRef: { close: ReturnType<typeof vi.fn> };
+
+  const protagonista: Protagonista = {
+    id: 'prota-1',
+    tipo: PersonaType.PROTAGONISTA,
+    nombre: 'Ana Test',
+    estado: EstadoPersona.ACTIVO,
+    createdAt: '2026-01-01',
+    updatedAt: '2026-01-01',
+    deletedAt: null,
+    rama: RamaEnum.MANADA,
+    partidaNacimiento: false,
+    dni: false,
+    dniPadres: false,
+    carnetObraSocial: false,
+  };
+
+  function setup(data: Partial<PersonaSelectorDialogData> = {}): void {
+    mockDialogRef = { close: vi.fn() };
+
+    TestBed.configureTestingModule({
+      imports: [PersonaSelectorDialogComponent],
+      providers: [
+        { provide: MatDialogRef, useValue: mockDialogRef },
+        { provide: MAT_DIALOG_DATA, useValue: { title: 'Agregar', ...data } },
+        {
+          provide: PersonasApiService,
+          useValue: { getAll: vi.fn().mockReturnValue(of([protagonista])) },
+        },
+      ],
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(PersonaSelectorDialogComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  }
+
+  const conPago: Partial<PersonaSelectorDialogData> = {
+    showPagoField: true,
+    showBonificarField: true,
+    montoBonificableFn: () => 50000,
+  };
+
+  it('no muestra el campo de pago sin showPagoField', () => {
+    setup({ showBonificarField: true, montoBonificableFn: () => 50000 });
+    component.form.patchValue({ personaId: 'prota-1' });
+    expect(component.mostrarCampoPago).toBe(false);
+  });
+
+  it('muestra el campo de pago cuando hay persona seleccionada con costo > 0', () => {
+    setup(conPago);
+    component.form.patchValue({ personaId: 'prota-1' });
+    expect(component.mostrarCampoPago).toBe(true);
+  });
+
+  it('el máximo a pagar descuenta la bonificación', () => {
+    setup(conPago);
+    component.form.patchValue({ personaId: 'prota-1', monto: 20000 });
+    expect(component.montoMaximoPago).toBe(30000);
+  });
+
+  it('rechaza confirmar si el pago excede el máximo', () => {
+    setup(conPago);
+    component.form.patchValue({ personaId: 'prota-1', monto: 20000, montoPago: 40000 });
+    expect(component.pagoExcedeMaximo).toBe(true);
+
+    component.onConfirm();
+
+    expect(mockDialogRef.close).not.toHaveBeenCalled();
+  });
+
+  it('incluye el pago en el resultado cuando el monto es > 0', () => {
+    setup(conPago);
+    component.form.patchValue({
+      personaId: 'prota-1',
+      montoPago: 15000,
+      medioPago: 'transferencia',
+    });
+
+    component.onConfirm();
+
+    expect(mockDialogRef.close).toHaveBeenCalledWith(
+      expect.objectContaining({ pago: { monto: 15000, medioPago: 'transferencia' } }),
+    );
+  });
+
+  it('no incluye pago en el resultado cuando el monto es 0 (es opcional)', () => {
+    setup(conPago);
+    component.form.patchValue({ personaId: 'prota-1', montoPago: 0 });
+
+    component.onConfirm();
+
+    const result = mockDialogRef.close.mock.calls[0][0];
+    expect(result.pago).toBeUndefined();
+  });
+});

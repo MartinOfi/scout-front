@@ -29,7 +29,16 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { finalize } from 'rxjs/operators';
 
 import { PersonaUnion } from '../../models';
-import { PersonaType, Rama, RAMAS, PERSONA_TYPE_LABELS, RAMA_LABELS } from '../../enums';
+import {
+  PersonaType,
+  Rama,
+  RAMAS,
+  PERSONA_TYPE_LABELS,
+  RAMA_LABELS,
+  MedioPago,
+  MedioPagoEnum,
+  MEDIO_PAGO_LABELS,
+} from '../../enums';
 import { PersonasApiService } from '../../../modules/personas/services/personas-api.service';
 import { FormFieldComponent } from '../form/form-field/form-field.component';
 import { SelectFieldComponent } from '../form/select-field/select-field.component';
@@ -68,6 +77,17 @@ export interface PersonaSelectorDialogData {
   showBonificarField?: boolean;
   /** Monto máximo bonificable para la persona seleccionada (0 = no bonificable) */
   montoBonificableFn?: (persona: PersonaUnion) => number;
+  /**
+   * Habilita un pago inicial opcional (efectivo/transferencia). El máximo es
+   * montoBonificableFn(persona) menos lo bonificado en el mismo formulario.
+   */
+  showPagoField?: boolean;
+}
+
+/** Pago inicial opcional registrado junto con la selección */
+export interface PersonaSelectorPago {
+  monto: number;
+  medioPago: MedioPago;
 }
 
 /**
@@ -80,6 +100,13 @@ export interface PersonaSelectorDialogResult {
   autorizacionEntregada?: boolean;
   /** Monto a bonificar (presente sólo si showBonificarField es true y es > 0) */
   montoBonificado?: number;
+  /** Pago inicial (presente sólo si showPagoField es true y el monto es > 0) */
+  pago?: PersonaSelectorPago;
+}
+
+interface MedioPagoOption {
+  value: MedioPago;
+  label: string;
 }
 
 // ============================================================================
@@ -123,7 +150,14 @@ export class PersonaSelectorDialogComponent implements OnInit {
     personaId: ['', Validators.required],
     autorizacionEntregada: [false],
     monto: [0, [Validators.min(0)]],
+    montoPago: [0, [Validators.min(0)]],
+    medioPago: [MedioPagoEnum.EFECTIVO as MedioPago],
   });
+
+  readonly mediosPagoOptions: MedioPagoOption[] = [
+    { value: MedioPagoEnum.EFECTIVO, label: MEDIO_PAGO_LABELS[MedioPagoEnum.EFECTIVO] },
+    { value: MedioPagoEnum.TRANSFERENCIA, label: MEDIO_PAGO_LABELS[MedioPagoEnum.TRANSFERENCIA] },
+  ];
 
   // Rama options for filter (spread to mutable array for select component)
   readonly ramaOptions: Rama[] = [...RAMAS];
@@ -181,7 +215,34 @@ export class PersonaSelectorDialogComponent implements OnInit {
   }
 
   get bonificarExcedeMaximo(): boolean {
-    return (Number(this.form.value.monto) || 0) > this.montoMaximoBonificable;
+    return this.montoBonificadoIngresado > this.montoMaximoBonificable;
+  }
+
+  private get montoBonificadoIngresado(): number {
+    return this.mostrarCampoBonificar ? Number(this.form.value.monto) || 0 : 0;
+  }
+
+  private get montoPagoIngresado(): number {
+    return this.mostrarCampoPago ? Number(this.form.value.montoPago) || 0 : 0;
+  }
+
+  /** Monto máximo a pagar: costo de la persona menos lo bonificado */
+  get montoMaximoPago(): number {
+    return Math.max(0, this.montoMaximoBonificable - this.montoBonificadoIngresado);
+  }
+
+  /** true si corresponde mostrar el campo de pago (persona seleccionada con costo > 0) */
+  get mostrarCampoPago(): boolean {
+    return !!this.data.showPagoField && this.montoMaximoBonificable > 0;
+  }
+
+  get pagoExcedeMaximo(): boolean {
+    return this.montoPagoIngresado > this.montoMaximoPago;
+  }
+
+  /** true si algún monto opcional es inválido y bloquea confirmar */
+  get montosInvalidos(): boolean {
+    return this.bonificarExcedeMaximo || this.pagoExcedeMaximo;
   }
 
   // ============================================================================
@@ -218,19 +279,23 @@ export class PersonaSelectorDialogComponent implements OnInit {
   }
 
   onConfirm(): void {
-    if (this.form.invalid || this.bonificarExcedeMaximo) return;
+    if (this.form.invalid || this.montosInvalidos) return;
 
     const personaId = this.form.value.personaId;
     const persona = this.filteredPersonas().find((p) => p.id === personaId);
 
     if (persona) {
-      const montoBonificado = this.mostrarCampoBonificar ? Number(this.form.value.monto) || 0 : 0;
+      const montoBonificado = this.montoBonificadoIngresado;
+      const montoPago = this.montoPagoIngresado;
       const result: PersonaSelectorDialogResult = {
         persona,
         ...(this.data.showAutorizacionField && {
           autorizacionEntregada: !!this.form.value.autorizacionEntregada,
         }),
         ...(montoBonificado > 0 && { montoBonificado }),
+        ...(montoPago > 0 && {
+          pago: { monto: montoPago, medioPago: this.form.value.medioPago as MedioPago },
+        }),
       };
       this.dialogRef.close(result);
     }
@@ -265,6 +330,9 @@ export class PersonaSelectorDialogComponent implements OnInit {
   getRamaLabel = (rama: Rama): string => {
     return RAMA_LABELS[rama];
   };
+
+  getMedioPagoLabel = (option: MedioPagoOption): string => option.label;
+  getMedioPagoValue = (option: MedioPagoOption): MedioPago => option.value;
 
   /** Get value for rama option */
   getRamaValue = (rama: Rama): string => {

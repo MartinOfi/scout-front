@@ -17,7 +17,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { Subject, from, firstValueFrom, switchMap, debounceTime } from 'rxjs';
+import { Observable, Subject, from, firstValueFrom, switchMap, debounceTime, of, finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { CampamentosStateService } from '../../../services';
@@ -283,6 +283,7 @@ export class CampamentoDetailComponent implements OnInit {
       showBonificarField: true,
       montoBonificableFn: (persona) =>
         persona.tipo === PersonaType.EDUCADOR ? camp.costoEducadores : camp.costoPorPersona,
+      showPagoField: true,
       confirmLabel: 'Agregar',
     };
 
@@ -294,20 +295,42 @@ export class CampamentoDetailComponent implements OnInit {
           personaId: result.persona.id,
           autorizacionEntregada: result.autorizacionEntregada ?? false,
         };
-        this.state.addParticipante(camp.id, dto).subscribe({
-          next: () => {
-            if (result.montoBonificado) {
-              this.state
-                .bonificarParticipante(camp.id, result.persona.id, result.montoBonificado)
-                .subscribe({
-                  next: () => this.loadCampamento(camp.id),
-                });
-            } else {
-              this.loadCampamento(camp.id);
-            }
-          },
-        });
+        this.inscribirParticipante(camp.id, dto, result);
       });
+  }
+
+  /**
+   * Alta del participante y, en orden, bonificación y pago inicial opcionales.
+   * El pago va después de la bonificación porque se valida contra el saldo
+   * pendiente ya bonificado.
+   */
+  private inscribirParticipante(
+    campamentoId: string,
+    dto: AddParticipanteDto,
+    result: PersonaSelectorDialogResult,
+  ): void {
+    const personaId = result.persona.id;
+    const { montoBonificado, pago } = result;
+
+    this.state
+      .addParticipante(campamentoId, dto)
+      .pipe(
+        switchMap((): Observable<unknown> =>
+          montoBonificado
+            ? this.state.bonificarParticipante(campamentoId, personaId, montoBonificado)
+            : of(null),
+        ),
+        switchMap((): Observable<unknown> =>
+          pago
+            ? this.state.registrarPago(campamentoId, personaId, {
+                montoPagado: pago.monto,
+                medioPago: pago.medioPago,
+              })
+            : of(null),
+        ),
+        finalize(() => this.loadCampamento(campamentoId)),
+      )
+      .subscribe();
   }
 
   /** Open payment dialog for creating a new payment */

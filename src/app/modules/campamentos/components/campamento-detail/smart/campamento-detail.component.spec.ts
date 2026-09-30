@@ -444,5 +444,46 @@ describe('CampamentoDetailComponent', () => {
       expect(mockState.bonificarParticipante).toHaveBeenCalledWith('camp-1', 'prota-9', 4000);
       expect(callOrder).toEqual(['bonificarParticipante', 'loadDetalle']);
     });
+
+    it('bonifica, registra el pago inicial y recién después recarga el detalle', () => {
+      const result: PersonaSelectorDialogResult = {
+        persona: nuevaPersona,
+        montoBonificado: 4000,
+        pago: { monto: 10000, medioPago: 'transferencia' },
+      };
+      mockDialogRef.afterClosed.mockReturnValue(of(result));
+      mockState.loadDetalle.mockClear();
+
+      const callOrder: string[] = [];
+      mockState.bonificarParticipante.mockImplementation(() => {
+        callOrder.push('bonificarParticipante');
+        return of(undefined);
+      });
+      mockState.registrarPago.mockImplementation(() => {
+        callOrder.push('registrarPago');
+        return of({});
+      });
+      mockState.loadDetalle.mockImplementation(() => {
+        callOrder.push('loadDetalle');
+      });
+
+      component.onAddParticipante();
+
+      expect(mockState.registrarPago).toHaveBeenCalledWith('camp-1', 'prota-9', {
+        montoPagado: 10000,
+        medioPago: 'transferencia',
+      });
+      expect(callOrder).toEqual(['bonificarParticipante', 'registrarPago', 'loadDetalle']);
+    });
+
+    it('no registra pago cuando el diálogo no lo incluye', () => {
+      const result: PersonaSelectorDialogResult = { persona: nuevaPersona };
+      mockDialogRef.afterClosed.mockReturnValue(of(result));
+      mockState.registrarPago.mockClear();
+
+      component.onAddParticipante();
+
+      expect(mockState.registrarPago).not.toHaveBeenCalled();
+    });
   });
 });

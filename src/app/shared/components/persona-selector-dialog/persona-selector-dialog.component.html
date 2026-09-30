@@ -65,6 +65,27 @@
       </app-form-field>
       }
 
+      <!-- Pago inicial (opcional) -->
+      @if (mostrarCampoPago) {
+      <app-form-field label="Registrar pago (opcional)" [forId]="'monto-pago'"
+        [hint]="'Máximo: ' + (montoMaximoPago | money)" [invalid]="pagoExcedeMaximo">
+        <div class="input-with-prefix">
+          <span class="input-prefix">$</span>
+          <app-number-field id="monto-pago" formControlName="montoPago" [min]="0" placeholder="0" />
+        </div>
+        @if (pagoExcedeMaximo) {
+        <span error>No puede exceder {{ montoMaximoPago | money }}</span>
+        }
+      </app-form-field>
+
+      @if (form.value.montoPago > 0) {
+      <app-form-field label="Medio de pago" [forId]="'medio-pago'" [required]="true">
+        <app-select-field id="medio-pago" formControlName="medioPago" [options]="mediosPagoOptions"
+          [optionLabelFn]="getMedioPagoLabel" [optionValueFn]="getMedioPagoValue" />
+      </app-form-field>
+      }
+      }
+
       <!-- Available count info -->
       @if (!loading() && filteredPersonas().length > 0) {
       <p class="available-count">
@@ -79,7 +100,7 @@
     <app-button variant="secondary" (clicked)="onCancel()">
       Cancelar
     </app-button>
-    <app-button variant="primary" [disabled]="form.invalid || loading() || bonificarExcedeMaximo"
+    <app-button variant="primary" [disabled]="form.invalid || loading() || montosInvalidos"
       (clicked)="onConfirm()">
       {{ data.confirmLabel ?? 'Confirmar' }}
     </app-button>
