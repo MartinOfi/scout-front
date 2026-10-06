@@ -68,6 +68,7 @@
     "src/app/modules/inscripciones/components/inscripcion-form/inscripcion-form.component.ts",
     "src/app/modules/inscripciones/components/inscripcion-form/inscripcion-form.component.spec.ts",
     "src/app/modules/inscripciones/services/inscripciones-api.service.ts",
+    "src/app/modules/inscripciones/services/inscripciones-api.delete-pago.spec.ts",
     "src/app/modules/inscripciones/services/inscripciones-state.service.ts",
     "src/app/modules/personas/services/personas-state.service.ts",
     "src/app/shared/services/configuracion.service.ts",

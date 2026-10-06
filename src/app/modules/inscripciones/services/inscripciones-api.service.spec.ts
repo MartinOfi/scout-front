@@ -56,10 +56,7 @@ describe('InscripcionesApiService', () => {
     };
 
     TestBed.configureTestingModule({
-      providers: [
-        InscripcionesApiService,
-        { provide: HttpService, useValue: mockHttpService },
-      ],
+      providers: [InscripcionesApiService, { provide: HttpService, useValue: mockHttpService }],
     });
 
     service = TestBed.inject(InscripcionesApiService);
@@ -483,55 +480,34 @@ describe('InscripcionesApiService', () => {
   // ==========================================================================
 
   describe('deletePago()', () => {
-    it('should call http.delete on movimientos endpoint', () => {
-      mockHttpService.delete.mockReturnValue(of(undefined));
-      mockHttpService.get.mockReturnValue(of(createPendienteScenario()));
+    it('should call DELETE on the inscripcion pagos endpoint, not on movimientos', () => {
+      mockHttpService.delete.mockReturnValue(of(createPendienteScenario()));
 
       service.deletePago('ins-123', 'mov-456').subscribe();
 
-      expect(mockHttpService.delete).toHaveBeenCalledWith(`${MOVIMIENTOS_ENDPOINT}/mov-456`);
+      expect(mockHttpService.delete).toHaveBeenCalledWith(
+        `${INSCRIPCIONES_ENDPOINT}/ins-123/pagos/mov-456`,
+      );
+      expect(mockHttpService.delete).not.toHaveBeenCalledWith(`${MOVIMIENTOS_ENDPOINT}/mov-456`);
     });
 
-    it('should refresh inscripcion after delete', async () => {
-      const refreshedInscripcion = createPendienteScenario();
-      mockHttpService.delete.mockReturnValue(of(undefined));
-      mockHttpService.get.mockReturnValue(of(refreshedInscripcion));
-
-      const result = await firstValueFrom(service.deletePago('ins-123', 'mov-456'));
-
-      expect(mockHttpService.get).toHaveBeenCalledWith(`${INSCRIPCIONES_ENDPOINT}/ins-123`);
-      expect(result).toEqual(refreshedInscripcion);
-    });
-
-    it('should return pendiente estado after last payment deleted', async () => {
+    it('should return the updated inscripcion from the response', async () => {
       const pendienteInscripcion = createPendienteScenario();
-      mockHttpService.delete.mockReturnValue(of(undefined));
-      mockHttpService.get.mockReturnValue(of(pendienteInscripcion));
+      mockHttpService.delete.mockReturnValue(of(pendienteInscripcion));
 
       const result = await firstValueFrom(service.deletePago('ins-123', 'last-payment'));
 
+      expect(result).toEqual(pendienteInscripcion);
       expect(result.estado).toBe('pendiente');
-      expect(result.movimientos.length).toBe(0);
-    });
-
-    it('should return parcial estado when payments remain', async () => {
-      const parcialInscripcion = createParcialScenario();
-      mockHttpService.delete.mockReturnValue(of(undefined));
-      mockHttpService.get.mockReturnValue(of(parcialInscripcion));
-
-      const result = await firstValueFrom(service.deletePago('ins-123', 'one-of-many'));
-
-      expect(result.estado).toBe('parcial');
-      expect(result.movimientos.length).toBeGreaterThan(0);
     });
 
     it('should propagate delete errors', async () => {
-      const error = new Error('Cannot delete finalized payment');
+      const error = new Error('Pago no encontrado');
       mockHttpService.delete.mockReturnValue(throwError(() => error));
 
-      await expect(
-        firstValueFrom(service.deletePago('ins-123', 'finalized-mov')),
-      ).rejects.toThrow('Cannot delete');
+      await expect(firstValueFrom(service.deletePago('ins-123', 'bad-mov'))).rejects.toThrow(
+        'Pago no encontrado',
+      );
     });
   });
 
