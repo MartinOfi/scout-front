@@ -3,3 +3,4 @@ export * from './error.interceptor';
 export * from './keep-alive.interceptor';
 export * from './loading.interceptor';
 export * from './retry.interceptor';
+export * from './app-http-interceptors';
