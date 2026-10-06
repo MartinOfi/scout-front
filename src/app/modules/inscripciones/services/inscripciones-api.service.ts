@@ -148,12 +148,13 @@ export class InscripcionesApiService {
 
   /**
    * Delete an existing payment (movimiento)
-   * Uses DELETE /api/v1/movimientos/:id then refreshes inscripcion state
+   * DELETE /api/v1/inscripciones/:id/pagos/:movimientoId — el backend bloquea
+   * DELETE /movimientos/:id para pagos de inscripción y devuelve la inscripción actualizada
    */
   deletePago(inscripcionId: string, movimientoId: string): Observable<InscripcionConEstado> {
-    return this.http
-      .delete<void>(`${this.movimientosEndpoint}/${movimientoId}`)
-      .pipe(switchMap(() => this.getById(inscripcionId)));
+    return this.http.delete<InscripcionConEstado>(
+      `${this.endpoint}/${inscripcionId}/pagos/${movimientoId}`,
+    );
   }
 
   /**
