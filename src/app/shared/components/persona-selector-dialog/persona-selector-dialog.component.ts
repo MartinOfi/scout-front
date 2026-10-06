@@ -260,7 +260,7 @@ export class PersonaSelectorDialogComponent implements OnInit {
   private loadPersonas(): void {
     this.loading.set(true);
     this.personasApi
-      .getAll()
+      .getAllActivos()
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (personas) => this.personas.set(personas),

@@ -3,7 +3,7 @@
  * Typed interfaces - NO any
  */
 
-import { CajaType } from '../enums';
+import { CajaType, EstadoPersona } from '../enums';
 
 /**
  * Propietario info returned from API
@@ -11,6 +11,7 @@ import { CajaType } from '../enums';
 export interface CajaPropietario {
   id: string;
   nombre: string;
+  estado?: EstadoPersona;
   rama?: string | null;
 }
 

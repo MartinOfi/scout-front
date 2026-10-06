@@ -28,6 +28,7 @@ import { GenericFiltersComponent } from '../../../../shared/components/filters/g
 import { FilterConfig } from '../../../../shared/components/filters/generic-filters/filter-config.interface';
 import { FilterType } from '../../../../shared/components/filters/generic-filters/filter-type.enum';
 import { RAMA_LABELS, RamaEnum } from '../../../../shared/enums/persona.enum';
+import { esPersonaDeshabilitada } from '../../../../shared/utils/persona-estado.util';
 
 @Component({
   selector: 'app-cuentas-personales',
@@ -54,13 +55,16 @@ export class CuentasPersonalesComponent implements OnInit {
   private readonly activeRama = signal<string>('');
 
   readonly tableData = computed((): TableData[] => {
-    const rows = this.cajasState.cajasPersonales().map((caja) => ({
-      id: caja.id,
-      nombre: this.getNombrePropietario(caja),
-      rama: this.getRamaPropietario(caja),
-      saldo: caja.saldoActual,
-      propietarioId: caja.propietarioId,
-    }));
+    const rows = this.cajasState
+      .cajasPersonales()
+      .filter((caja) => this.esCuentaVisible(caja))
+      .map((caja) => ({
+        id: caja.id,
+        nombre: this.getNombrePropietario(caja),
+        rama: this.getRamaPropietario(caja),
+        saldo: caja.saldoActual,
+        propietarioId: caja.propietarioId,
+      }));
 
     const search = this.activeSearch().toLowerCase();
     if (!search) return rows;
@@ -119,6 +123,12 @@ export class CuentasPersonalesComponent implements OnInit {
 
   ngOnInit(): void {
     this.cajasState.loadCajasPersonales();
+  }
+
+  /** Un deshabilitado solo figura mientras tenga saldo pendiente en su cuenta. */
+  private esCuentaVisible(caja: CajaConSaldo): boolean {
+    const deshabilitado = caja.propietario !== null && esPersonaDeshabilitada(caja.propietario);
+    return !deshabilitado || caja.saldoActual !== 0;
   }
 
   private getNombrePropietario(caja: CajaConSaldo): string {

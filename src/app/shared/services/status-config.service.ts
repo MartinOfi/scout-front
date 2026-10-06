@@ -22,6 +22,7 @@ export class StatusConfigService {
   private readonly statusMap: Record<string, string> = {
     // Spanish status names
     activo: 'success',
+    deshabilitado: 'danger',
     completado: 'success',
     confirmado: 'success',
     aprobado: 'success',

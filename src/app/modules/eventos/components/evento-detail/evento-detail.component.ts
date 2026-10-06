@@ -352,7 +352,7 @@ export class EventoDetailComponent implements OnInit, OnDestroy {
     const tab = this.route.snapshot.queryParamMap.get('tab');
     this.activeTab.set(tab ?? 'productos');
 
-    this.personasApi.getAll().subscribe((ps) => this.personas.set(ps));
+    this.personasApi.getAllActivos().subscribe((ps) => this.personas.set(ps));
 
     /**
      * switchMap auto-cancels the previous in-flight request when a newer

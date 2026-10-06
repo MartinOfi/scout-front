@@ -12,7 +12,7 @@ import { signal, WritableSignal } from '@angular/core';
 import { CuentasPersonalesComponent } from './cuentas-personales.component';
 import { CajasStateService } from '../../services/cajas-state.service';
 import { CajaConSaldo } from '../../../../shared/models';
-import { CajaType, RamaEnum } from '../../../../shared/enums';
+import { CajaType, EstadoPersona, RamaEnum } from '../../../../shared/enums';
 import { ActionEvent, TableData } from '../../../../shared/models/table.model';
 
 describe('CuentasPersonalesComponent', () => {
@@ -107,6 +107,30 @@ describe('CuentasPersonalesComponent', () => {
       expect(tableData[0]['nombre']).toBe('Juan Perez');
       expect(tableData[0]['saldo']).toBe(1000);
       expect(tableData[0]['propietarioId']).toBe('p-1');
+    });
+
+    it('oculta a los deshabilitados sin saldo y muestra a los que todavía tienen saldo', () => {
+      mockCajasStateService.cajasPersonales.set([
+        createMockCajaConSaldo({
+          id: 'caja-activa',
+          propietario: { id: 'p-1', nombre: 'Activa', estado: EstadoPersona.ACTIVO },
+          saldoActual: 0,
+        }),
+        createMockCajaConSaldo({
+          id: 'caja-baja-sin-saldo',
+          propietario: { id: 'p-2', nombre: 'Baja', estado: EstadoPersona.INACTIVO },
+          saldoActual: 0,
+        }),
+        createMockCajaConSaldo({
+          id: 'caja-baja-con-saldo',
+          propietario: { id: 'p-3', nombre: 'Baja Deudora', estado: EstadoPersona.INACTIVO },
+          saldoActual: -500,
+        }),
+      ]);
+
+      const ids = component.tableData().map((row) => row['id']);
+
+      expect(ids).toEqual(['caja-activa', 'caja-baja-con-saldo']);
     });
 
     it('should handle empty cajasPersonales list', () => {

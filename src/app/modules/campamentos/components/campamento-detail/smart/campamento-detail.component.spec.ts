@@ -132,7 +132,10 @@ describe('CampamentoDetailComponent', () => {
         },
         {
           provide: PersonasApiService,
-          useValue: { getAll: vi.fn().mockReturnValue(of([])) },
+          useValue: {
+            getAll: vi.fn().mockReturnValue(of([])),
+            getAllActivos: vi.fn().mockReturnValue(of([])),
+          },
         },
         {
           provide: MovimientosApiService,
@@ -508,6 +511,31 @@ describe('CampamentoDetailComponent', () => {
       component.onAddParticipante();
 
       expect(mockState.registrarPago).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('onRegistrarGasto', () => {
+    it('ofrece como responsables solo personas activas', () => {
+      mockState.detalleInfo.set({
+        id: 'camp-1',
+        nombre: 'Campamento Verano',
+        fechaInicio: new Date('2026-01-15'),
+        fechaFin: new Date('2026-01-20'),
+        costoPorPersona: 50000,
+        costoEducadores: 0,
+        cuotasBase: 3,
+      });
+      fixture.detectChanges();
+      vi.spyOn(
+        component as unknown as { openGastoDialog: () => unknown },
+        'openGastoDialog',
+      ).mockReturnValue(of({ afterClosed: () => of(undefined) }));
+      const personasApi = TestBed.inject(PersonasApiService);
+
+      component.onRegistrarGasto();
+
+      expect(personasApi.getAllActivos).toHaveBeenCalled();
+      expect(personasApi.getAll).not.toHaveBeenCalled();
     });
   });
 });
