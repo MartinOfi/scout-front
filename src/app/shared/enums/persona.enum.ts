@@ -40,7 +40,7 @@ export enum EstadoPersona {
  */
 export const ESTADO_PERSONA_LABELS: Record<EstadoPersona, string> = {
   [EstadoPersona.ACTIVO]: 'Activo',
-  [EstadoPersona.INACTIVO]: 'Inactivo',
+  [EstadoPersona.INACTIVO]: 'Deshabilitado',
 } as const;
 
 /**

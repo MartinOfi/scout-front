@@ -137,7 +137,7 @@ export class QuickMovimientoDialogComponent implements OnInit {
   }
 
   private loadPersonas(): void {
-    this.personasApi.getAll().subscribe({
+    this.personasApi.getAllActivos().subscribe({
       next: (personas) => {
         const options: PersonaOption[] = personas.map((p) => ({
           id: p.id,

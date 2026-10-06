@@ -30,7 +30,13 @@ import { GenericFiltersComponent } from '../../../../shared/components/filters/g
 import { FilterConfig } from '../../../../shared/components/filters/generic-filters/filter-config.interface';
 import { FilterType } from '../../../../shared/components/filters/generic-filters/filter-type.enum';
 import { TableColumn, ActionEvent, TableAction } from '../../../../shared/models/table.model';
-import { PersonaType, Rama, EstadoPersona, RamaEnum } from '../../../../shared/enums';
+import {
+  PersonaType,
+  Rama,
+  EstadoPersona,
+  RamaEnum,
+  ESTADO_PERSONA_LABELS,
+} from '../../../../shared/enums';
 import { Protagonista, PersonaUnion } from '../../../../shared/models';
 import {
   generateRamaTabs,
@@ -44,6 +50,14 @@ import {
 } from '../../../../shared/constants/persona.constants';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { ConfirmDialogService } from '../../../../shared/services/confirm-dialog.service';
+import {
+  esPersonaDeshabilitada,
+  soloHabilitadas,
+} from '../../../../shared/utils/persona-estado.util';
+
+const FILTRO_MOSTRAR_DESHABILITADOS = 'mostrarDeshabilitados';
+const ACCION_DESHABILITAR = 'deshabilitar';
+const ACCION_REHABILITAR = 'rehabilitar';
 
 interface StatConfig {
   readonly icon: string;
@@ -59,6 +73,8 @@ interface PersonaTableRow {
   saldoPersonal: string;
   deudaGrupo: string;
   tipo: PersonaType;
+  estado: EstadoPersona;
+  estadoLabel: string;
   rama?: Rama;
   // Documentación entregada (solo protagonistas)
   partidaNacimiento?: boolean;
@@ -102,24 +118,27 @@ export class PersonasDashboardComponent implements OnInit {
   /** Current search filter */
   readonly searchFilter = signal<string>('');
 
+  /** Los deshabilitados quedan ocultos salvo que se pida verlos */
+  readonly mostrarDeshabilitados = signal<boolean>(false);
+
   /** Stats computed from state */
   readonly stats = computed((): readonly StatConfig[] => [
     {
       icon: PERSONA_TYPE_ICONS[PersonaType.PROTAGONISTA],
       title: 'Protagonistas',
-      value: this.state.protagonistaCount(),
+      value: this.visibles(this.state.protagonistas()).length,
       variant: 'info',
     },
     {
       icon: PERSONA_TYPE_ICONS[PersonaType.EDUCADOR],
       title: 'Educadores',
-      value: this.state.educadorCount(),
+      value: this.visibles(this.state.educadores()).length,
       variant: 'success',
     },
     {
       icon: 'people',
       title: 'Personas Extras',
-      value: this.state.personasExternasCount(),
+      value: this.visibles(this.state.personasExternas()).length,
       variant: 'warning',
     },
     { icon: 'groups', title: 'Total Activos', value: this.totalActivos(), variant: 'danger' },
@@ -145,6 +164,12 @@ export class PersonasDashboardComponent implements OnInit {
       label: 'Buscar',
       placeholder: 'Buscar por nombre...',
       defaultValue: '',
+    },
+    {
+      key: FILTRO_MOSTRAR_DESHABILITADOS,
+      type: FilterType.BOOLEAN,
+      label: 'Mostrar deshabilitados',
+      defaultValue: false,
     },
   ];
 
@@ -181,8 +206,13 @@ export class PersonasDashboardComponent implements OnInit {
       actions: this.getTableActions(),
     };
 
+    const estadoColumns: TableColumn[] = this.mostrarDeshabilitados()
+      ? [{ key: 'estadoLabel', header: 'Estado', type: 'status' }]
+      : [];
+
     return [
       { key: 'nombreCompleto', header: 'Nombre y Apellido', type: 'text' },
+      ...estadoColumns,
       ...docColumns,
       actions,
     ];
@@ -204,6 +234,8 @@ export class PersonasDashboardComponent implements OnInit {
       personas = this.state.personasExternas();
     }
 
+    personas = this.visibles(personas);
+
     // Apply search filter
     if (search) {
       personas = personas.filter((p) => p.nombre.toLowerCase().includes(search));
@@ -223,6 +255,7 @@ export class PersonasDashboardComponent implements OnInit {
   onFilterChange(filters: Record<string, unknown>): void {
     const search = (filters['search'] as string) ?? '';
     this.searchFilter.set(search);
+    this.mostrarDeshabilitados.set(filters[FILTRO_MOSTRAR_DESHABILITADOS] === true);
   }
 
   onNuevoMiembro(): void {
@@ -252,6 +285,12 @@ export class PersonasDashboardComponent implements OnInit {
       case 'delete':
         this.confirmDelete(row);
         break;
+      case ACCION_DESHABILITAR:
+        this.confirmCambioHabilitacion(row, false);
+        break;
+      case ACCION_REHABILITAR:
+        this.confirmCambioHabilitacion(row, true);
+        break;
     }
   }
 
@@ -259,8 +298,41 @@ export class PersonasDashboardComponent implements OnInit {
     return [
       { key: 'view', label: 'Ver', icon: 'visibility', tooltip: 'Ver detalle' },
       { key: 'edit', label: 'Editar', icon: 'edit', tooltip: 'Editar persona' },
+      {
+        key: ACCION_DESHABILITAR,
+        label: 'Deshabilitar',
+        icon: 'person_off',
+        tooltip: 'Deshabilitar (deja de aparecer al crear inscripciones, campamentos, etc.)',
+        visible: (row) => !esPersonaDeshabilitada(row as PersonaTableRow),
+      },
+      {
+        key: ACCION_REHABILITAR,
+        label: 'Rehabilitar',
+        icon: 'person_add',
+        tooltip: 'Rehabilitar persona',
+        visible: (row) => esPersonaDeshabilitada(row as PersonaTableRow),
+      },
       { key: 'delete', label: 'Eliminar', icon: 'delete', tooltip: 'Eliminar persona' },
     ];
+  }
+
+  private confirmCambioHabilitacion(row: PersonaTableRow, habilitar: boolean): void {
+    const titulo = habilitar ? 'Rehabilitar persona' : 'Deshabilitar persona';
+    const mensaje = habilitar
+      ? `${row.nombreCompleto} vuelve a aparecer en todas las listas.`
+      : `${row.nombreCompleto} dejará de aparecer al crear inscripciones, campamentos, ` +
+        'ventas o movimientos. Su historial y sus deudas pendientes siguen visibles.';
+
+    this.confirmDialog
+      .confirm(titulo, mensaje, {
+        icon: habilitar ? 'person_add' : 'person_off',
+        confirmText: habilitar ? 'Rehabilitar' : 'Deshabilitar',
+      })
+      .subscribe((confirmed: boolean) => {
+        if (confirmed) {
+          this.state.cambiarHabilitacion(row.id, habilitar).subscribe();
+        }
+      });
   }
 
   private confirmDelete(row: PersonaTableRow): void {
@@ -287,6 +359,11 @@ export class PersonasDashboardComponent implements OnInit {
     }
   }
 
+  /** Tabla y stats comparten este criterio para que siempre coincidan. */
+  private visibles<T extends PersonaUnion>(personas: T[]): T[] {
+    return this.mostrarDeshabilitados() ? personas : soloHabilitadas(personas);
+  }
+
   private getProtagonistasbyRama(rama: Rama): Protagonista[] {
     return this.state.protagonistas().filter((p) => p.rama === rama);
   }
@@ -300,6 +377,8 @@ export class PersonasDashboardComponent implements OnInit {
       saldoPersonal: '$0', // TODO: Connect to actual saldo data
       deudaGrupo: '$0', // TODO: Connect to actual deuda data
       tipo: persona.tipo,
+      estado: persona.estado,
+      estadoLabel: ESTADO_PERSONA_LABELS[persona.estado],
       rama: protagonista?.rama,
       // Documentación entregada (solo para protagonistas)
       partidaNacimiento: protagonista?.partidaNacimiento ?? false,

@@ -27,10 +27,21 @@ export class PersonasApiService {
   private readonly endpointPersonasExternas = API_CONFIG.ENDPOINTS.PERSONAS_EXTERNAS;
 
   /**
-   * Get all active personas
+   * Todos los miembros, incluidos los deshabilitados. Para listados y vistas
+   * históricas donde un deshabilitado tiene que seguir apareciendo.
    */
   getAll(): Observable<PersonaUnion[]> {
     return this.http.get<PersonaUnion[]>(this.endpoint);
+  }
+
+  /**
+   * Solo miembros habilitados. Para selectores que crean algo nuevo
+   * (inscribir, agregar participante, elegir responsable...).
+   */
+  getAllActivos(): Observable<PersonaUnion[]> {
+    return this.http.get<PersonaUnion[]>(this.endpoint, {
+      [API_CONFIG.QUERY_PARAMS.SOLO_ACTIVOS]: true,
+    });
   }
 
   /**

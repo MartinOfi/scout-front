@@ -23,7 +23,7 @@ import { PersonaDashboardDto } from '../models';
 
 import { PersonasApiService } from './personas-api.service';
 import { ErrorHandlerService, NotificationService } from '../../../shared/services';
-import { PersonaType } from '../../../shared/enums';
+import { EstadoPersona, PersonaType } from '../../../shared/enums';
 
 @Injectable({
   providedIn: 'root',
@@ -90,18 +90,6 @@ export class PersonasStateService {
 
   readonly totalCount = computed((): number => {
     return this.allPersonas().length;
-  });
-
-  readonly protagonistaCount = computed((): number => {
-    return this._protagonistas().length;
-  });
-
-  readonly educadorCount = computed((): number => {
-    return this._educadores().length;
-  });
-
-  readonly personasExternasCount = computed((): number => {
-    return this._personasExternas().length;
   });
 
   // Dashboard computed
@@ -235,6 +223,28 @@ export class PersonasStateService {
       catchError((err: unknown) => {
         this._error.set(this.errorHandler.extractMessage(err, 'Error al actualizar persona'));
         this._loading.set(false);
+        return throwError(() => err);
+      }),
+    );
+  }
+
+  /**
+   * Deshabilitar o rehabilitar una persona. Un deshabilitado deja de aparecer
+   * en los selectores para crear algo nuevo, pero conserva todo su historial.
+   */
+  cambiarHabilitacion(id: string, habilitar: boolean): Observable<PersonaUnion> {
+    const estado = habilitar ? EstadoPersona.ACTIVO : EstadoPersona.INACTIVO;
+    const mensaje = habilitar ? 'Persona rehabilitada' : 'Persona deshabilitada';
+
+    return this.apiService.update(id, { estado }).pipe(
+      tap((persona: PersonaUnion) => {
+        this._updateInState(persona);
+        this.notificationService.showSuccess(mensaje);
+      }),
+      catchError((err: unknown) => {
+        this.notificationService.showError(
+          this.errorHandler.extractMessage(err, 'Error al cambiar el estado de la persona'),
+        );
         return throwError(() => err);
       }),
     );

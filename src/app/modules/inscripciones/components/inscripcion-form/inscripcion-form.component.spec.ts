@@ -22,7 +22,7 @@ import {
   InscripcionConEstado,
   PersonaUnion,
 } from '../../../../shared/models';
-import { TipoInscripcion } from '../../../../shared/enums';
+import { EstadoPersona, PersonaType, TipoInscripcion } from '../../../../shared/enums';
 import { MockRouter, createMockRouter } from '../../../../shared/testing/common-mocks';
 
 /** Montos de configuración usados por el mock de ConfiguracionService */
@@ -319,6 +319,42 @@ describe('InscripcionFormComponent', () => {
       component.onSubmit();
 
       expect('personaNueva' in lastCreateDto()).toBe(false);
+    });
+  });
+
+  describe('Personas deshabilitadas', () => {
+    const activa = {
+      id: 'p-activa',
+      nombre: 'Ana',
+      tipo: PersonaType.PROTAGONISTA,
+      estado: EstadoPersona.ACTIVO,
+    } as PersonaUnion;
+    const deshabilitada = {
+      id: 'p-inactiva',
+      nombre: 'Beto',
+      tipo: PersonaType.PROTAGONISTA,
+      estado: EstadoPersona.INACTIVO,
+    } as PersonaUnion;
+
+    beforeEach(() => {
+      mockPersonasState.allPersonas.set([activa, deshabilitada]);
+    });
+
+    it('al crear, el selector no ofrece personas deshabilitadas', () => {
+      component.ngOnInit();
+
+      expect(component.personas()).toEqual([activa]);
+    });
+
+    it('al editar, conserva a la persona deshabilitada para que la inscripción la siga mostrando', () => {
+      mockActivatedRoute.snapshot.paramMap = convertToParamMap({ id: 'insc-123' });
+      mockStateService.inscripciones.set([
+        createMockInscripcion({ id: 'insc-123', personaId: 'p-inactiva' }),
+      ]);
+
+      component.ngOnInit();
+
+      expect(component.personas()).toEqual([activa, deshabilitada]);
     });
   });
 

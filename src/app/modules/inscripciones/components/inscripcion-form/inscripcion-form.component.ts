@@ -52,6 +52,7 @@ import { SelectFieldComponent } from '../../../../shared/components/form/select-
 import { NumberFieldComponent } from '../../../../shared/components/form/number-field/number-field.component';
 import { CheckboxFieldComponent } from '../../../../shared/components/form/checkbox-field/checkbox-field.component';
 import { MoneyPipe } from '../../../../shared/pipes';
+import { soloHabilitadas } from '../../../../shared/utils/persona-estado.util';
 
 interface TipoOption {
   value: TipoInscripcion;
@@ -103,7 +104,12 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
 
   readonly loading = this.state.loading;
   readonly personasLoading = this.personasState.loading;
-  readonly personas: Signal<PersonaUnion[]> = this.personasState.allPersonas;
+  /** Al crear no se ofrece a los deshabilitados; al editar o pagar se conserva a quien ya está inscripto. */
+  private readonly modoCreacion = signal<boolean>(true);
+  readonly personas: Signal<PersonaUnion[]> = computed(() => {
+    const todas = this.personasState.allPersonas();
+    return this.modoCreacion() ? soloHabilitadas(todas) : todas;
+  });
   readonly tipoLabels = TIPO_INSCRIPCION_LABELS;
   readonly tipos: TipoInscripcion[] = ['grupo', 'scout_argentina'];
 
@@ -188,6 +194,7 @@ export class InscripcionFormComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.inscripcionId = this.route.snapshot.paramMap.get('id');
     this.isEditing = !!this.inscripcionId;
+    this.modoCreacion.set(!this.isEditing);
 
     // Load personas for the selector if not already loaded
     if (this.personasState.allPersonas().length === 0) {

@@ -51,6 +51,9 @@ export const API_CONFIG = {
     // Reportes
     REPORTES_DEUDAS: 'reportes/deudas',
   },
+  QUERY_PARAMS: {
+    SOLO_ACTIVOS: 'soloActivos',
+  },
 } as const;
 
 /**
