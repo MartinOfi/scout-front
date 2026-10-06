@@ -73,7 +73,6 @@
     "src/app/shared/components/persona-selector-dialog/persona-selector-dialog.component.spec.ts",
     "src/app/shared/forms/validators/persona-reembolso.validator.spec.ts",
     "src/app/shared/forms/validators/persona-reembolso.validator.ts",
-    "src/app/modules/personas/services/personas-api.service.ts",
     "src/app/modules/inscripciones/components/inscripcion-form/inscripcion-form.component.ts",
     "src/app/modules/inscripciones/components/inscripcion-form/inscripcion-form.component.spec.ts",
     "src/app/modules/inscripciones/services/inscripciones-api.service.ts",
