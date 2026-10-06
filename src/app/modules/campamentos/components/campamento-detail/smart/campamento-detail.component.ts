@@ -504,7 +504,7 @@ export class CampamentoDetailComponent implements OnInit {
     if (!camp) return;
 
     this.personasApi
-      .getAll()
+      .getAllActivos()
       .pipe(
         switchMap((responsables) => {
           const dialogData: GastoCampamentoDialogData = {

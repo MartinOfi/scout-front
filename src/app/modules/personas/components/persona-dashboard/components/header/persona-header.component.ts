@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { PersonaDashboardPersona } from '../../../../models';
 import {
+  ESTADO_PERSONA_LABELS,
   PersonaType,
   EstadoPersona,
   CargoEducador,
@@ -40,10 +41,7 @@ export class PersonaHeaderComponent {
     [PersonaType.AGRUPACION]: 'Grupo',
   };
 
-  readonly estadoLabels: Record<EstadoPersona, string> = {
-    [EstadoPersona.ACTIVO]: 'Activo',
-    [EstadoPersona.INACTIVO]: 'Inactivo',
-  };
+  readonly estadoLabels: Record<EstadoPersona, string> = ESTADO_PERSONA_LABELS;
 
   readonly ramaLabels = RAMA_LABELS;
   readonly cargoLabels = CARGO_EDUCADOR_LABELS;

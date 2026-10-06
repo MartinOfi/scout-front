@@ -197,7 +197,7 @@ export class MovimientoFormComponent implements OnInit {
     // Load cajas and personas in parallel
     forkJoin({
       cajas: this.cajasApi.getAll(),
-      personas: this.personasApi.getAll(),
+      personas: this.personasApi.getAllActivos(),
     })
       .pipe(
         tap(({ cajas, personas }) => {

@@ -20,6 +20,10 @@ describe('PersonaSelectorDialogComponent - bonificar field', () => {
   let component: PersonaSelectorDialogComponent;
   let fixture: ComponentFixture<PersonaSelectorDialogComponent>;
   let mockDialogRef: { close: ReturnType<typeof vi.fn> };
+  let mockPersonasApi: {
+    getAll: ReturnType<typeof vi.fn>;
+    getAllActivos: ReturnType<typeof vi.fn>;
+  };
 
   const protagonista: Protagonista = {
     id: 'prota-1',
@@ -50,6 +54,10 @@ describe('PersonaSelectorDialogComponent - bonificar field', () => {
 
   function setup(data: Partial<PersonaSelectorDialogData> = {}): void {
     mockDialogRef = { close: vi.fn() };
+    mockPersonasApi = {
+      getAll: vi.fn().mockReturnValue(of([protagonista, educadorExento])),
+      getAllActivos: vi.fn().mockReturnValue(of([protagonista, educadorExento])),
+    };
 
     TestBed.configureTestingModule({
       imports: [PersonaSelectorDialogComponent],
@@ -59,10 +67,7 @@ describe('PersonaSelectorDialogComponent - bonificar field', () => {
           provide: MAT_DIALOG_DATA,
           useValue: { title: 'Agregar', ...data },
         },
-        {
-          provide: PersonasApiService,
-          useValue: { getAll: vi.fn().mockReturnValue(of([protagonista, educadorExento])) },
-        },
+        { provide: PersonasApiService, useValue: mockPersonasApi },
       ],
     }).compileComponents();
 
@@ -70,6 +75,12 @@ describe('PersonaSelectorDialogComponent - bonificar field', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
   }
+
+  it('carga solo personas activas: un deshabilitado no se puede agregar', () => {
+    setup();
+    expect(mockPersonasApi.getAllActivos).toHaveBeenCalled();
+    expect(mockPersonasApi.getAll).not.toHaveBeenCalled();
+  });
 
   it('no muestra el campo de bonificar sin showBonificarField', () => {
     setup();
