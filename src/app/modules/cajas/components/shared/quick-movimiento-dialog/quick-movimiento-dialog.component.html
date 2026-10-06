@@ -85,6 +85,21 @@
         </app-select-field>
       </div>
 
+      <!-- Persona a Reembolsar (solo cuando estadoPago = pendiente_reembolso) -->
+      @if (isPendienteReembolso) {
+        <div class="form-row">
+          <app-select-field
+            label="Persona a reembolsar"
+            formControlName="personaAReembolsarId"
+            [options]="personas()"
+            optionValue="id"
+            optionLabel="nombre"
+            [searchable]="true"
+            placeholder="Seleccionar persona que adelantó el dinero">
+          </app-select-field>
+        </div>
+      }
+
       <!-- Descripción -->
       <div class="form-row full-width">
         <app-textarea-field
