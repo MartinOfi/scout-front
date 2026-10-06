@@ -31,7 +31,6 @@ const CONCEPTO_ICONS: Partial<Record<ConceptoMovimiento, string>> = {
   [ConceptoMovimiento.INSCRIPCION_GRUPO]: 'how_to_reg',
   [ConceptoMovimiento.INSCRIPCION_SCOUT_ARGENTINA]: 'how_to_reg',
   [ConceptoMovimiento.INSCRIPCION_PAGO_SCOUT_ARGENTINA]: 'payments',
-  [ConceptoMovimiento.CUOTA_GRUPO]: 'calendar_month',
   [ConceptoMovimiento.CAMPAMENTO_PAGO]: 'camping',
   [ConceptoMovimiento.CAMPAMENTO_GASTO]: 'camping',
   [ConceptoMovimiento.EVENTO_VENTA_INGRESO]: 'storefront',

@@ -1,6 +1,6 @@
 /**
  * Inscripciones Routes Configuration
- * Lazy loading para inscripciones y cuotas
+ * Lazy loading para inscripciones
  */
 
 import { Routes } from '@angular/router';
@@ -25,13 +25,6 @@ export const INSCRIPCIONES_ROUTES: Routes = [
     loadComponent: () =>
       import('./components/inscripcion-form/smart/inscripcion-form.component').then(
         (m) => m.InscripcionFormComponent,
-      ),
-  },
-  {
-    path: 'cuotas',
-    loadComponent: () =>
-      import('./components/cuotas-list/smart/cuotas-list.component').then(
-        (m) => m.CuotasListComponent,
       ),
   },
   {

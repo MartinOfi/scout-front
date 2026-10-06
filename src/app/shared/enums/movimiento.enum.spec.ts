@@ -2,7 +2,8 @@ import {
   MedioPagoEnum,
   MEDIOS_PAGO,
   MEDIO_PAGO_LABELS,
-  CONCEPTOS_CREABLES_MANUALMENTE,
+  CONCEPTOS_MANUALES_POR_TIPO,
+  TipoMovimientoEnum,
   ConceptoMovimiento,
   CATEGORIA_MOVIMIENTO_LABELS,
   CategoriaMovimiento,
@@ -27,25 +28,64 @@ describe('MedioPagoEnum', () => {
   });
 });
 
-describe('CONCEPTOS_CREABLES_MANUALMENTE', () => {
-  it('debe incluir GASTO_GENERAL', () => {
-    expect(CONCEPTOS_CREABLES_MANUALMENTE).toContain(ConceptoMovimiento.GASTO_GENERAL);
+describe('CONCEPTOS_MANUALES_POR_TIPO', () => {
+  const ingresos = CONCEPTOS_MANUALES_POR_TIPO[TipoMovimientoEnum.INGRESO];
+  const egresos = CONCEPTOS_MANUALES_POR_TIPO[TipoMovimientoEnum.EGRESO];
+
+  it('ofrece todos los conceptos de ingreso, no solo AJUSTE_INICIAL', () => {
+    expect(ingresos).toEqual(
+      expect.arrayContaining([
+        ConceptoMovimiento.INSCRIPCION_GRUPO,
+        ConceptoMovimiento.INSCRIPCION_SCOUT_ARGENTINA,
+        ConceptoMovimiento.CAMPAMENTO_PAGO,
+        ConceptoMovimiento.EVENTO_VENTA_INGRESO,
+        ConceptoMovimiento.EVENTO_VENTA_RECUPERO_COSTO,
+        ConceptoMovimiento.EVENTO_GRUPO_INGRESO,
+        ConceptoMovimiento.ASIGNACION_FONDO_RAMA,
+        ConceptoMovimiento.AJUSTE_INICIAL,
+      ]),
+    );
   });
 
-  it('debe incluir AJUSTE_INICIAL', () => {
-    expect(CONCEPTOS_CREABLES_MANUALMENTE).toContain(ConceptoMovimiento.AJUSTE_INICIAL);
+  it('ofrece todos los conceptos de egreso', () => {
+    expect(egresos).toEqual(
+      expect.arrayContaining([
+        ConceptoMovimiento.INSCRIPCION_PAGO_SCOUT_ARGENTINA,
+        ConceptoMovimiento.CAMPAMENTO_GASTO,
+        ConceptoMovimiento.EVENTO_VENTA_GASTO,
+        ConceptoMovimiento.EVENTO_GRUPO_GASTO,
+        ConceptoMovimiento.GASTO_GENERAL,
+        ConceptoMovimiento.REEMBOLSO,
+        ConceptoMovimiento.AJUSTE_INICIAL,
+      ]),
+    );
   });
 
-  it('no debe incluir conceptos de sistema', () => {
-    expect(CONCEPTOS_CREABLES_MANUALMENTE).not.toContain(ConceptoMovimiento.CUOTA_GRUPO);
-    expect(CONCEPTOS_CREABLES_MANUALMENTE).not.toContain(ConceptoMovimiento.INSCRIPCION_GRUPO);
-    expect(CONCEPTOS_CREABLES_MANUALMENTE).not.toContain(ConceptoMovimiento.CAMPAMENTO_PAGO);
-    expect(CONCEPTOS_CREABLES_MANUALMENTE).not.toContain(ConceptoMovimiento.EVENTO_VENTA_INGRESO);
-    expect(CONCEPTOS_CREABLES_MANUALMENTE).not.toContain(ConceptoMovimiento.REEMBOLSO);
+  it('no mezcla tipos: ningún concepto de egreso aparece en ingreso y viceversa', () => {
+    expect(ingresos).not.toContain(ConceptoMovimiento.GASTO_GENERAL);
+    expect(ingresos).not.toContain(ConceptoMovimiento.CAMPAMENTO_GASTO);
+    expect(egresos).not.toContain(ConceptoMovimiento.CAMPAMENTO_PAGO);
+    expect(egresos).not.toContain(ConceptoMovimiento.EVENTO_GRUPO_INGRESO);
   });
 
-  it('debe tener exactamente 2 entradas', () => {
-    expect(CONCEPTOS_CREABLES_MANUALMENTE.length).toBe(2);
+  it('excluye los conceptos que siempre van en pareja ligada (transferencias, bonificaciones, uso de saldo)', () => {
+    const ligados = [
+      ConceptoMovimiento.TRANSFERENCIA_ENTRE_CAJAS,
+      ConceptoMovimiento.TRANSFERENCIA_SALDO_PERSONAL,
+      ConceptoMovimiento.BONIFICACION_OTORGADA,
+      ConceptoMovimiento.BONIFICACION_RECIBIDA,
+      ConceptoMovimiento.USO_SALDO_PERSONAL,
+    ];
+    for (const concepto of ligados) {
+      expect(ingresos).not.toContain(concepto);
+      expect(egresos).not.toContain(concepto);
+    }
+  });
+});
+
+describe('ConceptoMovimiento sin cuota de grupo', () => {
+  it('no existe más el concepto cuota_grupo', () => {
+    expect(Object.values(ConceptoMovimiento)).not.toContain('cuota_grupo');
   });
 });
 

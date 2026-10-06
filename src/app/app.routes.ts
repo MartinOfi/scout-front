@@ -103,8 +103,8 @@ export const routes: Routes = [
           ),
         data: {
           page: {
-            title: 'Inscripciones y Cuotas',
-            subtitle: 'Gestión de inscripciones Scout Argentina y cuotas de grupo',
+            title: 'Inscripciones',
+            subtitle: 'Gestión de inscripciones Scout Argentina y de grupo',
           },
         } satisfies RouteDataWithPage,
       },

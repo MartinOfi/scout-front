@@ -9,7 +9,6 @@ export * from './caja.model';
 export * from './movimiento.model';
 export * from './inscripcion.model';
 export * from './pago-inscripcion.model';
-export * from './cuota.model';
 export * from './campamento.model';
 export * from './participante-campamento.model';
 export * from './pago-campamento.model';

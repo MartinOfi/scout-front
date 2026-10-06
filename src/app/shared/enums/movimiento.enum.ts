@@ -15,7 +15,7 @@ export enum TipoMovimientoEnum {
 }
 
 /**
- * Concepts of movements (15 total)
+ * Concepts of movements
  * Synced with backend: src/common/enums/index.ts
  */
 export enum ConceptoMovimiento {
@@ -23,9 +23,6 @@ export enum ConceptoMovimiento {
   INSCRIPCION_GRUPO = 'inscripcion_grupo',
   INSCRIPCION_SCOUT_ARGENTINA = 'inscripcion_scout_argentina',
   INSCRIPCION_PAGO_SCOUT_ARGENTINA = 'inscripcion_pago_scout_argentina',
-
-  // Cuotas
-  CUOTA_GRUPO = 'cuota_grupo',
 
   // Campamentos
   CAMPAMENTO_PAGO = 'campamento_pago',
@@ -73,7 +70,6 @@ export const CONCEPTO_MOVIMIENTO_LABELS: Record<ConceptoMovimiento, string> = {
   [ConceptoMovimiento.INSCRIPCION_GRUPO]: 'Inscripción de Grupo',
   [ConceptoMovimiento.INSCRIPCION_SCOUT_ARGENTINA]: 'Inscripción Scout Argentina',
   [ConceptoMovimiento.INSCRIPCION_PAGO_SCOUT_ARGENTINA]: 'Pago a Scout Argentina',
-  [ConceptoMovimiento.CUOTA_GRUPO]: 'Cuota de Grupo',
   [ConceptoMovimiento.CAMPAMENTO_PAGO]: 'Pago de Campamento',
   [ConceptoMovimiento.CAMPAMENTO_GASTO]: 'Gasto de Campamento',
   [ConceptoMovimiento.EVENTO_VENTA_INGRESO]: 'Ingreso Evento de Venta',
@@ -138,13 +134,34 @@ export const ESTADO_PAGO_LABELS: Record<EstadoPago, string> = {
 } as const;
 
 /**
- * Whitelist of concepts that can be created manually via the individual form.
- * All other concepts are system-generated from events/camps/inscripciones/cuotas.
+ * Conceptos que ofrece la carga manual de un movimiento, según su tipo.
+ * Quedan afuera los que siempre se crean en pareja ligada por su propio flujo
+ * (transferencias, bonificaciones, uso de saldo personal): cargar una sola
+ * pata a mano rompería el saldo de la otra caja.
  */
-export const CONCEPTOS_CREABLES_MANUALMENTE: readonly ConceptoMovimiento[] = [
-  ConceptoMovimiento.GASTO_GENERAL,
-  ConceptoMovimiento.AJUSTE_INICIAL,
-] as const;
+export const CONCEPTOS_MANUALES_POR_TIPO: Readonly<
+  Record<TipoMovimientoEnum, readonly ConceptoMovimiento[]>
+> = {
+  [TipoMovimientoEnum.INGRESO]: [
+    ConceptoMovimiento.INSCRIPCION_GRUPO,
+    ConceptoMovimiento.INSCRIPCION_SCOUT_ARGENTINA,
+    ConceptoMovimiento.CAMPAMENTO_PAGO,
+    ConceptoMovimiento.EVENTO_VENTA_INGRESO,
+    ConceptoMovimiento.EVENTO_VENTA_RECUPERO_COSTO,
+    ConceptoMovimiento.EVENTO_GRUPO_INGRESO,
+    ConceptoMovimiento.ASIGNACION_FONDO_RAMA,
+    ConceptoMovimiento.AJUSTE_INICIAL,
+  ],
+  [TipoMovimientoEnum.EGRESO]: [
+    ConceptoMovimiento.INSCRIPCION_PAGO_SCOUT_ARGENTINA,
+    ConceptoMovimiento.CAMPAMENTO_GASTO,
+    ConceptoMovimiento.EVENTO_VENTA_GASTO,
+    ConceptoMovimiento.EVENTO_GRUPO_GASTO,
+    ConceptoMovimiento.GASTO_GENERAL,
+    ConceptoMovimiento.REEMBOLSO,
+    ConceptoMovimiento.AJUSTE_INICIAL,
+  ],
+};
 
 /**
  * Filtro de la lista de movimientos (común a campamentos y eventos).

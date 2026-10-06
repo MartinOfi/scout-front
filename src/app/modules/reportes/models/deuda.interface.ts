@@ -21,15 +21,6 @@ export interface InscripcionDeuda {
   saldo: number;
 }
 
-export interface CuotaDeuda {
-  cuotaId: string;
-  nombre: string;
-  ano: number;
-  montoTotal: number;
-  montoPagado: number;
-  saldo: number;
-}
-
 export interface DocumentacionPersonal {
   dni: boolean;
   partidaNacimiento: boolean;
@@ -59,7 +50,6 @@ export interface PersonaDeuda {
   campamentos: CampamentoDeuda[];
   inscripcionesGrupo: InscripcionDeuda[];
   inscripcionesScout: InscripcionDeuda[];
-  cuotas: CuotaDeuda[];
   /** null para educadores (no tienen documentación personal). */
   documentacionPersonal: DocumentacionPersonal | null;
   documentacionInscripcion: DocInscripcion[];

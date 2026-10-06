@@ -20,8 +20,8 @@ describe('MovimientoInfoCardComponent', () => {
     cajaId: 'caja-1',
     tipo: TipoMovimientoEnum.INGRESO,
     monto: 1500.50,
-    concepto: ConceptoMovimiento.CUOTA_GRUPO,
-    descripcion: 'Cuota mensual enero',
+    concepto: ConceptoMovimiento.INSCRIPCION_GRUPO,
+    descripcion: 'Inscripción de grupo 2026',
     responsableId: 'resp-1',
     responsable: {
       id: 'resp-1',
@@ -127,7 +127,7 @@ describe('MovimientoInfoCardComponent', () => {
 
     it('should display concepto label', () => {
       const conceptoValue = compiled.queryAll(By.css('.info-item .value'))[0];
-      expect(conceptoValue.nativeElement.textContent.trim()).toBe('Cuota de Grupo');
+      expect(conceptoValue.nativeElement.textContent.trim()).toBe('Inscripción de Grupo');
     });
 
     it('should display fecha formatted', () => {
@@ -157,7 +157,7 @@ describe('MovimientoInfoCardComponent', () => {
     it('should display descripcion when provided', () => {
       const descripcionItem = compiled.query(By.css('.info-item.full-width'));
       expect(descripcionItem).toBeTruthy();
-      expect(descripcionItem.nativeElement.textContent).toContain('Cuota mensual enero');
+      expect(descripcionItem.nativeElement.textContent).toContain('Inscripción de grupo 2026');
     });
 
     it('should NOT display descripcion when not provided', () => {
