@@ -11,6 +11,7 @@
   "include": [
     "src/**/*.d.ts",
     "src/app/core/interceptors/retry.interceptor.spec.ts",
+    "src/app/core/interceptors/app-http-interceptors.spec.ts",
     "src/app/core/services/theme-logger.service.ts",
     "src/app/core/services/theme-storage.service.ts",
     "src/app/core/services/theme-storage.service.spec.ts",

@@ -13,12 +13,7 @@ import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { firstValueFrom } from 'rxjs';
 
 import { routes } from './app.routes';
-import {
-  authInterceptor,
-  errorInterceptor,
-  keepAliveInterceptor,
-  retryInterceptor,
-} from './core/interceptors';
+import { APP_HTTP_INTERCEPTORS } from './core/interceptors';
 import { AuthStateService } from './modules/auth/services';
 import { ThemeService } from './core/services/theme.service';
 
@@ -57,12 +52,7 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(
-      withInterceptors([
-        keepAliveInterceptor, // Resets keep-alive timer on every request
-        authInterceptor, // Must be first auth-wise - adds auth token
-        retryInterceptor, // Retries transient errors (502/503/504) with exponential backoff
-        errorInterceptor, // Handles errors globally (only after retries exhausted)
-      ]),
+      withInterceptors(APP_HTTP_INTERCEPTORS),
     ),
     provideAnimationsAsync(),
     provideCharts(withDefaultRegisterables()),
