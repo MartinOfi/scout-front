@@ -89,6 +89,7 @@ const mockParticipanteBonificado: ParticipantePagoDto = {
   estadoPago: EstadoPagoCampamento.PAGADO,
   saldoCuentaPersonal: 0,
   autorizacionEntregada: true,
+  fechaInscripcion: '2026-01-05T10:00:00Z',
   pagos: [],
 };
 
@@ -188,6 +189,7 @@ describe('CampamentoDetailComponent', () => {
         estadoPago: EstadoPagoCampamento.EXENTO,
         saldoCuentaPersonal: 0,
         autorizacionEntregada: true,
+        fechaInscripcion: '2026-01-05T10:00:00Z',
         pagos: [],
       },
     ]);
@@ -218,6 +220,7 @@ describe('CampamentoDetailComponent', () => {
         estadoPago: EstadoPagoCampamento.PAGADO,
         saldoCuentaPersonal: 0,
         autorizacionEntregada: true,
+        fechaInscripcion: '2026-01-05T10:00:00Z',
         pagos: [],
       },
     ]);
@@ -249,6 +252,7 @@ describe('CampamentoDetailComponent', () => {
         estadoPago: EstadoPagoCampamento.PARCIAL,
         saldoCuentaPersonal: 0,
         autorizacionEntregada: false,
+        fechaInscripcion: '2026-01-05T10:00:00Z',
         pagos: [],
       },
     ]);
@@ -258,6 +262,26 @@ describe('CampamentoDetailComponent', () => {
       '.participante-card__paid',
     );
     expect(paidEl?.textContent).toContain('5.000');
+  });
+
+  it('muestra la fecha de inscripción al final de la info del participante', () => {
+    mockState.detalleInfo.set({
+      id: 'camp-1',
+      nombre: 'Campamento Verano',
+      fechaInicio: new Date('2026-01-15'),
+      fechaFin: new Date('2026-01-20'),
+      costoPorPersona: 10000,
+      costoEducadores: 0,
+      cuotasBase: 3,
+    });
+    mockState.detalleParticipantes.set([mockParticipanteBonificado]);
+    fixture.detectChanges();
+
+    const fechaEl: HTMLElement | null = fixture.nativeElement.querySelector(
+      '.participante-card__info > :last-child',
+    );
+    expect(fechaEl?.classList).toContain('participante-card__fecha');
+    expect(fechaEl?.textContent).toContain('05/01/2026');
   });
 
   it('onQuitarBonificacion llama a quitarBonificacionParticipante con el campamento y el participante actuales', () => {

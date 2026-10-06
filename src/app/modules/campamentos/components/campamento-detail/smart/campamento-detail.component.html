@@ -146,6 +146,9 @@
                   Bonificado: {{ participante.montoBonificado | money }}
                 </span>
                 }
+                <span class="participante-card__fecha">
+                  Inscripto el {{ participante.fechaInscripcion | date:'dd/MM/yyyy' }}
+                </span>
               </div>
               <div class="participante-card__status"
                 [class.participante-card__status--complete]="participante.saldoPendiente === 0"

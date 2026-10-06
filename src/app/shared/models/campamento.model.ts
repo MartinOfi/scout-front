@@ -209,6 +209,8 @@ export interface ParticipantePagoDto {
   /** Personal account balance available for mixed payments */
   saldoCuentaPersonal: number;
   autorizacionEntregada: boolean;
+  /** Fecha en que se agregó al participante (createdAt del vínculo) */
+  fechaInscripcion: string;
   pagos: PagoParticipanteDto[];
 }
 

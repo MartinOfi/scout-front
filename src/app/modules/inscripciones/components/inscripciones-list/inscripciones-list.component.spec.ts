@@ -219,6 +219,33 @@ describe('InscripcionesListComponent', () => {
       const tableData = component.tableData();
       expect(tableData[0].estado).toBe('pendiente');
     });
+
+    it('should map createdAt to fechaInscripcion', () => {
+      mockStateService.inscripciones.set([
+        createMockInscripcion({ id: '1', createdAt: '2026-03-15T12:00:00Z' }),
+      ]);
+
+      expect(component.tableData()[0].fechaInscripcion).toBe('2026-03-15T12:00:00Z');
+    });
+  });
+
+  describe('Fecha de inscripción column', () => {
+    const lastColumn = () => component.tableColumns().at(-1);
+
+    it.each<TipoInscripcion>(['scout_argentina', 'grupo'])(
+      'should be the last column (date type) on %s tab',
+      (tipo) => {
+        component.activeTab.set(tipo);
+
+        expect(lastColumn()).toEqual(
+          expect.objectContaining({
+            key: 'fechaInscripcion',
+            header: 'Fecha de inscripción',
+            type: 'date',
+          }),
+        );
+      },
+    );
   });
 
   describe('Stats Computed', () => {
