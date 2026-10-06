@@ -551,6 +551,14 @@ $section-gap: 20px;
     color: var(--brand-secondary);
   }
 
+  &__fecha {
+    display: block;
+    margin-top: 2px;
+    font-size: 12px;
+    color: t.$stone-500;
+    font-variant-numeric: tabular-nums;
+  }
+
   &__chip {
     padding: 2px 8px;
     border-radius: 10px;

@@ -50,6 +50,7 @@ interface InscripcionTableRow {
   salidasCercanas: boolean;
   autorizacionIngreso: boolean;
   certificadoAptitudFisica: boolean;
+  fechaInscripcion: string;
 }
 
 @Component({
@@ -149,6 +150,7 @@ export class InscripcionesListComponent {
       salidasCercanas: i.salidasCercanas,
       autorizacionIngreso: i.autorizacionIngreso,
       certificadoAptitudFisica: i.certificadoAptitudFisica,
+      fechaInscripcion: i.createdAt,
     }));
   });
 
@@ -241,12 +243,18 @@ export class InscripcionesListComponent {
     actions: this.getTableActions(),
   };
 
+  /** Registration date column (createdAt), always last */
+  private readonly fechaInscripcionColumn: TableColumn = {
+    key: 'fechaInscripcion',
+    header: 'Fecha de inscripción',
+    type: 'date',
+  };
+
   /** Dynamic table columns based on active tab */
   readonly tableColumns = computed((): TableColumn[] => {
     const isScoutArgentina = this.activeTab() === 'scout_argentina';
-    return isScoutArgentina
-      ? [...this.baseColumns, ...this.documentColumns, this.actionColumn]
-      : [...this.baseColumns, this.actionColumn];
+    const middleColumns = isScoutArgentina ? this.documentColumns : [];
+    return [...this.baseColumns, ...middleColumns, this.actionColumn, this.fechaInscripcionColumn];
   });
 
   private getTableActions(): TableAction[] {
