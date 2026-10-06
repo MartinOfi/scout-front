@@ -4,7 +4,15 @@
  * SIN any - tipado estricto
  */
 
-import { Component, Inject, ChangeDetectionStrategy, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  Inject,
+  ChangeDetectionStrategy,
+  OnInit,
+  signal,
+  inject,
+  DestroyRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
@@ -20,6 +28,7 @@ import {
 } from '../../../../../shared/enums';
 import { CreateMovimientoDto, CajaConSaldo } from '../../../../../shared/models';
 import { PersonasApiService } from '../../../../personas/services/personas-api.service';
+import { syncPersonaAReembolsarRequerida } from '../../../../../shared/forms/validators/persona-reembolso.validator';
 
 // Shared Form Components
 import { NumberFieldComponent } from '../../../../../shared/components/form/number-field/number-field.component';
@@ -78,6 +87,7 @@ interface PersonaOption {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuickMovimientoDialogComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
   form!: FormGroup;
   readonly loading = signal(true);
   readonly personas = signal<PersonaOption[]>([]);
@@ -121,7 +131,9 @@ export class QuickMovimientoDialogComponent implements OnInit {
       medioPago: [MedioPagoEnum.EFECTIVO, [Validators.required]],
       estadoPago: [EstadoPago.PAGADO, [Validators.required]],
       descripcion: ['', [Validators.maxLength(500), safeTextValidator()]],
+      personaAReembolsarId: [null],
     });
+    syncPersonaAReembolsarRequerida(this.form, this.destroyRef);
   }
 
   private loadPersonas(): void {
@@ -150,6 +162,10 @@ export class QuickMovimientoDialogComponent implements OnInit {
 
   get selectedTipo(): TipoMovimientoEnum | null {
     return this.form.get('tipo')?.value || null;
+  }
+
+  get isPendienteReembolso(): boolean {
+    return this.form.get('estadoPago')?.value === EstadoPago.PENDIENTE_REEMBOLSO;
   }
 
   get selectedConcepto(): string {
@@ -181,6 +197,7 @@ export class QuickMovimientoDialogComponent implements OnInit {
       responsableId: formValue.responsableId,
       medioPago: formValue.medioPago,
       estadoPago: formValue.estadoPago,
+      personaAReembolsarId: formValue.personaAReembolsarId || undefined,
       descripcion: formValue.descripcion || undefined,
       requiereComprobante: false,
     };
