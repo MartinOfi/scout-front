@@ -162,7 +162,7 @@ describe('PersonaSelectorDialogComponent - pago field', () => {
         { provide: MAT_DIALOG_DATA, useValue: { title: 'Agregar', ...data } },
         {
           provide: PersonasApiService,
-          useValue: { getAll: vi.fn().mockReturnValue(of([protagonista])) },
+          useValue: { getAllActivos: vi.fn().mockReturnValue(of([protagonista])) },
         },
       ],
     }).compileComponents();
