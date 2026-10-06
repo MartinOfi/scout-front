@@ -61,7 +61,6 @@ export interface DeudaCategoriaConsolidado {
 export interface DeudasTotalesConsolidado {
   readonly total: number;
   readonly inscripciones: DeudaCategoriaConsolidado;
-  readonly cuotas: DeudaCategoriaConsolidado;
   readonly campamentos: DeudaCategoriaConsolidado;
 }
 

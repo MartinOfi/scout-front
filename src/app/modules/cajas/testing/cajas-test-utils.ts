@@ -59,7 +59,7 @@ export function createMockMovimiento(overrides: Partial<Movimiento> = {}): Movim
     cajaId: 'caja-1',
     tipo: TipoMovimientoEnum.INGRESO,
     monto: 1000,
-    concepto: ConceptoMovimiento.CUOTA_GRUPO,
+    concepto: ConceptoMovimiento.INSCRIPCION_GRUPO,
     fecha: new Date('2024-01-01'),
     descripcion: 'Mock movimiento',
     responsableId: 'resp-1',

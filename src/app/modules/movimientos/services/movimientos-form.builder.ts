@@ -52,7 +52,6 @@ export class MovimientosFormBuilder {
       eventoId: [null],
       campamentoId: [null],
       inscripcionId: [null],
-      cuotaId: [null],
     });
   }
 
@@ -93,7 +92,6 @@ export class MovimientosFormBuilder {
       eventoId: rest.eventoId || undefined,
       campamentoId: rest.campamentoId || undefined,
       inscripcionId: rest.inscripcionId || undefined,
-      cuotaId: rest.cuotaId || undefined,
     };
   }
 

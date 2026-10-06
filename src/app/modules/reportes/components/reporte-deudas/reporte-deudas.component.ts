@@ -162,7 +162,6 @@ export class ReporteDeudasComponent implements OnInit {
         ano: i.ano,
         saldo: i.saldo,
       })),
-      ...p.cuotas.map((c) => ({ label: 'Cuota', name: c.nombre, ano: c.ano, saldo: c.saldo })),
     ]
       .filter((d) => d.saldo > 0)
       .sort((a, b) => a.ano - b.ano || a.label.localeCompare(b.label));

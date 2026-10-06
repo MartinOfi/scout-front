@@ -12,7 +12,7 @@ import {
   ConceptoMovimiento,
   TipoMovimientoEnum,
   CONCEPTO_MOVIMIENTO_LABELS,
-  CONCEPTOS_CREABLES_MANUALMENTE,
+  CONCEPTOS_MANUALES_POR_TIPO,
 } from '../../../../../../shared/enums';
 
 // Shared Form Components
@@ -35,15 +35,10 @@ export class ConceptoSelectorComponent {
 
   readonly conceptosFiltrados = computed((): ConceptoMovimiento[] => {
     const tipo = this.tipo();
-    const manuales = [...CONCEPTOS_CREABLES_MANUALMENTE];
+    if (tipo) return [...CONCEPTOS_MANUALES_POR_TIPO[tipo]];
 
-    if (!tipo) return manuales;
-
-    const esIngreso = tipo === TipoMovimientoEnum.INGRESO;
-    return manuales.filter((c) => {
-      if (c === ConceptoMovimiento.GASTO_GENERAL) return !esIngreso;
-      return true;
-    });
+    const todos = Object.values(CONCEPTOS_MANUALES_POR_TIPO).flat();
+    return [...new Set(todos)];
   });
 
   onSelectChange(event: Event): void {

@@ -35,7 +35,6 @@ export const MESSAGES = {
     CAMPAMENTOS: 'No hay campamentos registrados',
     EVENTOS: 'No hay eventos registrados',
     INSCRIPCIONES: 'No hay inscripciones registradas',
-    CUOTAS: 'No hay cuotas registradas',
   },
 } as const;
 

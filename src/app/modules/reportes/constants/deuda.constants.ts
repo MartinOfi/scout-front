@@ -26,7 +26,7 @@ export const RAMA_FILTER_OPTIONS = [
 /**
  * Tipos de deuda por los que se puede filtrar.
  * `DINERO` unifica todas las deudas monetarias (campamentos, inscripciones
- * Scout AR, inscripciones de grupo y cuotas) en una sola opción.
+ * Scout AR e inscripciones de grupo) en una sola opción.
  */
 export enum TipoDeudaFilter {
   TODOS = '',
@@ -34,7 +34,6 @@ export enum TipoDeudaFilter {
   CAMPAMENTOS = 'campamentos',
   INSCRIPCIONES_SCOUT = 'inscripcionesScout',
   INSCRIPCIONES_GRUPO = 'inscripcionesGrupo',
-  CUOTAS = 'cuotas',
   DOCUMENTACION = 'documentacion',
 }
 
@@ -44,7 +43,6 @@ export const TIPO_DEUDA_FILTER_LABELS: Readonly<Record<TipoDeudaFilter, string>>
   [TipoDeudaFilter.CAMPAMENTOS]: 'Campamentos',
   [TipoDeudaFilter.INSCRIPCIONES_SCOUT]: 'Inscripciones Scout AR',
   [TipoDeudaFilter.INSCRIPCIONES_GRUPO]: 'Inscripciones Grupo',
-  [TipoDeudaFilter.CUOTAS]: 'Cuotas',
   [TipoDeudaFilter.DOCUMENTACION]: 'Documentación',
 } as const;
 

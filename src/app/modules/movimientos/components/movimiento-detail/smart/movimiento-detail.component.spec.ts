@@ -28,7 +28,7 @@ describe('MovimientoDetailComponent', () => {
     cajaId: 'caja-1',
     tipo: TipoMovimientoEnum.INGRESO,
     monto: 1500,
-    concepto: ConceptoMovimiento.CUOTA_GRUPO,
+    concepto: ConceptoMovimiento.INSCRIPCION_GRUPO,
     descripcion: 'Test movimiento',
     responsableId: 'resp-1',
     medioPago: MedioPagoEnum.TRANSFERENCIA,

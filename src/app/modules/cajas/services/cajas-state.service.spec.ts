@@ -30,7 +30,6 @@ const mockConsolidado: ConsolidadoSaldosResponse = {
   deudasTotales: {
     total: 0,
     inscripciones: { total: 0, cantidad: 0 },
-    cuotas: { total: 0, cantidad: 0 },
     campamentos: { total: 0, cantidad: 0 },
   },
   fondoSolidario: { id: null, saldo: 0, bonificacionesOtorgadas: 0 },

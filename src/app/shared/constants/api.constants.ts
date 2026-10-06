@@ -42,9 +42,6 @@ export const API_CONFIG = {
     // Inscripciones
     INSCRIPCIONES: 'inscripciones',
 
-    // Cuotas
-    CUOTAS: 'cuotas',
-
     // Campamentos
     CAMPAMENTOS: 'campamentos',
 

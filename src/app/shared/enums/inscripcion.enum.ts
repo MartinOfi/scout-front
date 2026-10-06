@@ -1,5 +1,5 @@
 /**
- * Inscripcion and Cuota related enums
+ * Inscripcion related enums
  * Mirrors backend: src/common/enums/index.ts
  */
 
@@ -30,22 +30,4 @@ export const ESTADO_INSCRIPCION_LABELS: Record<EstadoInscripcion, string> = {
   parcial: 'Pago Parcial',
   pagado: 'Pagado',
   bonificado: 'Bonificado',
-} as const;
-
-/**
- * Cuota states (similar to inscription but without bonificado)
- */
-export enum EstadoCuota {
-  PENDIENTE = 'pendiente',
-  PARCIAL = 'parcial',
-  PAGADO = 'pagado',
-}
-
-/**
- * Labels for EstadoCuota
- */
-export const ESTADO_CUOTA_LABELS: Record<EstadoCuota, string> = {
-  [EstadoCuota.PENDIENTE]: 'Pendiente',
-  [EstadoCuota.PARCIAL]: 'Pago Parcial',
-  [EstadoCuota.PAGADO]: 'Pagado',
 } as const;

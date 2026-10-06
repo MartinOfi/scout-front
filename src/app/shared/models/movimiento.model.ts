@@ -37,7 +37,6 @@ export interface Movimiento {
   eventoId?: string;
   campamentoId?: string;
   inscripcionId?: string;
-  cuotaId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -61,7 +60,6 @@ export interface CreateMovimientoDto {
   eventoId?: string;
   campamentoId?: string;
   inscripcionId?: string;
-  cuotaId?: string;
 }
 
 /**
