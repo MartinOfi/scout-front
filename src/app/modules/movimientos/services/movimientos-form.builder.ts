@@ -64,6 +64,9 @@ export class MovimientosFormBuilder {
       descripcion: [movimiento.descripcion ?? '', [Validators.maxLength(500)]],
       comprobanteEntregado: [movimiento.comprobanteEntregado ?? false],
       estadoPago: [movimiento.estadoPago ?? '', [Validators.required]],
+      // Solo lectura: default de personaAReembolsarId (disabled → no viaja en el DTO)
+      responsableId: [{ value: movimiento.responsableId, disabled: true }],
+      personaAReembolsarId: [movimiento.personaAReembolsarId ?? null],
     });
   }
 
@@ -102,6 +105,7 @@ export class MovimientosFormBuilder {
       descripcion: form.value.descripcion || undefined,
       comprobanteEntregado: form.value.comprobanteEntregado as boolean,
       estadoPago: form.value.estadoPago as EstadoPago,
+      personaAReembolsarId: form.value.personaAReembolsarId || undefined,
     };
   }
 

@@ -11,6 +11,7 @@ import {
   inject,
   signal,
   computed,
+  DestroyRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -33,6 +34,7 @@ import {
   CATEGORIA_MOVIMIENTO_LABELS,
 } from '../../../../shared/enums';
 import { CajaConSaldo, PersonaUnion, Movimiento } from '../../../../shared/models';
+import { syncPersonaAReembolsarRequerida } from '../../../../shared/forms/validators/persona-reembolso.validator';
 
 // Shared Form Components
 import { FormFieldComponent } from '../../../../shared/components/form/form-field/form-field.component';
@@ -90,6 +92,7 @@ export class MovimientoFormComponent implements OnInit {
   private readonly formBuilder = inject(MovimientosFormBuilder);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly loading = this.state.loading;
 
@@ -163,6 +166,7 @@ export class MovimientoFormComponent implements OnInit {
 
           // Build edit form with movimiento data
           this.form = this.formBuilder.buildEditForm(movimiento);
+          syncPersonaAReembolsarRequerida(this.form, this.destroyRef);
         }),
         catchError((error) => {
           console.error('Error loading data for edit:', error);
@@ -188,6 +192,7 @@ export class MovimientoFormComponent implements OnInit {
       medioPago: MedioPagoEnum.EFECTIVO,
       estadoPago: EstadoPago.PAGADO,
     });
+    syncPersonaAReembolsarRequerida(this.form, this.destroyRef);
 
     // Load cajas and personas in parallel
     forkJoin({
@@ -264,6 +269,10 @@ export class MovimientoFormComponent implements OnInit {
       nombre: p.nombre,
     }));
     this.personas.set(options);
+  }
+
+  get isPendienteReembolso(): boolean {
+    return this.form?.get('estadoPago')?.value === EstadoPago.PENDIENTE_REEMBOLSO;
   }
 
   onConceptoChange(concepto: string): void {

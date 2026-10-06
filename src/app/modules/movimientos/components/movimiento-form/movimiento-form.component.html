@@ -26,6 +26,24 @@
       <div class="form-body">
         <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
+          <!-- Persona a Reembolsar (solo cuando estadoPago = pendiente_reembolso) -->
+          <ng-template #personaReembolsoField>
+            @if (isPendienteReembolso) {
+            <app-form-field label="Persona a Reembolsar" [forId]="'persona-reembolsar-select'" [required]="true"
+              [invalid]="!!(form.get('personaAReembolsarId')?.invalid && form.get('personaAReembolsarId')?.touched)">
+              <app-select-field
+                id="persona-reembolsar-select"
+                formControlName="personaAReembolsarId"
+                placeholder="Seleccionar persona que adelantó el dinero"
+                [options]="personas()"
+                optionValue="id"
+                optionLabel="nombre"
+                [searchable]="true" />
+              <span error>Seleccione la persona que adelantó el dinero</span>
+            </app-form-field>
+            }
+          </ng-template>
+
           <!-- CREATE MODE: Full form -->
           @if (!isEditing()) {
 
@@ -118,6 +136,7 @@
               [options]="estadoPagoOptions" optionValue="value" optionLabel="label" />
             <span error>El estado es requerido</span>
           </app-form-field>
+          <ng-container [ngTemplateOutlet]="personaReembolsoField" />
 
           } @else {
           <!-- EDIT MODE: Limited editable fields -->
@@ -181,6 +200,7 @@
               [options]="estadoPagoOptions" optionValue="value" optionLabel="label" />
             <span error>El estado es requerido</span>
           </app-form-field>
+          <ng-container [ngTemplateOutlet]="personaReembolsoField" />
 
           <!-- Comprobante Entregado -->
           <div class="toggle-field">
