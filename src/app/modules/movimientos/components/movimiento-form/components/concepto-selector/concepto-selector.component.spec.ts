@@ -40,7 +40,7 @@ describe('ConceptoSelectorComponent', () => {
         CONCEPTOS_MANUALES_POR_TIPO[TipoMovimientoEnum.EGRESO],
       );
       expect(component.conceptosFiltrados()).toContain(ConceptoMovimiento.GASTO_GENERAL);
-      expect(component.conceptosFiltrados()).not.toContain(ConceptoMovimiento.CAMPAMENTO_PAGO);
+      expect(component.conceptosFiltrados()).not.toContain(ConceptoMovimiento.EVENTO_GRUPO_INGRESO);
     });
 
     it('sin tipo seteado devuelve la unión de ingreso y egreso sin duplicados', () => {
@@ -49,7 +49,7 @@ describe('ConceptoSelectorComponent', () => {
 
       const conceptos = component.conceptosFiltrados();
 
-      expect(conceptos).toContain(ConceptoMovimiento.CAMPAMENTO_PAGO);
+      expect(conceptos).toContain(ConceptoMovimiento.EVENTO_GRUPO_INGRESO);
       expect(conceptos).toContain(ConceptoMovimiento.GASTO_GENERAL);
       expect(conceptos.filter((c) => c === ConceptoMovimiento.AJUSTE_INICIAL).length).toBe(1);
     });

@@ -35,9 +35,6 @@ describe('CONCEPTOS_MANUALES_POR_TIPO', () => {
   it('ofrece todos los conceptos de ingreso, no solo AJUSTE_INICIAL', () => {
     expect(ingresos).toEqual(
       expect.arrayContaining([
-        ConceptoMovimiento.INSCRIPCION_GRUPO,
-        ConceptoMovimiento.INSCRIPCION_SCOUT_ARGENTINA,
-        ConceptoMovimiento.CAMPAMENTO_PAGO,
         ConceptoMovimiento.EVENTO_VENTA_INGRESO,
         ConceptoMovimiento.EVENTO_VENTA_RECUPERO_COSTO,
         ConceptoMovimiento.EVENTO_GRUPO_INGRESO,
@@ -50,7 +47,6 @@ describe('CONCEPTOS_MANUALES_POR_TIPO', () => {
   it('ofrece todos los conceptos de egreso', () => {
     expect(egresos).toEqual(
       expect.arrayContaining([
-        ConceptoMovimiento.INSCRIPCION_PAGO_SCOUT_ARGENTINA,
         ConceptoMovimiento.CAMPAMENTO_GASTO,
         ConceptoMovimiento.EVENTO_VENTA_GASTO,
         ConceptoMovimiento.EVENTO_GRUPO_GASTO,
@@ -64,7 +60,7 @@ describe('CONCEPTOS_MANUALES_POR_TIPO', () => {
   it('no mezcla tipos: ningún concepto de egreso aparece en ingreso y viceversa', () => {
     expect(ingresos).not.toContain(ConceptoMovimiento.GASTO_GENERAL);
     expect(ingresos).not.toContain(ConceptoMovimiento.CAMPAMENTO_GASTO);
-    expect(egresos).not.toContain(ConceptoMovimiento.CAMPAMENTO_PAGO);
+    expect(egresos).not.toContain(ConceptoMovimiento.EVENTO_VENTA_INGRESO);
     expect(egresos).not.toContain(ConceptoMovimiento.EVENTO_GRUPO_INGRESO);
   });
 
@@ -77,6 +73,19 @@ describe('CONCEPTOS_MANUALES_POR_TIPO', () => {
       ConceptoMovimiento.USO_SALDO_PERSONAL,
     ];
     for (const concepto of ligados) {
+      expect(ingresos).not.toContain(concepto);
+      expect(egresos).not.toContain(concepto);
+    }
+  });
+
+  it('excluye los pagos que solo se pueden borrar desde su inscripción o campamento', () => {
+    const conFlujoPropio = [
+      ConceptoMovimiento.INSCRIPCION_GRUPO,
+      ConceptoMovimiento.INSCRIPCION_SCOUT_ARGENTINA,
+      ConceptoMovimiento.INSCRIPCION_PAGO_SCOUT_ARGENTINA,
+      ConceptoMovimiento.CAMPAMENTO_PAGO,
+    ];
+    for (const concepto of conFlujoPropio) {
       expect(ingresos).not.toContain(concepto);
       expect(egresos).not.toContain(concepto);
     }

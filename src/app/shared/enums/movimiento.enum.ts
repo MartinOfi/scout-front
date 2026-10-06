@@ -135,17 +135,18 @@ export const ESTADO_PAGO_LABELS: Record<EstadoPago, string> = {
 
 /**
  * Conceptos que ofrece la carga manual de un movimiento, según su tipo.
- * Quedan afuera los que siempre se crean en pareja ligada por su propio flujo
- * (transferencias, bonificaciones, uso de saldo personal): cargar una sola
- * pata a mano rompería el saldo de la otra caja.
+ * Quedan afuera:
+ * - los que siempre se crean en pareja ligada por su propio flujo
+ *   (transferencias, bonificaciones, uso de saldo personal): cargar una sola
+ *   pata a mano rompería el saldo de la otra caja;
+ * - los pagos de inscripción y de campamento: el back solo permite borrarlos
+ *   desde su inscripción/campamento, así que uno cargado a mano (sin vínculo)
+ *   quedaría imborrable y no descontaría ninguna deuda.
  */
 export const CONCEPTOS_MANUALES_POR_TIPO: Readonly<
   Record<TipoMovimientoEnum, readonly ConceptoMovimiento[]>
 > = {
   [TipoMovimientoEnum.INGRESO]: [
-    ConceptoMovimiento.INSCRIPCION_GRUPO,
-    ConceptoMovimiento.INSCRIPCION_SCOUT_ARGENTINA,
-    ConceptoMovimiento.CAMPAMENTO_PAGO,
     ConceptoMovimiento.EVENTO_VENTA_INGRESO,
     ConceptoMovimiento.EVENTO_VENTA_RECUPERO_COSTO,
     ConceptoMovimiento.EVENTO_GRUPO_INGRESO,
@@ -153,7 +154,6 @@ export const CONCEPTOS_MANUALES_POR_TIPO: Readonly<
     ConceptoMovimiento.AJUSTE_INICIAL,
   ],
   [TipoMovimientoEnum.EGRESO]: [
-    ConceptoMovimiento.INSCRIPCION_PAGO_SCOUT_ARGENTINA,
     ConceptoMovimiento.CAMPAMENTO_GASTO,
     ConceptoMovimiento.EVENTO_VENTA_GASTO,
     ConceptoMovimiento.EVENTO_GRUPO_GASTO,
